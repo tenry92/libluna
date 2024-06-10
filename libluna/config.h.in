@@ -1,0 +1,52 @@
+#pragma once
+
+// this file is configured by CMake
+
+////////////////////////////////////////////////////////////////////////////////
+// VERSION
+
+#define VERSION_STRING "@PROJECT_VERSION@"
+#define VERSION_STRING_NUL "@PROJECT_VERSION@\0"
+
+#define VERSION_STRING_SHORT "@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@"
+#define VERSION_STRING_SHORT_NUL "@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@\0"
+
+#define VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define VERSION_BUILD @PROJECT_VERSION_PATCH@
+#define VERSION_REVISION @PROJECT_VERSION_TWEAK@
+
+////////////////////////////////////////////////////////////////////////////////
+// META
+
+// internal name, all lowercase, no whitespace
+#define APP_NAME "@APP_NAME@"
+
+// product name, may contain uppercase letters and whitespace
+#define APP_PRODUCT_NAME "@APP_PRODUCT_NAME@"
+
+#define APP_DESCRIPTION "@APP_DESCRIPTION@"
+
+#define APP_ORIGINAL_FILENAME "@APP_ORIGINAL_FILENAME@"
+
+////////////////////////////////////////////////////////////////////////////////
+// ICON
+
+#ifdef _WIN32
+#define BUILD_WIN32_ICON_FILE "@BUILD_WIN32_ICON_FILE@"
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+// PATHS
+
+#define APP_ASSETS_PATH "@APP_ASSETS_PATH@"
+#define APP_CONFIG_PATH "@APP_CONFIG_PATH@"
+
+////////////////////////////////////////////////////////////////////////////////
+// CONFIGURATION
+
+#cmakedefine LUNA_USE_SDL
+#cmakedefine LUNA_USE_GLFW
+#cmakedefine LUNA_USE_EGL
+#cmakedefine LUNA_USE_OPENGL
+#cmakedefine LUNA_USE_IMGUI
