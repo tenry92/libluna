@@ -91,15 +91,18 @@ template <typename T> Vector2<T> Vector2<T>::absolute() const {
   return Vector2<T>(std::abs(x()), std::abs(y()));
 }
 
-template <typename T> Vector2<T> Vector2<T>::scaleToFit(const Vector2<T> &other) const {
-  float scaleWidth = static_cast<float>(other.x()) / static_cast<float>(this->x());
-  float scaleHeight = static_cast<float>(other.y()) / static_cast<float>(this->y());
+template <typename T>
+Vector2<T> Vector2<T>::scaleToFit(const Vector2<T> &other) const {
+  float scaleWidth =
+      static_cast<float>(other.x()) / static_cast<float>(this->x());
+  float scaleHeight =
+      static_cast<float>(other.y()) / static_cast<float>(this->y());
 
   float scaleFactor = std::min(scaleWidth, scaleHeight);
 
   return Vector2<T>(
-    static_cast<T>(static_cast<float>(this->x()) * scaleFactor),
-    static_cast<T>(static_cast<float>(this->y()) * scaleFactor)
+      static_cast<T>(static_cast<float>(this->x()) * scaleFactor),
+      static_cast<T>(static_cast<float>(this->y()) * scaleFactor)
   );
 }
 
