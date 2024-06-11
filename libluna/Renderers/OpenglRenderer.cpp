@@ -38,11 +38,11 @@
 
 #include <libluna/CanvasImpl.hpp>
 
-#include <libluna/GL/common.hpp>
 #include <libluna/GL/Shader.hpp>
 #include <libluna/GL/ShaderLib.hpp>
-#include <libluna/GL/Uniform.hpp>
 #include <libluna/GL/SpriteBuffer.hpp>
+#include <libluna/GL/Uniform.hpp>
+#include <libluna/GL/common.hpp>
 
 #include <libluna/GL/shaders/3d_frag.glsl.h>
 #include <libluna/GL/shaders/3d_vert.glsl.h>
@@ -148,9 +148,7 @@ class OpenglRenderer::impl {
 
     auto texture = mTextureCache->getTextureBySprite(sprite);
 
-    GL::SpriteBuffer spriteBuffer({
-      texture->getWidth(), texture->getHeight()
-    });
+    GL::SpriteBuffer spriteBuffer({texture->getWidth(), texture->getHeight()});
 
     spriteBuffer.bind();
 
@@ -517,10 +515,14 @@ void OpenglRenderer::render() {
   int canvasHeight = 600;
 
 #ifdef LUNA_USE_SDL
-  SDL_GetWindowSize(getCanvas()->getImpl()->sdl.window, &canvasWidth, &canvasHeight);
+  SDL_GetWindowSize(
+      getCanvas()->getImpl()->sdl.window, &canvasWidth, &canvasHeight
+  );
 #endif
 #ifdef LUNA_USE_GLFW
-  glfwGetFramebufferSize(getCanvas()->getImpl()->glfw.window, &canvasWidth, &canvasHeight);
+  glfwGetFramebufferSize(
+      getCanvas()->getImpl()->glfw.window, &canvasWidth, &canvasHeight
+  );
 #endif
 
   CHECK_GL(glViewport(0, 0, canvasWidth, canvasHeight));
@@ -557,11 +559,16 @@ void OpenglRenderer::render() {
 
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, internalSize.x(), internalSize.y(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D(
+        GL_TEXTURE_2D, 0, GL_RGBA, internalSize.x(), internalSize.y(), 0,
+        GL_RGBA, GL_UNSIGNED_BYTE, nullptr
+    );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+    glFramebufferTexture2D(
+        GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0
+    );
 
     CHECK_GL(glViewport(0, 0, internalSize.x(), internalSize.y()));
   }
@@ -578,7 +585,8 @@ void OpenglRenderer::render() {
 
     spriteBuffer.bind();
 
-    mImpl->mUniforms.spriteTexture = mImpl->mSpriteShader.getUniform("uSpriteTexture");
+    mImpl->mUniforms.spriteTexture =
+        mImpl->mSpriteShader.getUniform("uSpriteTexture");
     mImpl->mUniforms.spriteTexture = 0;
     CHECK_GL(glBindTexture(GL_TEXTURE_2D, tex));
 
@@ -594,9 +602,11 @@ void OpenglRenderer::render() {
 
     mImpl->mUniforms.spritePos = spritePos;
 
-    mImpl->mUniforms.screenSize = mImpl->mSpriteShader.getUniform("uScreenSize");
     mImpl->mUniforms.screenSize =
-        Vector2f(static_cast<float>(canvasWidth), static_cast<float>(canvasHeight));
+        mImpl->mSpriteShader.getUniform("uScreenSize");
+    mImpl->mUniforms.screenSize = Vector2f(
+        static_cast<float>(canvasWidth), static_cast<float>(canvasHeight)
+    );
 
     spriteBuffer.draw();
 

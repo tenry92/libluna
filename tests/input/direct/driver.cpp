@@ -29,7 +29,6 @@ int main(int argc, char **argv) {
     auto &events = canvas->getButtonEvents();
 
     while (!events.empty()) {
-      cout << events.size() << endl;
       auto event = events.front();
       events.pop();
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libluna/Vector.hpp>
 #include <libluna/GL/common.hpp>
+#include <libluna/Vector.hpp>
 
 namespace Luna::GL {
   class SpriteBuffer {
@@ -35,25 +35,26 @@ namespace Luna::GL {
       mSize = size;
 
       float vertices[] = {/* x, y, u, v */
-        0.f,
-        0.f,
-        0.f,
-        mFlipVertical ? 1.0f : 0.f,
-        static_cast<float>(mSize.x()),
-        0.f,
-        1.0f,
-        mFlipVertical ? 1.0f : 0.f,
-        static_cast<float>(mSize.x()),
-        static_cast<float>(mSize.y()),
-        1.f,
-        mFlipVertical ? 0.0f : 1.f,
-        0.f,
-        static_cast<float>(mSize.y()),
-        0.f,
-        mFlipVertical ? 0.0f : 1.f
-      };
+                          0.f,
+                          0.f,
+                          0.f,
+                          mFlipVertical ? 1.0f : 0.f,
+                          static_cast<float>(mSize.x()),
+                          0.f,
+                          1.0f,
+                          mFlipVertical ? 1.0f : 0.f,
+                          static_cast<float>(mSize.x()),
+                          static_cast<float>(mSize.y()),
+                          1.f,
+                          mFlipVertical ? 0.0f : 1.f,
+                          0.f,
+                          static_cast<float>(mSize.y()),
+                          0.f,
+                          mFlipVertical ? 0.0f : 1.f};
 
-      CHECK_GL(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW));
+      CHECK_GL(glBufferData(
+          GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW
+      ));
     }
 
     void bind() {
@@ -76,7 +77,9 @@ namespace Luna::GL {
     void fillElementBuffer() {
       unsigned int indices[] = {0, 1, 2, 0, 2, 3};
 
-      CHECK_GL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW));
+      CHECK_GL(glBufferData(
+          GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW
+      ));
     }
 
     void configureVertexAttributes() {
@@ -112,4 +115,4 @@ namespace Luna::GL {
     unsigned int mElementBuffer;
     unsigned int mVertexAttribConf;
   };
-}
+} // namespace Luna::GL
