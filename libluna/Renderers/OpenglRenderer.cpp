@@ -38,24 +38,17 @@
 
 #include <libluna/CanvasImpl.hpp>
 
+#include <libluna/GL/common.hpp>
 #include <libluna/GL/Shader.hpp>
 #include <libluna/GL/ShaderLib.hpp>
 #include <libluna/GL/Uniform.hpp>
+#include <libluna/GL/SpriteBuffer.hpp>
 
 #include <libluna/GL/shaders/3d_frag.glsl.h>
 #include <libluna/GL/shaders/3d_vert.glsl.h>
 #include <libluna/GL/shaders/common3d.glsl.h>
 #include <libluna/GL/shaders/sprite_frag.glsl.h>
 #include <libluna/GL/shaders/sprite_vert.glsl.h>
-
-#define CHECK_GL(x)                                                            \
-  {                                                                            \
-    glGetError();                                                              \
-    GLenum err;                                                                \
-    x;                                                                         \
-    while ((err = glGetError()) != GL_NO_ERROR)                                \
-      logError("opengl error [" #x "]: {}", getGlErrorString(err));            \
-  }
 
 using namespace Luna;
 
@@ -89,23 +82,6 @@ class GlTextureWrapper {
 
 using TextureType = std::shared_ptr<GlTextureWrapper>;
 using TextureCacheType = TextureCache<TextureType>;
-
-const char *getGlErrorString(GLenum err) {
-  switch (err) {
-  default:
-    return "unknown";
-  case GL_INVALID_ENUM:
-    return "invalid enum";
-  case GL_INVALID_VALUE:
-    return "invalid value";
-  case GL_INVALID_OPERATION:
-    return "invalid operation";
-  case GL_INVALID_FRAMEBUFFER_OPERATION:
-    return "invalid framebuffer operation";
-  case GL_OUT_OF_MEMORY:
-    return "out of memory";
-  }
-}
 
 class OpenglRenderer::impl {
   public:
@@ -154,6 +130,8 @@ class OpenglRenderer::impl {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     glDisable(GL_MULTISAMPLE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     mUniforms.screenSize = mSpriteShader.getUniform("uScreenSize");
     mUniforms.screenSize =
         Vector2f(static_cast<float>(width), static_cast<float>(height));
@@ -170,69 +148,11 @@ class OpenglRenderer::impl {
 
     auto texture = mTextureCache->getTextureBySprite(sprite);
 
-    float vertices[] = {/* x, y, u, v */
-                        0.f,
-                        0.f,
-                        0.f,
-                        0.f,
-                        static_cast<float>(texture->getWidth()),
-                        0.f,
-                        1.f,
-                        0.f,
-                        static_cast<float>(texture->getWidth()),
-                        static_cast<float>(texture->getHeight()),
-                        1.f,
-                        1.f,
-                        0.f,
-                        static_cast<float>(texture->getHeight()),
-                        0.f,
-                        1.f};
+    GL::SpriteBuffer spriteBuffer({
+      texture->getWidth(), texture->getHeight()
+    });
 
-    unsigned int indices[] = {0, 1, 2, 0, 2, 3};
-
-    // vbo: store the actual vertex buffer (positions, coordinates etc.)
-    unsigned int vbo;
-    CHECK_GL(glGenBuffers(1, &vbo));
-    CHECK_GL(glBindBuffer(GL_ARRAY_BUFFER, vbo));
-    CHECK_GL(glBufferData(
-        GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW
-    ));
-
-    // vao: store vertex attrib configurations
-    unsigned int vao;
-    CHECK_GL(glGenVertexArrays(1, &vao));
-    CHECK_GL(glBindVertexArray(vao));
-    // data layout:
-    // [V1  ] [V2  ] [V3  ] [V4  ]
-    // [x, y] [x, y] [x, y] [x, y]
-    CHECK_GL(glVertexAttribPointer(
-        0,        // input location = 0
-        2,        // vec2
-        GL_FLOAT, // vector of floats
-        GL_FALSE, // don't normalize input data
-        4 * sizeof(float
-            ),    // stride; offset between each vector (2 = xy, 4 = xyvu)
-        (void *)0 // offset; where data begins in the buffer
-    ));
-    CHECK_GL(glEnableVertexAttribArray(0));
-    CHECK_GL(glVertexAttribPointer(
-        1,        // input location = 1
-        2,        // vec2
-        GL_FLOAT, // vector of floats
-        GL_FALSE, // don't normalize input data
-        4 * sizeof(float
-            ), // stride; offset between each vector (2 = xy, 4 = xyvu)
-        (void *)(2 * sizeof(float)) // offset; where data begins in the buffer
-    ));
-    CHECK_GL(glEnableVertexAttribArray(1));
-
-    // drawing using element buffer instead:
-    unsigned int ebo;
-    CHECK_GL(glGenBuffers(1, &ebo));
-    CHECK_GL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-    CHECK_GL(glBufferData(
-        GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW
-    ));
+    spriteBuffer.bind();
 
     mUniforms.spriteTexture = mSpriteShader.getUniform("uSpriteTexture");
     mUniforms.spriteTexture = 0;
@@ -243,11 +163,7 @@ class OpenglRenderer::impl {
     mUniforms.spritePos = mSpriteShader.getUniform("uSpritePos");
     mUniforms.spritePos = transformedPosition;
 
-    CHECK_GL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
-
-    CHECK_GL(glDeleteBuffers(1, &ebo));
-    CHECK_GL(glDeleteVertexArrays(1, &vao));
-    CHECK_GL(glDeleteBuffers(1, &vbo));
+    spriteBuffer.draw();
   }
 
   void renderWorld(Canvas *canvas) {
@@ -597,17 +513,17 @@ void OpenglRenderer::render() {
   }
 #endif
 
-  int width = 800;
-  int height = 600;
+  int canvasWidth = 800;
+  int canvasHeight = 600;
 
 #ifdef LUNA_USE_SDL
-  SDL_GetWindowSize(getCanvas()->getImpl()->sdl.window, &width, &height);
+  SDL_GetWindowSize(getCanvas()->getImpl()->sdl.window, &canvasWidth, &canvasHeight);
 #endif
 #ifdef LUNA_USE_GLFW
-  glfwGetFramebufferSize(getCanvas()->getImpl()->glfw.window, &width, &height);
+  glfwGetFramebufferSize(getCanvas()->getImpl()->glfw.window, &canvasWidth, &canvasHeight);
 #endif
 
-  CHECK_GL(glViewport(0, 0, width, height));
+  CHECK_GL(glViewport(0, 0, canvasWidth, canvasHeight));
 
   auto canvas = getCanvas();
 
@@ -626,8 +542,67 @@ void OpenglRenderer::render() {
   }
 
   mImpl->updateTextureCache(canvas);
+
   mImpl->renderWorld(canvas);
-  mImpl->renderSprites(canvas, width, height);
+
+  auto internalSize = canvas->getImpl()->mOriginalSize;
+
+  bool useFramebuffer = true;
+  GLuint fbo;
+  GLuint tex;
+
+  if (useFramebuffer) {
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, internalSize.x(), internalSize.y(), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+
+    CHECK_GL(glViewport(0, 0, internalSize.x(), internalSize.y()));
+  }
+
+  mImpl->renderSprites(canvas, internalSize.x(), internalSize.y());
+
+  if (useFramebuffer) {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    CHECK_GL(glViewport(0, 0, canvasWidth, canvasHeight));
+
+    auto scaledSize = internalSize.scaleToFit({canvasWidth, canvasHeight});
+
+    GL::SpriteBuffer spriteBuffer(scaledSize, true);
+
+    spriteBuffer.bind();
+
+    mImpl->mUniforms.spriteTexture = mImpl->mSpriteShader.getUniform("uSpriteTexture");
+    mImpl->mUniforms.spriteTexture = 0;
+    CHECK_GL(glBindTexture(GL_TEXTURE_2D, tex));
+
+    mImpl->mUniforms.spritePos = mImpl->mSpriteShader.getUniform("uSpritePos");
+
+    Vector2f spritePos{0, 0};
+
+    if (canvasWidth > scaledSize.x()) {
+      spritePos.x(static_cast<float>(canvasWidth - scaledSize.x()) / 2);
+    } else {
+      spritePos.y(static_cast<float>(canvasHeight - scaledSize.y()) / 2);
+    }
+
+    mImpl->mUniforms.spritePos = spritePos;
+
+    mImpl->mUniforms.screenSize = mImpl->mSpriteShader.getUniform("uScreenSize");
+    mImpl->mUniforms.screenSize =
+        Vector2f(static_cast<float>(canvasWidth), static_cast<float>(canvasHeight));
+
+    spriteBuffer.draw();
+
+    glDeleteTextures(1, &tex);
+    glDeleteFramebuffers(1, &fbo);
+  }
 }
 
 void OpenglRenderer::present() {
