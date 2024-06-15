@@ -13,16 +13,16 @@ enum LogType {
   LoadingMyResource,
 };
 
-static std::vector<int> log;
+static std::vector<int> logData;
 
 class MyResource {
   public:
   MyResource(const Luna::String &text) {
-    log.push_back(ConstructingMyResource);
+    logData.push_back(ConstructingMyResource);
     mText = text;
   }
 
-  ~MyResource() { log.push_back(DeconstructingMyResource); }
+  ~MyResource() { logData.push_back(DeconstructingMyResource); }
 
   const Luna::String &getText() const { return mText; }
 
@@ -35,7 +35,7 @@ class MyResourceLoader {
   MyResourceLoader(const Luna::String &name) : mName(name) {}
 
   shared_ptr<MyResource> operator()() {
-    log.push_back(LoadingMyResource);
+    logData.push_back(LoadingMyResource);
     return make_shared<MyResource>(mName);
   }
 
