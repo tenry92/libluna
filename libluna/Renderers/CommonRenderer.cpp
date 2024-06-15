@@ -286,7 +286,7 @@ void CommonRenderer::end2dFramebuffer(Canvas *canvas) {
   auto scaledSize = getInternalSize().scaleToFit(getCanvasSize());
   Vector2f pos{0, 0};
 
-  if (getCanvasSize().x() > getCanvasSize().y()) {
+  if (getCanvasSize().x() > scaledSize.x()) {
     pos.x(static_cast<float>(getCanvasSize().x() - scaledSize.x()) / 2);
   } else {
     pos.y(static_cast<float>(getCanvasSize().y() - scaledSize.y()) / 2);
