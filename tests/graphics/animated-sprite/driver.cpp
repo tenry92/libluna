@@ -24,10 +24,10 @@ class DummyImageLoader {
   public:
   DummyImageLoader() {}
 
-  std::shared_ptr<Image> operator()() {
+  ImagePtr operator()() {
     int frameCount = 23;
 
-    Png png(std::make_unique<ResourceReader>("coin.png"));
+    Png png(ResourceReader::make("coin.png"));
     logDebug("decode png file");
     return png.decode(frameCount);
   }

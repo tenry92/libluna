@@ -434,7 +434,7 @@ void Canvas::setBackgroundColor(Color color) {
 Color Canvas::getBackgroundColor() const { return mImpl->mBackgroundColor; }
 
 #ifdef LUNA_USE_SDL
-std::shared_ptr<Image> Canvas::captureScreenshot() {
+ImagePtr Canvas::captureScreenshot() {
   SDL_Surface *surface = SDL_GetWindowSurface(mImpl->sdl.window);
   // returns nullptr if SDL_FRAMEBUFFER_ACCELERATION=0 env is not set
 

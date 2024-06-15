@@ -11,6 +11,9 @@ set(STATIC_FILES
   textures/ConcreteBlocksPavingSquareStack001_GLOSS_1K.png
   textures/ConcreteBlocksPavingSquareStack001_NRM_1K.png
   textures/ConcreteBlocksPavingSquareStack001_REFL_1K.png
+  caveman/character.png
+  caveman/tileset_decoration.png
+  caveman/tileset_solid.png
 )
 
 # compiled asset filenames

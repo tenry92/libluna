@@ -41,7 +41,7 @@ class StreamAudioNode::impl {
   impl(const String &name) : mName{name} {}
 
   void init() {
-    mOpusReader = std::make_unique<ResourceReader>(mName.c_str());
+    mOpusReader = ResourceReader::make(mName.c_str());
 
     OpusFileCallbacks callbacks;
     callbacks.read = [](void *stream, unsigned char *buffer, int byteCount) {
@@ -92,7 +92,7 @@ class StreamAudioNode::impl {
 
   String mName;
 
-  std::unique_ptr<ResourceReader> mOpusReader;
+  ResourceReaderPtr mOpusReader;
   OggOpusFile *mOggOpusFile{nullptr};
 };
 

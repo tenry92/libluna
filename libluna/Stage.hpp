@@ -13,8 +13,8 @@ namespace Luna {
     Stage();
     ~Stage();
 
-    std::shared_ptr<Sprite> makeSprite();
-    const std::list<std::shared_ptr<Sprite>> &getSprites() const;
+    SpritePtr makeSprite();
+    const std::list<SpritePtr> &getSprites() const;
 
     std::shared_ptr<Model> makeModel();
     const std::list<std::shared_ptr<Model>> &getModels() const;

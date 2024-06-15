@@ -64,7 +64,7 @@ void CommonRenderer::destroyTexture([[maybe_unused]] int id) {
   // stub
 }
 
-void CommonRenderer::loadTexture([[maybe_unused]] int id, [[maybe_unused]] std::shared_ptr<Image> image, [[maybe_unused]] int frameIndex) {
+void CommonRenderer::loadTexture([[maybe_unused]] int id, [[maybe_unused]] ImagePtr image, [[maybe_unused]] int frameIndex) {
   // stub
 }
 

@@ -20,11 +20,11 @@ class DummyImageLoader {
   public:
   DummyImageLoader() {}
 
-  std::shared_ptr<Image> operator()() {
+  ImagePtr operator()() {
     int width = 16;
     int height = 16;
     int frameCount = 1;
-    auto image = std::make_shared<Image>(32, Vector2i(width, height), frameCount);
+    auto image = Image::make(32, Vector2i(width, height), frameCount);
 
     uint8_t frame[width * height * 4];
 

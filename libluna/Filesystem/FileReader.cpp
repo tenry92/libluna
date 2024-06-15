@@ -12,6 +12,10 @@ class FileReader::impl {
   std::size_t size;
 };
 
+FileReaderPtr FileReader::make(const Path &filename) {
+  return FileReaderPtr(new FileReader(filename));
+}
+
 FileReader::FileReader(const Path &filename) : mImpl{std::make_unique<impl>()} {
   mImpl->stream =
       std::ifstream(filename.getRawPath().c_str(), std::ios::binary);

@@ -90,7 +90,7 @@ namespace Luna {
      * It is guaranteed that the given texture ID was previously passed to
      * @ref createTexture().
      */
-    virtual void loadTexture(int id, std::shared_ptr<Image> image, int frameIndex);
+    virtual void loadTexture(int id, ImagePtr image, int frameIndex);
 
     /**
      * @brief Resize the texture for the provided ID.

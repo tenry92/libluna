@@ -225,7 +225,7 @@ void OpenglRenderer::destroyTexture(int id) {
   CHECK_GL(glDeleteTextures(1, &texture));
 }
 
-void OpenglRenderer::loadTexture(int id, std::shared_ptr<Image> image, int frameIndex) {
+void OpenglRenderer::loadTexture(int id, ImagePtr image, int frameIndex) {
   GLuint texture = mImpl->mTextureIdMapping.at(id);
 
   CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));

@@ -187,7 +187,7 @@ void SdlRenderer::destroyTexture(int id) {
   SDL_DestroyTexture(texture);
 }
 
-void SdlRenderer::loadTexture(int id, std::shared_ptr<Image> image, int frameIndex) {
+void SdlRenderer::loadTexture(int id, ImagePtr image, int frameIndex) {
   if (mImpl->mTextureIdMapping.count(id)) {
     SDL_Texture *oldTexture = mImpl->mTextureIdMapping.at(id);
     SDL_DestroyTexture(oldTexture);
@@ -196,7 +196,7 @@ void SdlRenderer::loadTexture(int id, std::shared_ptr<Image> image, int frameInd
   
   if (!image->isTrue()) {
     /// @todo Get palette from sprite
-    image = std::make_shared<Image>(image->toTrue(nullptr));
+    image = image->toTrue(nullptr);
   }
 
   SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(

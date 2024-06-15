@@ -7,9 +7,12 @@
 #include <libluna/InputStream.hpp>
 
 namespace Luna::Filesystem {
+  class FileReader;
+  using FileReaderPtr = std::unique_ptr<FileReader>;
+
   class FileReader final : public InputStream {
     public:
-    explicit FileReader(const Path &filename);
+    static FileReaderPtr make(const Path &filename);
     ~FileReader();
 
     bool isValid() const final override;
@@ -23,6 +26,7 @@ namespace Luna::Filesystem {
     ) final override;
 
     private:
+    explicit FileReader(const Path &filename);
     class impl;
     std::unique_ptr<impl> mImpl;
   };
