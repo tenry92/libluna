@@ -2,6 +2,8 @@
 
 #include <glad/glad.h>
 
+#include <libluna/Logger.hpp>
+
 #define CHECK_GL(x)                                                            \
   {                                                                            \
     glGetError();                                                              \

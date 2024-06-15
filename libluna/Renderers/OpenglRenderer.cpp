@@ -34,15 +34,15 @@
 #include <libluna/Application.hpp>
 #include <libluna/Logger.hpp>
 #include <libluna/MemoryReader.hpp>
-#include <libluna/TextureCache.hpp>
 
 #include <libluna/CanvasImpl.hpp>
 
+#include <libluna/GL/common.hpp>
+#include <libluna/GL/MeshBuffer.hpp>
 #include <libluna/GL/Shader.hpp>
 #include <libluna/GL/ShaderLib.hpp>
 #include <libluna/GL/SpriteBuffer.hpp>
 #include <libluna/GL/Uniform.hpp>
-#include <libluna/GL/common.hpp>
 
 #include <libluna/GL/shaders/3d_frag.glsl.h>
 #include <libluna/GL/shaders/3d_vert.glsl.h>
@@ -52,337 +52,15 @@
 
 using namespace Luna;
 
-class GlTextureWrapper {
-  public:
-  GlTextureWrapper(
-      GLuint texture, int width, int height,
-      std::shared_ptr<Internal::GraphicsMetrics> metrics
-  )
-      : mTexture{texture}, mWidth{width}, mHeight{height}, mMetrics{metrics} {
-    ++mMetrics->textureCount;
-  }
-
-  ~GlTextureWrapper() {
-    glDeleteTextures(1, &mTexture);
-    --mMetrics->textureCount;
-  }
-
-  GLuint getTexture() const { return mTexture; }
-
-  int getWidth() const { return mWidth; }
-
-  int getHeight() const { return mHeight; }
-
-  private:
-  GLuint mTexture;
-  int mWidth;
-  int mHeight;
-  std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
-};
-
-using TextureType = std::shared_ptr<GlTextureWrapper>;
-using TextureCacheType = TextureCache<TextureType>;
-
 class OpenglRenderer::impl {
   public:
-  void clearBackground(Color color = {1.0f, 0.5f, 1.0f, 1.0f}) {
-    CHECK_GL(glClearColor(color.red, color.green, color.blue, 1.0f));
-    CHECK_GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-  }
-
-  void updateTextureCache(Canvas *canvas) {
-    if (!mTextureCache || mTextureCache->getStage() != canvas->getStage()) {
-      std::function<TextureType(std::shared_ptr<Image>, int)> callback =
-          [this](std::shared_ptr<Image> image, int frameIndex) -> TextureType {
-        logDebug("loading gl texture from image#{}", frameIndex);
-
-        if (!image->isTrue()) {
-          /// @todo Get palette from sprite
-          image = std::make_shared<Image>(image->toTrue(nullptr));
-        }
-
-        GLuint texture;
-        CHECK_GL(glGenTextures(1, &texture));
-        CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
-        CHECK_GL(glTexImage2D(
-            GL_TEXTURE_2D, 0,                              /* mipmap level */
-            GL_RGBA,                                       /* internal format */
-            image->getSize().x(), image->getSize().y(), 0, /* format (legacy) */
-            GL_RGBA,                                       /* input format */
-            GL_UNSIGNED_BYTE, image->getFrameData(frameIndex)
-        ));
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        return std::make_shared<GlTextureWrapper>(
-            texture, image->getSize().x(), image->getSize().y(), mMetrics
-        );
-      };
-      mTextureCache =
-          std::make_unique<TextureCacheType>(canvas->getStage(), callback);
-    }
-
-    mTextureCache->updateCache();
-  }
-
-  void renderSprites(Canvas *canvas, int width, int height) {
-    mSpriteShader.use();
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_MULTISAMPLE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    mUniforms.screenSize = mSpriteShader.getUniform("uScreenSize");
-    mUniforms.screenSize =
-        Vector2f(static_cast<float>(width), static_cast<float>(height));
-
-    for (auto &&sprite : canvas->getStage()->getSprites()) {
-      renderSprite(canvas, sprite);
-    }
-  }
-
-  void renderSprite(Canvas *canvas, std::shared_ptr<Sprite> sprite) {
-    if (!mTextureCache->hasTextureBySprite(sprite)) {
-      return;
-    }
-
-    auto texture = mTextureCache->getTextureBySprite(sprite);
-
-    GL::SpriteBuffer spriteBuffer({texture->getWidth(), texture->getHeight()});
-
-    spriteBuffer.bind();
-
-    mUniforms.spriteTexture = mSpriteShader.getUniform("uSpriteTexture");
-    mUniforms.spriteTexture = 0;
-    CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture->getTexture()));
-
-    auto transformedPosition =
-        sprite->getPosition() - canvas->getCamera2d().getPosition();
-    mUniforms.spritePos = mSpriteShader.getUniform("uSpritePos");
-    mUniforms.spritePos = transformedPosition;
-
-    spriteBuffer.draw();
-  }
-
-  void renderWorld(Canvas *canvas) {
-    mModelShader.use();
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_MULTISAMPLE);
-
-    auto ambientLight = canvas->getStage()->getAmbientLight();
-    mUniforms.ambientLightColor =
-        mModelShader.getUniform("uAmbientLight.color");
-    mUniforms.ambientLightIntensity =
-        mModelShader.getUniform("uAmbientLight.intensity");
-    mUniforms.ambientLightColor = ambientLight.color;
-    mUniforms.ambientLightIntensity = ambientLight.intensity;
-
-    mUniforms.pointLightsColor =
-        mModelShader.getUniform("uPointLights[{}].color", 1);
-    mUniforms.pointLightsPosition =
-        mModelShader.getUniform("uPointLights[{}].position", 1);
-
-    // int lightIndex = 0;
-
-    for (auto &&pointLight : canvas->getStage()->getPointLights()) {
-      mUniforms.pointLightsColor[0] = pointLight->color;
-      mUniforms.pointLightsPosition[0] = pointLight->position;
-    }
-
-    for (auto &&model : canvas->getStage()->getModels()) {
-      renderModel(canvas, model);
-    }
-  }
-
-  void renderModel(Canvas *canvas, std::shared_ptr<Model> model) {
-    auto mesh = model->getMesh();
-
-    if (!mesh) {
-      return;
-    }
-
-    if (!mTextureCache->hasTextureByImage(model->getMaterial().getDiffuse())) {
-      return;
-    }
-
-    auto texture =
-        mTextureCache->getTextureByImage(model->getMaterial().getDiffuse());
-
-    std::shared_ptr<GlTextureWrapper> normalMap;
-
-    if (mTextureCache->hasTextureByImage(model->getMaterial().getNormal())) {
-      normalMap =
-          mTextureCache->getTextureByImage(model->getMaterial().getNormal());
-    }
-
-    // vertices: [[x, y, z, u, v, nx, ny, nz], ...]
-    std::vector<float> vertices;
-    vertices.reserve(mesh->getVertices().size() * 14);
-
-    for (int i = 0; i < static_cast<int>(mesh->getVertices().size()); ++i) {
-      auto &&vertex = mesh->getVertices().at(i);
-      vertices.push_back(vertex.x());
-      vertices.push_back(vertex.y());
-      vertices.push_back(vertex.z());
-
-      if (i < static_cast<int>(mesh->getTexCoords().size())) {
-        auto &&texCoords = mesh->getTexCoords().at(i);
-        vertices.push_back(texCoords.x()); // u
-        vertices.push_back(texCoords.y()); // v
-      } else {
-        vertices.push_back(0.0f); // u
-        vertices.push_back(0.0f); // v
-      }
-
-      if (i < static_cast<int>(mesh->getNormals().size())) {
-        auto &&normal = mesh->getNormals().at(i);
-        vertices.push_back(normal.x());
-        vertices.push_back(normal.y());
-        vertices.push_back(normal.z());
-      } else {
-        vertices.push_back(0.0f);
-        vertices.push_back(0.0f);
-        vertices.push_back(0.0f);
-      }
-
-      if (i < static_cast<int>(mesh->getTangents().size())) {
-        auto &&tangent = mesh->getTangents().at(i);
-        vertices.push_back(tangent.x());
-        vertices.push_back(tangent.y());
-        vertices.push_back(tangent.z());
-      } else {
-        vertices.push_back(0.0f);
-        vertices.push_back(0.0f);
-        vertices.push_back(0.0f);
-      }
-
-      if (i < static_cast<int>(mesh->getBitangents().size())) {
-        auto &&bitangent = mesh->getBitangents().at(i);
-        vertices.push_back(bitangent.x());
-        vertices.push_back(bitangent.y());
-        vertices.push_back(bitangent.z());
-      } else {
-        vertices.push_back(0.0f);
-        vertices.push_back(0.0f);
-        vertices.push_back(0.0f);
-      }
-    }
-
-    std::vector<unsigned int> indices;
-    indices.reserve(mesh->getFaces().size() * 3);
-
-    for (auto &&face : mesh->getFaces()) {
-      indices.push_back(static_cast<unsigned int>(face.at(0)));
-      indices.push_back(static_cast<unsigned int>(face.at(1)));
-      indices.push_back(static_cast<unsigned int>(face.at(2)));
-    }
-
-    // vbo: store the actual vertex buffer (positions, coordinates etc.)
-    unsigned int vbo;
-    CHECK_GL(glGenBuffers(1, &vbo));
-    CHECK_GL(glBindBuffer(GL_ARRAY_BUFFER, vbo));
-    CHECK_GL(glBufferData(
-        GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(),
-        GL_STATIC_DRAW
-    ));
-
-    // vao: store vertex attrib configurations
-    unsigned int vao;
-    CHECK_GL(glGenVertexArrays(1, &vao));
-    CHECK_GL(glBindVertexArray(vao));
-    int stride = 14 * sizeof(float);
-
-    CHECK_GL(glVertexAttribPointer(
-        0,        // input location = 0
-        3,        // vec3
-        GL_FLOAT, // vector of floats
-        GL_FALSE, // don't normalize input data
-        stride,   // stride; offset between each vector
-        (void *)0 // offset; where data begins in the buffer
-    ));
-    CHECK_GL(glEnableVertexAttribArray(0));
-
-    CHECK_GL(glVertexAttribPointer(
-        1,        // input location = 1
-        2,        // vec2
-        GL_FLOAT, // vector of floats
-        GL_FALSE, // don't normalize input data
-        stride,   // stride; offset between each vector (2 = xy, 4 = xyvu)
-        (void *)(3 * sizeof(float)) // offset; where data begins in the buffer
-    ));
-    CHECK_GL(glEnableVertexAttribArray(1));
-
-    CHECK_GL(glVertexAttribPointer(
-        2,        // input location = 2
-        3,        // vec3
-        GL_FLOAT, // vector of floats
-        GL_TRUE,  // normalize input data
-        stride,   // stride; offset between each vector (2 = xy, 4 = xyvu)
-        (void *)(5 * sizeof(float)) // offset; where data begins in the buffer
-    ));
-    CHECK_GL(glEnableVertexAttribArray(2));
-
-    // GL_TRIANGLES: {0 1 2} {3 4 5}
-    // GL_TRIANGLE_STRIP: {0 1 2} {1 2 3}
-    // GL_TRIANGLE_FAN: {0 1 2} {0 2 3}
-    // CHECK_GL(glDrawArrays(GL_TRIANGLES, 0, 3));
-
-    // drawing using element buffer instead:
-    unsigned int ebo;
-    CHECK_GL(glGenBuffers(1, &ebo));
-    CHECK_GL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-    CHECK_GL(glBufferData(
-        GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
-        indices.data(), GL_STATIC_DRAW
-    ));
-
-    mUniforms.materialDiffuseMap =
-        mModelShader.getUniform("uMaterial.diffuseMap");
-    mUniforms.materialDiffuseMap = 0;
-    CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture->getTexture()));
-
-    if (normalMap) {
-      mUniforms.materialNormalMap =
-          mModelShader.getUniform("uMaterial.normalMap");
-      mUniforms.materialNormalMap = 1;
-      CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture->getTexture()));
-
-      glActiveTexture(GL_TEXTURE1);
-      CHECK_GL(glBindTexture(GL_TEXTURE_2D, normalMap->getTexture()));
-      glActiveTexture(GL_TEXTURE0);
-    }
-
-    mUniforms.transformModel = mModelShader.getUniform("uTransform.model");
-    mUniforms.transformModel = model->getTransform();
-
-    auto camera = canvas->getCamera3d();
-
-    mUniforms.transformView = mModelShader.getUniform("uTransform.view");
-    mUniforms.transformView = camera.getViewMatrix();
-
-    mUniforms.transformProjection =
-        mModelShader.getUniform("uTransform.projection");
-    mUniforms.transformProjection = camera.getProjectionMatrix(4.0f / 3.0f);
-
-    mUniforms.viewPos = mModelShader.getUniform("uViewPos");
-    mUniforms.viewPos = camera.getPosition();
-
-    CHECK_GL(glDrawElements(
-        GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0
-    ));
-
-    CHECK_GL(glDeleteBuffers(1, &ebo));
-    CHECK_GL(glDeleteVertexArrays(1, &vao));
-    CHECK_GL(glDeleteBuffers(1, &vbo));
-  }
-
 #ifdef LUNA_USE_IMGUI
   ImGuiContext *mImGuiContext{nullptr};
 #endif
+
   GL::Shader mSpriteShader;
   GL::Shader mModelShader;
-  std::unique_ptr<TextureCacheType> mTextureCache;
+  // std::unique_ptr<TextureCacheType> mTextureCache;
   std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
 
   struct {
@@ -401,6 +79,10 @@ class OpenglRenderer::impl {
     GL::Uniform pointLightsPosition;
     GL::Uniform viewPos;
   } mUniforms;
+
+  std::map<int, GLuint> mTextureIdMapping;
+  std::map<int, GLuint> mFramebuffers;
+  std::map<int, std::shared_ptr<GL::MeshBuffer>> mMeshMapping;
 };
 
 OpenglRenderer::OpenglRenderer() : mImpl{std::make_unique<impl>()} {
@@ -469,7 +151,7 @@ void OpenglRenderer::initializeImmediateGui() {
 
   ImGui_ImplOpenGL3_Init("#version 430 core");
 
-// todo(?): load fonts
+  // todo(?): load fonts
 #endif
 }
 
@@ -500,121 +182,6 @@ void OpenglRenderer::close() {
 #endif
 }
 
-void OpenglRenderer::render() {
-#ifdef LUNA_USE_IMGUI
-  if (mImpl->mImGuiContext) {
-    ImGui_ImplOpenGL3_NewFrame();
-#ifdef LUNA_USE_SDL
-    ImGui_ImplSDL2_NewFrame();
-#endif
-    ImGui::NewFrame();
-  }
-#endif
-
-  int canvasWidth = 800;
-  int canvasHeight = 600;
-
-#ifdef LUNA_USE_SDL
-  SDL_GetWindowSize(
-      getCanvas()->getImpl()->sdl.window, &canvasWidth, &canvasHeight
-  );
-#endif
-#ifdef LUNA_USE_GLFW
-  glfwGetFramebufferSize(
-      getCanvas()->getImpl()->glfw.window, &canvasWidth, &canvasHeight
-  );
-#endif
-
-  CHECK_GL(glViewport(0, 0, canvasWidth, canvasHeight));
-
-  auto canvas = getCanvas();
-
-  if (!canvas) {
-    mImpl->clearBackground();
-
-    return;
-  }
-
-  auto bgColor = canvas->getBackgroundColor();
-
-  mImpl->clearBackground(bgColor);
-
-  if (!canvas->getStage()) {
-    return;
-  }
-
-  mImpl->updateTextureCache(canvas);
-
-  mImpl->renderWorld(canvas);
-
-  auto internalSize = canvas->getImpl()->mOriginalSize;
-
-  bool useFramebuffer = true;
-  GLuint fbo;
-  GLuint tex;
-
-  if (useFramebuffer) {
-    glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glTexImage2D(
-        GL_TEXTURE_2D, 0, GL_RGBA, internalSize.x(), internalSize.y(), 0,
-        GL_RGBA, GL_UNSIGNED_BYTE, nullptr
-    );
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glFramebufferTexture2D(
-        GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0
-    );
-
-    CHECK_GL(glViewport(0, 0, internalSize.x(), internalSize.y()));
-  }
-
-  mImpl->renderSprites(canvas, internalSize.x(), internalSize.y());
-
-  if (useFramebuffer) {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    CHECK_GL(glViewport(0, 0, canvasWidth, canvasHeight));
-
-    auto scaledSize = internalSize.scaleToFit({canvasWidth, canvasHeight});
-
-    GL::SpriteBuffer spriteBuffer(scaledSize, true);
-
-    spriteBuffer.bind();
-
-    mImpl->mUniforms.spriteTexture =
-        mImpl->mSpriteShader.getUniform("uSpriteTexture");
-    mImpl->mUniforms.spriteTexture = 0;
-    CHECK_GL(glBindTexture(GL_TEXTURE_2D, tex));
-
-    mImpl->mUniforms.spritePos = mImpl->mSpriteShader.getUniform("uSpritePos");
-
-    Vector2f spritePos{0, 0};
-
-    if (canvasWidth > scaledSize.x()) {
-      spritePos.x(static_cast<float>(canvasWidth - scaledSize.x()) / 2);
-    } else {
-      spritePos.y(static_cast<float>(canvasHeight - scaledSize.y()) / 2);
-    }
-
-    mImpl->mUniforms.spritePos = spritePos;
-
-    mImpl->mUniforms.screenSize =
-        mImpl->mSpriteShader.getUniform("uScreenSize");
-    mImpl->mUniforms.screenSize = Vector2f(
-        static_cast<float>(canvasWidth), static_cast<float>(canvasHeight)
-    );
-
-    spriteBuffer.draw();
-
-    glDeleteTextures(1, &tex);
-    glDeleteFramebuffers(1, &fbo);
-  }
-}
-
 void OpenglRenderer::present() {
 #ifdef LUNA_USE_IMGUI
   if (mImpl->mImGuiContext) {
@@ -634,6 +201,204 @@ void OpenglRenderer::present() {
 
 Internal::GraphicsMetrics OpenglRenderer::getMetrics() {
   return *mImpl->mMetrics;
+}
+
+
+void OpenglRenderer::clearBackground(Color color) {
+  CHECK_GL(glClearColor(color.red, color.green, color.blue, color.alpha));
+  CHECK_GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+}
+
+void OpenglRenderer::createTexture(int id) {
+  GLuint texture;
+  CHECK_GL(glGenTextures(1, &texture));
+  mImpl->mTextureIdMapping.emplace(id, texture);
+
+  CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
+  CHECK_GL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+  CHECK_GL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+}
+
+void OpenglRenderer::destroyTexture(int id) {
+  GLuint texture = mImpl->mTextureIdMapping.at(id);
+  mImpl->mTextureIdMapping.erase(id);
+  CHECK_GL(glDeleteTextures(1, &texture));
+}
+
+void OpenglRenderer::loadTexture(int id, std::shared_ptr<Image> image, int frameIndex) {
+  GLuint texture = mImpl->mTextureIdMapping.at(id);
+
+  CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
+  CHECK_GL(glTexImage2D(
+      GL_TEXTURE_2D, 0,                              /* mipmap level */
+      GL_RGBA,                                       /* internal format */
+      image->getSize().x(), image->getSize().y(), 0, /* format (legacy) */
+      GL_RGBA,                                       /* input format */
+      GL_UNSIGNED_BYTE, image->getFrameData(frameIndex)
+  ));
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
+void OpenglRenderer::resizeTexture(int id, Vector2i size) {
+  GLuint texture = mImpl->mTextureIdMapping.at(id);
+  CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
+  CHECK_GL(glTexImage2D(
+    GL_TEXTURE_2D, 0, GL_RGBA, size.x(), size.y(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
+    nullptr
+  ));
+}
+
+void OpenglRenderer::renderTexture([[maybe_unused]] Canvas *canvas, RenderTextureInfo *info) {
+  mImpl->mSpriteShader.use();
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_CULL_FACE);
+  glDisable(GL_MULTISAMPLE);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  auto screenSize = getCurrentRenderSize();
+  mImpl->mUniforms.screenSize = mImpl->mSpriteShader.getUniform("uScreenSize");
+  mImpl->mUniforms.screenSize =
+      Vector2f(static_cast<float>(screenSize.x()), static_cast<float>(screenSize.y()));
+
+  GLuint texture = mImpl->mTextureIdMapping.at(info->textureId);
+
+  GL::SpriteBuffer spriteBuffer(info->size);
+
+  spriteBuffer.bind();
+
+  mImpl->mUniforms.spriteTexture = mImpl->mSpriteShader.getUniform("uSpriteTexture");
+  mImpl->mUniforms.spriteTexture = 0;
+  CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
+
+  mImpl->mUniforms.spritePos = mImpl->mSpriteShader.getUniform("uSpritePos");
+  mImpl->mUniforms.spritePos = info->position;
+
+  spriteBuffer.draw();
+}
+
+void OpenglRenderer::createMesh([[maybe_unused]] int id) {
+  // stub
+}
+
+void OpenglRenderer::destroyMesh([[maybe_unused]] int id) {
+  mImpl->mMeshMapping.erase(id);
+}
+
+void OpenglRenderer::loadMesh([[maybe_unused]] int id, [[maybe_unused]] std::shared_ptr<Mesh> mesh) {
+  auto meshBuffer = std::make_shared<GL::MeshBuffer>(mesh);
+
+  mImpl->mMeshMapping.emplace(id, meshBuffer);
+}
+
+void OpenglRenderer::renderMesh([[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info) {
+  mImpl->mModelShader.use();
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
+  glEnable(GL_MULTISAMPLE);
+
+  auto ambientLight = canvas->getStage()->getAmbientLight();
+  mImpl->mUniforms.ambientLightColor =
+      mImpl->mModelShader.getUniform("uAmbientLight.color");
+  mImpl->mUniforms.ambientLightIntensity =
+      mImpl->mModelShader.getUniform("uAmbientLight.intensity");
+  mImpl->mUniforms.ambientLightColor = ambientLight.color;
+  mImpl->mUniforms.ambientLightIntensity = ambientLight.intensity;
+
+  mImpl->mUniforms.pointLightsColor =
+      mImpl->mModelShader.getUniform("uPointLights[{}].color", 1);
+  mImpl->mUniforms.pointLightsPosition =
+      mImpl->mModelShader.getUniform("uPointLights[{}].position", 1);
+
+  for (auto &&pointLight : canvas->getStage()->getPointLights()) {
+    mImpl->mUniforms.pointLightsColor[0] = pointLight->color;
+    mImpl->mUniforms.pointLightsPosition[0] = pointLight->position;
+  }
+
+  auto mesh = mImpl->mMeshMapping.at(info->meshId);
+  mesh->bind();
+
+  GLuint diffuse = mImpl->mTextureIdMapping.at(info->diffuseTextureId);
+
+  mImpl->mUniforms.materialDiffuseMap =
+      mImpl->mModelShader.getUniform("uMaterial.diffuseMap");
+  mImpl->mUniforms.materialDiffuseMap = 0;
+  CHECK_GL(glBindTexture(GL_TEXTURE_2D, diffuse));
+
+  if (info->normalTextureId) {
+    GLuint normal = mImpl->mTextureIdMapping.at(info->normalTextureId);
+    mImpl->mUniforms.materialNormalMap =
+        mImpl->mModelShader.getUniform("uMaterial.normalMap");
+    mImpl->mUniforms.materialNormalMap = 1;
+
+    glActiveTexture(GL_TEXTURE1);
+    CHECK_GL(glBindTexture(GL_TEXTURE_2D, normal));
+    glActiveTexture(GL_TEXTURE0);
+  }
+
+  mImpl->mUniforms.transformModel = mImpl->mModelShader.getUniform("uTransform.model");
+  mImpl->mUniforms.transformModel = info->transform;
+
+  auto camera = canvas->getCamera3d();
+
+  mImpl->mUniforms.transformView = mImpl->mModelShader.getUniform("uTransform.view");
+  mImpl->mUniforms.transformView = camera.getViewMatrix();
+
+  mImpl->mUniforms.transformProjection =
+      mImpl->mModelShader.getUniform("uTransform.projection");
+  mImpl->mUniforms.transformProjection = camera.getProjectionMatrix(static_cast<float>(getCurrentRenderSize().x()) / static_cast<float>(getCurrentRenderSize().y()));
+
+  mesh->draw();
+}
+
+void OpenglRenderer::setTextureFilterEnabled([[maybe_unused]] int id, [[maybe_unused]] bool enabled) {
+
+}
+
+void OpenglRenderer::setRenderTargetTexture(int id) {
+  GLuint framebuffer;
+
+  if (mImpl->mFramebuffers.count(id) == 0) {
+    CHECK_GL(glGenFramebuffers(1, &framebuffer));
+    mImpl->mFramebuffers.emplace(id, framebuffer);
+  } else {
+    framebuffer = mImpl->mFramebuffers.at(id);
+  }
+
+  CHECK_GL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
+
+  GLuint texture = mImpl->mTextureIdMapping.at(id);
+  CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
+  CHECK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+    GL_TEXTURE_2D, texture, 0
+  ));
+
+  GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+  if (status != GL_FRAMEBUFFER_COMPLETE) {
+    logWarn("framebuffer is not complete");
+  }
+}
+
+void OpenglRenderer::unsetRenderTargetTexture() {
+  CHECK_GL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+}
+
+void OpenglRenderer::setViewport(Vector2i offset, Vector2i size) {
+  CHECK_GL(glViewport(offset.x(), offset.y(), size.x(), size.y()));
+}
+
+
+void OpenglRenderer::imguiNewFrame() {
+#ifdef LUNA_USE_IMGUI
+  if (mImpl->mImGuiContext) {
+    ImGui_ImplOpenGL3_NewFrame();
+#ifdef LUNA_USE_SDL
+    ImGui_ImplSDL2_NewFrame();
+#endif
+    ImGui::NewFrame();
+  }
+#endif
 }
 
 #endif

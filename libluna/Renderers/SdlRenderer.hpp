@@ -1,9 +1,11 @@
-#include <libluna/AbstractRenderer.hpp>
+#pragma once
+
+#include <libluna/Renderers/CommonRenderer.hpp>
 
 #include <memory>
 
 namespace Luna {
-  class SdlRenderer : public AbstractRenderer {
+  class SdlRenderer : public CommonRenderer {
     public:
     SdlRenderer();
     ~SdlRenderer() override;
@@ -12,12 +14,25 @@ namespace Luna {
     void initializeImmediateGui() override;
     void quitImmediateGui() override;
     void close() override;
-    void render() override;
     void present() override;
     Internal::GraphicsMetrics getMetrics() override;
 
+    void clearBackground(Color color) override;
+    void createTexture(int id) override;
+    void destroyTexture(int id) override;
+    void loadTexture(int id, std::shared_ptr<Image> image, int frameIndex) override;
+    void resizeTexture(int id, Vector2i size) override;
+    void renderTexture(Canvas *canvas, RenderTextureInfo *info) override;
+
+    void setTextureFilterEnabled(int id, bool enabled) override;
+    void setRenderTargetTexture(int id) override;
+    void unsetRenderTargetTexture() override;
+
+    void setViewport(Vector2i offset, Vector2i size) override;
+
+    void imguiNewFrame() override;
+
     private:
-    void drawDebugGrid();
     class impl;
     std::unique_ptr<impl> mImpl;
   };

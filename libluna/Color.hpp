@@ -49,6 +49,8 @@ namespace Luna {
       return static_cast<Type>(reduceDepth(alpha, bits));
     }
 
+    static inline Color Transparent() { return Color(0.0f, 0.0f, 0.0f, 0.0f); };
+
     float red;
     float green;
     float blue;
