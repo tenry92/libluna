@@ -26,11 +26,11 @@ class DummyImageLoader {
     int frameCount = 1;
     auto image = Image::make(32, Vector2i(width, height), frameCount);
 
-    uint8_t frame[width * height * 4];
+    std::vector<uint8_t> frame(width * height * 4);
 
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
-        uint8_t *pixelPtr = frame + (x + y * width) * 4;
+        uint8_t *pixelPtr = frame.data() + (x + y * width) * 4;
         pixelPtr[0] = 255; // red
         pixelPtr[1] = x * 255 / width; // green
         pixelPtr[2] = y * 255 / height; // blue
@@ -38,7 +38,7 @@ class DummyImageLoader {
       }
     }
 
-    image->setFrameData(0, frame);
+    image->setFrameData(0, frame.data());
 
     return image;
   }
