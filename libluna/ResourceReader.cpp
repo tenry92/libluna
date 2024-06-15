@@ -10,10 +10,14 @@ class ResourceReader::impl {
   std::unique_ptr<Filesystem::FileReader> fileReader;
 };
 
+ResourceReaderPtr ResourceReader::make(const char *name) {
+  return ResourceReaderPtr(new ResourceReader(name));
+}
+
 ResourceReader::ResourceReader(const char *name)
     : mImpl{std::make_unique<impl>()} {
   auto filePath = Application::getInstance()->getAssetsPath().cd(name);
-  mImpl->fileReader = std::make_unique<Filesystem::FileReader>(filePath);
+  mImpl->fileReader = Filesystem::FileReader::make(filePath);
 }
 
 ResourceReader::~ResourceReader() = default;

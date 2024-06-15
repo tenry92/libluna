@@ -12,7 +12,7 @@ namespace Luna::Util {
     Png(std::unique_ptr<Luna::InputStream> reader);
     ~Png();
 
-    std::shared_ptr<Image>
+    ImagePtr
     decode(int framesPerRow = 1, int framesPerColumn = 1);
 
     private:

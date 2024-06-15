@@ -4,7 +4,7 @@ using namespace Luna;
 
 class Stage::impl {
   public:
-  std::list<std::shared_ptr<Sprite>> mSprites;
+  std::list<SpritePtr> mSprites;
   std::list<std::shared_ptr<Model>> mModels;
   AmbientLight mAmbientLight;
   std::list<std::shared_ptr<PointLight>> mPointLights;
@@ -14,14 +14,14 @@ Stage::Stage() : mImpl{std::make_unique<impl>()} {}
 
 Stage::~Stage() = default;
 
-std::shared_ptr<Sprite> Stage::makeSprite() {
-  auto sprite = std::make_shared<Sprite>();
+SpritePtr Stage::makeSprite() {
+  auto sprite = Sprite::make();
   mImpl->mSprites.emplace_back(sprite);
 
   return sprite;
 }
 
-const std::list<std::shared_ptr<Sprite>> &Stage::getSprites() const {
+const std::list<SpritePtr> &Stage::getSprites() const {
   return mImpl->mSprites;
 }
 

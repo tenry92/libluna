@@ -34,7 +34,7 @@
 
 class Luna::CanvasImpl {
   public:
-  inline CanvasImpl(const Vector2i &size) : mSize{size} {}
+  inline CanvasImpl(const Vector2i &size) : mSize{size}, mOriginalSize{size} {}
   void setVideoDriver(const String &name);
   void createWindow(bool opengl);
   void processCommandQueue();
@@ -42,6 +42,7 @@ class Luna::CanvasImpl {
 
   Canvas *mCanvas;
   Vector2i mSize;
+  Vector2i mOriginalSize;
   std::shared_ptr<Stage> mStage;
   std::unique_ptr<AbstractRenderer> mRenderer;
   std::unique_ptr<ImmediateGui> mImmediateGui;

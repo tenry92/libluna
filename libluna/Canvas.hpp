@@ -43,7 +43,7 @@ namespace Luna {
     void setBackgroundColor(Color color);
     Color getBackgroundColor() const;
 
-    std::shared_ptr<Image> captureScreenshot();
+    ImagePtr captureScreenshot();
 
     void render();
     void sync();

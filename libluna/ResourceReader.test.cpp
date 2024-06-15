@@ -16,13 +16,13 @@ int main(int, char **) {
     app.setAssetsPath(assetsPath);
 
     const char *filename = "test.txt";
-    ResourceReader resourceReader(filename);
+    auto resourceReader = ResourceReader::make(filename);
 
-    ASSERT_EQL(resourceReader.getSize(), 36, "getSize()");
+    ASSERT_EQL(resourceReader->getSize(), 36, "getSize()");
 
-    std::vector<std::uint8_t> buffer(resourceReader.getSize());
-    resourceReader.read(
-        buffer.data(), sizeof(std::uint8_t), resourceReader.getSize()
+    std::vector<std::uint8_t> buffer(resourceReader->getSize());
+    resourceReader->read(
+        buffer.data(), sizeof(std::uint8_t), resourceReader->getSize()
     );
     std::string contents(
         reinterpret_cast<const char *>(buffer.data()), buffer.size()

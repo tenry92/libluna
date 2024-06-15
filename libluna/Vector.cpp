@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 
 #include <libluna/Vector.hpp>
@@ -16,6 +17,13 @@ template <typename T>
 Vector2<T>::Vector2(const Vector2<T> &other) : mImpl{std::make_unique<impl>()} {
   mImpl->x = other.x();
   mImpl->y = other.y();
+}
+
+template <typename T>
+template <typename U>
+Vector2<T>::Vector2(const Vector2<U> &other) : mImpl{std::make_unique<impl>()} {
+  mImpl->x = static_cast<T>(other.x());
+  mImpl->y = static_cast<T>(other.y());
 }
 
 template <typename T>
@@ -79,6 +87,25 @@ template <typename T> Vector2<T> Vector2<T>::normalized() const {
   return Vector2<T>(x() / length, y() / length);
 }
 
+template <typename T> Vector2<T> Vector2<T>::absolute() const {
+  return Vector2<T>(std::abs(x()), std::abs(y()));
+}
+
+template <typename T>
+Vector2<T> Vector2<T>::scaleToFit(const Vector2<T> &other) const {
+  float scaleWidth =
+      static_cast<float>(other.x()) / static_cast<float>(this->x());
+  float scaleHeight =
+      static_cast<float>(other.y()) / static_cast<float>(this->y());
+
+  float scaleFactor = std::min(scaleWidth, scaleHeight);
+
+  return Vector2<T>(
+      static_cast<T>(static_cast<float>(this->x()) * scaleFactor),
+      static_cast<T>(static_cast<float>(this->y()) * scaleFactor)
+  );
+}
+
 template <typename T>
 T Vector2<T>::distance(const Vector2<T> &left, const Vector2<T> &right) {
   return (left - right).magnitude();
@@ -86,6 +113,7 @@ T Vector2<T>::distance(const Vector2<T> &left, const Vector2<T> &right) {
 
 template class Luna::Vector2<int>;
 template class Luna::Vector2<float>;
+template Luna::Vector2<float>::Vector2(const Vector2<int> &);
 
 template <typename T> class Vector3<T>::impl {
   public:

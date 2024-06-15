@@ -114,9 +114,13 @@ set(PUBLIC_MODULES
   Vector
 )
 
+set(PRIVATE_MODULES
+  Renderers/CommonRenderer
+)
+
 # private modules (their .hpp files will NOT be installed)
 if(LUNA_USE_IMGUI)
-  set(PRIVATE_MODULES
+  list(APPEND PRIVATE_MODULES
     Internal/DebugGui
   )
 endif()

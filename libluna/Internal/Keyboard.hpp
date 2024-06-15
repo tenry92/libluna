@@ -53,6 +53,8 @@ namespace Luna::Internal {
         return base + "Escape";
       case SDL_SCANCODE_TAB:
         return base + "Tab";
+      case SDL_SCANCODE_BACKSPACE:
+        return base + "Backspace";
       case SDL_SCANCODE_SPACE:
         return base + "Space";
       case SDL_SCANCODE_MINUS:
@@ -67,6 +69,8 @@ namespace Luna::Internal {
         return base + "Backslash";
       case SDL_SCANCODE_SEMICOLON:
         return base + "Semicolon";
+      case SDL_SCANCODE_GRAVE:
+        return base + "Grave";
       case SDL_SCANCODE_COMMA:
         return base + "Comma";
       case SDL_SCANCODE_PERIOD:

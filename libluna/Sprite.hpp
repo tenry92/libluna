@@ -9,9 +9,12 @@
 #include <libluna/Vector.hpp>
 
 namespace Luna {
+  class Sprite;
+  using SpritePtr = std::shared_ptr<Sprite>;
+
   class Sprite final {
     public:
-    Sprite();
+    static SpritePtr make();
     ~Sprite();
 
     void setImage(std::shared_ptr<ResourceRef<Image>> image);
@@ -31,6 +34,7 @@ namespace Luna {
     Vector2f getPosition() const;
 
     private:
+    Sprite();
     class impl;
     std::unique_ptr<impl> mImpl;
   };

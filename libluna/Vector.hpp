@@ -37,6 +37,7 @@ namespace Luna {
     public:
     Vector2();
     Vector2(const Vector2<T> &other);
+    template <typename U> Vector2(const Vector2<U> &other);
     Vector2(T x, T y);
     ~Vector2();
 
@@ -59,6 +60,9 @@ namespace Luna {
 
     T magnitude() const;
     Vector2<T> normalized() const;
+    Vector2<T> absolute() const;
+
+    Vector2<T> scaleToFit(const Vector2<T> &other) const;
 
     static T distance(const Vector2<T> &left, const Vector2<T> &right);
 
