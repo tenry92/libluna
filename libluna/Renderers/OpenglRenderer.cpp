@@ -83,6 +83,7 @@ class OpenglRenderer::impl {
   std::map<int, GLuint> mTextureIdMapping;
   std::map<int, GLuint> mFramebuffers;
   std::map<int, std::shared_ptr<GL::MeshBuffer>> mMeshMapping;
+  bool mUsingFramebuffer{false};
 };
 
 OpenglRenderer::OpenglRenderer() : mImpl{std::make_unique<impl>()} {
@@ -263,7 +264,7 @@ void OpenglRenderer::renderTexture([[maybe_unused]] Canvas *canvas, RenderTextur
 
   GLuint texture = mImpl->mTextureIdMapping.at(info->textureId);
 
-  GL::SpriteBuffer spriteBuffer(info->size);
+  GL::SpriteBuffer spriteBuffer(info->size, !mImpl->mUsingFramebuffer);
 
   spriteBuffer.bind();
 
@@ -378,10 +379,13 @@ void OpenglRenderer::setRenderTargetTexture(int id) {
   if (status != GL_FRAMEBUFFER_COMPLETE) {
     logWarn("framebuffer is not complete");
   }
+
+  mImpl->mUsingFramebuffer = true;
 }
 
 void OpenglRenderer::unsetRenderTargetTexture() {
   CHECK_GL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+  mImpl->mUsingFramebuffer = false;
 }
 
 void OpenglRenderer::setViewport(Vector2i offset, Vector2i size) {

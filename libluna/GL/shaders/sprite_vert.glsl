@@ -11,6 +11,6 @@ out vec2 vTexCoord;
 void main()
 {
   vec2 translatedPos = aPos + uSpritePos;
-  gl_Position = vec4((-1 + (translatedPos / uScreenSize) * 2) * vec2(1, -1), 0.0, 1.0);
+  gl_Position = vec4((-1 + (translatedPos / uScreenSize) * 2), 0.0, 1.0);
   vTexCoord = aTexCoord;
 }

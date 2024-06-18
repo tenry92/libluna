@@ -296,6 +296,5 @@ void CommonRenderer::end2dFramebuffer(Canvas *canvas) {
   info.textureId = mRenderTargetId;
   info.size = scaledSize;
   info.position = pos;
-  // todo (OpenGL only): flip vertically
   renderTexture(canvas, &info);
 }
