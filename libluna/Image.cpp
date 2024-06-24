@@ -19,6 +19,19 @@ class Image::impl {
   std::vector<std::vector<uint8_t>> mFrames;
 };
 
+ImagePtr Image::make() {
+  return ImagePtr(new Image());
+}
+ImagePtr Image::make(int bitsPerPixel, const Vector2i &size, int frameCount) {
+  return ImagePtr(new Image(bitsPerPixel, size, frameCount));
+}
+ImagePtr Image::make(const Image &other) {
+  return ImagePtr(new Image(other));
+}
+ImagePtr Image::make(Image &&other) {
+  return ImagePtr(new Image(std::move(other)));
+}
+
 Image::Image() : mImpl{std::make_unique<impl>()} {}
 
 Image::Image(int bitsPerPixel, const Vector2i &size, int frameCount)
@@ -62,12 +75,12 @@ void Image::setFrameData(int frameIndex, const uint8_t *frameData) {
   std::memcpy(mImpl->mFrames[frameIndex].data(), frameData, getBytesPerFrame());
 }
 
-Image Image::toTrue(std::shared_ptr<Palette> palette) {
-  Image newImage = makeTrue(getSize(), getFrameCount());
+ImagePtr Image::toTrue(std::shared_ptr<Palette> palette) {
+  ImagePtr newImage = makeTrue(getSize(), getFrameCount());
 
   for (int frameIndex = 0; frameIndex < getFrameCount(); ++frameIndex) {
     std::vector<uint8_t> frameData;
-    frameData.reserve(newImage.getBytesPerFrame());
+    frameData.reserve(newImage->getBytesPerFrame());
     for (int y = 0; y < getSize().x(); ++y) {
       for (int x = 0; x < getSize().y(); ++x) {
         auto pixelValue = getPixelValueAt(frameIndex, x, y);
@@ -78,7 +91,7 @@ Image Image::toTrue(std::shared_ptr<Palette> palette) {
         frameData.push_back(static_cast<uint8_t>(color.reduceAlpha(8)));
       }
     }
-    newImage.setFrameData(frameIndex, frameData.data());
+    newImage->setFrameData(frameIndex, frameData.data());
   }
 
   return newImage;

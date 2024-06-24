@@ -65,7 +65,7 @@ Png::Png(std::unique_ptr<Luna::InputStream> reader)
 
 Png::~Png() = default;
 
-std::shared_ptr<Image> Png::decode(int framesPerRow, int framesPerColumn) {
+ImagePtr Png::decode(int framesPerRow, int framesPerColumn) {
   mImpl->init();
   mImpl->read();
 
@@ -73,7 +73,7 @@ std::shared_ptr<Image> Png::decode(int framesPerRow, int framesPerColumn) {
   int frameHeight = mImpl->getHeight() / framesPerColumn;
   int frameCount = framesPerRow * framesPerColumn;
 
-  auto image = std::make_shared<Image>(
+  auto image = Image::make(
       32, Vector2i(frameWidth, frameHeight), frameCount
   );
 

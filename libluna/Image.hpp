@@ -7,17 +7,21 @@
 #include <libluna/Vector.hpp>
 
 namespace Luna {
+  class Image;
+  using ImagePtr = std::shared_ptr<Image>;
+
   class Image {
     public:
-    Image();
-    Image(int bitsPerPixel, const Vector2i &size, int frameCount = 1);
-    Image(const Image &other);
-    Image(Image &&other);
-    static inline Image makeIndexed(const Vector2i &size, int frameCount = 1) {
-      return Image(4, size, frameCount);
+    static ImagePtr make();
+    static ImagePtr make(int bitsPerPixel, const Vector2i &size, int frameCount = 1);
+    static ImagePtr make(const Image &other);
+    static ImagePtr make(Image &&other);
+
+    static inline ImagePtr makeIndexed(const Vector2i &size, int frameCount = 1) {
+      return make(4, size, frameCount);
     }
-    static inline Image makeTrue(const Vector2i &size, int frameCount = 1) {
-      return Image(32, size, frameCount);
+    static inline ImagePtr makeTrue(const Vector2i &size, int frameCount = 1) {
+      return make(32, size, frameCount);
     }
     ~Image();
     int getBitsPerPixel() const;
@@ -25,7 +29,7 @@ namespace Luna {
     int getFrameCount() const;
     const uint8_t *getFrameData(int frameIndex = 0) const;
     void setFrameData(int frameIndex, const uint8_t *frameData);
-    Image toTrue(std::shared_ptr<Palette> palette);
+    ImagePtr toTrue(std::shared_ptr<Palette> palette);
 
     inline bool isIndexed() const { return getBitsPerPixel() <= 8; }
 
@@ -72,6 +76,10 @@ namespace Luna {
     }
 
     private:
+    Image();
+    Image(int bitsPerPixel, const Vector2i &size, int frameCount = 1);
+    Image(const Image &other);
+    Image(Image &&other);
     class impl;
     std::unique_ptr<impl> mImpl;
   };

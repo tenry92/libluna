@@ -23,8 +23,8 @@ class DummyImageLoader {
   public:
   DummyImageLoader(String filename) : mFilename(filename) {}
 
-  std::shared_ptr<Image> operator()() {
-    Png png(std::make_unique<ResourceReader>(mFilename.c_str()));
+  ImagePtr operator()() {
+    Png png(ResourceReader::make(mFilename.c_str()));
     return png.decode();
   }
 

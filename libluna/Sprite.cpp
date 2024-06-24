@@ -15,6 +15,10 @@ class Sprite::impl {
   Vector2f mPosition;
 };
 
+SpritePtr Sprite::make() {
+  return SpritePtr(new Sprite());
+}
+
 Sprite::Sprite() : mImpl{std::make_unique<impl>()} {}
 
 Sprite::~Sprite() = default;

@@ -5,9 +5,12 @@
 #include <libluna/InputStream.hpp>
 
 namespace Luna {
+  class ResourceReader;
+  using ResourceReaderPtr = std::unique_ptr<ResourceReader>;
+
   class ResourceReader final : public InputStream {
     public:
-    ResourceReader(const char *name);
+    static ResourceReaderPtr make(const char *name);
     ~ResourceReader();
 
     bool isValid() const override;
@@ -21,6 +24,7 @@ namespace Luna {
     ) override;
 
     private:
+    ResourceReader(const char *name);
     class impl;
     std::unique_ptr<impl> mImpl;
   };

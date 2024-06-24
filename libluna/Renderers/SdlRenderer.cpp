@@ -1,15 +1,15 @@
 #include <libluna/config.h>
 
-#include <cmath>
-#include <memory>
-
 #ifdef LUNA_USE_SDL
 #include <libluna/Renderers/SdlRenderer.hpp>
 
 #include <list>
 #include <map>
 
-#include <SDL2/SDL.h>
+#ifdef LUNA_USE_GLFW
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#endif
 
 #ifdef LUNA_USE_IMGUI
 #include <imgui/backends/imgui_impl_sdl2.h>
@@ -18,10 +18,8 @@
 #endif // IMGUI
 
 #include <libluna/Application.hpp>
-#include <libluna/Image.hpp>
 #include <libluna/Logger.hpp>
-#include <libluna/ResourceRef.hpp>
-#include <libluna/TextureCache.hpp>
+#include <libluna/MemoryReader.hpp>
 
 #include <libluna/CanvasImpl.hpp>
 
@@ -49,46 +47,16 @@ struct SdlDeleter {
   }
 };
 
-class SdlTextureWrapper {
-  public:
-  SdlTextureWrapper(
-      SDL_Texture *texture, int width, int height,
-      std::shared_ptr<Internal::GraphicsMetrics> metrics
-  )
-      : mTexture{texture}, mWidth{width}, mHeight{height}, mMetrics{metrics} {
-    ++mMetrics->textureCount;
-  }
-
-  ~SdlTextureWrapper() {
-    SDL_DestroyTexture(mTexture);
-    mTexture = nullptr;
-    --mMetrics->textureCount;
-  }
-
-  SDL_Texture *getTexture() const { return mTexture; }
-
-  int getWidth() const { return mWidth; }
-
-  int getHeight() const { return mHeight; }
-
-  private:
-  SDL_Texture *mTexture;
-  int mWidth;
-  int mHeight;
-  std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
-};
-
-using TextureType = std::shared_ptr<SdlTextureWrapper>;
-using TextureCacheType = TextureCache<TextureType>;
-
 class SdlRenderer::impl {
   public:
-  std::unique_ptr<SDL_Renderer, SdlDeleter> mRenderer;
-  std::unique_ptr<TextureCacheType> mTextureCache;
-  std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
 #ifdef LUNA_USE_IMGUI
   ImGuiContext *mImGuiContext{nullptr};
 #endif
+
+  std::unique_ptr<SDL_Renderer, SdlDeleter> mRenderer;
+  std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
+
+  std::map<int, SDL_Texture *> mTextureIdMapping;
 };
 
 SdlRenderer::SdlRenderer() : mImpl{std::make_unique<impl>()} {
@@ -155,7 +123,7 @@ void SdlRenderer::initializeImmediateGui() {
   );
   ImGui_ImplSDLRenderer2_Init(mImpl->mRenderer.get());
 
-// todo(?): load fonts
+  // todo(?): load fonts
 #endif
 }
 
@@ -184,95 +152,6 @@ void SdlRenderer::close() {
   mImpl->mRenderer.reset();
 }
 
-void SdlRenderer::render() {
-#ifdef LUNA_USE_IMGUI
-  if (mImpl->mImGuiContext) {
-    ImGui_ImplSDLRenderer2_NewFrame();
-    ImGui_ImplSDL2_NewFrame();
-    ImGui::NewFrame();
-  }
-#endif
-
-  auto canvas = getCanvas();
-
-  if (!canvas) {
-    CHECK_SDL(SDL_SetRenderDrawColor(
-        mImpl->mRenderer.get(), 0, 0, 0, SDL_ALPHA_OPAQUE
-    ));
-    CHECK_SDL(SDL_RenderClear(mImpl->mRenderer.get()));
-
-    return;
-  }
-
-  auto bgColor = canvas->getBackgroundColor();
-  CHECK_SDL(SDL_SetRenderDrawColor(
-      mImpl->mRenderer.get(), static_cast<uint8_t>(bgColor.reduceRed(8)),
-      static_cast<uint8_t>(bgColor.reduceGreen(8)),
-      static_cast<uint8_t>(bgColor.reduceBlue(8)), SDL_ALPHA_OPAQUE
-  ));
-  CHECK_SDL(SDL_RenderClear(mImpl->mRenderer.get()));
-
-  if (!canvas->getStage()) {
-    return;
-  }
-
-  if (!mImpl->mTextureCache ||
-      mImpl->mTextureCache->getStage() != canvas->getStage()) {
-    std::function<TextureType(std::shared_ptr<Image>, int)> callback =
-        [this](std::shared_ptr<Image> image, int frameIndex) -> TextureType {
-      logDebug("loading sdl texture from image#{}", frameIndex);
-
-      if (!image->isTrue()) {
-        /// @todo Get palette from sprite
-        image = std::make_shared<Image>(image->toTrue(nullptr));
-      }
-
-      SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(
-          (void *)(image->getFrameData(frameIndex)), image->getSize().x(),
-          image->getSize().y(), 32, image->getBytesPerLine(),
-          SDL_PIXELFORMAT_RGBA32
-      );
-
-      auto texture =
-          SDL_CreateTextureFromSurface(mImpl->mRenderer.get(), surface);
-
-      SDL_FreeSurface(surface);
-
-      return std::make_shared<SdlTextureWrapper>(
-          texture, image->getSize().x(), image->getSize().y(), mImpl->mMetrics
-      );
-    };
-    mImpl->mTextureCache =
-        std::make_unique<TextureCacheType>(canvas->getStage(), callback);
-  }
-
-  mImpl->mTextureCache->updateCache();
-
-  // CHECK_SDL(SDL_SetRenderDrawColor(mImpl->mRenderer.get(), 111, 0, 111,
-  // SDL_ALPHA_OPAQUE)); SDL_Rect f = {0, 0, 1920, 1080};
-  // CHECK_SDL(SDL_RenderFillRect(mImpl->mRenderer.get(), &f));
-
-  auto camera2d = canvas->getCamera2d();
-
-  // drawDebugGrid();
-
-  for (auto &&sprite : canvas->getStage()->getSprites()) {
-    if (!mImpl->mTextureCache->hasTextureBySprite(sprite)) {
-      continue;
-    }
-
-    auto texture = mImpl->mTextureCache->getTextureBySprite(sprite);
-    auto position = sprite->getPosition() - camera2d.getPosition();
-
-    SDL_Rect dstrect = {
-        static_cast<int>(position.x()), static_cast<int>(position.y()),
-        texture->getWidth(), texture->getHeight()};
-    CHECK_SDL(SDL_RenderCopy(
-        mImpl->mRenderer.get(), texture->getTexture(), nullptr, &dstrect
-    ));
-  }
-}
-
 void SdlRenderer::present() {
 #ifdef LUNA_USE_IMGUI
   if (mImpl->mImGuiContext) {
@@ -284,59 +163,110 @@ void SdlRenderer::present() {
   SDL_RenderPresent(mImpl->mRenderer.get());
 }
 
-void SdlRenderer::drawDebugGrid() {
-  auto canvas = getCanvas();
-  auto camera2d = canvas->getCamera2d();
-  int screenWidth, screenHeight;
-  SDL_GetWindowSize(
-      getCanvas()->getImpl()->sdl.window, &screenWidth, &screenHeight
-  );
-
-  for (int x = 0; x < screenWidth + 15; x += 16) {
-    auto camX = camera2d.getPosition().x();
-    auto offset = static_cast<int>(-std::fmod(camX, 32));
-    auto isMain = x % 32 == 0;
-    auto value = static_cast<uint8_t>(isMain ? 127 : 63);
-    CHECK_SDL(SDL_SetRenderDrawColor(
-        mImpl->mRenderer.get(), value, value, value, isMain ? 127 : 63
-    ));
-    CHECK_SDL(SDL_RenderDrawLine(
-        mImpl->mRenderer.get(), x + offset, 0, x + offset, screenHeight
-    ));
-  }
-
-  for (int y = 0; y < screenHeight + 15; y += 16) {
-    auto camY = camera2d.getPosition().y();
-    auto offset = static_cast<int>(-std::fmod(camY, 32));
-    auto isMain = y % 32 == 0;
-    auto value = static_cast<uint8_t>(isMain ? 127 : 63);
-    CHECK_SDL(SDL_SetRenderDrawColor(
-        mImpl->mRenderer.get(), value, value, value, isMain ? 127 : 63
-    ));
-    CHECK_SDL(SDL_RenderDrawLine(
-        mImpl->mRenderer.get(), 0, y + offset, screenWidth, y + offset
-    ));
-  }
-
-  CHECK_SDL(SDL_SetRenderDrawColor(mImpl->mRenderer.get(), 191, 0, 0, 127));
-  for (int i = -2; i <= 2; ++i) {
-    CHECK_SDL(SDL_RenderDrawLine(
-        mImpl->mRenderer.get(), 0,
-        static_cast<int>(-camera2d.getPosition().y()) + i, screenWidth,
-        static_cast<int>(-camera2d.getPosition().y()) + i
-    ));
-  }
-
-  CHECK_SDL(SDL_SetRenderDrawColor(mImpl->mRenderer.get(), 0, 127, 0, 127));
-  for (int i = -2; i <= 2; ++i) {
-    CHECK_SDL(SDL_RenderDrawLine(
-        mImpl->mRenderer.get(),
-        static_cast<int>(-camera2d.getPosition().x()) + i, 0,
-        static_cast<int>(-camera2d.getPosition().x()) + i, screenHeight
-    ));
-  }
+Internal::GraphicsMetrics SdlRenderer::getMetrics() {
+  return *mImpl->mMetrics;
 }
 
-Internal::GraphicsMetrics SdlRenderer::getMetrics() { return *mImpl->mMetrics; }
+
+void SdlRenderer::clearBackground(Color color) {
+  CHECK_SDL(SDL_SetRenderDrawColor(
+      mImpl->mRenderer.get(), static_cast<uint8_t>(color.reduceRed(8)),
+      static_cast<uint8_t>(color.reduceGreen(8)),
+      static_cast<uint8_t>(color.reduceBlue(8)), SDL_ALPHA_OPAQUE
+  ));
+  CHECK_SDL(SDL_RenderClear(mImpl->mRenderer.get()));
+}
+
+void SdlRenderer::createTexture([[maybe_unused]] int id) {
+  // stub
+}
+
+void SdlRenderer::destroyTexture(int id) {
+  SDL_Texture *texture = mImpl->mTextureIdMapping.at(id);
+  mImpl->mTextureIdMapping.erase(id);
+  SDL_DestroyTexture(texture);
+}
+
+void SdlRenderer::loadTexture(int id, ImagePtr image, int frameIndex) {
+  if (mImpl->mTextureIdMapping.count(id)) {
+    SDL_Texture *oldTexture = mImpl->mTextureIdMapping.at(id);
+    SDL_DestroyTexture(oldTexture);
+    mImpl->mTextureIdMapping.erase(id);
+  }
+  
+  if (!image->isTrue()) {
+    /// @todo Get palette from sprite
+    image = image->toTrue(nullptr);
+  }
+
+  SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(
+      (void *)(image->getFrameData(frameIndex)), image->getSize().x(),
+      image->getSize().y(), 32, image->getBytesPerLine(),
+      SDL_PIXELFORMAT_RGBA32
+  );
+
+  auto texture =
+      SDL_CreateTextureFromSurface(mImpl->mRenderer.get(), surface);
+
+  SDL_FreeSurface(surface);
+
+  mImpl->mTextureIdMapping.emplace(id, texture);
+}
+
+void SdlRenderer::resizeTexture([[maybe_unused]] int id, [[maybe_unused]] Vector2i size) {
+  if (mImpl->mTextureIdMapping.count(id)) {
+    SDL_Texture *oldTexture = mImpl->mTextureIdMapping.at(id);
+    mImpl->mTextureIdMapping.erase(id);
+    SDL_DestroyTexture(oldTexture);
+  }
+
+  SDL_Texture *texture = SDL_CreateTexture(mImpl->mRenderer.get(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, size.x(), size.y());
+  mImpl->mTextureIdMapping.emplace(id, texture);
+}
+
+void SdlRenderer::renderTexture([[maybe_unused]] Canvas *canvas, RenderTextureInfo *info) {
+  auto texture = mImpl->mTextureIdMapping.at(info->textureId);
+
+  SDL_Rect dstrect = {
+      static_cast<int>(info->position.x()), static_cast<int>(info->position.y()),
+      info->size.x(), info->size.y()};
+  CHECK_SDL(SDL_RenderCopy(
+      mImpl->mRenderer.get(), texture, nullptr, &dstrect
+  ));
+}
+
+void SdlRenderer::setTextureFilterEnabled([[maybe_unused]] int id, [[maybe_unused]] bool enabled) {
+
+}
+
+void SdlRenderer::setRenderTargetTexture(int id) {
+  auto texture = mImpl->mTextureIdMapping.at(id);
+  SDL_SetRenderTarget(mImpl->mRenderer.get(), texture);
+}
+
+void SdlRenderer::unsetRenderTargetTexture() {
+  SDL_SetRenderTarget(mImpl->mRenderer.get(), nullptr);
+}
+
+void SdlRenderer::setViewport(Vector2i offset, Vector2i size) {
+  SDL_Rect viewport;
+  viewport.x = offset.x();
+  viewport.y = offset.y();
+  viewport.w = size.x();
+  viewport.h = size.y();
+
+  SDL_RenderSetViewport(mImpl->mRenderer.get(), &viewport);
+}
+
+
+void SdlRenderer::imguiNewFrame() {
+#ifdef LUNA_USE_IMGUI
+  if (mImpl->mImGuiContext) {
+    ImGui_ImplSDLRenderer2_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    ImGui::NewFrame();
+  }
+#endif
+}
 
 #endif

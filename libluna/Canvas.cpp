@@ -434,7 +434,7 @@ void Canvas::setBackgroundColor(Color color) {
 Color Canvas::getBackgroundColor() const { return mImpl->mBackgroundColor; }
 
 #ifdef LUNA_USE_SDL
-std::shared_ptr<Image> Canvas::captureScreenshot() {
+ImagePtr Canvas::captureScreenshot() {
   SDL_Surface *surface = SDL_GetWindowSurface(mImpl->sdl.window);
   // returns nullptr if SDL_FRAMEBUFFER_ACCELERATION=0 env is not set
 
@@ -479,24 +479,28 @@ void Canvas::sync() {
 
   std::unique_lock lock(mImpl->mMutex);
 
-  if (mImpl->mCommandQueue.empty()) {
-    return;
-  }
+#ifdef LUNA_USE_SDL
+  auto command = std::make_shared<CanvasCommand>(([]() {
+    SDL_Event event;
 
-  bool result = mImpl->mCv.wait_for(lock, 4s, [this]() {
-    return mImpl->mCommandQueue.empty();
-  });
+    while (SDL_PollEvent(&event)) {
+      Application::getInstance()->getImpl()->pushSdlEvent(&event);
+    }
+  }));
 
-  if (!result) {
-    logError("wait timeout expired and predicate still false");
-  }
+  mImpl->mCommandQueue.emplace(command);
+
+  mImpl->processCommandQueue();
 #endif
 
-#if defined(LUNA_USE_SDL) && defined(LUNA_THREADED_CANVAS)
-  SDL_Event event;
+  if (!mImpl->mCommandQueue.empty()) {
+    bool result = mImpl->mCv.wait_for(lock, 4s, [this]() {
+      return mImpl->mCommandQueue.empty();
+    });
 
-  while (SDL_PollEvent(&event)) {
-    Application::getInstance()->getImpl()->pushSdlEvent(&event);
+    if (!result) {
+      logError("wait timeout expired and predicate still false");
+    }
   }
 #endif
 }

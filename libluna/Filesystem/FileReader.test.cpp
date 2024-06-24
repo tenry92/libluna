@@ -16,12 +16,12 @@ int main(int, char **) {
     Application app(0, nullptr);
     app.setAssetsPath(assetsPath);
 
-    FileReader fileReader(app.getAssetsPath().cd("test.txt"));
+    auto fileReader = FileReader::make(app.getAssetsPath().cd("test.txt"));
 
-    ASSERT_EQL(fileReader.getSize(), 36, "getSize()");
+    ASSERT_EQL(fileReader->getSize(), 36, "getSize()");
 
-    std::vector<std::uint8_t> buffer(fileReader.getSize());
-    fileReader.read(buffer.data(), sizeof(std::uint8_t), fileReader.getSize());
+    std::vector<std::uint8_t> buffer(fileReader->getSize());
+    fileReader->read(buffer.data(), sizeof(std::uint8_t), fileReader->getSize());
     std::string contents(
         reinterpret_cast<const char *>(buffer.data()), buffer.size()
     );
@@ -34,9 +34,9 @@ int main(int, char **) {
     Application app(0, nullptr);
     app.setAssetsPath(assetsPath);
 
-    FileReader fileReader(app.getAssetsPath().cd("test.txt"));
+    auto fileReader = FileReader::make(app.getAssetsPath().cd("test.txt"));
 
-    fileReader.seek(1000000);
+    fileReader->seek(1000000);
   });
 
   return runTests();
