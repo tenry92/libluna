@@ -25,6 +25,11 @@
 #include <GLFW/glfw3.h>
 #endif
 
+#ifdef LUNA_USE_EGL
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+#endif
+
 #include <libluna/AbstractRenderer.hpp>
 #include <libluna/Camera2d.hpp>
 #include <libluna/Camera3d.hpp>
@@ -67,6 +72,13 @@ class Luna::CanvasImpl {
   struct {
     GLFWwindow *window{nullptr};
   } glfw;
+#endif
+#ifdef LUNA_USE_EGL
+  struct {
+    EGLDisplay display;
+    EGLContext context;
+    EGLSurface surface;
+  } egl;
 #endif
 
   std::queue<std::shared_ptr<Command>> mCommandQueue;

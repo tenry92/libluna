@@ -15,7 +15,10 @@
 #include <GLFW/glfw3.h>
 #endif
 
-#include <glad/glad.h>
+#ifdef LUNA_USE_EGL
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+#endif
 
 #ifdef LUNA_USE_IMGUI
 #include <imgui/backends/imgui_impl_opengl3.h>
@@ -26,10 +29,14 @@
 #include <imgui/backends/imgui_impl_sdlrenderer2.h>
 #endif
 
-#ifdef LUNA_USE_GLWF
+#ifdef LUNA_USE_GLFW
 #include <imgui/backends/imgui_impl_glfw.h>
 #endif
 #endif // IMGUI
+
+#ifdef __SWITCH__
+#include <switch.h>
+#endif
 
 #include <libluna/Application.hpp>
 #include <libluna/Logger.hpp>
@@ -197,6 +204,10 @@ void OpenglRenderer::present() {
 
 #ifdef LUNA_USE_GLFW
   glfwSwapBuffers(getCanvas()->getImpl()->glfw.window);
+#endif
+
+#ifdef LUNA_USE_EGL
+  eglSwapBuffers(getCanvas()->getImpl()->egl.display, getCanvas()->getImpl()->egl.surface);
 #endif
 }
 

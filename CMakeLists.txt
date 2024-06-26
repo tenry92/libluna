@@ -6,6 +6,8 @@ project(libluna
   LANGUAGES C CXX
 )
 
+include(ExternalProject)
+
 set(CMAKE_MODULE_PATH "/opt/cmake/module")
 set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX_PATH}")
 
@@ -21,21 +23,30 @@ set(APP_ORIGINAL_FILENAME "${APP_NAME}")
 ################################################################################
 # DETECT TARGET FEATURE SUPPORT
 
-if(UNIX OR WIN32)
+set(DESKTOP_AND_SWITCH Linux Windows NintendoSwitch)
+set(DESKTOP Linux Windows)
+
+if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
   set(SUPPORTS_SDL ON)
+  set(SUPPORTS_EGL OFF)
+  set(SUPPORTS_OPENGL ON)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
+  set(SUPPORTS_SDL OFF)
+  set(SUPPORTS_EGL ON)
   set(SUPPORTS_OPENGL ON)
 else()
   set(SUPPORTS_SDL OFF)
+  set(SUPPORTS_EGL OFF)
   set(SUPPORTS_OPENGL OFF)
 endif()
 
-if(UNIX OR WIN32)
+if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
   set(SUPPORTS_STD_THREAD ON)
 else()
   set(SUPPORTS_STD_THREAD OFF)
 endif()
 
-if(UNIX OR WIN32)
+if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
   set(SUPPORTS_IMGUI ON)
 else()
   set(SUPPORTS_IMGUI OFF)
@@ -47,7 +58,7 @@ endif()
 option(LUNA_USE_SDL "Use SDL2 for Window creation, input handling and audio output" ${SUPPORTS_SDL})
 option(LUNA_USE_GLFW "Use GLFW for Window creation and input handling" OFF)
 option(LUNA_USE_OPENGL "Use OpenGL" ${SUPPORTS_OPENGL})
-option(LUNA_USE_EGL "Use EGL" OFF)
+option(LUNA_USE_EGL "Use EGL" ${SUPPORTS_EGL})
 option(LUNA_USE_STD_THREAD "Use std::thread" ${SUPPORTS_STD_THREAD})
 option(LUNA_USE_IMGUI "Use ImGui" ${SUPPORTS_IMGUI})
 
@@ -59,8 +70,23 @@ configure_file(libluna/config.h.in libluna/config.h)
 ################################################################################
 # TOOLS
 
-add_subdirectory(tools/xxd)
-set(XXD xxd)
+ExternalProject_Add(
+  gfxtool
+  PREFIX ${CMAKE_CURRENT_BINARY_DIR}/tools
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/tools
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tools/gfxtool
+  BUILD_ALWAYS ON
+)
+
+ExternalProject_Add(
+  xxd
+  PREFIX ${CMAKE_CURRENT_BINARY_DIR}/tools
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/tools
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tools/xxd
+  BUILD_ALWAYS ON
+)
+
+set(XXD "${CMAKE_CURRENT_BINARY_DIR}/tools/bin/xxd")
 
 ################################################################################
 # TARGET CONFIGURATION
@@ -249,6 +275,10 @@ target_include_directories(luna PUBLIC
 
 target_link_libraries(luna PRIVATE glad)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
+  target_link_libraries(luna PRIVATE EGL glapi drm_nouveau)
+endif()
+
 target_include_directories(luna PUBLIC
   /usr/local/include
 )
@@ -271,7 +301,7 @@ foreach(SHADER_SOURCE_FILE ${SHADER_SOURCE_FILES})
     OUTPUT ${SHADER_HEADER_FILE}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/libluna/GL/shaders
     COMMAND ${XXD} -n ${SHADER_SOURCE_FILE} -i ${PROJECT_SOURCE_DIR}/libluna/GL/shaders/${SHADER_SOURCE_FILE} ${SHADER_HEADER_FILE}
-    DEPENDS ${XXD} ${PROJECT_SOURCE_DIR}/libluna/GL/shaders/${SHADER_SOURCE_FILE}
+    DEPENDS xxd ${PROJECT_SOURCE_DIR}/libluna/GL/shaders/${SHADER_SOURCE_FILE}
     COMMENT "Converting ${SHADER_SOURCE_FILE} to C header"
   )
   list(APPEND SHADER_HEADER_FILES "${SHADER_HEADER_FILE}")
@@ -313,6 +343,10 @@ foreach(test_name ${UNIT_TESTS})
 
   add_dependencies(${TEST_TARGET_NAME} luna)
   target_link_libraries(${TEST_TARGET_NAME} PRIVATE luna)
+
+  if(CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
+    nx_create_nro(${TEST_TARGET_NAME})
+  endif()
 endforeach()
 
 ################################################################################
@@ -323,4 +357,6 @@ add_subdirectory(tests)
 ################################################################################
 # THIRD PARTY
 
-add_subdirectory(libs/glad-4.3)
+if(NOT NINTENDO_SWITCH)
+  add_subdirectory(libs/glad-4.3)
+endif()

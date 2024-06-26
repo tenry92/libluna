@@ -1,5 +1,15 @@
 #include <libluna/config.h>
 
+#ifdef LUNA_USE_EGL
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+#include <glad/glad.h>
+#endif
+
+#ifdef __SWITCH__
+#include <switch.h>
+#endif
+
 #include <libluna/Canvas.hpp>
 
 #include <functional>
@@ -29,7 +39,7 @@ using Luna::String;
 
 namespace {
 #ifdef LUNA_USE_OPENGL
-  void setGlAttributes() {
+  [[maybe_unused]] void setGlAttributes() {
 #ifdef LUNA_USE_SDL
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
@@ -106,6 +116,9 @@ void CanvasImpl::setVideoDriver(const String &name) {
     mRenderer = std::make_unique<OpenglGraphicsDriver>();
   }
 #endif
+#ifdef LUNA_USE_EGL
+  mRenderer = std::make_unique<OpenglRenderer>();
+#endif
 
   if (!mRenderer) {
     return;
@@ -116,7 +129,7 @@ void CanvasImpl::setVideoDriver(const String &name) {
   mRenderer->initialize();
 }
 
-void CanvasImpl::createWindow(bool opengl) {
+void CanvasImpl::createWindow([[maybe_unused]] bool opengl) {
   Terminal::quit();
 
 #ifdef LUNA_USE_SDL
@@ -153,6 +166,39 @@ void CanvasImpl::createWindow(bool opengl) {
   if (!this->sdl.window) {
     logError("error creating sdl window: {}", SDL_GetError());
   }
+#endif
+
+#ifdef LUNA_USE_EGL
+  this->egl.display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+  eglInitialize(this->egl.display, nullptr, nullptr);
+  eglBindAPI(EGL_OPENGL_API);
+
+  EGLConfig config;
+  EGLint numConfigs;
+  static const EGLint framebufferAttributeList[] = {
+    EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
+    EGL_RED_SIZE,     8,
+    EGL_GREEN_SIZE,   8,
+    EGL_BLUE_SIZE,    8,
+    EGL_ALPHA_SIZE,   8,
+    EGL_DEPTH_SIZE,   24,
+    EGL_STENCIL_SIZE, 8,
+    EGL_NONE
+  };
+  eglChooseConfig(this->egl.display, framebufferAttributeList, &config, 1, &numConfigs);
+
+  this->egl.surface = eglCreateWindowSurface(this->egl.display, config, nwindowGetDefault(), nullptr);
+
+  static const EGLint contextAttributeList[] = {
+    EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR, EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT_KHR,
+    EGL_CONTEXT_MAJOR_VERSION_KHR, 4,
+    EGL_CONTEXT_MINOR_VERSION_KHR, 3,
+    EGL_NONE
+  };
+
+  this->egl.context = eglCreateContext(this->egl.display, config, EGL_NO_CONTEXT, contextAttributeList);
+
+  eglMakeCurrent(this->egl.display, this->egl.surface, this->egl.surface, this->egl.context);
 #endif
 }
 

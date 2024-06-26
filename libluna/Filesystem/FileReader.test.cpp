@@ -9,9 +9,23 @@
 using namespace Luna;
 using namespace Luna::Filesystem;
 
+#ifdef __SWITCH__
+static const char *assetsPath = "romfs:/assets";
+#else
 static const char *assetsPath = "tests/assets";
+#endif
 
 int main(int, char **) {
+#ifdef __SWITCH__
+  if (R_FAILED(romfsInit())) {
+    consoleInit(NULL);
+    printf("romfsInit error\n");
+    while (appletMainLoop()) {
+      consoleUpdate(NULL);
+    }
+  }
+#endif
+
   TEST("read full text file", []() {
     Application app(0, nullptr);
     app.setAssetsPath(assetsPath);

@@ -70,6 +70,13 @@ $ docker build -t cpp-cmake-env .
 $ docker run -it --rm cpp-cmake-env
 ```
 
+In order to increase the build speed, you can enable parallel builds for CMake
+by running the following command first:
+
+```sh
+export CMAKE_BUILD_PARALLEL_LEVEL=4
+```
+
 When everything is ready, use the following commands to configure the build:
 
 ```sh
@@ -79,6 +86,15 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 
 When using vcpkg (on Windows), make sure to also add
 `-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake`.
+
+If you want to cross-compile using devkitpro, use the following CMake command:
+
+```sh
+export DEVKITPRO=/opt/devkitpro
+cmake -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake ..
+```
+
+Replace `Switch.cmake` according to your target platform.
 
 Next you can build the library, internal dependencies and tools using:
 

@@ -16,6 +16,10 @@
 #include <psapi.h>
 #endif
 
+#ifdef __SWITCH__
+#include <switch.h>
+#endif
+
 #ifdef LUNA_USE_SDL
 #include <SDL2/SDL.h>
 #endif
@@ -50,6 +54,16 @@ static Application *gSingletonApp;
 
 static void initSystem() {
   Terminal::init();
+
+#ifdef __SWITCH__
+  logInfo("initializing romfs");
+
+  Result rc = romfsInit();
+
+  if (R_FAILED(rc)) {
+    logWarn("romfsInit failed: {}", rc);
+  }
+#endif
 
 #ifdef LUNA_USE_SDL
   logInfo("initializing SDL");
@@ -125,6 +139,12 @@ void ApplicationImpl::mainLoop() {
   logInfo("entering main loop");
 
   while (hasCanvas() && mRaisedErrorMessage.isEmpty()) {
+#ifdef __SWITCH__
+    if (!appletMainLoop()) {
+      break;
+    }
+#endif
+
     mDebugMetrics->frameTicker.tick();
 #ifdef LUNA_USE_SDL
     SDL_Event event;
@@ -289,12 +309,6 @@ int Application::run() {
     logInfo("calling ready callback");
     mImpl->mReadyCallback();
   }
-
-#ifdef __SWITCH__
-  while (appletMainLoop()) {
-    Luna::Terminal::update();
-  }
-#endif
 
   if (mImpl->hasCanvas()) {
     mImpl->mAudioManager.init();

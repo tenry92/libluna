@@ -41,7 +41,8 @@ class PathManager::impl {
 #ifdef _NDS
     mAssetsPath = Path("/assets");
 #elif defined(__3DS__) || defined(__SWITCH__)
-    mAssetsPath = Path("romfs:/assets");
+    // mAssetsPath = Path("romfs:/assets");
+    mAssetsPath = Path("romfs:");
 #else
     auto programPath = mProgramPath;
     if (programPath.up().basename() == "bin") {

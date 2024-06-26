@@ -11,6 +11,15 @@
 #include <GLFW/glfw3.h>
 #endif
 
+#ifdef LUNA_USE_EGL
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+#endif
+
+#ifdef __SWITCH__
+#include <switch.h>
+#endif
+
 #include <libluna/Renderers/CommonRenderer.hpp>
 #include <libluna/CanvasImpl.hpp>
 
@@ -112,10 +121,9 @@ void CommonRenderer::unsetRenderTargetTexture() {
   // stub
 }
 
-
 Vector2i CommonRenderer::getCanvasSize() const {
-  int canvasWidth;
-  int canvasHeight;
+  int canvasWidth = 1920;
+  int canvasHeight = 1080;
 
 #ifdef LUNA_USE_SDL
   SDL_GetWindowSize(
@@ -126,6 +134,11 @@ Vector2i CommonRenderer::getCanvasSize() const {
   glfwGetFramebufferSize(
       getCanvas()->getImpl()->glfw.window, &canvasWidth, &canvasHeight
   );
+#endif
+#ifdef __SWITCH__
+  ViDisplay display;
+  viOpenDefaultDisplay(&display);
+  viGetDisplayResolution(&display, &canvasWidth, &canvasHeight);
 #endif
 
   return Vector2i(canvasWidth, canvasHeight);

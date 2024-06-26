@@ -42,7 +42,7 @@ class DestinationAudioNode : public AudioNode {
 namespace {
   AudioManager *gInstance{nullptr};
 
-  void audioCallback(void *userData, std::uint8_t *stream, int byteCount) {
+  [[maybe_unused]] void audioCallback(void *userData, std::uint8_t *stream, int byteCount) {
     auto metrics = &AudioManager::getInstance()->getImpl()->mMetrics;
 
     Logger::getInstance().setThreadIdentifier("audio");
