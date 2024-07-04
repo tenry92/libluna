@@ -6,7 +6,7 @@
 #include <libluna/AudioNode.hpp>
 #include <libluna/Canvas.hpp>
 #include <libluna/Filesystem/Path.hpp>
-#include <libluna/ResourceRef.hpp>
+#include <libluna/Resource.hpp>
 #include <libluna/Sprite.hpp>
 #include <libluna/String.hpp>
 

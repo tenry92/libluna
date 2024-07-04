@@ -15,15 +15,15 @@ class Image::impl {
   public:
   int mBitsPerPixel; ///< Should be (indexed) 4, 8, (true) 24 or 32.
   Vector2i mSize;
-  int mFrameCount{0};
-  std::vector<std::vector<uint8_t>> mFrames;
+  std::vector<uint8_t> mData;
+  PalettePtr mPalette;
 };
 
 ImagePtr Image::make() {
   return ImagePtr(new Image());
 }
-ImagePtr Image::make(int bitsPerPixel, const Vector2i &size, int frameCount) {
-  return ImagePtr(new Image(bitsPerPixel, size, frameCount));
+ImagePtr Image::make(int bitsPerPixel, const Vector2i &size) {
+  return ImagePtr(new Image(bitsPerPixel, size));
 }
 ImagePtr Image::make(const Image &other) {
   return ImagePtr(new Image(other));
@@ -34,24 +34,18 @@ ImagePtr Image::make(Image &&other) {
 
 Image::Image() : mImpl{std::make_unique<impl>()} {}
 
-Image::Image(int bitsPerPixel, const Vector2i &size, int frameCount)
+Image::Image(int bitsPerPixel, const Vector2i &size)
     : mImpl{std::make_unique<impl>()} {
   mImpl->mBitsPerPixel = bitsPerPixel;
   mImpl->mSize = size;
-  mImpl->mFrameCount = frameCount;
-  mImpl->mFrames.resize(frameCount);
-
-  for (int i = 0; i < frameCount; ++i) {
-    mImpl->mFrames[i].resize(getBytesPerFrame());
-  }
+  mImpl->mData.resize(getByteCount());
 }
 
 Image::Image(const Image &other)
     : Image(
-          other.mImpl->mBitsPerPixel, other.mImpl->mSize,
-          other.mImpl->mFrameCount
+          other.mImpl->mBitsPerPixel, other.mImpl->mSize
       ) {
-  mImpl->mFrames = other.mImpl->mFrames;
+  mImpl->mData = other.mImpl->mData;
 }
 
 Image::Image(Image &&other) {
@@ -65,34 +59,72 @@ int Image::getBitsPerPixel() const { return mImpl->mBitsPerPixel; }
 
 Vector2i Image::getSize() const { return mImpl->mSize; }
 
-int Image::getFrameCount() const { return mImpl->mFrameCount; }
-
-const uint8_t *Image::getFrameData(int frameIndex) const {
-  return mImpl->mFrames[frameIndex].data();
+void Image::setPalette(PalettePtr palette) {
+  mImpl->mPalette = palette;
 }
 
-void Image::setFrameData(int frameIndex, const uint8_t *frameData) {
-  std::memcpy(mImpl->mFrames[frameIndex].data(), frameData, getBytesPerFrame());
+PalettePtr Image::getPalette() const {
+  return mImpl->mPalette;
 }
 
-ImagePtr Image::toTrue(std::shared_ptr<Palette> palette) {
-  ImagePtr newImage = makeTrue(getSize(), getFrameCount());
+uint8_t *Image::getData() const {
+  return mImpl->mData.data();
+}
 
-  for (int frameIndex = 0; frameIndex < getFrameCount(); ++frameIndex) {
-    std::vector<uint8_t> frameData;
-    frameData.reserve(newImage->getBytesPerFrame());
-    for (int y = 0; y < getSize().x(); ++y) {
-      for (int x = 0; x < getSize().y(); ++x) {
-        auto pixelValue = getPixelValueAt(frameIndex, x, y);
-        auto color = palette->at(pixelValue);
-        frameData.push_back(static_cast<uint8_t>(color.reduceRed(8)));
-        frameData.push_back(static_cast<uint8_t>(color.reduceGreen(8)));
-        frameData.push_back(static_cast<uint8_t>(color.reduceBlue(8)));
-        frameData.push_back(static_cast<uint8_t>(color.reduceAlpha(8)));
-      }
-    }
-    newImage->setFrameData(frameIndex, frameData.data());
+ColorRgb16 *Image::getRgb16() const {
+  return reinterpret_cast<ColorRgb16 *>(getData());
+}
+
+ColorRgb24 *Image::getRgb24() const {
+  return reinterpret_cast<ColorRgb24 *>(getData());
+}
+
+ColorRgb32 *Image::getRgb32() const {
+  return reinterpret_cast<ColorRgb32 *>(getData());
+}
+
+ImagePtr Image::toRgb16() {
+  switch (mImpl->mBitsPerPixel) {
+    case 16:
+      return shared_from_this();
+    default:
+      // todo: error
+      return shared_from_this();
   }
+}
 
-  return newImage;
+uint8_t Image::getNibbleAt(int x, int y) const {
+  auto &byte = getData()[(x + y * getSize().x()) / 2];
+
+  if (x % 2) {
+    return (byte >> 4) & 0xf;
+  } else {
+    return byte & 0xf;
+  }
+}
+
+void Image::setNibbleAt(int x, int y, uint8_t value) {
+  auto &byte = getData()[(x + y * getSize().x()) / 2];
+
+  if (x % 2) {
+    byte = (value & 0xf) | (byte & 0xf0);
+  } else {
+    byte = ((value << 4) & 0xf0) | (byte & 0xf);
+  }
+}
+
+uint8_t &Image::byteAt(int x, int y) const {
+  return getData()[x + y * getSize().x()];
+}
+
+ColorRgb16 &Image::rgb16At(int x, int y) const {
+  return getRgb16()[x + y * getSize().x()];
+}
+
+ColorRgb24 &Image::rgb24At(int x, int y) const {
+  return getRgb24()[x + y * getSize().x()];
+}
+
+ColorRgb32 &Image::rgb32At(int x, int y) const {
+  return getRgb32()[x + y * getSize().x()];
 }

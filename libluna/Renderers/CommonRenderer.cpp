@@ -13,10 +13,11 @@
 
 #include <libluna/Renderers/CommonRenderer.hpp>
 #include <libluna/CanvasImpl.hpp>
+#include <libluna/Logger.hpp>
 
 using namespace Luna;
 
-CommonRenderer::CommonRenderer() : mNextTextureId{1}, mNextMeshId{1}, mRenderTargetId{0} {}
+CommonRenderer::CommonRenderer() : mRenderTargetId{0} {}
 
 CommonRenderer::~CommonRenderer() {
   // todo
@@ -42,7 +43,8 @@ void CommonRenderer::render() {
   renderWorld(canvas);
 
   if (!mRenderTargetId) {
-    mRenderTargetId = mNextTextureId++;
+    mRenderTargetId = mTextureIdAllocator.next();
+    logDebug("create texture #{} (render target)", mRenderTargetId);
     createTexture(mRenderTargetId);
   }
 
@@ -52,7 +54,7 @@ void CommonRenderer::render() {
   end2dFramebuffer(canvas);
 }
 
-void CommonRenderer::clearBackground([[maybe_unused]] Color color) {
+void CommonRenderer::clearBackground([[maybe_unused]] ColorRgb color) {
   // stub
 }
 
@@ -64,7 +66,7 @@ void CommonRenderer::destroyTexture([[maybe_unused]] int id) {
   // stub
 }
 
-void CommonRenderer::loadTexture([[maybe_unused]] int id, [[maybe_unused]] ImagePtr image, [[maybe_unused]] int frameIndex) {
+void CommonRenderer::loadTexture([[maybe_unused]] int id, [[maybe_unused]] ImagePtr image) {
   // stub
 }
 
@@ -140,7 +142,7 @@ Vector2i CommonRenderer::getCurrentRenderSize() const {
 }
 
 void CommonRenderer::updateTextureCache(std::shared_ptr<Stage> stage) {
-  std::unordered_set<std::shared_ptr<ResourceRef<Image>>> visitedImages;
+  std::unordered_set<ImageResPtr> visitedImages;
   std::unordered_set<std::shared_ptr<Mesh>> visitedMeshes;
   
   for (auto &&sprite : stage->getSprites()) {
@@ -151,31 +153,16 @@ void CommonRenderer::updateTextureCache(std::shared_ptr<Stage> stage) {
     visitedImages.emplace(sprite->getImage());
 
     if (mKnownImages.count(sprite->getImage()) == 0) {
-      // int textureId = mNextTextureId++;
-      // mKnownImages.emplace(sprite->getImage(), textureId);
-      // createTexture(textureId);
-
-      // auto future = sprite->getImage()->get();
-      // // check with each update whether future is ready:
-      // // if (imageRef->isReady()):
-      // auto image = future.get();
-      // loadTexture(textureId, image, 0);
-      // mImageSizes.emplace(sprite->getImage(), image->getSize());
-
-
       auto future = sprite->getImage()->get();
       // check with each update whether future is ready:
       // if (imageRef->isReady()):
       auto image = future.get();
-      int textureId = mNextTextureId;
+      int textureId = mTextureIdAllocator.next();
       mKnownImages.emplace(sprite->getImage(), textureId);
       mImageSizes.emplace(sprite->getImage(), image->getSize());
-
-      for (int i = 0; i < image->getFrameCount(); ++i) {
-        int frameTextureId = mNextTextureId++;
-        createTexture(frameTextureId);
-        loadTexture(frameTextureId, image, i);
-      }
+      logDebug("create texture #{} (sprite)", textureId);
+      createTexture(textureId);
+      loadTexture(textureId, image);
     }
   }
 
@@ -183,7 +170,7 @@ void CommonRenderer::updateTextureCache(std::shared_ptr<Stage> stage) {
     visitedMeshes.emplace(model->getMesh());
 
     if (mKnownMeshes.count(model->getMesh()) == 0) {
-      int meshId = mNextMeshId++;
+      int meshId = mMeshIdAllocator.next();
       mKnownMeshes.emplace(model->getMesh(), meshId);
       createMesh(meshId);
       loadMesh(meshId, model->getMesh());
@@ -196,15 +183,16 @@ void CommonRenderer::updateTextureCache(std::shared_ptr<Stage> stage) {
       visitedImages.emplace(diffuse);
 
       if (mKnownImages.count(diffuse) == 0) {
-        int textureId = mNextTextureId++;
+        int textureId = mTextureIdAllocator.next();
         mKnownImages.emplace(diffuse, textureId);
+        logDebug("create texture #{} (diffuse)", textureId);
         createTexture(textureId);
 
         auto future = diffuse->get();
         // check with each update whether future is ready:
         // if (imageRef->isReady()):
         auto image = future.get();
-        loadTexture(textureId, image, 0);
+        loadTexture(textureId, image);
         mImageSizes.emplace(diffuse, image->getSize());
       }
     }
@@ -213,15 +201,16 @@ void CommonRenderer::updateTextureCache(std::shared_ptr<Stage> stage) {
       visitedImages.emplace(normal);
 
       if (mKnownImages.count(normal) == 0) {
-        int textureId = mNextTextureId++;
+        int textureId = mTextureIdAllocator.next();
         mKnownImages.emplace(normal, textureId);
+        logDebug("create texture #{} (normal)", textureId);
         createTexture(textureId);
 
         auto future = normal->get();
         // check with each update whether future is ready:
         // if (imageRef->isReady()):
         auto image = future.get();
-        loadTexture(textureId, image, 0);
+        loadTexture(textureId, image);
         mImageSizes.emplace(normal, image->getSize());
       }
     }
@@ -230,9 +219,11 @@ void CommonRenderer::updateTextureCache(std::shared_ptr<Stage> stage) {
   for (auto it = mKnownImages.begin(); it != mKnownImages.end();) {
     if (visitedImages.find(it->first) == visitedImages.end()) {
       // todo: delete all frames of an animated image
+      logDebug("destroy texture #{}", it->second);
+      mTextureIdAllocator.free(static_cast<uint8_t>(it->second));
       destroyTexture(it->second);
-      it = mKnownImages.erase(it);
       mImageSizes.erase(it->first);
+      it = mKnownImages.erase(it);
     } else {
       ++it;
     }
@@ -262,7 +253,7 @@ void CommonRenderer::renderWorld(Canvas *canvas) {
 void CommonRenderer::renderSprites(Canvas *canvas, [[maybe_unused]] Vector2i renderSize) {
   for (auto &&sprite : canvas->getStage()->getSprites()) {
     RenderTextureInfo info;
-    info.textureId = mKnownImages.at(sprite->getImage()) + sprite->getFrame();
+    info.textureId = mKnownImages.at(sprite->getImage());
     info.size = mImageSizes.at(sprite->getImage());
     info.position = sprite->getPosition() - canvas->getCamera2d().getPosition();
     renderTexture(canvas, &info);
@@ -274,7 +265,7 @@ void CommonRenderer::start2dFramebuffer([[maybe_unused]] Canvas *canvas) {
   setRenderTargetTexture(mRenderTargetId);
   setViewport({0, 0}, getInternalSize());
   mCurrentRenderSize = getInternalSize();
-  clearBackground(Color::Transparent());
+  clearBackground(ColorRgb{0, 0, 0, 0});
 }
 
 void CommonRenderer::end2dFramebuffer(Canvas *canvas) {

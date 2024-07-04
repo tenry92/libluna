@@ -218,6 +218,11 @@ libgfx_Image *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userD
 
 int libgfx_writeImageToFile(libgfx_Image *image, const char *filename) {
   FILE *file = fopen(filename, "wb");
+  
+  if (!file) {
+    return 1;
+  }
+
   int result = libgfx_writeImageToCallback(image, writeFileCallback, file);
   fclose(file);
 

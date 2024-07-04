@@ -50,7 +50,6 @@ namespace Luna::GL {
       }
 
       auto sourceLines = mRegisteredShaders.at(filename).split('\n');
-      logDebug("line count: {}", sourceLines.size());
 
       std::list<Luna::String> output;
 #ifdef INSERT_GLSL_LINE_STATEMENTS

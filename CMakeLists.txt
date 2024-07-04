@@ -60,6 +60,7 @@ configure_file(libluna/config.h.in libluna/config.h)
 # TOOLS
 
 add_subdirectory(tools/xxd)
+add_subdirectory(libs/libgfx)
 set(XXD xxd)
 
 ################################################################################
@@ -109,7 +110,6 @@ set(PUBLIC_MODULES
   Stage
   String
   Terminal
-  Util/Png
   Util/Zlib
   Vector
 )
@@ -151,16 +151,26 @@ list(APPEND PUBLIC_HEADERS
   libluna/Color.hpp
   libluna/InputStream.hpp
   libluna/Palette.hpp
-  libluna/ResourceRef.hpp
+  libluna/Resource.hpp
   libs/imgui/imgui.h
   libs/imgui/imconfig.h
 )
 
-# enable warnings
+# enable warnings and debug
 if(MSVC)
   target_compile_options(luna PRIVATE /W4 /WX)
+
+  set(CMAKE_CXX_FLAGS_DEBUG "/Zi /Od")
+  set(CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG")
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/O2 /Zi /DNDEBUG")
+  set(CMAKE_CXX_FLAGS_MINSIZEREL "/O1 /DNDEBUG")
 else()
   target_compile_options(luna PRIVATE -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wpedantic -Werror -Wnull-dereference -Wconversion)
+
+  set(CMAKE_CXX_FLAGS_DEBUG "-g")
+  set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
+  set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os")
 endif()
 
 ################################################################################
@@ -173,9 +183,6 @@ endif()
 
 find_package(ZLIB REQUIRED)
 target_link_libraries(luna PUBLIC ZLIB::ZLIB)
-
-find_package(PNG REQUIRED)
-target_link_libraries(luna PUBLIC PNG::PNG)
 
 find_path(OPUSFILE_INCLUDE_DIR NAMES opusfile.h REQUIRED PATH_SUFFIXES opus)
 find_library(OGG_LIB NAMES ogg)
@@ -300,9 +307,8 @@ set(UNIT_TESTS
   InputManager
   Matrix
   ResourceReader
-  ResourceRef
+  Resource
   String
-  Util/Png
   Util/Zlib
   Vector
 )

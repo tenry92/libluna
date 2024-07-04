@@ -1,41 +1,41 @@
 add_executable(canvas graphics/canvas/driver.cpp)
 add_dependencies(canvas luna)
-target_link_libraries(canvas PRIVATE luna)
+target_link_libraries(canvas PRIVATE luna libgfx)
 
 add_executable(bgcolor graphics/bgcolor/driver.cpp)
 add_dependencies(bgcolor luna)
-target_link_libraries(bgcolor PRIVATE luna)
+target_link_libraries(bgcolor PRIVATE luna libgfx)
 
 add_executable(sprite graphics/sprite/driver.cpp)
 add_dependencies(sprite luna)
-target_link_libraries(sprite PRIVATE luna)
+target_link_libraries(sprite PRIVATE luna libgfx)
 
 add_executable(moving-sprites graphics/moving-sprites/driver.cpp)
 add_dependencies(moving-sprites luna)
-target_link_libraries(moving-sprites PRIVATE luna)
+target_link_libraries(moving-sprites PRIVATE luna libgfx)
 
 add_executable(triangle graphics/triangle/driver.cpp)
 add_dependencies(triangle luna)
-target_link_libraries(triangle PRIVATE luna)
+target_link_libraries(triangle PRIVATE luna libgfx)
 
 add_executable(room graphics/room/driver.cpp)
 add_dependencies(room luna)
-target_link_libraries(room PRIVATE luna)
+target_link_libraries(room PRIVATE luna libgfx)
 
 add_executable(animated-sprite graphics/animated-sprite/driver.cpp)
 add_dependencies(animated-sprite luna)
-target_link_libraries(animated-sprite PRIVATE luna)
+target_link_libraries(animated-sprite PRIVATE luna libgfx)
 
 add_executable(direct-input input/direct/driver.cpp)
 add_dependencies(direct-input luna)
-target_link_libraries(direct-input PRIVATE luna)
+target_link_libraries(direct-input PRIVATE luna libgfx)
 
 add_executable(audio-music audio/music/driver.cpp)
 add_dependencies(audio-music luna)
-target_link_libraries(audio-music PRIVATE luna)
+target_link_libraries(audio-music PRIVATE luna libgfx)
 
 # add_executable(game-caveman games/caveman/driver.cpp)
 # add_dependencies(game-caveman luna)
-# target_link_libraries(game-caveman PRIVATE luna)
+# target_link_libraries(game-caveman PRIVATE luna libgfx)
 
 add_subdirectory(assets)

@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <libluna/AbstractRenderer.hpp>
+#include <libluna/IdAllocator.hpp>
 #include <libluna/Matrix.hpp>
 
 namespace Luna {
@@ -69,7 +70,7 @@ namespace Luna {
 
     void render() override;
 
-    virtual void clearBackground(Color color);
+    virtual void clearBackground(ColorRgb color);
 
     /**
      * @brief Create a new empty texture for the provided ID.
@@ -90,7 +91,7 @@ namespace Luna {
      * It is guaranteed that the given texture ID was previously passed to
      * @ref createTexture().
      */
-    virtual void loadTexture(int id, ImagePtr image, int frameIndex);
+    virtual void loadTexture(int id, ImagePtr image);
 
     /**
      * @brief Resize the texture for the provided ID.
@@ -176,12 +177,12 @@ namespace Luna {
 
     void end2dFramebuffer(Canvas *canvas);
 
-    int mNextTextureId;
-    int mNextMeshId;
+    IdAllocator<uint16_t> mTextureIdAllocator;
+    IdAllocator<uint16_t> mMeshIdAllocator;
     int mRenderTargetId;
     Vector2i mCurrentRenderSize;
-    std::unordered_map<std::shared_ptr<ResourceRef<Image>>, int> mKnownImages;
-    std::unordered_map<std::shared_ptr<ResourceRef<Image>>, Vector2i> mImageSizes;
+    std::unordered_map<ImageResPtr, int> mKnownImages;
+    std::unordered_map<ImageResPtr, Vector2i> mImageSizes;
     std::unordered_map<std::shared_ptr<Mesh>, int> mKnownMeshes;
   };
 } // namespace Luna
