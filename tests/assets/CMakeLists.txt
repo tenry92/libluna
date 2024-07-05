@@ -21,7 +21,6 @@ set(ASSET_FILES
 set(ASSETS_INPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 set(ASSETS_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/assets")
 
-# find_program(GFXTOOL gfxtool HINTS "${CMAKE_BINARY_DIR}/tools/gfxtool" REQUIRED)
 set(GFXTOOL "${LUNA_INSTALL_NATIVE_DIR}/bin/gfxtool")
 
 function(make_target_name file)

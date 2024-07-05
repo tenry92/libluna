@@ -70,37 +70,49 @@ namespace Luna {
 
   inline ColorRgb16 makeColorRgb16(ColorRgb24 other) {
     ColorRgb16 result;
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
+#endif
     result.red = reduce8BitTo5Bit(other.red);
     result.green = reduce8BitTo5Bit(other.green);
     result.blue = reduce8BitTo5Bit(other.blue);
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif
     result.alpha = 1;
     return result;
   }
 
   inline ColorRgb16 makeColorRgb16(ColorRgb32 other) {
     ColorRgb16 result;
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
+#endif
     result.red = reduce8BitTo5Bit(other.red);
     result.green = reduce8BitTo5Bit(other.green);
     result.blue = reduce8BitTo5Bit(other.blue);
     result.alpha = (other.alpha >> 7) & 0x1;
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif
     return result;
   }
 
   inline ColorRgb16 makeColorRgb16(ColorRgb other) {
     ColorRgb16 result;
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
+#endif
     result.red = static_cast<uint8_t>(other.red * 31);
     result.green = static_cast<uint8_t>(other.green * 31);
     result.blue = static_cast<uint8_t>(other.blue * 31);
     result.alpha = static_cast<uint8_t>(other.alpha * 1);
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif
     return result;
   }
 
