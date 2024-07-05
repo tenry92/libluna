@@ -209,6 +209,24 @@ void ApplicationImpl::mainLoop() {
     ++mDebugMetrics->framesElapsed;
   }
 
+  for (auto &&canvas : canvases) {
+    if (canvas.expired()) {
+      continue;
+    }
+
+    canvas.lock()->close();
+  }
+
+  if (!mRaisedErrorMessage.isEmpty()) {
+#ifdef __SWITCH__
+    Terminal::init();
+    logError("{}", mRaisedErrorMessage);
+    while (appletMainLoop()) {
+      Terminal::update();
+    }
+#endif
+  }
+
   logInfo("existing main loop");
 }
 
@@ -485,7 +503,7 @@ std::list<std::shared_ptr<Canvas>> Application::getOpenCanvases() {
 }
 
 void Application::raiseCriticalError(const String &message) {
-  if (!mImpl->mRaisedErrorMessage.isEmpty()) {
+  if (mImpl->mRaisedErrorMessage.isEmpty()) {
     mImpl->mRaisedErrorMessage = message;
   }
 }

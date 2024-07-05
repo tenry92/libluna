@@ -10,7 +10,7 @@
 #include <libluna/Logger.hpp>
 #include <libluna/String.hpp>
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(__SWITCH__)
 #define INSERT_GLSL_LINE_STATEMENTS
 #endif
 

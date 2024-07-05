@@ -417,6 +417,25 @@ void Canvas::close() {
     mImpl->glfw.window = nullptr;
   }
 #endif
+
+#ifdef LUNA_USE_EGL
+  if (mImpl->egl.display) {
+    eglMakeCurrent(mImpl->egl.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+
+    if (mImpl->egl.context) {
+      eglDestroyContext(mImpl->egl.display, mImpl->egl.context);
+      mImpl->egl.context = nullptr;
+    }
+
+    if (mImpl->egl.surface) {
+      eglDestroySurface(mImpl->egl.display, mImpl->egl.surface);
+      mImpl->egl.surface = nullptr;
+    }
+
+    // eglTerminate(mImpl->egl.display);
+    // mImpl->egl.display = nullptr;
+  }
+#endif
 }
 
 void Canvas::setVideoDriver(const String &name) {

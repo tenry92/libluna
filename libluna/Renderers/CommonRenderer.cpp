@@ -281,7 +281,7 @@ void CommonRenderer::start2dFramebuffer([[maybe_unused]] Canvas *canvas) {
   clearBackground(ColorRgb{0, 0, 0, 0});
 }
 
-void CommonRenderer::end2dFramebuffer(Canvas *canvas) {
+void CommonRenderer::end2dFramebuffer([[maybe_unused]] Canvas *canvas) {
   unsetRenderTargetTexture();
   setViewport({0, 0}, getCanvasSize());
   mCurrentRenderSize = getCanvasSize();

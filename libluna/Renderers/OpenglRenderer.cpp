@@ -261,14 +261,14 @@ void OpenglRenderer::resizeTexture(int id, Vector2i size) {
   ));
 }
 
-void OpenglRenderer::renderTexture([[maybe_unused]] Canvas *canvas, RenderTextureInfo *info) {
+void OpenglRenderer::renderTexture([[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info) {
   mImpl->mSpriteShader.use();
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_CULL_FACE);
   glDisable(GL_MULTISAMPLE);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  auto screenSize = getCurrentRenderSize();
+  [[maybe_unused]] auto screenSize = getCurrentRenderSize();
   mImpl->mUniforms.screenSize = mImpl->mSpriteShader.getUniform("uScreenSize");
   mImpl->mUniforms.screenSize =
       Vector2f(static_cast<float>(screenSize.x()), static_cast<float>(screenSize.y()));

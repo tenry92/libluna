@@ -17,6 +17,7 @@ namespace Luna::GL {
 
     if (!success) {
       glGetShaderInfoLog(shader, 512, nullptr, infoLog);
+      Application::getInstance()->raiseCriticalError(infoLog);
       Luna::logError("opengl shader compilation error: {}", infoLog);
     }
   }
@@ -28,6 +29,7 @@ namespace Luna::GL {
 
     if (!success) {
       glGetProgramInfoLog(program, 512, nullptr, infoLog);
+      Application::getInstance()->raiseCriticalError(infoLog);
       Luna::logError("opengl program link error: {}", infoLog);
     }
   }
