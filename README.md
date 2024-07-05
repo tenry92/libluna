@@ -77,6 +77,20 @@ by running the following command first:
 export CMAKE_BUILD_PARALLEL_LEVEL=4
 ```
 
+To find out the optimal number, check the number of logical cores your computer
+has:
+
+```sh
+# linux
+nproc
+
+# windows
+wmic cpu get NumberOfLogicalProcessors
+
+# macos
+sysctl -n hw.logicalcpu
+```
+
 When everything is ready, use the following commands to configure the build:
 
 ```sh
