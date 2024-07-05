@@ -1,3 +1,7 @@
+// disable MSVC warning about using fopen_s and strncpy_s
+// (these are not available on GCC)
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <string.h>
 
@@ -52,12 +56,12 @@ static inline float getBytesPerPixel(libgfx_ColorFormat colorFormat) {
 }
 
 static int getBytesPerFrame(libgfx_Image *image) {
-  return image->width * image->height * getBytesPerPixel(image->colorFormat);
+  return (int) (image->width * image->height * getBytesPerPixel(image->colorFormat));
 }
 
 static int readFileCallback(void *dest, size_t size, void *userData) {
   FILE *file = (FILE *) userData;
-  return fread(dest, size, 1, file) * size;
+  return (int) (fread(dest, size, 1, file) * size);
 }
 
 static int readMemCallback(void *dest, size_t size, void *userData) {
@@ -68,12 +72,12 @@ static int readMemCallback(void *dest, size_t size, void *userData) {
 
   srcPointer += size;
 
-  return size;
+  return (int) size;
 }
 
 static int writeFileCallback(const void *src, size_t size, void *userData) {
   FILE *file = (FILE *) userData;
-  return fwrite(src, size, 1, file) * size;
+  return (int) (fwrite(src, size, 1, file) * size);
 }
 
 static int writeMemCallback(const void *src, size_t size, void *userData) {
@@ -84,24 +88,24 @@ static int writeMemCallback(const void *src, size_t size, void *userData) {
 
   destPointer += size;
 
-  return size;
+  return (int) size;
 }
 
 libgfx_Image *libgfx_loadImageFromFile(const char *filename) {
-  FILE *file = fopen(filename, "rb");
+  FILE *fp = fopen(filename, "rb");
 
-  if (!file) {
+  if (!fp) {
     errorMessage = "Couldn't open file";
     return NULL;
   }
 
-  libgfx_Image *image = libgfx_loadImageFromCallback(readFileCallback, file);
-  fclose(file);
+  libgfx_Image *image = libgfx_loadImageFromCallback(readFileCallback, fp);
+  fclose(fp);
   return image;
 }
 
 libgfx_Image *libgfx_loadImageFromMemory(const void *buffer, size_t bufferSize) {
-  return libgfx_loadImageFromCallback(readMemCallback, &buffer);
+  return libgfx_loadImageFromCallback(readMemCallback, (void *) &buffer);
 }
 
 libgfx_Image *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userData) {
@@ -206,7 +210,7 @@ libgfx_Image *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userD
     pal->numColors = (numColors > 0 ? numColors : 256);
 
     libgfx_allocPalette(image, pal, format, pal->numColors);
-    if (read(pal->colors, pal->numColors * getBytesPerPixel(pal->colorFormat), userData) == 0) {
+    if (read(pal->colors, (size_t) (pal->numColors * getBytesPerPixel(pal->colorFormat)), userData) == 0) {
       libgfx_freeImage(image);
       errorMessage = "Error reading palette";
       return NULL;
@@ -217,14 +221,14 @@ libgfx_Image *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userD
 }
 
 int libgfx_writeImageToFile(libgfx_Image *image, const char *filename) {
-  FILE *file = fopen(filename, "wb");
+  FILE *fp = fopen(filename, "wb");
   
-  if (!file) {
+  if (!fp) {
     return 1;
   }
 
-  int result = libgfx_writeImageToCallback(image, writeFileCallback, file);
-  fclose(file);
+  int result = libgfx_writeImageToCallback(image, writeFileCallback, fp);
+  fclose(fp);
 
   return result;
 }
@@ -271,7 +275,7 @@ int libgfx_writeImageToCallback(libgfx_Image *image, libgfx_WriteCallback write,
     uint8_t numColors = pal->numColors;
     write(&format, sizeof(format), userData);
     write(&numColors, sizeof(numColors), userData);
-    write(pal->colors, pal->numColors * getBytesPerPixel(pal->colorFormat), userData);
+    write(pal->colors, (size_t) (pal->numColors * getBytesPerPixel(pal->colorFormat)), userData);
   }
   
   return 0;
@@ -326,7 +330,7 @@ int libgfx_allocAnimation(libgfx_Image *image, libgfx_Animation *animation, int 
 }
 
 int libgfx_allocPalette(libgfx_Image *image, libgfx_Palette *palette, libgfx_ColorFormat colorFormat, int numColors) {
-  int bytesPerColor = getBytesPerPixel(colorFormat);
+  int bytesPerColor = (int) getBytesPerPixel(colorFormat);
   
   palette->colorFormat = colorFormat;
   palette->numColors = numColors;
@@ -336,7 +340,7 @@ int libgfx_allocPalette(libgfx_Image *image, libgfx_Palette *palette, libgfx_Col
 }
 
 void *libgfx_getFramePointer(libgfx_Image *image, int frameIndex) {
-  return image->frames + getBytesPerFrame(image) * frameIndex;
+  return (void *) (((char *) image->frames) + getBytesPerFrame(image) * frameIndex);
 }
 
 libgfx_Animation *libgfx_getAnimation(libgfx_Image *image, int index) {
