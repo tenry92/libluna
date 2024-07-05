@@ -22,7 +22,7 @@ set(ASSETS_INPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 set(ASSETS_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/assets")
 
 # find_program(GFXTOOL gfxtool HINTS "${CMAKE_BINARY_DIR}/tools/gfxtool" REQUIRED)
-set(GFXTOOL "${CMAKE_BINARY_DIR}/libs/libgfx/gfxtool")
+set(GFXTOOL "${LUNA_INSTALL_NATIVE_DIR}/bin/gfxtool")
 
 function(make_target_name file)
   string(REPLACE "/" "_" target_name "${file}")
@@ -34,12 +34,11 @@ function(copy_static_file file)
   get_filename_component(name_rel_dir "${file}" DIRECTORY)
   set(output_file "${ASSETS_OUTPUT_PATH}/${name_rel_dir}/${file}")
   get_filename_component(name_dir "${output_file}" DIRECTORY)
-  message("copy ${ASSETS_INPUT_PATH}/${file} => ${output_file}")
   add_custom_command(
     OUTPUT "${output_file}"
     COMMAND ${CMAKE_COMMAND} -E make_directory "${name_dir}"
     COMMAND ${CMAKE_COMMAND} -E copy "${ASSETS_INPUT_PATH}/${file}" "${output_file}"
-    DEPENDS "${ASSETS_INPUT_PATH}/${file}" gfxtool
+    DEPENDS "${ASSETS_INPUT_PATH}/${file}" gfxtool-native
     COMMENT "Copying static asset file ${file}"
   )
   add_custom_target("copy_${target_name}" ALL DEPENDS "${output_file}")
@@ -63,13 +62,11 @@ function(convert_gfx file params)
     endif()
   endforeach()
 
-  message("gfxtool command: ${command}")
-
   add_custom_command(
     OUTPUT "${output_file}"
     COMMAND ${CMAKE_COMMAND} -E make_directory "${name_dir}"
     COMMAND ${command}
-    DEPENDS "${ASSETS_INPUT_PATH}/${file}" gfxtool
+    DEPENDS "${ASSETS_INPUT_PATH}/${file}" gfxtool-native
     COMMENT "Converting GFX file ${file} to ${output_file}; ${params}"
   )
   add_custom_target("convert_gfx_${target_name}" ALL DEPENDS "${output_file}")

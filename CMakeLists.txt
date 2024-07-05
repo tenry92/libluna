@@ -6,8 +6,16 @@ project(libluna
   LANGUAGES C CXX
 )
 
+include(ExternalProject)
+
 set(CMAKE_MODULE_PATH "/opt/cmake/module")
 set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX_PATH}")
+
+################################################################################
+# VARIABLES
+
+set(LUNA_BUILD_NATIVE_DIR "${CMAKE_CURRENT_BINARY_DIR}/native")
+set(LUNA_INSTALL_NATIVE_DIR "${CMAKE_CURRENT_BINARY_DIR}/native")
 
 ################################################################################
 # METADATA
@@ -59,9 +67,37 @@ configure_file(libluna/config.h.in libluna/config.h)
 ################################################################################
 # TOOLS
 
-add_subdirectory(tools/xxd)
-add_subdirectory(libs/libgfx)
-set(XXD xxd)
+# these are always built for the host platform
+
+ExternalProject_Add(
+  libgfx-native
+  PREFIX "${LUNA_BUILD_NATIVE_DIR}"
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${LUNA_INSTALL_NATIVE_DIR}
+  CMAKE_ARGS -DCMAKE_PREFIX_PATH=${LUNA_INSTALL_NATIVE_DIR}
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs/libgfx
+  BUILD_ALWAYS ON
+)
+
+ExternalProject_Add(
+  gfxtool-native
+  PREFIX "${LUNA_BUILD_NATIVE_DIR}"
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${LUNA_INSTALL_NATIVE_DIR}
+  CMAKE_ARGS -DCMAKE_PREFIX_PATH=${LUNA_INSTALL_NATIVE_DIR}
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tools/gfxtool
+  BUILD_ALWAYS ON
+  DEPENDS libgfx-native
+)
+
+ExternalProject_Add(
+  xxd-native
+  PREFIX "${LUNA_BUILD_NATIVE_DIR}"
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${LUNA_INSTALL_NATIVE_DIR}
+  CMAKE_ARGS -DCMAKE_PREFIX_PATH=${LUNA_INSTALL_NATIVE_DIR}
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tools/xxd
+  BUILD_ALWAYS ON
+)
+
+set(XXD "${LUNA_INSTALL_NATIVE_DIR}/bin/xxd")
 
 ################################################################################
 # TARGET CONFIGURATION
@@ -288,6 +324,8 @@ add_custom_target(shaders ALL
   DEPENDS ${SHADER_HEADER_FILES}
 )
 
+add_dependencies(shaders xxd-native)
+
 ################################################################################
 # INSTALL
 
@@ -330,3 +368,4 @@ add_subdirectory(tests)
 # THIRD PARTY
 
 add_subdirectory(libs/glad-4.3)
+add_subdirectory(libs/libgfx)
