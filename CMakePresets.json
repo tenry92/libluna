@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 19,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default Config",
+      "description": "Default build for native system",
+      "generator": "Unix Makefiles",
+      "hidden": false,
+      "binaryDir": "${sourceDir}/build"
+    },
+    {
+      "name": "switch",
+      "displayName": "Config for Nintendo Switch",
+      "description": "Build for Nintendo Switch",
+      "generator": "Unix Makefiles",
+      "hidden": false,
+      "binaryDir": "${sourceDir}/build-switch",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{DEVKITPRO}/cmake/Switch.cmake"
+      },
+      "environment": {
+        "DEVKITPRO": "/opt/devkitpro"
+      }
+    }
+  ]
+}
