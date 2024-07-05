@@ -12,6 +12,12 @@ set(CMAKE_MODULE_PATH "/opt/cmake/module")
 set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX_PATH}")
 
 ################################################################################
+# VARIABLES
+
+set(LUNA_BUILD_NATIVE_DIR "${CMAKE_CURRENT_BINARY_DIR}/native")
+set(LUNA_INSTALL_NATIVE_DIR "${CMAKE_CURRENT_BINARY_DIR}/native")
+
+################################################################################
 # METADATA
 
 set(APP_AUTHOR "Tenry")
@@ -70,23 +76,37 @@ configure_file(libluna/config.h.in libluna/config.h)
 ################################################################################
 # TOOLS
 
+# these are always built for the host platform
+
 ExternalProject_Add(
-  gfxtool
-  PREFIX ${CMAKE_CURRENT_BINARY_DIR}/tools
-  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/tools
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tools/gfxtool
+  libgfx-native
+  PREFIX "${LUNA_BUILD_NATIVE_DIR}"
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${LUNA_INSTALL_NATIVE_DIR}
+  CMAKE_ARGS -DCMAKE_PREFIX_PATH=${LUNA_INSTALL_NATIVE_DIR}
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs/libgfx
   BUILD_ALWAYS ON
 )
 
 ExternalProject_Add(
-  xxd
-  PREFIX ${CMAKE_CURRENT_BINARY_DIR}/tools
-  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/tools
+  gfxtool-native
+  PREFIX "${LUNA_BUILD_NATIVE_DIR}"
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${LUNA_INSTALL_NATIVE_DIR}
+  CMAKE_ARGS -DCMAKE_PREFIX_PATH=${LUNA_INSTALL_NATIVE_DIR}
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tools/gfxtool
+  BUILD_ALWAYS ON
+  DEPENDS libgfx-native
+)
+
+ExternalProject_Add(
+  xxd-native
+  PREFIX "${LUNA_BUILD_NATIVE_DIR}"
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${LUNA_INSTALL_NATIVE_DIR}
+  CMAKE_ARGS -DCMAKE_PREFIX_PATH=${LUNA_INSTALL_NATIVE_DIR}
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tools/xxd
   BUILD_ALWAYS ON
 )
 
-set(XXD "${CMAKE_CURRENT_BINARY_DIR}/tools/bin/xxd")
+set(XXD "${LUNA_INSTALL_NATIVE_DIR}/bin/xxd")
 
 ################################################################################
 # TARGET CONFIGURATION
@@ -135,7 +155,6 @@ set(PUBLIC_MODULES
   Stage
   String
   Terminal
-  Util/Png
   Util/Zlib
   Vector
 )
@@ -177,16 +196,26 @@ list(APPEND PUBLIC_HEADERS
   libluna/Color.hpp
   libluna/InputStream.hpp
   libluna/Palette.hpp
-  libluna/ResourceRef.hpp
+  libluna/Resource.hpp
   libs/imgui/imgui.h
   libs/imgui/imconfig.h
 )
 
-# enable warnings
+# enable warnings and debug
 if(MSVC)
   target_compile_options(luna PRIVATE /W4 /WX)
+
+  set(CMAKE_CXX_FLAGS_DEBUG "/Zi /Od")
+  set(CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG")
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/O2 /Zi /DNDEBUG")
+  set(CMAKE_CXX_FLAGS_MINSIZEREL "/O1 /DNDEBUG")
 else()
   target_compile_options(luna PRIVATE -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wpedantic -Werror -Wnull-dereference -Wconversion)
+
+  set(CMAKE_CXX_FLAGS_DEBUG "-g")
+  set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
+  set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os")
 endif()
 
 ################################################################################
@@ -199,9 +228,6 @@ endif()
 
 find_package(ZLIB REQUIRED)
 target_link_libraries(luna PUBLIC ZLIB::ZLIB)
-
-find_package(PNG REQUIRED)
-target_link_libraries(luna PUBLIC PNG::PNG)
 
 find_path(OPUSFILE_INCLUDE_DIR NAMES opusfile.h REQUIRED PATH_SUFFIXES opus)
 find_library(OGG_LIB NAMES ogg)
@@ -301,7 +327,7 @@ foreach(SHADER_SOURCE_FILE ${SHADER_SOURCE_FILES})
     OUTPUT ${SHADER_HEADER_FILE}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/libluna/GL/shaders
     COMMAND ${XXD} -n ${SHADER_SOURCE_FILE} -i ${PROJECT_SOURCE_DIR}/libluna/GL/shaders/${SHADER_SOURCE_FILE} ${SHADER_HEADER_FILE}
-    DEPENDS xxd ${PROJECT_SOURCE_DIR}/libluna/GL/shaders/${SHADER_SOURCE_FILE}
+    DEPENDS xxd-native ${PROJECT_SOURCE_DIR}/libluna/GL/shaders/${SHADER_SOURCE_FILE}
     COMMENT "Converting ${SHADER_SOURCE_FILE} to C header"
   )
   list(APPEND SHADER_HEADER_FILES "${SHADER_HEADER_FILE}")
@@ -310,6 +336,8 @@ endforeach()
 add_custom_target(shaders ALL
   DEPENDS ${SHADER_HEADER_FILES}
 )
+
+add_dependencies(shaders xxd-native)
 
 ################################################################################
 # INSTALL
@@ -330,9 +358,8 @@ set(UNIT_TESTS
   InputManager
   Matrix
   ResourceReader
-  ResourceRef
+  Resource
   String
-  Util/Png
   Util/Zlib
   Vector
 )
@@ -360,3 +387,5 @@ add_subdirectory(tests)
 if(NOT NINTENDO_SWITCH)
   add_subdirectory(libs/glad-4.3)
 endif()
+
+add_subdirectory(libs/libgfx)

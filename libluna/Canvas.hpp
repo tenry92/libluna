@@ -40,8 +40,8 @@ namespace Luna {
     void setCamera3d(const Camera3d &camera);
     Camera3d getCamera3d() const;
 
-    void setBackgroundColor(Color color);
-    Color getBackgroundColor() const;
+    void setBackgroundColor(ColorRgb color);
+    ColorRgb getBackgroundColor() const;
 
     ImagePtr captureScreenshot();
 

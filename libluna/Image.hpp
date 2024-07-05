@@ -4,80 +4,108 @@
 
 #include <libluna/Color.hpp>
 #include <libluna/Palette.hpp>
+#include <libluna/Resource.hpp>
 #include <libluna/Vector.hpp>
 
 namespace Luna {
   class Image;
   using ImagePtr = std::shared_ptr<Image>;
+  using ImageResPtr = ResourcePtr<Image>;
 
-  class Image {
+  class Image : public std::enable_shared_from_this<Image> {
     public:
     static ImagePtr make();
-    static ImagePtr make(int bitsPerPixel, const Vector2i &size, int frameCount = 1);
+    static ImagePtr make(int bitsPerPixel, const Vector2i &size);
     static ImagePtr make(const Image &other);
     static ImagePtr make(Image &&other);
 
-    static inline ImagePtr makeIndexed(const Vector2i &size, int frameCount = 1) {
-      return make(4, size, frameCount);
+    static inline ImagePtr makeIndexed4(const Vector2i &size) {
+      return make(4, size);
     }
-    static inline ImagePtr makeTrue(const Vector2i &size, int frameCount = 1) {
-      return make(32, size, frameCount);
+    static inline ImagePtr makeIndexed8(const Vector2i &size) {
+      return make(8, size);
+    }
+    static inline ImagePtr makeRgb16(const Vector2i &size) {
+      return make(16, size);
+    }
+    static inline ImagePtr makeRgb24(const Vector2i &size) {
+      return make(24, size);
+    }
+    static inline ImagePtr makeRgb32(const Vector2i &size) {
+      return make(32, size);
     }
     ~Image();
     int getBitsPerPixel() const;
     Vector2i getSize() const;
-    int getFrameCount() const;
-    const uint8_t *getFrameData(int frameIndex = 0) const;
-    void setFrameData(int frameIndex, const uint8_t *frameData);
-    ImagePtr toTrue(std::shared_ptr<Palette> palette);
 
-    inline bool isIndexed() const { return getBitsPerPixel() <= 8; }
+    void setPalette(PalettePtr palette);
+    PalettePtr getPalette() const;
 
-    inline bool isTrue() const { return getBitsPerPixel() >= 24; }
+    uint8_t *getData() const;
+    ColorRgb16 *getRgb16() const;
+    ColorRgb24 *getRgb24() const;
+    ColorRgb32 *getRgb32() const;
 
-    int getBytesPerFrame() const {
+    /**
+     * @brief Convert the image to RGB16.
+     *
+     * If the image is in RGB24 or RGB32, the bits per channel are reduced.
+     * If the image is already in RGB16, a reference to the same instance is
+     * returned.
+     * If the image is using a palette, a palette must be assigned first.
+     */
+    ImagePtr toRgb16();
+
+    /**
+     * @brief Convert the image to RGB24.
+     *
+     * If the image is in RGB16 or RGB32, the bits per channel are adjusted.
+     * The alpha channel is discared.
+     * If the image is already in RGB24, a reference to the same instance is
+     * returned.
+     * If the image is using a palette, a palette must be assigned first.
+     */
+    ImagePtr toRgb24();
+
+    /**
+     * @brief Convert the image to RGB32.
+     *
+     * If the image is in RGB16 or RGB24, the bits per channel are expanded.
+     * If the image is already in RGB32, a reference to the same instance is
+     * returned.
+     * If the image is using a palette, a palette must be assigned first.
+     */
+    ImagePtr toRgb32();
+
+    int getByteCount() const {
       return getSize().x() * getSize().y() / 2 * (getBitsPerPixel() / 4);
     }
 
-    // todo: rename to "getBytesPerRow"
-    int getBytesPerLine() const {
+    int getBytesPerRow() const {
       return getSize().x() / 2 * (getBitsPerPixel() / 4);
     }
 
-    inline int getPixelValueAt(int frameIndex, int x, int y) const {
-      const uint8_t *firstByte =
-          getFrameData(frameIndex) +
-          (x + y * getSize().x()) * (getBitsPerPixel() / 4) / 2;
+    /**
+     * @brief Get nibble (4-bit value) at given coordinates.
+     *
+     * Unlike the other at-methods, this one does not return a reference since
+     * references to half a byte is not possible.
+     */
+    uint8_t getNibbleAt(int x, int y) const;
 
-      if (getBitsPerPixel() == 4) {
-        if (x % 2 == 0) {
-          return *firstByte & 0xf;
-        } else {
-          return (*firstByte >> 4) & 0xf;
-        }
-      } else {
-        return *firstByte;
-      }
-    }
+    void setNibbleAt(int x, int y, uint8_t value);
 
-    inline Color getPixelColorAt(int frameIndex, int x, int y) const {
-      const uint8_t *firstByte =
-          getFrameData(frameIndex) +
-          (x + y * getSize().x()) * (getBitsPerPixel() / 4) / 2;
+    uint8_t &byteAt(int x, int y) const;
 
-      float red = static_cast<float>(firstByte[0]) / 255;
-      float green = static_cast<float>(firstByte[1]) / 255;
-      float blue = static_cast<float>(firstByte[2]) / 255;
-      float alpha = getBitsPerPixel() == 32
-                        ? static_cast<float>(firstByte[3]) / 255
-                        : 1.f;
+    ColorRgb16 &rgb16At(int x, int y) const;
 
-      return Color(red, green, blue, alpha);
-    }
+    ColorRgb24 &rgb24At(int x, int y) const;
+
+    ColorRgb32 &rgb32At(int x, int y) const;
 
     private:
     Image();
-    Image(int bitsPerPixel, const Vector2i &size, int frameCount = 1);
+    Image(int bitsPerPixel, const Vector2i &size);
     Image(const Image &other);
     Image(Image &&other);
     class impl;

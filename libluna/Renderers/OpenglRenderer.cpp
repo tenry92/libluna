@@ -216,7 +216,7 @@ Internal::GraphicsMetrics OpenglRenderer::getMetrics() {
 }
 
 
-void OpenglRenderer::clearBackground(Color color) {
+void OpenglRenderer::clearBackground(ColorRgb color) {
   CHECK_GL(glClearColor(color.red, color.green, color.blue, color.alpha));
   CHECK_GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
@@ -237,7 +237,7 @@ void OpenglRenderer::destroyTexture(int id) {
   CHECK_GL(glDeleteTextures(1, &texture));
 }
 
-void OpenglRenderer::loadTexture(int id, ImagePtr image, int frameIndex) {
+void OpenglRenderer::loadTexture(int id, ImagePtr image) {
   GLuint texture = mImpl->mTextureIdMapping.at(id);
 
   CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
@@ -246,7 +246,7 @@ void OpenglRenderer::loadTexture(int id, ImagePtr image, int frameIndex) {
       GL_RGBA,                                       /* internal format */
       image->getSize().x(), image->getSize().y(), 0, /* format (legacy) */
       GL_RGBA,                                       /* input format */
-      GL_UNSIGNED_BYTE, image->getFrameData(frameIndex)
+      GL_UNSIGNED_BYTE, image->getData()
   ));
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

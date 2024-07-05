@@ -4,8 +4,8 @@ using namespace Luna;
 
 class Material::impl {
   public:
-  std::shared_ptr<ResourceRef<Image>> mDiffuse;
-  std::shared_ptr<ResourceRef<Image>> mNormal;
+  ImageResPtr mDiffuse;
+  ImageResPtr mNormal;
 };
 
 Material::Material() : mImpl{std::make_unique<impl>()} {}
@@ -22,18 +22,18 @@ Material &Material::operator=(const Material &other) {
 
 Material::~Material() = default;
 
-void Material::setDiffuse(std::shared_ptr<ResourceRef<Image>> image) {
+void Material::setDiffuse(ImageResPtr image) {
   mImpl->mDiffuse = image;
 }
 
-std::shared_ptr<ResourceRef<Image>> Material::getDiffuse() const {
+ImageResPtr Material::getDiffuse() const {
   return mImpl->mDiffuse;
 }
 
-void Material::setNormal(std::shared_ptr<ResourceRef<Image>> image) {
+void Material::setNormal(ImageResPtr image) {
   mImpl->mNormal = image;
 }
 
-std::shared_ptr<ResourceRef<Image>> Material::getNormal() const {
+ImageResPtr Material::getNormal() const {
   return mImpl->mNormal;
 }

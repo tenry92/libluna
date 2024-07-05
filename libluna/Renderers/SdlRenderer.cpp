@@ -168,11 +168,10 @@ Internal::GraphicsMetrics SdlRenderer::getMetrics() {
 }
 
 
-void SdlRenderer::clearBackground(Color color) {
+void SdlRenderer::clearBackground(ColorRgb color) {
+  auto color32 = makeColorRgb32(color);
   CHECK_SDL(SDL_SetRenderDrawColor(
-      mImpl->mRenderer.get(), static_cast<uint8_t>(color.reduceRed(8)),
-      static_cast<uint8_t>(color.reduceGreen(8)),
-      static_cast<uint8_t>(color.reduceBlue(8)), SDL_ALPHA_OPAQUE
+      mImpl->mRenderer.get(), color32.red, color32.green, color32.blue, SDL_ALPHA_OPAQUE
   ));
   CHECK_SDL(SDL_RenderClear(mImpl->mRenderer.get()));
 }
@@ -187,21 +186,21 @@ void SdlRenderer::destroyTexture(int id) {
   SDL_DestroyTexture(texture);
 }
 
-void SdlRenderer::loadTexture(int id, ImagePtr image, int frameIndex) {
+void SdlRenderer::loadTexture(int id, ImagePtr image) {
   if (mImpl->mTextureIdMapping.count(id)) {
     SDL_Texture *oldTexture = mImpl->mTextureIdMapping.at(id);
     SDL_DestroyTexture(oldTexture);
     mImpl->mTextureIdMapping.erase(id);
   }
   
-  if (!image->isTrue()) {
-    /// @todo Get palette from sprite
-    image = image->toTrue(nullptr);
-  }
+  // if (!image->isTrue()) {
+  //   /// @todo Get palette from sprite
+  //   image = image->toTrue(nullptr);
+  // }
 
   SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(
-      (void *)(image->getFrameData(frameIndex)), image->getSize().x(),
-      image->getSize().y(), 32, image->getBytesPerLine(),
+      (void *)(image->getData()), image->getSize().x(),
+      image->getSize().y(), 32, image->getByteCount(),
       SDL_PIXELFORMAT_RGBA32
   );
 

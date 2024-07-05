@@ -53,7 +53,7 @@ class Luna::CanvasImpl {
   std::unique_ptr<ImmediateGui> mImmediateGui;
   Camera2d mCamera2d;
   Camera3d mCamera3d;
-  Color mBackgroundColor;
+  ColorRgb mBackgroundColor;
   std::queue<ButtonEvent> mButtonEvents;
   std::map<std::string, float> mAxisValues;
 

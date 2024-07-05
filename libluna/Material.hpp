@@ -3,7 +3,7 @@
 #include <memory>
 
 #include <libluna/Image.hpp>
-#include <libluna/ResourceRef.hpp>
+#include <libluna/Resource.hpp>
 
 namespace Luna {
   class Material {
@@ -13,11 +13,11 @@ namespace Luna {
     Material(const Material &other);
     Material &operator=(const Material &other);
 
-    void setDiffuse(std::shared_ptr<ResourceRef<Image>> image);
-    std::shared_ptr<ResourceRef<Image>> getDiffuse() const;
+    void setDiffuse(ImageResPtr image);
+    ImageResPtr getDiffuse() const;
 
-    void setNormal(std::shared_ptr<ResourceRef<Image>> image);
-    std::shared_ptr<ResourceRef<Image>> getNormal() const;
+    void setNormal(ImageResPtr image);
+    ImageResPtr getNormal() const;
 
     private:
     class impl;

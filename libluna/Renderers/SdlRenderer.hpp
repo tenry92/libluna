@@ -17,10 +17,10 @@ namespace Luna {
     void present() override;
     Internal::GraphicsMetrics getMetrics() override;
 
-    void clearBackground(Color color) override;
+    void clearBackground(ColorRgb color) override;
     void createTexture(int id) override;
     void destroyTexture(int id) override;
-    void loadTexture(int id, ImagePtr image, int frameIndex) override;
+    void loadTexture(int id, ImagePtr image) override;
     void resizeTexture(int id, Vector2i size) override;
     void renderTexture(Canvas *canvas, RenderTextureInfo *info) override;
 

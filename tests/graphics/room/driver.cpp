@@ -1,10 +1,12 @@
 #include <vector>
 #include <cmath>
+#include <cstring>
+
+#include <libgfx/libgfx.h>
 
 #include <libluna/Application.hpp>
 #include <libluna/MeshBuilder.hpp>
 #include <libluna/InputManager.hpp>
-#include <libluna/Util/Png.hpp>
 #include <libluna/ResourceReader.hpp>
 
 #ifdef __SWITCH__
@@ -17,15 +19,25 @@
 
 using namespace std;
 using namespace Luna;
-using namespace Luna::Util;
+
+static int readFromResource(void *dest, size_t size, void *userData) {
+  auto *reader = reinterpret_cast<ResourceReader *>(userData);
+
+  return reader->read(reinterpret_cast<uint8_t *>(dest), 1, size);
+}
 
 class DummyImageLoader {
   public:
   DummyImageLoader(String filename) : mFilename(filename) {}
 
   ImagePtr operator()() {
-    Png png(ResourceReader::make(mFilename.c_str()));
-    return png.decode();
+    auto reader = ResourceReader::make(mFilename.c_str());
+    auto gfx = libgfx_loadImageFromCallback(readFromResource, reader.get());
+    auto image = Image::makeRgb32({gfx->width, gfx->height});
+    memcpy(image->getData(), libgfx_getFramePointer(gfx, 0), image->getByteCount());
+    libgfx_freeImage(gfx);
+
+    return image;
   }
 
   private:
@@ -104,10 +116,10 @@ int main(int argc, char **argv) {
     model = stage->makeModel();
     model->setMesh(mesh);
 
-    auto diffuseRef = make_shared<ResourceRef<Image>>(DummyImageLoader("textures/BricksDragfacedRunning008_COL_1K.png"));
+    auto diffuseRef = make_shared<Resource<Image>>(DummyImageLoader("textures/BricksDragfacedRunning008_COL_1K.gfx"));
     model->getMaterial().setDiffuse(diffuseRef);
 
-    auto normalRef = make_shared<ResourceRef<Image>>(DummyImageLoader("textures/BricksDragfacedRunning008_NRM_1K.png"));
+    auto normalRef = make_shared<Resource<Image>>(DummyImageLoader("textures/BricksDragfacedRunning008_NRM_1K.gfx"));
     model->getMaterial().setNormal(normalRef);
   });
 

@@ -5,8 +5,11 @@
 #include <queue>
 
 namespace Luna {
+  template <typename T> class Resource;
+  template <typename T> using ResourcePtr = std::shared_ptr<Resource<T>>;
+
   /**
-   * @brief Resource reference to images, levels, audio and more.
+   * @brief Resource for images, levels, audio and more.
    *
    * Some implementations load the whole resource into the memory
    * (e.g. many image loaders), some open a streaming reference
@@ -16,16 +19,43 @@ namespace Luna {
    * usually scheduled in a separate queue. Make sure to check `isReady()`
    * before accessing any of the resource's data.
    */
-  template <typename T> class ResourceRef {
+  template <typename T> class Resource {
     public:
+    /**
+     * @brief The data type that is returned after the resource is loaded.
+     *
+     * This is a shared pointer to the actual resource object.
+     */
     using ResultType = std::shared_ptr<T>;
+
+    /**
+     * @brief Type for loading the resource of ResultType.
+     */
     using LoaderType = std::function<ResultType()>;
+
+    /**
+     * @brief Future for a ResultType.
+     */
     using FutureType = std::future<ResultType>;
 
-    inline ResourceRef(LoaderType loader) { mLoader = loader; }
+    using PromiseType = std::promise<ResultType>;
 
+    /**
+     * @brief Instantiate a new resource using the given loader.
+     *
+     * The loader will not be called until a user is interested in retrieving
+     * the actual resource.
+     */
+    inline Resource(LoaderType loader) { mLoader = loader; }
+
+    /**
+     * @brief Get the future for this resource.
+     *
+     * If not initiated yet, this will trigger loading the actual resource.
+     * If the resource is already loaded, the future resolved immediately.
+     */
     inline FutureType get() {
-      std::promise<ResultType> promise;
+      PromiseType promise;
       auto future = promise.get_future();
 
       if (this->isReady()) {
@@ -63,7 +93,7 @@ namespace Luna {
     }
 
     private:
-    std::queue<std::promise<ResultType>> mPromises;
+    std::queue<PromiseType> mPromises;
     std::weak_ptr<T> mResource;
     LoaderType mLoader;
   };

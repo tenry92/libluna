@@ -1,6 +1,12 @@
 Build layout
 ============
 
+The libluna repository contains multiple CMake projects and sub-configurations,
+each identified by a CMakeLists.txt file in its root directory.
+
+Building is initiated from the root's CMakeLists.txt file, which includes all
+the other required projects and configurations.
+
 When building using CMake, the build directory will usually hold the following
 structure:
 

@@ -53,7 +53,7 @@ namespace Luna::GL {
       return value;
     }
 
-    inline Luna::Color operator=(Luna::Color value) const {
+    inline Luna::ColorRgb operator=(Luna::ColorRgb value) const {
       glUniform3f(mLocation, value.red, value.green, value.blue);
       return value;
     }

@@ -29,26 +29,26 @@ int main(int argc, char **argv) {
 
   app.addInterval(60, [&](float elapsedTime) {
     t += elapsedTime * 0.4f;
-    Color baseColor;
+    ColorRgb baseColor;
 
     switch (static_cast<int>(t) % 6) {
       case 0:
-        baseColor = Color(1.0f, 0.f, 0.f);
+        baseColor = ColorRgb{1.0f, 0.f, 0.f};
         break;
       case 1:
-        baseColor = Color(1.0f, 1.f, 0.f);
+        baseColor = ColorRgb{1.0f, 1.f, 0.f};
         break;
       case 2:
-        baseColor = Color(0.0f, 1.f, 0.f);
+        baseColor = ColorRgb{0.0f, 1.f, 0.f};
         break;
       case 3:
-        baseColor = Color(0.0f, 1.f, 1.f);
+        baseColor = ColorRgb{0.0f, 1.f, 1.f};
         break;
       case 4:
-        baseColor = Color(0.0f, 0.f, 1.f);
+        baseColor = ColorRgb{0.0f, 0.f, 1.f};
         break;
       case 5:
-        baseColor = Color(1.0f, 0.f, 1.f);
+        baseColor = ColorRgb{1.0f, 0.f, 1.f};
         break;
     }
 

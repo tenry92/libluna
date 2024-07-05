@@ -726,7 +726,10 @@ static int encode(Options *options) {
 
   if (options->outputFile != NULL) {
     printf("Writing %s\n", options->outputFile);
-    libgfx_writeImageToFile(image, options->outputFile);
+    if (libgfx_writeImageToFile(image, options->outputFile)) {
+      fprintf(stderr, "Error writing %s\n", options->outputFile);
+      return 1;
+    }
   }
 
   return 0;
@@ -834,6 +837,12 @@ static int decode(Options *options) {
   }
 
   FILE *fp = fopen(options->outputFile, "wb");
+
+  if (!fp) {
+    fprintf(stderr, "Error opening %s\n", options->outputFile);
+    return 1;
+  }
+
   png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
   png_infop info = png_create_info_struct(png);
   png_init_io(png, fp);

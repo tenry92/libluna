@@ -473,11 +473,11 @@ void Canvas::setCamera3d(const Camera3d &camera) { mImpl->mCamera3d = camera; }
 
 Camera3d Canvas::getCamera3d() const { return mImpl->mCamera3d; }
 
-void Canvas::setBackgroundColor(Color color) {
+void Canvas::setBackgroundColor(ColorRgb color) {
   mImpl->mBackgroundColor = color;
 }
 
-Color Canvas::getBackgroundColor() const { return mImpl->mBackgroundColor; }
+ColorRgb Canvas::getBackgroundColor() const { return mImpl->mBackgroundColor; }
 
 #ifdef LUNA_USE_SDL
 ImagePtr Canvas::captureScreenshot() {

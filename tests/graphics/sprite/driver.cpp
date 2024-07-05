@@ -1,5 +1,6 @@
 #include <vector>
 #include <cmath>
+#include <cstring>
 
 #include <libluna/Application.hpp>
 #include <libluna/Sprite.hpp>
@@ -23,8 +24,7 @@ class DummyImageLoader {
   ImagePtr operator()() {
     int width = 16;
     int height = 16;
-    int frameCount = 1;
-    auto image = Image::make(32, Vector2i(width, height), frameCount);
+    auto image = Image::make(32, Vector2i(width, height));
 
     std::vector<uint8_t> frame(width * height * 4);
 
@@ -38,7 +38,7 @@ class DummyImageLoader {
       }
     }
 
-    image->setFrameData(0, frame.data());
+    std::memcpy(image->getData(), frame.data(), image->getByteCount());
 
     return image;
   }
@@ -58,10 +58,10 @@ int main(int argc, char **argv) {
     canvas->setVideoDriver(app.getDefaultVideoDriver());
     canvas->setStage(stage);
 
-    auto imageRef = make_shared<ResourceRef<Image>>(DummyImageLoader());
+    auto imageRes = make_shared<Resource<Image>>(DummyImageLoader());
 
     sprite = stage->makeSprite();
-    sprite->setImage(imageRef);
+    sprite->setImage(imageRes);
     sprite->setPosition({32, 128});
   });
 

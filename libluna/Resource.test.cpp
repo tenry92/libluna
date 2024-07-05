@@ -1,6 +1,6 @@
 #include <vector>
 
-#include <libluna/ResourceRef.hpp>
+#include <libluna/Resource.hpp>
 #include <libluna/String.hpp>
 #include <libluna/Test.hpp>
 
@@ -46,7 +46,7 @@ class MyResourceLoader {
 int main(int, char **) {
   TEST("futures", []() {
     shared_ptr<MyResource> resource1, resource2;
-    auto resource = Luna::ResourceRef<MyResource>(MyResourceLoader("test"));
+    auto resource = Luna::Resource<MyResource>(MyResourceLoader("test"));
 
     ASSERT(resource.isReady() == false, "resource is not ready yet");
 
