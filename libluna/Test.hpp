@@ -64,18 +64,21 @@ static void ASSERT_EQL(
 static int runTests() {
   Luna::Console::init();
 
+  int result = 0;
+
   int index = 0;
 
   for (auto &test : tests) {
     ++index;
     testFailed = false;
-    Luna::Console::write("[{}/{}: {}:", index, tests.size(), test.description);
+    Luna::Console::write("[{}/{}]: {}:", index, tests.size(), test.description);
 
     try {
       test.callback();
     } catch (std::exception &error) {
       assertMessage = error.what();
       testFailed = true;
+      result = 1;
     }
 
     if (testFailed) {
@@ -104,5 +107,5 @@ static int runTests() {
 
   Luna::Console::quit();
 
-  return 0;
+  return result;
 }

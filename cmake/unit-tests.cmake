@@ -1,3 +1,5 @@
+enable_testing()
+
 set(UNIT_TESTS
   Filesystem/FileReader
   Filesystem/Path
@@ -22,6 +24,10 @@ foreach(test_name ${UNIT_TESTS})
 
   add_dependencies(${TEST_TARGET_NAME} luna)
   target_link_libraries(${TEST_TARGET_NAME} PRIVATE luna)
+
+  if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
+    add_test(NAME ${TEST_TARGET_NAME} COMMAND ${TEST_TARGET_NAME})
+  endif()
 
   if(CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
     nx_create_nro(${TEST_TARGET_NAME})
