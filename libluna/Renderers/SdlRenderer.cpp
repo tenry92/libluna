@@ -200,7 +200,7 @@ void SdlRenderer::loadTexture(int id, ImagePtr image) {
 
   SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(
       (void *)(image->getData()), image->getSize().x(),
-      image->getSize().y(), 32, image->getByteCount(),
+      image->getSize().y(), 32, image->getByteCount() / image->getSize().y(),
       SDL_PIXELFORMAT_RGBA32
   );
 
