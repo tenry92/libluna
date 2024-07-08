@@ -518,7 +518,7 @@ String Application::getDefaultVideoDriver() const {
 #ifdef N64
     return "n64";
 #endif
-#ifdef LUNA_WINDOW_OPENGL
+#ifdef LUNA_RENDERER_OPENGL
     return "opengl";
 #else
     return "sdl";
