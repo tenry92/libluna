@@ -30,6 +30,11 @@
 #include <libluna/Renderers/OpenglRenderer.hpp>
 #endif
 
+#ifdef N64
+#include <libdragon.h>
+#include <libluna/Renderers/N64Renderer.hpp>
+#endif
+
 #include <libluna/CanvasImpl.hpp>
 #include <libluna/ImmediateGuiImpl.hpp>
 
@@ -80,6 +85,11 @@ class CanvasCommand : public Command {
 
 void CanvasImpl::setVideoDriver(const String &name) {
   logInfo("setting canvas video driver to {}", name);
+#ifdef N64
+  display_init(RESOLUTION_320x240, DEPTH_16_BPP, 3, GAMMA_NONE, FILTERS_RESAMPLE_ANTIALIAS_DEDITHER);
+  rdpq_init();
+  mRenderer = std::make_unique<N64Renderer>();
+#endif
 
 #ifdef LUNA_USE_SDL
 #ifdef LUNA_USE_OPENGL

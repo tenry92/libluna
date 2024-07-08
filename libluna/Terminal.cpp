@@ -32,6 +32,10 @@
 #include <switch.h>
 #endif
 
+#ifdef N64
+#include <libdragon.h>
+#endif
+
 #ifdef _WIN32
 static WORD originalConsoleAttributes;
 static bool hasOriginalConsoleAttributes{false};
@@ -49,11 +53,18 @@ void Terminal::init() {
 #ifdef __SWITCH__
   consoleInit(NULL);
 #endif
+#ifdef N64
+  console_init();
+  console_set_render_mode(RENDER_MANUAL);
+#endif
 }
 
 void Terminal::update() {
 #ifdef __SWITCH__
   consoleUpdate(NULL);
+#endif
+#ifdef N64
+  console_render();
 #endif
 }
 

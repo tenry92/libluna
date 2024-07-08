@@ -20,6 +20,10 @@
 #include <switch.h>
 #endif
 
+#ifdef N64
+#include <libdragon.h>
+#endif
+
 #include <libluna/Renderers/CommonRenderer.hpp>
 #include <libluna/CanvasImpl.hpp>
 #include <libluna/Logger.hpp>
@@ -33,6 +37,7 @@ CommonRenderer::~CommonRenderer() {
 }
 
 void CommonRenderer::render() {
+  startRender();
   imguiNewFrame();
 
   setViewport({0, 0}, getCanvasSize());
@@ -61,6 +66,15 @@ void CommonRenderer::render() {
   start2dFramebuffer(canvas);
   renderSprites(canvas, getInternalSize());
   end2dFramebuffer(canvas);
+  endRender();
+}
+
+void CommonRenderer::startRender() {
+  // stub
+}
+
+void CommonRenderer::endRender() {
+  // stub
 }
 
 void CommonRenderer::clearBackground([[maybe_unused]] ColorRgb color) {
@@ -142,6 +156,10 @@ Vector2i CommonRenderer::getCanvasSize() const {
   viOpenDefaultDisplay(&display);
   viGetDisplayResolution(&display, &canvasWidth, &canvasHeight);
 #endif
+#ifdef N64
+  canvasWidth = display_get_width();
+  canvasHeight = display_get_height();
+#endif
 
   return Vector2i(canvasWidth, canvasHeight);
 }
@@ -154,7 +172,8 @@ Vector2i CommonRenderer::getCurrentRenderSize() const {
   return mCurrentRenderSize;
 }
 
-void CommonRenderer::updateTextureCache(std::shared_ptr<Stage> stage) {
+void CommonRenderer::updateTextureCache([[maybe_unused]] std::shared_ptr<Stage> stage) {
+#ifndef N64
   std::unordered_set<ImageResPtr> visitedImages;
   std::unordered_set<std::shared_ptr<Mesh>> visitedMeshes;
   
@@ -241,6 +260,7 @@ void CommonRenderer::updateTextureCache(std::shared_ptr<Stage> stage) {
       ++it;
     }
   }
+#endif
 }
 
 void CommonRenderer::renderWorld(Canvas *canvas) {

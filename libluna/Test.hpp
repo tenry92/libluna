@@ -69,8 +69,12 @@ static int runTests() {
   for (auto &test : tests) {
     ++index;
     testFailed = false;
+#ifdef N64
+    printf("[%d/%d]: %s:", index, tests.size(), test.description.c_str());
+#else
     std::cout << "[" << index << "/" << tests.size()
               << "]: " << test.description << ":";
+#endif
 
     try {
       test.callback();
@@ -81,19 +85,40 @@ static int runTests() {
 
     if (testFailed) {
       Luna::Terminal::setColor(Luna::Terminal::brightRed);
+#ifdef N64
+      printf(" FAILED");
+#else
       std::cout << " FAILED";
+#endif
       Luna::Terminal::resetColor();
+#ifdef N64
+      printf("\n  Failed assertion: %s\n", assertMessage.c_str());
+#else
       std::cout << "\n  Failed assertion: " << assertMessage << std::endl;
+#endif
     } else {
       Luna::Terminal::setColor(Luna::Terminal::brightGreen);
+#ifdef N64
+      printf(" PASSED");
+#else
       std::cout << " PASSED";
+#endif
       Luna::Terminal::resetColor();
+#ifdef N64
+      printf("\n");
+#else
       std::cout << std::endl;
+#endif
     }
   }
 
 #ifdef __SWITCH__
   while (appletMainLoop()) {
+    Luna::Terminal::update();
+  }
+#endif
+#ifdef N64
+  while (true) {
     Luna::Terminal::update();
   }
 #endif

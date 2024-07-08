@@ -70,6 +70,10 @@ namespace Luna {
 
     void render() override;
 
+    virtual void startRender();
+
+    virtual void endRender();
+
     virtual void clearBackground(ColorRgb color);
 
     /**

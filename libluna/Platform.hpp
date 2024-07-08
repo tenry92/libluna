@@ -60,6 +60,14 @@ namespace Luna {
 #endif
     }
 
+    static constexpr inline bool isN64() {
+#ifdef N64
+      return true;
+#else
+      return false;
+#endif
+    }
+
     static constexpr inline bool isDebug() {
 #ifdef NDEBUG
       return false;
@@ -112,6 +120,8 @@ namespace Luna {
         return "Nintendo 3DS";
       } else if (Platform::isSwitch()) {
         return "Nintendo Switch";
+      } else if (Platform::isN64()) {
+        return "Nintendo 64";
       } else {
         return "Unknown";
       }

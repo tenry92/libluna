@@ -185,6 +185,10 @@ if(LUNA_USE_OPENGL)
   list(APPEND PRIVATE_MODULES Renderers/OpenglRenderer)
 endif()
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
+  list(APPEND PRIVATE_MODULES Renderers/N64Renderer)
+endif()
+
 # X => libluna/X.cpp
 set(SOURCE_FILES ${PUBLIC_MODULES} ${PRIVATE_MODULES})
 list(TRANSFORM SOURCE_FILES PREPEND "libluna/")
@@ -233,19 +237,21 @@ if(LUNA_USE_STD_THREAD)
   target_link_libraries(luna PUBLIC Threads::Threads)
 endif()
 
-find_package(ZLIB REQUIRED)
-target_link_libraries(luna PUBLIC ZLIB::ZLIB)
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
+  find_package(ZLIB REQUIRED)
+  target_link_libraries(luna PUBLIC ZLIB::ZLIB)
 
-find_path(OPUSFILE_INCLUDE_DIR NAMES opusfile.h REQUIRED PATH_SUFFIXES opus)
-find_library(OGG_LIB NAMES ogg)
-find_library(OPUS_LIB NAMES opus)
-find_library(OPUSFILE_LIB NAMES opusfile)
-target_include_directories(luna PRIVATE ${OPUSFILE_INCLUDE_DIR})
-target_link_libraries(luna PRIVATE ${OPUSFILE_LIB} ${OPUS_LIB} ${OGG_LIB})
+  find_path(OPUSFILE_INCLUDE_DIR NAMES opusfile.h REQUIRED PATH_SUFFIXES opus)
+  find_library(OGG_LIB NAMES ogg)
+  find_library(OPUS_LIB NAMES opus)
+  find_library(OPUSFILE_LIB NAMES opusfile)
+  target_include_directories(luna PRIVATE ${OPUSFILE_INCLUDE_DIR})
+  target_link_libraries(luna PRIVATE ${OPUSFILE_LIB} ${OPUS_LIB} ${OGG_LIB})
 
-find_path(UTF8_INCLUDE_DIR NAMES utf8.h REQUIRED HINTS ${PROJECT_SOURCE_DIR}/libs PATH_SUFFIXES utf8)
-find_path(GLM_INCLUDE_DIR NAMES glm/glm.hpp REQUIRED PATH_SUFFIXES utf8)
-target_include_directories(luna PRIVATE ${UTF8_INCLUDE_DIR} ${GLM_INCLUDE_DIR})
+  find_path(UTF8_INCLUDE_DIR NAMES utf8.h REQUIRED HINTS ${PROJECT_SOURCE_DIR}/libs PATH_SUFFIXES utf8)
+  find_path(GLM_INCLUDE_DIR NAMES glm/glm.hpp REQUIRED PATH_SUFFIXES utf8)
+  target_include_directories(luna PRIVATE ${UTF8_INCLUDE_DIR} ${GLM_INCLUDE_DIR})
+endif()
 
 if(LUNA_USE_SDL)
   find_package(SDL2 REQUIRED)
@@ -306,10 +312,17 @@ target_include_directories(luna PUBLIC
   /usr/include/opus
 )
 
-target_link_libraries(luna PRIVATE glad)
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
+  target_link_libraries(luna PRIVATE glad)
+endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
   target_link_libraries(luna PRIVATE EGL glapi drm_nouveau)
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
+  target_include_directories(luna PRIVATE ${LIBDRAGON_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/libs/utf8)
+  # target_link_libraries(luna PRIVATE ${LIBDRAGON_LIB})
 endif()
 
 target_include_directories(luna PUBLIC
@@ -364,12 +377,17 @@ set(UNIT_TESTS
   Image
   InputManager
   Matrix
-  ResourceReader
-  Resource
   String
-  Util/Zlib
   Vector
 )
+
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
+  list(APPEND UNIT_TESTS
+    ResourceReader
+    Resource
+    Util/Zlib
+  )
+endif()
 
 foreach(test_name ${UNIT_TESTS})
   string(REPLACE "/" "_" TEST_TARGET_NAME "${test_name}.test")
@@ -381,6 +399,10 @@ foreach(test_name ${UNIT_TESTS})
   if(CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
     nx_create_nro(${TEST_TARGET_NAME})
   endif()
+
+  if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
+    n64_create_rom(${TEST_TARGET_NAME})
+  endif()
 endforeach()
 
 ################################################################################
@@ -391,7 +413,7 @@ add_subdirectory(tests)
 ################################################################################
 # THIRD PARTY
 
-if(NOT NINTENDO_SWITCH)
+if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
   add_subdirectory(libs/glad-4.3)
 endif()
 

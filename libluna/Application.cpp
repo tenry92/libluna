@@ -20,6 +20,10 @@
 #include <switch.h>
 #endif
 
+#ifdef N64
+#include <libdragon.h>
+#endif
+
 #ifdef LUNA_USE_SDL
 #include <SDL2/SDL.h>
 #endif
@@ -85,18 +89,32 @@ static void initSystem() {
 
 static void printCompiler() {
   for (auto &&info : Platform::getCompilerInfo()) {
+#ifdef N64
+    printf("%s\n", info.c_str());
+#else
     cout << info.s_str() << endl;
+#endif
   }
 }
 
 static void printDefines() {
+#ifdef N64
   if (Platform::isDebug()) {
-    cout << "debug build (NDBEUG defined)" << endl;
+    printf("debug build (NDBEUG undefined)\n");
   } else {
-    cout << "release build (NDEBUG undefined)" << endl;
+    printf("release build (NDEBUG defined)\n");
+  }
+
+  printf("System: %s\n", Platform::getSystemName().c_str());
+#else
+  if (Platform::isDebug()) {
+    cout << "debug build (NDBEUG undefined)" << endl;
+  } else {
+    cout << "release build (NDEBUG defined)" << endl;
   }
 
   cout << "System: " << Platform::getSystemName().s_str() << endl;
+#endif
 }
 
 static void printArguments(const std::vector<String> &args) {
@@ -182,6 +200,7 @@ void ApplicationImpl::mainLoop() {
 #endif
     executeKeyboardShortcuts();
     mIntervalManager.executePendingIntervals();
+
     mAudioManager.update();
 
     mDebugMetrics->frameTicker.measure();
@@ -512,6 +531,9 @@ String Application::getDefaultVideoDriver() const {
   String driverName = Application::getInstance()->getOptionValue("video");
 
   if (driverName.isEmpty()) {
+#ifdef N64
+    return "n64";
+#endif
 #ifdef LUNA_USE_OPENGL
     return "opengl";
 #else

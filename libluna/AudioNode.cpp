@@ -1,6 +1,8 @@
 #include <cstring>
 
+#ifndef N64
 #include <opusfile.h>
+#endif
 
 #include <libluna/Application.hpp>
 #include <libluna/AudioManagerImpl.hpp>
@@ -41,6 +43,7 @@ class StreamAudioNode::impl {
   impl(const String &name) : mName{name} {}
 
   void init() {
+#ifndef N64
     mOpusReader = ResourceReader::make(mName.c_str());
 
     OpusFileCallbacks callbacks;
@@ -79,21 +82,32 @@ class StreamAudioNode::impl {
     if (result != 0) {
       logError("failed opening opus file");
     }
+#endif
   }
 
-  bool isInitialized() { return mOggOpusFile != nullptr; }
+  bool isInitialized() {
+#ifndef N64
+    return mOggOpusFile != nullptr;
+#else
+    return true;
+#endif
+  }
 
   void free() {
+#ifndef N64
     if (mOggOpusFile) {
       op_free(mOggOpusFile);
       mOggOpusFile = nullptr;
     }
+#endif
   }
 
   String mName;
 
   ResourceReaderPtr mOpusReader;
+#ifndef N64
   OggOpusFile *mOggOpusFile{nullptr};
+#endif
 };
 
 StreamAudioNode::StreamAudioNode(const String &name)
@@ -102,7 +116,8 @@ StreamAudioNode::StreamAudioNode(const String &name)
 
 StreamAudioNode::~StreamAudioNode() = default;
 
-void StreamAudioNode::render(float *buffer, int frameCount) {
+void StreamAudioNode::render([[maybe_unused]] float *buffer, [[maybe_unused]] int frameCount) {
+#ifndef N64
   if (!mImpl->isInitialized()) {
     mImpl->init();
   }
@@ -132,4 +147,5 @@ void StreamAudioNode::render(float *buffer, int frameCount) {
   for (int sampleIndex = 0; sampleIndex < frameCount * 2; ++sampleIndex) {
     buffer[sampleIndex] *= 0.1f;
   }
+#endif
 }

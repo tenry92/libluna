@@ -1,3 +1,5 @@
+#ifndef N64
+
 #include <cstring>
 #include <stdexcept>
 
@@ -87,3 +89,5 @@ std::vector<uint8_t> Zlib::inflate() {
 
   return result;
 }
+
+#endif

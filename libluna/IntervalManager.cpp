@@ -50,12 +50,19 @@ void IntervalManager::executePendingIntervals() {
   for (auto &&currentInterval : mImpl->mExecuteAlways) {
     auto delta = now - currentInterval.lastExecution;
     currentInterval.lastExecution = now;
+#ifdef N64
+    float deltaSeconds = 1.0f / 60.0f;
+#else
     auto nanoSeconds = std::chrono::nanoseconds(delta).count();
     float deltaSeconds = static_cast<float>(nanoSeconds) / std::nano::den;
+#endif
 
     currentInterval.callback(deltaSeconds);
   }
 
+#ifdef N64
+  mImpl->mIntervalQueue.top().callback(1.0f / 60.0f);
+#else
   while (!mImpl->mIntervalQueue.empty()) {
     auto currentInterval = mImpl->mIntervalQueue.top();
 
@@ -80,4 +87,5 @@ void IntervalManager::executePendingIntervals() {
     mImpl->mIntervalQueue.emplace(currentInterval);
     currentInterval.callback(deltaSeconds);
   }
+#endif
 }

@@ -21,7 +21,7 @@ class PathManager::impl {
     wchar_t selfPath[MAX_PATH] = {0};
     GetModuleFileNameW(nullptr, selfPath, MAX_PATH);
     mProgramPath = Path(selfPath);
-#elif defined(__SWITCH__) || defined(__3DS__) || defined(_NDS)
+#elif defined(__SWITCH__) || defined(__3DS__) || defined(_NDS) || defined(N64)
     return;
 #else
     char selfPath[PATH_MAX];
@@ -43,6 +43,8 @@ class PathManager::impl {
 #elif defined(__3DS__) || defined(__SWITCH__)
     // mAssetsPath = Path("romfs:/assets");
     mAssetsPath = Path("romfs:");
+#elif defined(N64)
+    mAssetsPath = Path("/");
 #else
     auto programPath = mProgramPath;
     if (programPath.up().basename() == "bin") {
