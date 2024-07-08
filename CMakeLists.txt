@@ -140,6 +140,7 @@ set(PUBLIC_MODULES
   Camera2d
   Camera3d
   Canvas
+  Console
   Filesystem/FileReader
   Filesystem/Path
   Image
@@ -161,7 +162,6 @@ set(PUBLIC_MODULES
   Sprite
   Stage
   String
-  Terminal
   Util/Zlib
   Vector
 )

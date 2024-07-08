@@ -6,7 +6,7 @@
 #include <list>
 #include <string>
 
-#include <libluna/Terminal.hpp>
+#include <libluna/Console.hpp>
 
 #ifdef __SWITCH__
 #include <switch.h>
@@ -62,7 +62,7 @@ static void ASSERT_EQL(
 }
 
 static int runTests() {
-  Luna::Terminal::init();
+  Luna::Console::init();
 
   int index = 0;
 
@@ -84,26 +84,26 @@ static int runTests() {
     }
 
     if (testFailed) {
-      Luna::Terminal::setColor(Luna::Terminal::brightRed);
+      Luna::Console::setColor(Luna::Console::brightRed);
 #ifdef N64
       printf(" FAILED");
 #else
       std::cout << " FAILED";
 #endif
-      Luna::Terminal::resetColor();
+      Luna::Console::resetColor();
 #ifdef N64
       printf("\n  Failed assertion: %s\n", assertMessage.c_str());
 #else
       std::cout << "\n  Failed assertion: " << assertMessage << std::endl;
 #endif
     } else {
-      Luna::Terminal::setColor(Luna::Terminal::brightGreen);
+      Luna::Console::setColor(Luna::Console::brightGreen);
 #ifdef N64
       printf(" PASSED");
 #else
       std::cout << " PASSED";
 #endif
-      Luna::Terminal::resetColor();
+      Luna::Console::resetColor();
 #ifdef N64
       printf("\n");
 #else
@@ -114,16 +114,16 @@ static int runTests() {
 
 #ifdef __SWITCH__
   while (appletMainLoop()) {
-    Luna::Terminal::update();
+    Luna::Console::update();
   }
 #endif
 #ifdef N64
   while (true) {
-    Luna::Terminal::update();
+    Luna::Console::update();
   }
 #endif
 
-  Luna::Terminal::quit();
+  Luna::Console::quit();
 
   return 0;
 }

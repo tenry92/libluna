@@ -38,6 +38,7 @@
 #endif
 
 #include <libluna/AudioManager.hpp>
+#include <libluna/Console.hpp>
 #include <libluna/ImmediateGui.hpp>
 #include <libluna/InputManager.hpp>
 #include <libluna/Internal/DebugMetrics.hpp>
@@ -46,7 +47,6 @@
 #include <libluna/PathManager.hpp>
 #include <libluna/Performance/Ticker.hpp>
 #include <libluna/Platform.hpp>
-#include <libluna/Terminal.hpp>
 
 #include <libluna/CanvasImpl.hpp>
 
@@ -57,7 +57,7 @@ using namespace Luna;
 static Application *gSingletonApp;
 
 static void initSystem() {
-  Terminal::init();
+  Console::init();
 
 #ifdef __SWITCH__
   logInfo("initializing romfs");
@@ -238,10 +238,10 @@ void ApplicationImpl::mainLoop() {
 
   if (!mRaisedErrorMessage.isEmpty()) {
 #ifdef __SWITCH__
-    Terminal::init();
+    Console::init();
     logError("{}", mRaisedErrorMessage);
     while (appletMainLoop()) {
-      Terminal::update();
+      Console::update();
     }
 #endif
   }

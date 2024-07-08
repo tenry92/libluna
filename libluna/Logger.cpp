@@ -3,10 +3,10 @@
 #include <iostream>
 #include <mutex>
 
-#include <libluna/Terminal.hpp>
+#include <libluna/Console.hpp>
 
 using namespace Luna;
-using namespace Luna::Terminal;
+using namespace Luna::Console;
 using Luna::Logger;
 
 #ifndef N64

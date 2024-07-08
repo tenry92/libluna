@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include <libluna/Matrix.hpp>
-#include <libluna/Terminal.hpp>
+#include <libluna/Console.hpp>
 #include <libluna/Test.hpp>
 
 using namespace Luna;
@@ -42,12 +42,12 @@ static void compareMatrix(const Matrix4x4 &actual, const Matrix4x4 &expected) {
       auto otherValue = expectedPtr[row + col * 4];
 
       if (abs(thisValue - otherValue) >= 0.05f) {
-        Terminal::setColor(Terminal::red);
+        Console::setColor(Console::red);
       }
 
       std::cout << std::setw(2) << std::setprecision(2) << thisValue;
 
-      Terminal::resetColor();
+      Console::resetColor();
 
       if (col < 3) {
         std::cout << ", ";
@@ -61,12 +61,12 @@ static void compareMatrix(const Matrix4x4 &actual, const Matrix4x4 &expected) {
       auto otherValue = actualPtr[row + col * 4];
 
       if (abs(thisValue - otherValue) >= 0.05f) {
-        Terminal::setColor(Terminal::green);
+        Console::setColor(Console::green);
       }
 
       std::cout << std::setw(2) << std::setprecision(2) << thisValue;
 
-      Terminal::resetColor();
+      Console::resetColor();
 
       if (col < 3) {
         std::cout << ", ";

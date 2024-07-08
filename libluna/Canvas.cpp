@@ -17,9 +17,9 @@
 #include <libluna/AbstractRenderer.hpp>
 #include <libluna/Application.hpp>
 #include <libluna/ApplicationImpl.hpp>
+#include <libluna/Console.hpp>
 #include <libluna/Internal/Keyboard.hpp>
 #include <libluna/Logger.hpp>
-#include <libluna/Terminal.hpp>
 
 #ifdef LUNA_USE_SDL
 #include <SDL2/SDL.h>
@@ -140,7 +140,7 @@ void CanvasImpl::setVideoDriver(const String &name) {
 }
 
 void CanvasImpl::createWindow([[maybe_unused]] bool opengl) {
-  Terminal::quit();
+  Console::quit();
 
 #ifdef LUNA_USE_SDL
   if (!SDL_WasInit(SDL_INIT_VIDEO)) {
