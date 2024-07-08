@@ -38,21 +38,6 @@ namespace Luna {
 
     void setAssetsPath(Filesystem::Path assetsPath);
 
-    /**
-     * \brief Get number of available processors.
-     */
-    unsigned int getProcessorCount();
-
-    /**
-     * \brief Get amount of used physical memory in bytes.
-     */
-    unsigned long getPhysicalMemoryUsage();
-
-    /**
-     * \brief Get amount of used virtual memory in bytes.
-     */
-    unsigned long getVirtualMemoryUsage();
-
     std::shared_ptr<Canvas> makeCanvas(const Vector2i &size);
     std::list<std::shared_ptr<Canvas>> getOpenCanvases();
 

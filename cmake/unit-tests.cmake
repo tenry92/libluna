@@ -7,6 +7,7 @@ set(UNIT_TESTS
   InputManager
   Matrix
   String
+  System
   Vector
 )
 

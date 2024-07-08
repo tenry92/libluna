@@ -84,6 +84,7 @@ set(PUBLIC_MODULES
   Sprite
   Stage
   String
+  System
   Util/Zlib
   Vector
 )

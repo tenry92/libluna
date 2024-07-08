@@ -11,6 +11,7 @@
 #include <libluna/CanvasImpl.hpp>
 #include <libluna/Internal/DebugGui.hpp>
 #include <libluna/Platform.hpp>
+#include <libluna/System.hpp>
 
 using namespace Luna;
 using namespace Luna::Internal;
@@ -66,14 +67,14 @@ void DebugGui::render() {
     ImGui::Separator();
 
     auto app = Application::getInstance();
-    ImGui::Text("Processor count: %d", app->getProcessorCount());
+    ImGui::Text("Processor count: %d", System::getProcessorCount());
     ImGui::Text(
         "Physical memory usage: %.1f MiB",
-        static_cast<float>(app->getPhysicalMemoryUsage() / 1024 / 1024)
+        static_cast<float>(System::getPhysicalMemoryUsage() / 1024 / 1024)
     );
     ImGui::Text(
         "Virtual memory usage: %.1f MiB",
-        static_cast<float>(app->getVirtualMemoryUsage() / 1024 / 1024)
+        static_cast<float>(System::getVirtualMemoryUsage() / 1024 / 1024)
     );
 
     ImGui::Separator();
