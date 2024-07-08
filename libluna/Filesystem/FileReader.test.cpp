@@ -1,6 +1,10 @@
 #include <string>
 #include <vector>
 
+#ifdef N64
+#include <libdragon.h>
+#endif
+
 #include <libluna/Application.hpp>
 #include <libluna/Filesystem/FileReader.hpp>
 #include <libluna/Filesystem/Path.hpp>
@@ -11,6 +15,8 @@ using namespace Luna::Filesystem;
 
 #ifdef __SWITCH__
 static const char *assetsPath = "romfs:/assets";
+#elif defined(N64)
+static const char *assetsPath = "rom:/assets";
 #else
 static const char *assetsPath = "tests/assets";
 #endif
@@ -24,6 +30,9 @@ int main(int, char **) {
       consoleUpdate(NULL);
     }
   }
+#endif
+#ifdef N64
+  dfs_init(DFS_DEFAULT_LOCATION);
 #endif
 
   TEST("read full text file", []() {

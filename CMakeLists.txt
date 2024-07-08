@@ -401,7 +401,7 @@ foreach(test_name ${UNIT_TESTS})
   endif()
 
   if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
-    n64_create_rom(${TEST_TARGET_NAME})
+    n64_create_rom(${TEST_TARGET_NAME} DFS "${CMAKE_CURRENT_BINARY_DIR}/tests/assets")
   endif()
 endforeach()
 
