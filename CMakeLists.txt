@@ -20,100 +20,22 @@ set(LUNA_INSTALL_NATIVE_DIR "${CMAKE_CURRENT_BINARY_DIR}/native")
 ################################################################################
 # METADATA
 
-set(APP_AUTHOR "Tenry")
-set(APP_NAME "${PROJECT_NAME}")
-set(APP_PRODUCT_NAME "Luna Game Engine")
-set(APP_DESCRIPTION "Luna Game Engine")
-set(APP_ORIGINAL_FILENAME "${APP_NAME}")
+include(cmake/metadata.cmake)
 
 ################################################################################
 # DETECT TARGET FEATURE SUPPORT
 
-set(DESKTOP_AND_SWITCH Linux Windows NintendoSwitch)
-set(DESKTOP Linux Windows)
-
-if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
-  set(SUPPORTS_SDL ON)
-  set(SUPPORTS_EGL OFF)
-  set(SUPPORTS_OPENGL ON)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
-  set(SUPPORTS_SDL OFF)
-  set(SUPPORTS_EGL ON)
-  set(SUPPORTS_OPENGL ON)
-else()
-  set(SUPPORTS_SDL OFF)
-  set(SUPPORTS_EGL OFF)
-  set(SUPPORTS_OPENGL OFF)
-endif()
-
-if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
-  set(SUPPORTS_STD_THREAD ON)
-else()
-  set(SUPPORTS_STD_THREAD OFF)
-endif()
-
-if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
-  set(SUPPORTS_IMGUI ON)
-else()
-  set(SUPPORTS_IMGUI OFF)
-endif()
+include(cmake/feature-support.cmake)
 
 ################################################################################
 # OPTIONS
 
-option(LUNA_USE_SDL "Use SDL2 for Window creation, input handling and audio output" ${SUPPORTS_SDL})
-option(LUNA_USE_GLFW "Use GLFW for Window creation and input handling" OFF)
-option(LUNA_USE_OPENGL "Use OpenGL" ${SUPPORTS_OPENGL})
-option(LUNA_USE_EGL "Use EGL" ${SUPPORTS_EGL})
-option(LUNA_USE_STD_THREAD "Use std::thread" ${SUPPORTS_STD_THREAD})
-option(LUNA_USE_IMGUI "Use ImGui" ${SUPPORTS_IMGUI})
-
-################################################################################
-# CONFIGURE
-
-configure_file(libluna/config.h.in libluna/config.h)
+include(cmake/options.cmake)
 
 ################################################################################
 # TOOLS
 
-# these are always built for the host platform
-
-if(MSVC)
-  set(EXT_PROJ_TOOLCHAIN CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake)
-endif()
-
-ExternalProject_Add(
-  libgfx-native
-  PREFIX "${LUNA_BUILD_NATIVE_DIR}"
-  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${LUNA_INSTALL_NATIVE_DIR}
-  CMAKE_ARGS -DCMAKE_PREFIX_PATH=${LUNA_INSTALL_NATIVE_DIR}
-  ${EXT_PROJ_TOOLCHAIN}
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs/libgfx
-  BUILD_ALWAYS ON
-)
-
-ExternalProject_Add(
-  gfxtool-native
-  PREFIX "${LUNA_BUILD_NATIVE_DIR}"
-  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${LUNA_INSTALL_NATIVE_DIR}
-  CMAKE_ARGS -DCMAKE_PREFIX_PATH=${LUNA_INSTALL_NATIVE_DIR}
-  ${EXT_PROJ_TOOLCHAIN}
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tools/gfxtool
-  BUILD_ALWAYS ON
-  DEPENDS libgfx-native
-)
-
-ExternalProject_Add(
-  xxd-native
-  PREFIX "${LUNA_BUILD_NATIVE_DIR}"
-  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${LUNA_INSTALL_NATIVE_DIR}
-  CMAKE_ARGS -DCMAKE_PREFIX_PATH=${LUNA_INSTALL_NATIVE_DIR}
-  ${EXT_PROJ_TOOLCHAIN}
-  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tools/xxd
-  BUILD_ALWAYS ON
-)
-
-set(XXD "${LUNA_INSTALL_NATIVE_DIR}/bin/xxd")
+include(cmake/tools.cmake)
 
 ################################################################################
 # TARGET CONFIGURATION
@@ -171,17 +93,17 @@ set(PRIVATE_MODULES
 )
 
 # private modules (their .hpp files will NOT be installed)
-if(LUNA_USE_IMGUI)
+if(LUNA_IMGUI)
   list(APPEND PRIVATE_MODULES
     Internal/DebugGui
   )
 endif()
 
-if(LUNA_USE_SDL)
+if(LUNA_RENDERER_SDL2)
   list(APPEND PRIVATE_MODULES Renderers/SdlRenderer)
 endif()
 
-if(LUNA_USE_OPENGL)
+if(LUNA_RENDERER_OPENGL)
   list(APPEND PRIVATE_MODULES Renderers/OpenglRenderer)
 endif()
 
@@ -232,102 +154,7 @@ endif()
 ################################################################################
 # DEPENDENCIES
 
-if(LUNA_USE_STD_THREAD)
-  find_package(Threads REQUIRED)
-  target_link_libraries(luna PUBLIC Threads::Threads)
-endif()
-
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
-  find_package(ZLIB REQUIRED)
-  target_link_libraries(luna PUBLIC ZLIB::ZLIB)
-
-  find_path(OPUSFILE_INCLUDE_DIR NAMES opusfile.h REQUIRED PATH_SUFFIXES opus)
-  find_library(OGG_LIB NAMES ogg)
-  find_library(OPUS_LIB NAMES opus)
-  find_library(OPUSFILE_LIB NAMES opusfile)
-  target_include_directories(luna PRIVATE ${OPUSFILE_INCLUDE_DIR})
-  target_link_libraries(luna PRIVATE ${OPUSFILE_LIB} ${OPUS_LIB} ${OGG_LIB})
-
-  find_path(UTF8_INCLUDE_DIR NAMES utf8.h REQUIRED HINTS ${PROJECT_SOURCE_DIR}/libs PATH_SUFFIXES utf8)
-  find_path(GLM_INCLUDE_DIR NAMES glm/glm.hpp REQUIRED PATH_SUFFIXES utf8)
-  target_include_directories(luna PRIVATE ${UTF8_INCLUDE_DIR} ${GLM_INCLUDE_DIR})
-endif()
-
-if(LUNA_USE_SDL)
-  find_package(SDL2 REQUIRED)
-  target_link_libraries(luna PUBLIC SDL2::SDL2)
-endif()
-
-if(LUNA_USE_GLFW)
-  find_package(glfw3 REQUIRED)
-  target_link_libraries(luna PUBLIC glfw)
-endif()
-
-if(LUNA_USE_OPENGL)
-  if(UNIX)
-    target_link_libraries(luna PUBLIC dl)
-  endif()
-endif()
-
-if(LUNA_USE_IMGUI)
-  add_library(imgui_base STATIC
-    libs/imgui/imgui_demo.cpp
-    libs/imgui/imgui_draw.cpp
-    libs/imgui/imgui_tables.cpp
-    libs/imgui/imgui_widgets.cpp
-    libs/imgui/imgui.cpp
-  )
-  target_include_directories(imgui_base PUBLIC libs/imgui)
-  target_link_libraries(luna PRIVATE imgui_base)
-
-  if(LUNA_USE_OPENGL)
-    add_library(imgui_opengl STATIC
-      libs/imgui/backends/imgui_impl_opengl3.cpp
-    )
-    target_include_directories(imgui_opengl PUBLIC libs/imgui)
-    target_link_libraries(luna PRIVATE imgui_opengl)
-  endif()
-
-  if(LUNA_USE_SDL)
-    add_library(imgui_sdl2 STATIC
-      libs/imgui/backends/imgui_impl_sdl2.cpp
-      libs/imgui/backends/imgui_impl_sdlrenderer2.cpp
-    )
-    target_include_directories(imgui_sdl2 PUBLIC libs/imgui)
-    target_link_libraries(imgui_sdl2 PUBLIC SDL2::SDL2)
-    target_link_libraries(luna PRIVATE imgui_sdl2)
-  endif()
-
-  if(LUNA_USE_GLFW)
-    add_library(imgui_glfw STATIC
-      libs/imgui/backends/imgui_impl_glfw.cpp
-    )
-    target_include_directories(imgui_glfw PUBLIC libs/imgui)
-    target_link_libraries(imgui_glfw PUBLIC glfw)
-    target_link_libraries(luna PRIVATE imgui_glfw)
-  endif()
-endif()
-
-target_include_directories(luna PUBLIC
-  /usr/include/opus
-)
-
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
-  target_link_libraries(luna PRIVATE glad)
-endif()
-
-if(CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
-  target_link_libraries(luna PRIVATE EGL glapi drm_nouveau)
-endif()
-
-if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
-  target_include_directories(luna PRIVATE ${LIBDRAGON_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/libs/utf8)
-  # target_link_libraries(luna PRIVATE ${LIBDRAGON_LIB})
-endif()
-
-target_include_directories(luna PUBLIC
-  /usr/local/include
-)
+include(cmake/dependencies.cmake)
 
 ################################################################################
 # GLSL SHADERS
@@ -371,50 +198,9 @@ install(FILES ${PUBLIC_HEADERS} DESTINATION include/libluna)
 ################################################################################
 # UNIT TESTS
 
-set(UNIT_TESTS
-  Filesystem/FileReader
-  Filesystem/Path
-  Image
-  InputManager
-  Matrix
-  String
-  Vector
-)
-
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
-  list(APPEND UNIT_TESTS
-    ResourceReader
-    Resource
-    Util/Zlib
-  )
-endif()
-
-foreach(test_name ${UNIT_TESTS})
-  string(REPLACE "/" "_" TEST_TARGET_NAME "${test_name}.test")
-  add_executable(${TEST_TARGET_NAME} libluna/${test_name}.test.cpp)
-
-  add_dependencies(${TEST_TARGET_NAME} luna)
-  target_link_libraries(${TEST_TARGET_NAME} PRIVATE luna)
-
-  if(CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
-    nx_create_nro(${TEST_TARGET_NAME})
-  endif()
-
-  if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
-    n64_create_rom(${TEST_TARGET_NAME} DFS "${CMAKE_CURRENT_BINARY_DIR}/tests/assets")
-  endif()
-endforeach()
+include(cmake/unit-tests.cmake)
 
 ################################################################################
 # FUNCTIONAL/INTEGRATION TESTS
 
 add_subdirectory(tests)
-
-################################################################################
-# THIRD PARTY
-
-if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
-  add_subdirectory(libs/glad-4.3)
-endif()
-
-add_subdirectory(libs/libgfx)

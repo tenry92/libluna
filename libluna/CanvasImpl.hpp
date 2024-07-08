@@ -17,15 +17,15 @@
 #include <thread>
 #endif
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
 #include <SDL2/SDL.h>
 #endif
 
-#ifdef LUNA_USE_GLFW
+#ifdef LUNA_WINDOW_GLFW
 #include <GLFW/glfw3.h>
 #endif
 
-#ifdef LUNA_USE_EGL
+#ifdef LUNA_WINDOW_EGL
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 #endif
@@ -57,23 +57,23 @@ class Luna::CanvasImpl {
   std::queue<ButtonEvent> mButtonEvents;
   std::map<std::string, float> mAxisValues;
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
   bool processSdlEvent(const SDL_Event *event);
   bool sdlEventTargetsThis(const SDL_Event *event);
   bool sendSdlEventToImmediateGui(const SDL_Event *event);
   struct {
     SDL_Window *window{nullptr};
-#ifdef LUNA_USE_OPENGL
+#ifdef LUNA_RENDERER_OPENGL
     SDL_GLContext glContext{nullptr};
 #endif
   } sdl;
 #endif
-#ifdef LUNA_USE_GLFW
+#ifdef LUNA_WINDOW_GLFW
   struct {
     GLFWwindow *window{nullptr};
   } glfw;
 #endif
-#ifdef LUNA_USE_EGL
+#ifdef LUNA_WINDOW_EGL
   struct {
     EGLDisplay display;
     EGLContext context;

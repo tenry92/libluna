@@ -2,7 +2,7 @@
 
 #include <libluna/config.h>
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
 #include <SDL2/SDL.h>
 #endif
 
@@ -10,7 +10,7 @@
 
 namespace Luna::Internal {
   namespace Keyboard {
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
     String sdlKeycodeToName(SDL_Keycode keycode) {
       if (keycode > ' ' && keycode <= '}') {
         return String("Keyboard/Keycode/") + keycode;

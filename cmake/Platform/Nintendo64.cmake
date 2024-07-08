@@ -1,0 +1,1 @@
+set(NINTENDO_64 TRUE)

@@ -1,35 +1,35 @@
 #include <libluna/config.h>
 
-#ifdef LUNA_USE_OPENGL
+#ifdef LUNA_RENDERER_OPENGL
 #include <libluna/Renderers/OpenglRenderer.hpp>
 
 #include <list>
 #include <map>
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
 #include <SDL2/SDL.h>
 #endif
 
-#ifdef LUNA_USE_GLFW
+#ifdef LUNA_WINDOW_GLFW
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #endif
 
-#ifdef LUNA_USE_EGL
+#ifdef LUNA_WINDOW_EGL
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 #endif
 
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
 #include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/imgui.h>
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
 #include <imgui/backends/imgui_impl_sdl2.h>
 #include <imgui/backends/imgui_impl_sdlrenderer2.h>
 #endif
 
-#ifdef LUNA_USE_GLFW
+#ifdef LUNA_WINDOW_GLFW
 #include <imgui/backends/imgui_impl_glfw.h>
 #endif
 #endif // IMGUI
@@ -61,7 +61,7 @@ using namespace Luna;
 
 class OpenglRenderer::impl {
   public:
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
   ImGuiContext *mImGuiContext{nullptr};
 #endif
 
@@ -142,7 +142,7 @@ void OpenglRenderer::initialize() {
 }
 
 void OpenglRenderer::initializeImmediateGui() {
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
   IMGUI_CHECKVERSION();
   mImpl->mImGuiContext = ImGui::CreateContext();
   ImGuiIO &io = ImGui::GetIO();
@@ -164,7 +164,7 @@ void OpenglRenderer::initializeImmediateGui() {
 }
 
 void OpenglRenderer::quitImmediateGui() {
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
   if (mImpl->mImGuiContext) {
     ImGui_ImplOpenGL3_Shutdown();
 #ifdef LUNA_USE_SDL
@@ -177,7 +177,7 @@ void OpenglRenderer::quitImmediateGui() {
 }
 
 void OpenglRenderer::close() {
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
   if (mImpl->mImGuiContext) {
     ImGui_ImplOpenGL3_Shutdown();
 
@@ -191,22 +191,22 @@ void OpenglRenderer::close() {
 }
 
 void OpenglRenderer::present() {
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
   if (mImpl->mImGuiContext) {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
   }
 #endif
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
   SDL_GL_SwapWindow(getCanvas()->getImpl()->sdl.window);
 #endif
 
-#ifdef LUNA_USE_GLFW
+#ifdef LUNA_WINDOW_GLFW
   glfwSwapBuffers(getCanvas()->getImpl()->glfw.window);
 #endif
 
-#ifdef LUNA_USE_EGL
+#ifdef LUNA_WINDOW_EGL
   eglSwapBuffers(getCanvas()->getImpl()->egl.display, getCanvas()->getImpl()->egl.surface);
 #endif
 }
@@ -405,10 +405,10 @@ void OpenglRenderer::setViewport(Vector2i offset, Vector2i size) {
 
 
 void OpenglRenderer::imguiNewFrame() {
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
   if (mImpl->mImGuiContext) {
     ImGui_ImplOpenGL3_NewFrame();
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
     ImGui_ImplSDL2_NewFrame();
 #endif
     ImGui::NewFrame();

@@ -5,7 +5,7 @@
 #include <memory>
 #include <queue>
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_AUDIO_SDL2
 #include <SDL2/SDL.h>
 #endif
 
@@ -23,7 +23,7 @@ namespace Luna {
     std::shared_ptr<AudioNode> mDestinationNode;
     std::queue<std::shared_ptr<Command>> mCommandQueue;
     Internal::AudioMetrics mMetrics;
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_AUDIO_SDL2
     SDL_AudioDeviceID mSdlAudioDeviceId{0};
 #endif
   };

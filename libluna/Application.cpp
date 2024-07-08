@@ -24,15 +24,15 @@
 #include <libdragon.h>
 #endif
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
 #include <SDL2/SDL.h>
 #endif
 
-#ifdef LUNA_USE_GLFW
+#ifdef LUNA_WINDOW_GLFW
 #include <GLFW/glfw3.h>
 #endif
 
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
 #include <imgui/imgui.h>
 #include <libluna/Internal/DebugGui.hpp>
 #endif
@@ -67,7 +67,7 @@ static void initSystem() {
   }
 #endif
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
   logInfo("initializing SDL");
 
   auto result = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_AUDIO);
@@ -77,7 +77,7 @@ static void initSystem() {
   }
 #endif
 
-#ifdef LUNA_USE_GLFW
+#ifdef LUNA_WINDOW_GLFW
   logInfo("initializing GLFW");
   if (!glfwInit()) {
     logError("unable to initialize GLFW");
@@ -148,7 +148,7 @@ void ApplicationImpl::mainLoop() {
 #endif
 
     mDebugMetrics->frameTicker.tick();
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
@@ -169,7 +169,7 @@ void ApplicationImpl::mainLoop() {
       }
     }
 #endif
-#ifdef LUNA_USE_GLFW
+#ifdef LUNA_WINDOW_GLFW
     glfwPollEvents();
 
     for (auto &&canvas : canvases) {
@@ -242,12 +242,12 @@ void ApplicationImpl::shutDown() {
     canvas.lock()->close();
   }
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
   logInfo("shutting down SDL");
   SDL_Quit();
 #endif
 
-#ifdef LUNA_USE_GLFW
+#ifdef LUNA_WINDOW_GLFW
   logInfo("shutting down GLFW");
   glfwTerminate();
 #endif
@@ -256,7 +256,7 @@ void ApplicationImpl::shutDown() {
 bool ApplicationImpl::hasCanvas() {
   for (auto &&canvas : canvases) {
     if (!canvas.expired()) {
-#ifdef LUNA_USE_GLFW
+#ifdef LUNA_WINDOW_GLFW
       if (canvas.lock()->mImpl->glfw.window != nullptr) {
         return true;
       }
@@ -269,7 +269,7 @@ bool ApplicationImpl::hasCanvas() {
   return false;
 }
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
 std::shared_ptr<Canvas> ApplicationImpl::getCanvasBySdlWindowId(Uint32 windowId
 ) {
   for (auto &&canvas : canvases) {
@@ -518,7 +518,7 @@ String Application::getDefaultVideoDriver() const {
 #ifdef N64
     return "n64";
 #endif
-#ifdef LUNA_USE_OPENGL
+#ifdef LUNA_WINDOW_OPENGL
     return "opengl";
 #else
     return "sdl";

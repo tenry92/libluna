@@ -2,11 +2,11 @@
 
 #include <libluna/config.h>
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
 #include <SDL2/SDL.h>
 #endif
 
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
 #include <imgui/imgui.h>
 #endif
 
@@ -18,11 +18,11 @@ class Luna::ImmediateGuiImpl {
   void init(Canvas *canvas);
   void newFrame();
   void render(ImmediateGui *gui);
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
   bool processSdlEvent(const SDL_Event *event);
 #endif
   Canvas *mCanvas{nullptr};
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
   ImGuiContext *mImGuiContext{nullptr};
 #endif
 };

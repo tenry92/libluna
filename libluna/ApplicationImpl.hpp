@@ -8,7 +8,7 @@
 #include <queue>
 #include <vector>
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
 #include <SDL2/SDL.h>
 #endif
 
@@ -29,7 +29,7 @@ class Luna::ApplicationImpl {
   void shutDown();
   bool hasCanvas();
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
   std::shared_ptr<Canvas> getCanvasBySdlWindowId(Uint32 windowId);
   void pushSdlEvent(SDL_Event *event);
 #endif

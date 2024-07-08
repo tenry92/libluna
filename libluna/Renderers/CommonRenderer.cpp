@@ -2,16 +2,16 @@
 
 #include <unordered_set>
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
 #include <SDL2/SDL.h>
 #endif
 
-#ifdef LUNA_USE_GLFW
+#ifdef LUNA_WINDOW_GLFW
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #endif
 
-#ifdef LUNA_USE_EGL
+#ifdef LUNA_WINDOW_EGL
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 #endif
@@ -141,12 +141,12 @@ Vector2i CommonRenderer::getCanvasSize() const {
   int canvasWidth = 1920;
   int canvasHeight = 1080;
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
   SDL_GetWindowSize(
       getCanvas()->getImpl()->sdl.window, &canvasWidth, &canvasHeight
   );
 #endif
-#ifdef LUNA_USE_GLFW
+#ifdef LUNA_WINDOW_GLFW
   glfwGetFramebufferSize(
       getCanvas()->getImpl()->glfw.window, &canvasWidth, &canvasHeight
   );

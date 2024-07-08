@@ -1,6 +1,6 @@
 #include <libluna/config.h>
 
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
 #include <imgui/imgui.h>
 #endif
 

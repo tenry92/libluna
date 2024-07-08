@@ -1,0 +1,5 @@
+set(APP_AUTHOR "Tenry")
+set(APP_NAME "${PROJECT_NAME}")
+set(APP_PRODUCT_NAME "Luna Game Engine")
+set(APP_DESCRIPTION "Luna Game Engine")
+set(APP_ORIGINAL_FILENAME "${APP_NAME}")

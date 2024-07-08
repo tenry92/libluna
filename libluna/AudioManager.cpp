@@ -5,7 +5,7 @@
 #include <list>
 #include <queue>
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_AUDIO_SDL2
 #include <SDL2/SDL.h>
 #endif
 
@@ -77,7 +77,7 @@ std::shared_ptr<AudioNode> AudioManager::getDestinationNode() const {
 }
 
 void AudioManager::init() {
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_AUDIO_SDL2
   SDL_AudioSpec desired, obtained;
 
   desired.freq = 48000;
@@ -103,7 +103,7 @@ void AudioManager::init() {
 }
 
 void AudioManager::update() {
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_AUDIO_SDL2
   SDL_LockAudioDevice(mImpl->mSdlAudioDeviceId);
   while (!mImpl->mCommandQueue.empty()) {
     auto command = mImpl->mCommandQueue.front();
@@ -115,7 +115,7 @@ void AudioManager::update() {
 }
 
 void AudioManager::free() {
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_AUDIO_SDL2
   if (mImpl->mSdlAudioDeviceId > 0) {
     SDL_CloseAudioDevice(mImpl->mSdlAudioDeviceId);
   }

@@ -1,6 +1,6 @@
 #include <libluna/config.h>
 
-#ifdef LUNA_USE_EGL
+#ifdef LUNA_WINDOW_EGL
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 #include <glad/glad.h>
@@ -21,12 +21,14 @@
 #include <libluna/Internal/Keyboard.hpp>
 #include <libluna/Logger.hpp>
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
 #include <SDL2/SDL.h>
+#ifdef LUNA_RENDERER_SDL2
 #include <libluna/Renderers/SdlRenderer.hpp>
 #endif
+#endif
 
-#ifdef LUNA_USE_OPENGL
+#ifdef LUNA_RENDERER_OPENGL
 #include <libluna/Renderers/OpenglRenderer.hpp>
 #endif
 
@@ -43,9 +45,9 @@ using namespace Luna::Internal;
 using Luna::String;
 
 namespace {
-#ifdef LUNA_USE_OPENGL
+#ifdef LUNA_RENDERER_OPENGL
   [[maybe_unused]] void setGlAttributes() {
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
@@ -59,7 +61,7 @@ namespace {
 #ifndef NDEBUG
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 #endif // #ifndef NDEBUG
-#endif // #ifdef LUNA_USE_SDL
+#endif // #ifdef LUNA_WINDOW_SDL2
 
 #ifdef LUNA_USE_GLFW
     glfwWindowHint(GLFW_DEPTH_BITS, 24);
@@ -68,7 +70,7 @@ namespace {
     glfwWindowHint(GLFW_VERSION_MINOR, 0);
 #endif // #ifdef LUNA_USE_GLFW
   }
-#endif // #ifdef LUNA_USE_OPENGL
+#endif // #ifdef LUNA_RENDERER_OPENGL
 } // namespace
 
 Command::~Command() = default;
@@ -91,8 +93,8 @@ void CanvasImpl::setVideoDriver(const String &name) {
   mRenderer = std::make_unique<N64Renderer>();
 #endif
 
-#ifdef LUNA_USE_SDL
-#ifdef LUNA_USE_OPENGL
+#ifdef LUNA_WINDOW_SDL2
+#ifdef LUNA_RENDERER_OPENGL
   if (name == "opengl") {
     this->sdl.glContext = SDL_GL_CreateContext(this->sdl.window);
     SDL_GL_MakeCurrent(this->sdl.window, this->sdl.glContext);
@@ -126,7 +128,7 @@ void CanvasImpl::setVideoDriver(const String &name) {
     mRenderer = std::make_unique<OpenglGraphicsDriver>();
   }
 #endif
-#ifdef LUNA_USE_EGL
+#ifdef LUNA_WINDOW_EGL
   mRenderer = std::make_unique<OpenglRenderer>();
 #endif
 
@@ -142,7 +144,7 @@ void CanvasImpl::setVideoDriver(const String &name) {
 void CanvasImpl::createWindow([[maybe_unused]] bool opengl) {
   Console::quit();
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
   if (!SDL_WasInit(SDL_INIT_VIDEO)) {
     SDL_InitSubSystem(SDL_INIT_VIDEO);
   }
@@ -156,7 +158,7 @@ void CanvasImpl::createWindow([[maybe_unused]] bool opengl) {
 
   Uint32 windowFlags = SDL_WINDOW_RESIZABLE;
 
-#ifdef LUNA_USE_OPENGL
+#ifdef LUNA_RENDERER_OPENGL
   if (opengl) {
     setGlAttributes();
     windowFlags |= SDL_WINDOW_OPENGL;
@@ -178,7 +180,7 @@ void CanvasImpl::createWindow([[maybe_unused]] bool opengl) {
   }
 #endif
 
-#ifdef LUNA_USE_EGL
+#ifdef LUNA_WINDOW_EGL
   this->egl.display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
   eglInitialize(this->egl.display, nullptr, nullptr);
   eglBindAPI(EGL_OPENGL_API);
@@ -273,7 +275,7 @@ void CanvasImpl::renderThread() {
 }
 #endif
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
 bool CanvasImpl::processSdlEvent(const SDL_Event *event) {
   if (!sdlEventTargetsThis(event)) {
     return false;
@@ -406,11 +408,11 @@ void Canvas::close() {
   }
 #endif
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
   if (mImpl->sdl.window) {
     logInfo("destorying SDL window");
 
-#ifdef LUNA_USE_OPENGL
+#ifdef LUNA_RENDERER_OPENGL
     if (mImpl->sdl.glContext) {
       SDL_GL_DeleteContext(mImpl->sdl.glContext);
       mImpl->sdl.glContext = nullptr;
@@ -428,7 +430,7 @@ void Canvas::close() {
   }
 #endif
 
-#ifdef LUNA_USE_EGL
+#ifdef LUNA_WINDOW_EGL
   if (mImpl->egl.display) {
     eglMakeCurrent(mImpl->egl.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 
@@ -508,7 +510,7 @@ void Canvas::setBackgroundColor(ColorRgb color) {
 
 ColorRgb Canvas::getBackgroundColor() const { return mImpl->mBackgroundColor; }
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
 ImagePtr Canvas::captureScreenshot() {
   SDL_Surface *surface = SDL_GetWindowSurface(mImpl->sdl.window);
   // returns nullptr if SDL_FRAMEBUFFER_ACCELERATION=0 env is not set
@@ -529,7 +531,7 @@ void Canvas::render() {
   }
 
   auto command = std::make_shared<CanvasCommand>(([this]() {
-#if defined(LUNA_USE_SDL) && defined(LUNA_USE_OPENGL)
+#if defined(LUNA_WINDOW_SDL2) && defined(LUNA_RENDERER_OPENGL)
     if (mImpl->sdl.glContext) {
       SDL_GL_MakeCurrent(mImpl->sdl.window, mImpl->sdl.glContext);
     }
@@ -554,7 +556,7 @@ void Canvas::sync() {
 
   std::unique_lock lock(mImpl->mMutex);
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
   auto command = std::make_shared<CanvasCommand>(([]() {
     SDL_Event event;
 

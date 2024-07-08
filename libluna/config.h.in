@@ -45,8 +45,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 // CONFIGURATION
 
-#cmakedefine LUNA_USE_SDL
-#cmakedefine LUNA_USE_GLFW
-#cmakedefine LUNA_USE_EGL
-#cmakedefine LUNA_USE_OPENGL
-#cmakedefine LUNA_USE_IMGUI
+#cmakedefine LUNA_WINDOW_SDL2
+#cmakedefine LUNA_WINDOW_GLFW
+#cmakedefine LUNA_WINDOW_EGL
+
+#cmakedefine LUNA_RENDERER_SDL2
+#cmakedefine LUNA_RENDERER_OPENGL
+#cmakedefine LUNA_RENDERER_N64_GL
+
+#cmakedefine LUNA_AUDIO_SDL2
+
+#cmakedefine LUNA_IMGUI
+#cmakedefine LUNA_STD_THREAD

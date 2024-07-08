@@ -3,14 +3,10 @@
 #include <libluna/ImmediateGui.hpp>
 #include <libluna/ImmediateGuiImpl.hpp>
 
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
 #include <imgui/imgui.h>
 
-#ifdef LUNA_USE_OPENGL
-#include <imgui/backends/imgui_impl_opengl3.h>
-#endif // OPENGL
-
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
 #include <imgui/backends/imgui_impl_sdl2.h>
 #include <imgui/backends/imgui_impl_sdlrenderer2.h>
 #endif
@@ -28,10 +24,10 @@ void ImmediateGuiImpl::newFrame() {
 
 void ImmediateGuiImpl::render(ImmediateGui *gui) { gui->render(); }
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
 bool ImmediateGuiImpl::processSdlEvent([[maybe_unused]] const SDL_Event *event
 ) {
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
   return ImGui_ImplSDL2_ProcessEvent(event);
 #else
   return false;

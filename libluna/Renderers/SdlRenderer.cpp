@@ -1,17 +1,17 @@
 #include <libluna/config.h>
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_RENDERER_SDL2
 #include <libluna/Renderers/SdlRenderer.hpp>
 
 #include <list>
 #include <map>
 
-#ifdef LUNA_USE_GLFW
+#ifdef LUNA_WINDOW_GLFW
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #endif
 
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
 #include <imgui/backends/imgui_impl_sdl2.h>
 #include <imgui/backends/imgui_impl_sdlrenderer2.h>
 #include <imgui/imgui.h>
@@ -49,7 +49,7 @@ struct SdlDeleter {
 
 class SdlRenderer::impl {
   public:
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
   ImGuiContext *mImGuiContext{nullptr};
 #endif
 
@@ -109,7 +109,7 @@ void SdlRenderer::initialize() {
 }
 
 void SdlRenderer::initializeImmediateGui() {
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
   IMGUI_CHECKVERSION();
   mImpl->mImGuiContext = ImGui::CreateContext();
   ImGuiIO &io = ImGui::GetIO();
@@ -128,7 +128,7 @@ void SdlRenderer::initializeImmediateGui() {
 }
 
 void SdlRenderer::quitImmediateGui() {
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
   if (mImpl->mImGuiContext) {
     ImGui_ImplSDLRenderer2_Shutdown();
     ImGui_ImplSDL2_Shutdown();
@@ -139,7 +139,7 @@ void SdlRenderer::quitImmediateGui() {
 }
 
 void SdlRenderer::close() {
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
   if (mImpl->mImGuiContext) {
     ImGui_ImplSDLRenderer2_Shutdown();
 
@@ -153,7 +153,7 @@ void SdlRenderer::close() {
 }
 
 void SdlRenderer::present() {
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
   if (mImpl->mImGuiContext) {
     ImGui::Render();
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
@@ -259,7 +259,7 @@ void SdlRenderer::setViewport(Vector2i offset, Vector2i size) {
 
 
 void SdlRenderer::imguiNewFrame() {
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
   if (mImpl->mImGuiContext) {
     ImGui_ImplSDLRenderer2_NewFrame();
     ImGui_ImplSDL2_NewFrame();
