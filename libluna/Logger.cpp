@@ -19,65 +19,36 @@ void Logger::log(LogLevel pLevel, const String &pMessage) {
   std::lock_guard<std::mutex> lock(gLogMutex);
 
   if (!gThreadIdentifier.isEmpty()) {
-    std::cout << '[' << gThreadIdentifier.s_str() << "] ";
+    Console::write("[{}]", gThreadIdentifier);
   }
 #endif
 
-#ifdef N64
   switch (pLevel) {
   case kDebug:
     setColor(purple);
-    printf("debug:   ");
+    Console::write("debug:   ");
     break;
   case kVerbose:
     setColor(cyan);
-    printf("verbose: ");
+    Console::write("verbose: ");
     break;
   case kInfo:
     setColor(blue);
-    printf("info:    ");
+    Console::write("info:    ");
     break;
   case kWarn:
     setColor(yellow);
-    printf("warn:    ");
+    Console::write("warn:    ");
     break;
   case kError:
     setColor(red);
-    printf("error:   ");
+    Console::write("error:   ");
     break;
   }
-#else
-  switch (pLevel) {
-  case kDebug:
-    setColor(purple);
-    std::cout << "debug:   ";
-    break;
-  case kVerbose:
-    setColor(cyan);
-    std::cout << "verbose: ";
-    break;
-  case kInfo:
-    setColor(blue);
-    std::cout << "info:    ";
-    break;
-  case kWarn:
-    setColor(yellow);
-    std::cout << "warn:    ";
-    break;
-  case kError:
-    setColor(red);
-    std::cout << "error:   ";
-    break;
-  }
-#endif
 
   resetColor();
 
-#ifdef N64
-  printf("%s\n", pMessage.c_str());
-#else
-  std::cout << pMessage.s_str() << std::endl;
-#endif
+  Console::writeLine(pMessage);
 }
 
 void Logger::setThreadIdentifier([[maybe_unused]] const String &pThreadId) {

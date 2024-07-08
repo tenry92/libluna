@@ -50,8 +50,6 @@
 
 #include <libluna/CanvasImpl.hpp>
 
-using std::cout, std::endl;
-
 using namespace Luna;
 
 static Application *gSingletonApp;
@@ -89,37 +87,23 @@ static void initSystem() {
 
 static void printCompiler() {
   for (auto &&info : Platform::getCompilerInfo()) {
-#ifdef N64
-    printf("%s\n", info.c_str());
-#else
-    cout << info.s_str() << endl;
-#endif
+    Console::writeLine(info);
   }
 }
 
 static void printDefines() {
-#ifdef N64
   if (Platform::isDebug()) {
-    printf("debug build (NDBEUG undefined)\n");
+    Console::writeLine("debug build (NDBEUG undefined)");
   } else {
-    printf("release build (NDEBUG defined)\n");
+    Console::writeLine("release build (NDEBUG defined)");
   }
 
-  printf("System: %s\n", Platform::getSystemName().c_str());
-#else
-  if (Platform::isDebug()) {
-    cout << "debug build (NDBEUG undefined)" << endl;
-  } else {
-    cout << "release build (NDEBUG defined)" << endl;
-  }
-
-  cout << "System: " << Platform::getSystemName().s_str() << endl;
-#endif
+  Console::writeLine("System: {}", Platform::getSystemName());
 }
 
 static void printArguments(const std::vector<String> &args) {
   for (std::size_t i = 0; i < args.size(); ++i) {
-    cout << "Argument " << i << ": " << args[i].s_str() << endl;
+    Console::writeLine("Argument {}: {}", i, args[i]);
   }
 }
 

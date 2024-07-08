@@ -69,12 +69,7 @@ static int runTests() {
   for (auto &test : tests) {
     ++index;
     testFailed = false;
-#ifdef N64
-    printf("[%d/%d]: %s:", index, tests.size(), test.description.c_str());
-#else
-    std::cout << "[" << index << "/" << tests.size()
-              << "]: " << test.description << ":";
-#endif
+    Luna::Console::write("[{}/{}: {}:", index, tests.size(), test.description);
 
     try {
       test.callback();
@@ -85,30 +80,14 @@ static int runTests() {
 
     if (testFailed) {
       Luna::Console::setColor(Luna::Console::brightRed);
-#ifdef N64
-      printf(" FAILED");
-#else
-      std::cout << " FAILED";
-#endif
+      Luna::Console::write(" FAILED");
       Luna::Console::resetColor();
-#ifdef N64
-      printf("\n  Failed assertion: %s\n", assertMessage.c_str());
-#else
-      std::cout << "\n  Failed assertion: " << assertMessage << std::endl;
-#endif
+      Luna::Console::writeLine("\n  Failed assertion: {}", assertMessage);
     } else {
       Luna::Console::setColor(Luna::Console::brightGreen);
-#ifdef N64
-      printf(" PASSED");
-#else
-      std::cout << " PASSED";
-#endif
+      Luna::Console::write(" PASSED");
       Luna::Console::resetColor();
-#ifdef N64
-      printf("\n");
-#else
-      std::cout << std::endl;
-#endif
+      Luna::Console::writeLine("");
     }
   }
 
