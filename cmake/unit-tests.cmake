@@ -6,6 +6,8 @@ set(UNIT_TESTS
   Image
   InputManager
   Matrix
+  ResourceReader
+  Resource
   String
   System
   Vector
@@ -13,8 +15,6 @@ set(UNIT_TESTS
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
   list(APPEND UNIT_TESTS
-    ResourceReader
-    Resource
     Util/Zlib
   )
 endif()

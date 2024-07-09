@@ -5,6 +5,41 @@
 #include <queue>
 
 namespace Luna {
+#ifdef N64
+  template <typename T>
+  class Promise;
+
+  template <typename T>
+  class Future {
+    public:
+    T get() {
+      return std::move(*mValue);
+    }
+
+    private:
+    std::shared_ptr<T> mValue;
+    Future() : mValue{std::make_shared<T>()} {}
+    friend class Promise<T>;
+  };
+
+  template <typename T>
+  class Promise {
+    public:
+    Future<T> get_future() {
+      Future<T> future;
+      mValue = future.mValue;
+      return future;
+    }
+
+    void set_value(const T &value) {
+      *mValue = value;
+    }
+
+    private:
+    std::shared_ptr<T> mValue;
+  };
+#endif
+
   template <typename T> class Resource;
   template <typename T> using ResourcePtr = std::shared_ptr<Resource<T>>;
 
@@ -33,12 +68,15 @@ namespace Luna {
      */
     using LoaderType = std::function<ResultType()>;
 
-    /**
-     * @brief Future for a ResultType.
-     */
+#ifdef N64
+    using FutureType = Future<ResultType>;
+
+    using PromiseType = Promise<ResultType>;
+#else
     using FutureType = std::future<ResultType>;
 
     using PromiseType = std::promise<ResultType>;
+#endif
 
     /**
      * @brief Instantiate a new resource using the given loader.

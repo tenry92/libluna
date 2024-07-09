@@ -66,6 +66,9 @@ static void initSystem() {
     logWarn("romfsInit failed: {}", rc);
   }
 #endif
+#ifdef N64
+  dfs_init(DFS_DEFAULT_LOCATION);
+#endif
 
 #ifdef LUNA_WINDOW_SDL2
   logInfo("initializing SDL");
