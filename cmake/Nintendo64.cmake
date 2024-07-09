@@ -15,6 +15,7 @@ find_program(N64_TOOL NAMES n64tool HINTS "${LIBDRAGON_ROOT}/bin")
 find_program(CMAKE_OBJCOPY NAMES mips64-elf-objcopy HINTS "${LIBDRAGON_ROOT}/bin")
 find_program(N64_ELFCOMPRESS NAMES n64elfcompress HINTS "${LIBDRAGON_ROOT}/bin")
 find_program(N64_MKDFS NAMES mkdfs HINTS "${LIBDRAGON_ROOT}/bin")
+find_program(N64_SYM NAMES n64sym HINTS "${LIBDRAGON_ROOT}/bin")
 
 find_path(LIBDRAGON_INCLUDE_DIR NAMES libdragon.h HINTS "${LIBDRAGON_ROOT}/mips64-elf/include")
 set(LIBDRAGON_LIB "${LIBDRAGON_ROOT}/mips64-elf/lib/libdragon.a")
@@ -37,6 +38,7 @@ function(n64_create_rom target)
   endif()
 
   set(ELF_PATH "${CMAKE_CURRENT_BINARY_DIR}/${target}")
+  set(SYM_PATH "${CMAKE_CURRENT_BINARY_DIR}/${target}.sym")
   set(ELF_STRIPPED_PATH "${ELF_PATH}.stripped")
   set(ELF_STRIPPED_COMPRESSED_PATH "${ELF_STRIPPED_PATH}.compressed")
   set(DFS_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${target}.dfs")
@@ -46,19 +48,20 @@ function(n64_create_rom target)
     add_custom_command(
       TARGET ${target}
       COMMAND ${N64_MKDFS} ${DFS_OUTPUT} ${ARG_DFS}
-      COMMENT "Creating DFS file"
+      COMMENT "Creating DFS file ${DFS_OUTPUT}"
     )
     set(DFS_ARG "--align;16;${DFS_OUTPUT}")
   endif()
 
   add_custom_command(
     TARGET ${target}
+    COMMAND ${N64_SYM} ${ELF_PATH} ${SYM_PATH}
     COMMAND ${CMAKE_COMMAND} -E copy ${ELF_PATH} ${ELF_STRIPPED_PATH}
     COMMAND ${CMAKE_STRIP} -s ${ELF_STRIPPED_PATH}
     COMMAND ${CMAKE_COMMAND} -E copy ${ELF_STRIPPED_PATH} ${ELF_STRIPPED_COMPRESSED_PATH}
     COMMAND ${N64_ELFCOMPRESS} -c 1 ${ELF_STRIPPED_COMPRESSED_PATH}
-    COMMAND ${N64_TOOL} ${TITLE_ARG} --toc --output ${N64_OUTPUT} --align 256 ${ELF_STRIPPED_COMPRESSED_PATH} ${DFS_ARG}
+    COMMAND ${N64_TOOL} ${TITLE_ARG} --toc --output ${N64_OUTPUT} --align 256 ${ELF_STRIPPED_COMPRESSED_PATH} --align 8 ${SYM_PATH} ${DFS_ARG}
     COMMAND ${CMAKE_COMMAND} -E remove ${ELF_STRIPPED_PATH} ${ELF_STRIPPED_COMPRESSED_PATH}
-    COMMENT "Creating N64 ROM"
+    COMMENT "Creating N64 ROM ${N64_OUTPUT}"
   )
 endfunction()
