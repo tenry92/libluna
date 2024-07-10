@@ -16,8 +16,13 @@ typedef struct {
   uint16_t size; // >= sizeof(libgfx_FileHeader)
   uint16_t width;
   uint16_t height;
+#ifdef LIBGFX_BIG_ENDIAN
+  uint8_t type : 4;
+  uint8_t format : 4;
+#else
   uint8_t format : 4;
   uint8_t type : 4;
+#endif
   uint16_t numFrames;
   uint16_t numTiles;
   uint16_t numAnimations; // for tileset, number of animated tiles
@@ -91,7 +96,29 @@ static int writeMemCallback(const void *src, size_t size, void *userData) {
   return (int) size;
 }
 
+#ifdef LIBGFX_BIG_ENDIAN
+uint16_t swap_endian_16(uint16_t value) {
+  return ((value << 8) & 0xff00) |
+    ((value >> 8) & 0x00ff);
+}
+
+uint32_t swap_endian_32(uint32_t value) {
+  return ((value << 24) & 0xff000000) |
+    ((value << 8) & 0x00ff0000) |
+    ((value >> 8) & 0x0000ff00) |
+    ((value >> 24) & 0x000000ff);
+}
+#else
+#define swap_endian_16(value) value
+#define swap_endian_32(value) value
+#endif
+
 libgfx_Image *libgfx_loadImageFromFile(const char *filename) {
+#ifdef LIBGFX_BIG_ENDIAN
+  printf("note: big endian\n");
+#else
+  printf("note: little endian\n");
+#endif
   FILE *fp = fopen(filename, "rb");
 
   if (!fp) {
@@ -116,6 +143,17 @@ libgfx_Image *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userD
     errorMessage = "Couldn't read GFX header";
     return NULL;
   }
+
+#ifdef LIBGFX_BIG_ENDIAN
+  header.version = swap_endian_16(header.version);
+  header.size = swap_endian_16(header.size);
+  header.width = swap_endian_16(header.width);
+  header.height = swap_endian_16(header.height);
+  header.numFrames = swap_endian_16(header.numFrames);
+  header.numTiles = swap_endian_16(header.numTiles);
+  header.numAnimations = swap_endian_16(header.numAnimations);
+  header.numPalettes = swap_endian_16(header.numPalettes);
+#endif
 
   if (strncmp("AGFX", header.signature, 4) != 0) {
     errorMessage = "Not a GFX file (invalid signature)";
@@ -163,6 +201,28 @@ libgfx_Image *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userD
     return NULL;
   }
 
+#ifdef LIBGFX_BIG_ENDIAN
+  if (header.format == LIBGFX_FORMAT_16BIT_RGBA) {
+    uint16_t *pixels = (uint16_t *) image->frames;
+
+    for (int offset = 0; offset < image->numFrames * getBytesPerFrame(image) / 2; ++offset) {
+      pixels[offset] = swap_endian_16(pixels[offset]);
+      libgfx_16BitPixel pixel = libgfx_to16BitPixels(image->frames)[offset];
+
+      //                  hi            lo
+      // input:           gggrrrrr abbbbbgg
+      // input (swapped): abbbbbgg gggrrrrr
+      // N64 format:      rrrrrggg ggbbabbb
+      //                  h   lh    lh    l
+
+      pixels[offset] = pixel.red << 11;
+      pixels[offset] |= pixel.green << 6;
+      pixels[offset] |= ((pixel.blue << 1) & 0x30) | (pixel.blue & 0x7);
+      pixels[offset] |= 0x8; // alpha
+    }
+  }
+#endif
+
   libgfx_allocAnimations(image, header.numAnimations);
 
   for (int i = 0; i < image->numAnimations; ++i) {
@@ -170,6 +230,7 @@ libgfx_Image *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userD
 
     uint16_t tileIndex;
     read(&tileIndex, sizeof(tileIndex), userData);
+    tileIndex = swap_endian_16(tileIndex);
 
     uint8_t numFrames;
     read(&numFrames, sizeof(numFrames), userData);
@@ -241,16 +302,16 @@ int libgfx_writeImageToCallback(libgfx_Image *image, libgfx_WriteCallback write,
   libgfx_FileHeader header;
 
   strncpy(header.signature, "AGFX", 4);
-  header.version = 1;
-  header.size = sizeof(header);
-  header.width = image->width;
-  header.height = image->height;
+  header.version = swap_endian_16(1);
+  header.size = swap_endian_16(sizeof(header));
+  header.width = swap_endian_16(image->width);
+  header.height = swap_endian_16(image->height);
   header.format = image->colorFormat;
   header.type = image->type;
-  header.numFrames = image->numFrames;
-  header.numTiles = image->numTiles || image->numFrames;
-  header.numAnimations = image->numAnimations;
-  header.numPalettes = image->numPalettes;
+  header.numFrames = swap_endian_16(image->numFrames);
+  header.numTiles = swap_endian_16(image->numTiles);
+  header.numAnimations = swap_endian_16(image->numAnimations);
+  header.numPalettes = swap_endian_16(image->numPalettes);
   write(&header, sizeof(header), userData);
 
   int bytesPerFrame = getBytesPerFrame(image);
@@ -258,7 +319,7 @@ int libgfx_writeImageToCallback(libgfx_Image *image, libgfx_WriteCallback write,
 
   for (int i = 0; i < image->numAnimations; ++i) {
     libgfx_Animation *anim = libgfx_getAnimation(image, i);
-    uint16_t tileIndex = anim->tileIndex;
+    uint16_t tileIndex = swap_endian_16(anim->tileIndex);
     uint8_t numFrames = anim->numFrames;
     write(&tileIndex, sizeof(tileIndex), userData);
     write(&numFrames, sizeof(numFrames), userData);

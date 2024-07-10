@@ -5,6 +5,10 @@ extern "C"
 {
 #endif
 
+#ifdef N64
+#define LIBGFX_BIG_ENDIAN
+#endif
+
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -149,28 +153,53 @@ typedef struct {
 
 #pragma pack(push, 1)
 typedef struct {
+#ifdef LIBGFX_BIG_ENDIAN
+  uint8_t second : 4;
+  uint8_t first : 4;
+#else
   uint8_t first : 4;
   uint8_t second : 4;
+#endif
 } libgfx_4BitPixel;
 
 typedef struct {
+#ifdef LIBGFX_BIG_ENDIAN
+  uint8_t alpha : 1;
+  uint8_t blue : 5;
+  uint8_t green : 5;
+  uint8_t red : 5;
+#else
   uint8_t red : 5;
   uint8_t green : 5;
   uint8_t blue : 5;
   uint8_t alpha : 1;
+#endif
 } libgfx_16BitPixel;
 
 typedef struct {
+#ifdef LIBGFX_BIG_ENDIAN
+  uint8_t blue;
+  uint8_t green;
+  uint8_t red;
+#else
   uint8_t red;
   uint8_t green;
   uint8_t blue;
+#endif
 } libgfx_24BitPixel;
 
 typedef struct {
+#ifdef LIBGFX_BIG_ENDIAN
+  uint8_t alpha;
+  uint8_t blue;
+  uint8_t green;
+  uint8_t red;
+#else
   uint8_t red;
   uint8_t green;
   uint8_t blue;
   uint8_t alpha;
+#endif
 } libgfx_32BitPixel;
 #pragma pack(pop)
 
