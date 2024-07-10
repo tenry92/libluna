@@ -59,14 +59,23 @@ int main(int argc, char **argv) {
 
   InputManager inputManager;
   inputManager.addButtonBinding("up", "Keyboard/Scancode/E");
+  inputManager.addButtonBinding("up", "Gamepad/N64/CUp");
   inputManager.addButtonBinding("down", "Keyboard/Scancode/Q");
+  inputManager.addButtonBinding("down", "Gamepad/N64/CDown");
   inputManager.addButtonBinding("forward", "Keyboard/Scancode/W");
+  inputManager.addButtonBinding("forward", "Gamepad/N64/DPadUp");
   inputManager.addButtonBinding("backward", "Keyboard/Scancode/S");
+  inputManager.addButtonBinding("backward", "Gamepad/N64/DPadDown");
   inputManager.addButtonBinding("left", "Keyboard/Scancode/A");
+  inputManager.addButtonBinding("left", "Gamepad/N64/DPadLeft");
   inputManager.addButtonBinding("right", "Keyboard/Scancode/D");
+  inputManager.addButtonBinding("right", "Gamepad/N64/DPadRight");
   inputManager.addButtonBinding("turnLeft", "Keyboard/Scancode/ArrowLeft");
+  inputManager.addButtonBinding("turnLeft", "Gamepad/N64/CLeft");
   inputManager.addButtonBinding("turnRight", "Keyboard/Scancode/ArrowRight");
+  inputManager.addButtonBinding("turnRight", "Gamepad/N64/CRight");
   inputManager.addButtonBinding("fast", "Keyboard/Scancode/LeftShift");
+  inputManager.addButtonBinding("fast", "Gamepad/N64/Z");
 
   // floor
   MeshBuilder::addQuadFace(mesh, {{
