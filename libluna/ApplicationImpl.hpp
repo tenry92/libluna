@@ -26,6 +26,7 @@ class Luna::ApplicationImpl {
   void executeKeyboardShortcuts();
 
   void mainLoop();
+  void processEvents();
   void shutDown();
   bool hasCanvas();
 

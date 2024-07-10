@@ -37,6 +37,34 @@
  * | `Keyboard/Scancode/LeftAlt`, `Keyboard/Scancode/RightAlt` | *N/A* |
  * | `Keyboard/Scancode/Pause` | *N/A* |
  * | `Keyboard/Scancode/ArrowUp`, `Keyboard/Scancode/ArrowDown`, `Keyboard/Scancode/ArrowLeft`, `Keyboard/Scancode/ArrowRight` | *N/A* |
+ *
+ * For controllers, the following primary buttons are defined:
+ *
+ * | Name | Xbox | Switch | PlayStation |
+ * |------|------|--------|-------------|
+ * | `Gamepad/Generic/ButtonSouth` | A | B | Cross
+ * | `Gamepad/Generic/ButtonEast` | B | A | Circle
+ * | `Gamepad/Generic/ButtonWest` | X | Y | Square
+ * | `Gamepad/Generic/ButtonNorth` | Y | X | Triangle
+ *
+ * In addition, the following additional buttons and axes are defined:
+ *
+ * - `Gamepad/Generic/Back`, `Gamepad/Generic/Back`
+ * - `Gamepad/Generic/Start`
+ * - `Gamepad/Generic/LeftThumb` (when left stick is pressed)
+ * - `Gamepad/Generic/RightThumb` (when right stick is pressed)
+ * - `Gamepad/Generic/DPadUp`
+ * - `Gamepad/Generic/DPadDown`
+ * - `Gamepad/Generic/DPadLeft`
+ * - `Gamepad/Generic/DPadRight`
+ * - `Gamepad/Generic/LeftButton` (L, L1, LB)
+ * - `Gamepad/Generic/RightButton` (R, R1, RB)
+ * - `Gamepad/Generic/LeftTrigger` (LZ, L2, LT)
+ * - `Gamepad/Generic/RightTrigger` (RZ, R2, RT)
+ * - `Gamepad/Generic/LeftStickX`
+ * - `Gamepad/Generic/LeftStickY`
+ * - `Gamepad/Generic/RightStickX`
+ * - `Gamepad/Generic/RightStickY`
  */
 
 namespace Luna {

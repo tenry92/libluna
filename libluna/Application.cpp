@@ -68,6 +68,7 @@ static void initSystem() {
 #endif
 #ifdef N64
   dfs_init(DFS_DEFAULT_LOCATION);
+  joypad_init();
 #endif
 
 #ifdef LUNA_WINDOW_SDL2
@@ -151,40 +152,7 @@ void ApplicationImpl::mainLoop() {
 #endif
 
     mDebugMetrics->frameTicker.tick();
-#ifdef LUNA_WINDOW_SDL2
-    SDL_Event event;
-
-    while (SDL_PollEvent(&event)) {
-      switch (event.type) {
-      case SDL_QUIT:
-        logInfo("sdl quit event received");
-        return;
-      }
-
-      for (auto &&canvas : canvases) {
-        if (canvas.expired()) {
-          continue;
-        }
-
-        if (canvas.lock()->getImpl()->processSdlEvent(&event)) {
-          break;
-        }
-      }
-    }
-#endif
-#ifdef LUNA_WINDOW_GLFW
-    glfwPollEvents();
-
-    for (auto &&canvas : canvases) {
-      if (canvas.expired() || !canvas.lock()->mImpl->glfw.window) {
-        continue;
-      }
-
-      if (glfwWindowShouldClose(canvas.lock()->mImpl->glfw.window)) {
-        canvas.lock()->close();
-      }
-    }
-#endif
+    processEvents();
     executeKeyboardShortcuts();
     mIntervalManager.executePendingIntervals();
 
@@ -241,6 +209,132 @@ void ApplicationImpl::mainLoop() {
   }
 
   logInfo("existing main loop");
+}
+
+void ApplicationImpl::processEvents() {
+#ifdef LUNA_WINDOW_SDL2
+  SDL_Event event;
+
+  while (SDL_PollEvent(&event)) {
+    switch (event.type) {
+    case SDL_QUIT:
+      logInfo("sdl quit event received");
+      return;
+    }
+
+    for (auto &&canvas : canvases) {
+      if (canvas.expired()) {
+        continue;
+      }
+
+      if (canvas.lock()->getImpl()->processSdlEvent(&event)) {
+        break;
+      }
+    }
+  }
+#endif
+#ifdef LUNA_WINDOW_GLFW
+  glfwPollEvents();
+
+  for (auto &&canvas : canvases) {
+    if (canvas.expired() || !canvas.lock()->mImpl->glfw.window) {
+      continue;
+    }
+
+    if (glfwWindowShouldClose(canvas.lock()->mImpl->glfw.window)) {
+      canvas.lock()->close();
+    }
+  }
+#endif
+#ifdef N64
+  for (auto &&canvas : canvases) {
+    if (canvas.expired()) {
+      continue;
+    }
+
+    auto &events = canvas.lock()->getButtonEvents();
+
+    joypad_poll();
+
+    auto pressed = joypad_get_buttons_pressed(JOYPAD_PORT_1);
+
+    if (pressed.z) {
+      events.push(ButtonEvent("Gamepad/N64/Z", true));
+    }
+
+    if (pressed.d_up) {
+      events.push(ButtonEvent("Gamepad/N64/DPadUp", true));
+    }
+
+    if (pressed.d_down) {
+      events.push(ButtonEvent("Gamepad/N64/DPadDown", true));
+    }
+
+    if (pressed.d_left) {
+      events.push(ButtonEvent("Gamepad/N64/DPadLeft", true));
+    }
+
+    if (pressed.d_right) {
+      events.push(ButtonEvent("Gamepad/N64/DPadRight", true));
+    }
+
+    if (pressed.c_up) {
+      events.push(ButtonEvent("Gamepad/N64/CUp", true));
+    }
+
+    if (pressed.c_down) {
+      events.push(ButtonEvent("Gamepad/N64/CDown", true));
+    }
+
+    if (pressed.c_left) {
+      events.push(ButtonEvent("Gamepad/N64/CLeft", true));
+    }
+
+    if (pressed.c_right) {
+      events.push(ButtonEvent("Gamepad/N64/CRight", true));
+    }
+
+    auto released = joypad_get_buttons_released(JOYPAD_PORT_1);
+
+    if (released.z) {
+      events.push(ButtonEvent("Gamepad/N64/Z", false));
+    }
+
+    if (released.d_up) {
+      events.push(ButtonEvent("Gamepad/N64/DPadUp", false));
+    }
+
+    if (released.d_down) {
+      events.push(ButtonEvent("Gamepad/N64/DPadDown", false));
+    }
+
+    if (released.d_left) {
+      events.push(ButtonEvent("Gamepad/N64/DPadLeft", false));
+    }
+
+    if (released.d_right) {
+      events.push(ButtonEvent("Gamepad/N64/DPadRight", false));
+    }
+
+    if (released.c_up) {
+      events.push(ButtonEvent("Gamepad/N64/CUp", false));
+    }
+
+    if (released.c_down) {
+      events.push(ButtonEvent("Gamepad/N64/CDown", false));
+    }
+
+    if (released.c_left) {
+      events.push(ButtonEvent("Gamepad/N64/CLeft", false));
+    }
+
+    if (released.c_right) {
+      events.push(ButtonEvent("Gamepad/N64/CRight", false));
+    }
+
+    return;
+  }
+#endif
 }
 
 void ApplicationImpl::shutDown() {
