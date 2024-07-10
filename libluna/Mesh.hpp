@@ -7,6 +7,9 @@
 #include <libluna/Vector.hpp>
 
 namespace Luna {
+  class Mesh;
+  using MeshPtr = std::shared_ptr<Mesh>;
+
   class Mesh final {
     public:
     using Face = std::array<std::size_t, 3>;

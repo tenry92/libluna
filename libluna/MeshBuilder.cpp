@@ -39,7 +39,12 @@ void MeshBuilder::addQuadFace(
   auto deltaUv2 = mesh->getTexCoords().at(indexOffset + 2) -
                   mesh->getTexCoords().at(indexOffset);
 
+#ifdef N64
+  // avoid division by 0 exception
+  float f = 1.0f;
+#else
   float f = 1.0f / (deltaUv1.x() * deltaUv2.y() - deltaUv2.x() - deltaUv1.y());
+#endif
 
   for (int i = 0; i < 4; ++i) {
     mesh->getTangents().push_back(

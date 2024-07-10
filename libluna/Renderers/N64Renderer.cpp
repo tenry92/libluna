@@ -17,6 +17,7 @@ class N64Renderer::impl {
   std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
 
   std::map<int, GLuint> mTextureIdMapping;
+  std::map<int, MeshPtr> mMeshIdMapping;
 };
 
 N64Renderer::N64Renderer() : mImpl{std::make_unique<impl>()} {
@@ -135,11 +136,42 @@ void N64Renderer::renderTexture([[maybe_unused]] Canvas *canvas, [[maybe_unused]
 
 void N64Renderer::createMesh([[maybe_unused]] int id) {}
 
-void N64Renderer::destroyMesh([[maybe_unused]] int id) {}
+void N64Renderer::destroyMesh([[maybe_unused]] int id) {
+  mImpl->mMeshIdMapping.erase(id);
+}
 
-void N64Renderer::loadMesh([[maybe_unused]] int id, [[maybe_unused]] std::shared_ptr<Mesh> mesh) {}
+void N64Renderer::loadMesh([[maybe_unused]] int id, [[maybe_unused]] std::shared_ptr<Mesh> mesh) {
+  mImpl->mMeshIdMapping.emplace(id, mesh);
+}
 
-void N64Renderer::renderMesh([[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info) {}
+void N64Renderer::renderMesh([[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info) {
+  auto mesh = mImpl->mMeshIdMapping.at(info->meshId);
+  auto texture = mImpl->mTextureIdMapping.at(info->diffuseTextureId);
+
+  glEnable(GL_TEXTURE_2D);
+  glEnable(GL_DEPTH_TEST);
+  glBindTexture(GL_TEXTURE_2D, texture);
+
+  auto camera = canvas->getCamera3d();
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadMatrixf((camera.getProjectionMatrix(4.0f / 3.0f) * camera.getViewMatrix()).getValuePointer());
+
+  glMatrixMode(GL_MODELVIEW);
+  glLoadMatrixf(info->transform.getValuePointer());
+
+  glBegin(GL_TRIANGLES);
+  for (std::size_t faceIndex = 0; faceIndex < mesh->getFaces().size(); ++faceIndex) {
+    for (std::size_t index : mesh->getFaces().at(faceIndex)) {
+      auto &vertex = mesh->getVertices().at(index);
+      auto &texCoords = mesh->getTexCoords().at(index);
+
+      glTexCoord2f(texCoords.x(), texCoords.y());
+      glVertex3f(vertex.x(), vertex.y(), vertex.z());
+    }
+  }
+  glEnd();
+}
 
 void N64Renderer::setTextureFilterEnabled([[maybe_unused]] int id, [[maybe_unused]] bool enabled) {}
 
