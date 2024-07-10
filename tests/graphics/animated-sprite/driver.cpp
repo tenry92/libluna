@@ -13,6 +13,9 @@
 #ifdef __SWITCH__
 #define CANVAS_WIDTH 1920
 #define CANVAS_HEIGHT 1080
+#elif defined(N64)
+#define CANVAS_WIDTH 320
+#define CANVAS_HEIGHT 240
 #else
 #define CANVAS_WIDTH 800
 #define CANVAS_HEIGHT 600
@@ -52,10 +55,17 @@ class DummyImageLoader {
   DummyImageLoader(libgfx_Image *gfx, int frameIndex) : mGfx(gfx), mFrameIndex(frameIndex) {}
 
   ImagePtr operator()() {
-    auto image = Image::makeRgb32({mGfx->width, mGfx->height});
-    memcpy(image->getData(), libgfx_getFramePointer(mGfx, mFrameIndex), image->getByteCount());
+    if (mGfx->colorFormat == LIBGFX_FORMAT_32BIT_RGBA) {
+      auto image = Image::makeRgb32({mGfx->width, mGfx->height});
+      memcpy(image->getData(), libgfx_getFramePointer(mGfx, mFrameIndex), image->getByteCount());
 
-    return image;
+      return image;
+    } else {
+      auto image = Image::makeRgb16({mGfx->width, mGfx->height});
+      memcpy(image->getData(), libgfx_getFramePointer(mGfx, mFrameIndex), image->getByteCount());
+
+      return image;
+    }
   }
 
   private:
@@ -101,14 +111,10 @@ int main(int argc, char **argv) {
 
     logDebug("make sprite");
     sprite = stage->makeSprite();
-    // sprite->setImage(image);
     sprite->setPosition({CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2});
-    // sprite->setAnimationFrames(0, 23);
-    // sprite->setFrameRate(30.0f);
   });
 
   app.addInterval(60, [&](float elapsedTime) {
-    // sprite->advanceAnimation(elapsedTime);
     sprite->setImage(animation.advance(elapsedTime));
   });
 
