@@ -12,10 +12,13 @@
 #endif
 
 #include <thread>
+#include <filesystem>
 
+#include <libluna/Application.hpp>
 #include <libluna/System.hpp>
 
 using namespace Luna;
+namespace fs = std::filesystem;
 
 unsigned int System::getProcessorCount() {
 #ifdef __MINGW32__
@@ -97,4 +100,27 @@ unsigned long System::getTotalMemorySize() {
 #else
   return 0;
 #endif
+}
+
+std::list<String> System::getAssetFiles() {
+  auto assetsPath = Application::getInstance()->getAssetsPath().getRawPath().s_str();
+  std::list<String> list;
+
+#ifdef N64
+  dir_t dir;
+  int result = dir_findfirst(assetsPath.c_str(), &dir);
+
+  while (result == 0) {
+    list.emplace_back(dir.d_name);
+    result = dir_findnext(assetsPath.c_str(), &dir);
+  }
+#else
+  if (fs::exists(assetsPath) && fs::is_directory(assetsPath)) {
+    for (const auto &entry : fs::recursive_directory_iterator(assetsPath)) {
+      list.emplace_back(entry.path());
+    }
+  }
+#endif
+
+  return list;
 }

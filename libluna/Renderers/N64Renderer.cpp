@@ -1,5 +1,7 @@
 #ifdef N64
 
+#include <map>
+
 #include <libdragon.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -13,6 +15,8 @@ using namespace Luna;
 class N64Renderer::impl {
   public:
   std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
+
+  std::map<int, GLuint> mTextureIdMapping;
 };
 
 N64Renderer::N64Renderer() : mImpl{std::make_unique<impl>()} {
@@ -58,15 +62,76 @@ void N64Renderer::clearBackground([[maybe_unused]] ColorRgb color) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void N64Renderer::createTexture([[maybe_unused]] int id) {}
+void N64Renderer::createTexture([[maybe_unused]] int id) {
+  GLuint texture;
+  glGenTextures(1, &texture);
+  mImpl->mTextureIdMapping.emplace(id, texture);
 
-void N64Renderer::destroyTexture([[maybe_unused]] int id) {}
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+}
 
-void N64Renderer::loadTexture([[maybe_unused]] int id, [[maybe_unused]] ImagePtr image) {}
+void N64Renderer::destroyTexture([[maybe_unused]] int id) {
+  GLuint texture = mImpl->mTextureIdMapping.at(id);
+  mImpl->mTextureIdMapping.erase(id);
+  glDeleteTextures(1, &texture);
+}
+
+void N64Renderer::loadTexture([[maybe_unused]] int id, [[maybe_unused]] ImagePtr image) {
+  GLuint texture = mImpl->mTextureIdMapping.at(id);
+
+  GLenum inputFormat = GL_RGBA;
+  GLenum inputType = GL_UNSIGNED_SHORT_5_5_5_1_EXT;
+
+  if (image->getBitsPerPixel() == 24) {
+    inputFormat = GL_RGB;
+    inputType = GL_BYTE;
+  } else if (image->getBitsPerPixel() == 32) {
+    inputType = GL_UNSIGNED_INT_8_8_8_8_EXT;
+  }
+
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glTexImage2D(
+      GL_TEXTURE_2D, 0,                              /* mipmap level */
+      GL_RGB5_A1,                                    /* internal format */
+      image->getSize().x(), image->getSize().y(), 0, /* format (legacy) */
+      inputFormat,                                   /* input format */
+      inputType, image->getData()
+  );
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
 
 void N64Renderer::resizeTexture([[maybe_unused]] int id, [[maybe_unused]] Vector2i size) {}
 
-void N64Renderer::renderTexture([[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info) {}
+void N64Renderer::renderTexture([[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info) {
+  GLuint texture = mImpl->mTextureIdMapping.at(info->textureId);
+
+  float displayWidth = static_cast<float>(display_get_width());
+  float displayHeight = static_cast<float>(display_get_height());
+
+  float left = (info->position.x() / displayWidth * 2.0f) - 1.0f;
+  float top = (info->position.y() / displayHeight * 2.0f) - 1.0f;
+  float right = ((info->position.x() + static_cast<float>(info->size.x())) / displayWidth * 2.0f) - 1.0f;
+  float bottom = ((info->position.y() - static_cast<float>(info->size.y())) / displayHeight * 2.0f) - 1.0f;
+
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(left, bottom, 0.0f);
+
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(left, top, 0.0f);
+
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(right, top, 0.0f);
+
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(right, bottom, 0.0f);
+  glEnd();
+}
 
 void N64Renderer::createMesh([[maybe_unused]] int id) {}
 

@@ -231,6 +231,13 @@ void ApplicationImpl::mainLoop() {
       Console::update();
     }
 #endif
+#ifdef N64
+    Console::init();
+    logError("{}", mRaisedErrorMessage);
+    while (true) {
+      Console::update();
+    }
+#endif
   }
 
   logInfo("existing main loop");

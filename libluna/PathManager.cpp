@@ -44,7 +44,7 @@ class PathManager::impl {
     // mAssetsPath = Path("romfs:/assets");
     mAssetsPath = Path("romfs:");
 #elif defined(N64)
-    mAssetsPath = Path("rom:");
+    mAssetsPath = Path("rom:/assets");
 #else
     auto programPath = mProgramPath;
     if (programPath.up().basename() == "bin") {

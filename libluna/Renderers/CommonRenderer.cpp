@@ -56,6 +56,7 @@ void CommonRenderer::render() {
 
   renderWorld(canvas);
 
+#ifndef N64
   if (!mRenderTargetId) {
     mRenderTargetId = mTextureIdAllocator.next();
     logDebug("create texture #{} (render target)", mRenderTargetId);
@@ -64,8 +65,11 @@ void CommonRenderer::render() {
 
   // render sprites to internal texture
   start2dFramebuffer(canvas);
+#endif
   renderSprites(canvas, getInternalSize());
+#ifndef N64
   end2dFramebuffer(canvas);
+#endif
   endRender();
 }
 
@@ -173,7 +177,6 @@ Vector2i CommonRenderer::getCurrentRenderSize() const {
 }
 
 void CommonRenderer::updateTextureCache([[maybe_unused]] std::shared_ptr<Stage> stage) {
-#ifndef N64
   std::unordered_set<ImageResPtr> visitedImages;
   std::unordered_set<std::shared_ptr<Mesh>> visitedMeshes;
   
@@ -260,7 +263,6 @@ void CommonRenderer::updateTextureCache([[maybe_unused]] std::shared_ptr<Stage> 
       ++it;
     }
   }
-#endif
 }
 
 void CommonRenderer::renderWorld(Canvas *canvas) {

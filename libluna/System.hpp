@@ -1,5 +1,9 @@
 #pragma once
 
+#include <list>
+
+#include <libluna/String.hpp>
+
 namespace Luna {
   namespace System {
     /**
@@ -18,5 +22,7 @@ namespace Luna {
     unsigned long getVirtualMemoryUsage();
 
     unsigned long getTotalMemorySize();
+
+    std::list<String> getAssetFiles();
   }
 }

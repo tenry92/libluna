@@ -61,7 +61,9 @@ void IntervalManager::executePendingIntervals() {
   }
 
 #ifdef N64
-  mImpl->mIntervalQueue.top().callback(1.0f / 60.0f);
+  if (!mImpl->mIntervalQueue.empty()) {
+    mImpl->mIntervalQueue.top().callback(1.0f / 60.0f);
+  }
 #else
   while (!mImpl->mIntervalQueue.empty()) {
     auto currentInterval = mImpl->mIntervalQueue.top();
