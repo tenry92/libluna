@@ -58,6 +58,8 @@ namespace Luna {
      */
     float getInputAxis(const String &name);
 
+    bool isClosed() const;
+
     CanvasImpl *getImpl() const;
 
     private:

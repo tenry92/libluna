@@ -360,13 +360,9 @@ void ApplicationImpl::shutDown() {
 bool ApplicationImpl::hasCanvas() {
   for (auto &&canvas : canvases) {
     if (!canvas.expired()) {
-#ifdef LUNA_WINDOW_GLFW
-      if (canvas.lock()->mImpl->glfw.window != nullptr) {
+      if (!canvas.lock()->isClosed()) {
         return true;
       }
-#else
-      return true;
-#endif
     }
   }
 

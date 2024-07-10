@@ -448,6 +448,8 @@ void Canvas::close() {
     // mImpl->egl.display = nullptr;
   }
 #endif
+
+  mImpl->mClosed = true;
 }
 
 void Canvas::setVideoDriver(const String &name) {
@@ -557,6 +559,8 @@ void Canvas::sync() {
   std::unique_lock lock(mImpl->mMutex);
 
 #ifdef LUNA_WINDOW_SDL2
+  // on Linux, SDL events are sent to the main thread only
+  // on Windows, SDL events are sent to the individual threads
   auto command = std::make_shared<CanvasCommand>(([]() {
     SDL_Event event;
 
@@ -584,6 +588,10 @@ void Canvas::sync() {
 
 std::queue<ButtonEvent> &Canvas::getButtonEvents() const {
   return mImpl->mButtonEvents;
+}
+
+bool Canvas::isClosed() const {
+  return mImpl->mClosed;
 }
 
 CanvasImpl *Canvas::getImpl() const { return mImpl.get(); }

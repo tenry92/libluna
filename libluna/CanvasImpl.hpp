@@ -56,6 +56,7 @@ class Luna::CanvasImpl {
   ColorRgb mBackgroundColor;
   std::queue<ButtonEvent> mButtonEvents;
   std::map<std::string, float> mAxisValues;
+  bool mClosed{false};
 
 #ifdef LUNA_WINDOW_SDL2
   bool processSdlEvent(const SDL_Event *event);
