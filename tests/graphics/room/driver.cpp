@@ -116,11 +116,14 @@ int main(int argc, char **argv) {
     model = stage->makeModel();
     model->setMesh(mesh);
 
-    auto diffuseRef = make_shared<Resource<Image>>(DummyImageLoader("textures/BricksDragfacedRunning008_COL_1K.gfx"));
+    auto diffuseRef = make_shared<Resource<Image>>(DummyImageLoader("textures/wall_32x32.gfx"));
     model->getMaterial().setDiffuse(diffuseRef);
 
-    auto normalRef = make_shared<Resource<Image>>(DummyImageLoader("textures/BricksDragfacedRunning008_NRM_1K.gfx"));
-    model->getMaterial().setNormal(normalRef);
+    // auto diffuseRef = make_shared<Resource<Image>>(DummyImageLoader("textures/BricksDragfacedRunning008_COL_1K.gfx"));
+    // model->getMaterial().setDiffuse(diffuseRef);
+
+    // auto normalRef = make_shared<Resource<Image>>(DummyImageLoader("textures/BricksDragfacedRunning008_NRM_1K.gfx"));
+    // model->getMaterial().setNormal(normalRef);
   });
 
   camera.setPosition({0.0f, 1.0f, 0.0f});

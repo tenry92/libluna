@@ -9,6 +9,7 @@ set(ASSET_FILES
   "beat-layer2.opus" "static"
   "beat-layer3.opus" "static"
   "textures/BricksDragfacedRunning008_COL_1K.png" "gfx"
+  "textures/wall_32x32.png" "gfx"
   "textures/BricksDragfacedRunning008_GLOSS_1K.png" "gfx"
   "textures/BricksDragfacedRunning008_NRM_1K.png" "gfx"
   "textures/BricksDragfacedRunning008_REFL_1K.png" "gfx"
