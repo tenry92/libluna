@@ -52,24 +52,26 @@ class DiscreteAnimation {
 
 class DummyImageLoader {
   public:
-  DummyImageLoader(libgfx_Image *gfx, int frameIndex) : mGfx(gfx), mFrameIndex(frameIndex) {}
+  DummyImageLoader(libgfx_Gfx *gfx, int frameIndex) : mGfx(gfx), mFrameIndex(frameIndex) {}
 
   ImagePtr operator()() {
-    if (mGfx->colorFormat == LIBGFX_FORMAT_32BIT_RGBA) {
-      auto image = Image::makeRgb32({mGfx->width, mGfx->height});
-      memcpy(image->getData(), libgfx_getFramePointer(mGfx, mFrameIndex), image->getByteCount());
+    auto frameset = &mGfx->framesets[0];
+
+    if (frameset->colorFormat == LIBGFX_COLOR_32BIT_RGBA) {
+      auto image = Image::makeRgb32({frameset->width, frameset->height});
+      memcpy(image->getData(), libgfx_getFramePointer(frameset, mFrameIndex), image->getByteCount());
 
       return image;
     } else {
-      auto image = Image::makeRgb16({mGfx->width, mGfx->height});
-      memcpy(image->getData(), libgfx_getFramePointer(mGfx, mFrameIndex), image->getByteCount());
+      auto image = Image::makeRgb16({frameset->width, frameset->height});
+      memcpy(image->getData(), libgfx_getFramePointer(frameset, mFrameIndex), image->getByteCount());
 
       return image;
     }
   }
 
   private:
-  libgfx_Image *mGfx;
+  libgfx_Gfx *mGfx;
   int mFrameIndex;
 };
 
@@ -93,14 +95,15 @@ int main(int argc, char **argv) {
 
     reader = ResourceReader::make("coin.gfx");
     auto gfx = libgfx_loadImageFromCallback(readFromResource, reader.get());
+    auto frameset = &gfx->framesets[0];
 
     logDebug("make imageRef");
     std::vector<ImageResPtr> frames;
-    frames.reserve(gfx->numFrames);
+    frames.reserve(frameset->numFrames);
 
-    logDebug("{}x{}: {}", gfx->width, gfx->height, gfx->numFrames);
+    logDebug("{}x{}: {}", frameset->width, frameset->height, frameset->numFrames);
 
-    for (int i = 0; i < gfx->numFrames; ++i) {
+    for (int i = 0; i < frameset->numFrames; ++i) {
       logDebug("loading frame {}", i);
       frames.emplace_back(make_shared<Resource<Image>>(DummyImageLoader(gfx, i)));
     }

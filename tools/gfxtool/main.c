@@ -239,7 +239,7 @@ static void parseOptions(int argc, char **argv, Options *options) {
   }
 }
 
-static int encodePaletteFromFile(libgfx_Image *image, Options *options, int palIndex) {
+static int encodePaletteFromFile(libgfx_Gfx *image, Options *options, int palIndex) {
   char filename[256] = {0};
   int colorsPerRow = 1;
   int colorsPerCol = 1;
@@ -358,24 +358,25 @@ static int encodePaletteFromFile(libgfx_Image *image, Options *options, int palI
   }
   png_read_image(png, inputRowPointers);
 
-  libgfx_ColorFormat palFormat = LIBGFX_FORMAT_32BIT_RGBA;
+  libgfx_ColorFormat palFormat = LIBGFX_COLOR_32BIT_RGBA;
 
   if (options->palFormat[palIndex]) {
     if (strcmp(options->palFormat[palIndex], "i4") == 0) {
-      palFormat = LIBGFX_FORMAT_4BIT_GRAYSCALE;
+      palFormat = LIBGFX_COLOR_4BIT_GRAYSCALE;
     } else if (strcmp(options->palFormat[palIndex], "i8") == 0) {
-      palFormat = LIBGFX_FORMAT_8BIT_GRAYSCALE;
+      palFormat = LIBGFX_COLOR_8BIT_GRAYSCALE;
     } else if (strcmp(options->palFormat[palIndex], "rgba16") == 0) {
-      palFormat = LIBGFX_FORMAT_16BIT_RGBA;
+      palFormat = LIBGFX_COLOR_16BIT_RGBA;
     } else if (strcmp(options->palFormat[palIndex], "rgb24") == 0) {
-      palFormat = LIBGFX_FORMAT_24BIT_RGB;
+      palFormat = LIBGFX_COLOR_24BIT_RGB;
     } else if (strcmp(options->palFormat[palIndex], "rgba32") == 0) {
-      palFormat = LIBGFX_FORMAT_32BIT_RGBA;
+      palFormat = LIBGFX_COLOR_32BIT_RGBA;
     }
   }
 
-  libgfx_Palette *pal = libgfx_getPalette(image, palIndex);
-  libgfx_allocPalette(image, pal, palFormat, numColors);
+  libgfx_Palette *pal = &image->palettes[palIndex];
+  pal->colorFormat = palFormat;
+  libgfx_allocPaletteColors(pal, numColors);
 
   for (int i = 0; i < numColors; ++i) {
     int x = (i % colorsPerRow) * colorWidth + colorWidth / 2 + rectLeft;
@@ -387,12 +388,12 @@ static int encodePaletteFromFile(libgfx_Image *image, Options *options, int palI
     uint8_t alpha = pointer[3];
 
     switch (pal->colorFormat) {
-      case LIBGFX_FORMAT_4BIT_GRAYSCALE:
+      case LIBGFX_COLOR_4BIT_GRAYSCALE:
         break;
-      case LIBGFX_FORMAT_8BIT_GRAYSCALE:
+      case LIBGFX_COLOR_8BIT_GRAYSCALE:
         ((uint8_t *) pal->colors)[i] = (red + green + blue) / 3;
         break;
-      case LIBGFX_FORMAT_16BIT_RGBA: {
+      case LIBGFX_COLOR_16BIT_RGBA: {
         libgfx_16BitPixel *rgbaPointer = libgfx_to16BitPixels(pal->colors);
         rgbaPointer[i].red = red >> 3;
         rgbaPointer[i].green = green >> 3;
@@ -400,12 +401,12 @@ static int encodePaletteFromFile(libgfx_Image *image, Options *options, int palI
         rgbaPointer[i].alpha = alpha >> 7;
         break;
       }
-      case LIBGFX_FORMAT_24BIT_RGB:
+      case LIBGFX_COLOR_24BIT_RGB:
         ((uint8_t *) pal->colors)[i * 3] = red;
         ((uint8_t *) pal->colors)[i * 3 + 1] = green;
         ((uint8_t *) pal->colors)[i * 3 + 2] = blue;
         break;
-      case LIBGFX_FORMAT_32BIT_RGBA:
+      case LIBGFX_COLOR_32BIT_RGBA:
         ((uint8_t *) pal->colors)[i * 4] = red;
         ((uint8_t *) pal->colors)[i * 4 + 1] = green;
         ((uint8_t *) pal->colors)[i * 4 + 2] = blue;
@@ -425,13 +426,13 @@ static int findColorIndex(libgfx_Palette *palette, int red, int green, int blue,
     int colorRed, colorGreen, colorBlue, colorAlpha;
 
     switch (palette->colorFormat) {
-      case LIBGFX_FORMAT_16BIT_RGBA:
+      case LIBGFX_COLOR_16BIT_RGBA:
         colorRed = expand5BitTo8Bit(libgfx_to16BitPixels(palette->colors)[colIndex].red);
         colorGreen = expand5BitTo8Bit(libgfx_to16BitPixels(palette->colors)[colIndex].green);
         colorBlue = expand5BitTo8Bit(libgfx_to16BitPixels(palette->colors)[colIndex].blue);
         colorAlpha = libgfx_to16BitPixels(palette->colors)[colIndex].alpha ? 255 : 0;
         break;
-      case LIBGFX_FORMAT_32BIT_RGBA:
+      case LIBGFX_COLOR_32BIT_RGBA:
         colorRed = ((uint8_t *) palette->colors)[colIndex * 4];
         colorGreen = ((uint8_t *) palette->colors)[colIndex * 4 + 1];
         colorBlue = ((uint8_t *) palette->colors)[colIndex * 4 + 2];
@@ -469,32 +470,21 @@ static int encode(Options *options) {
 
   printf("Reading %s\n", options->inputFile);
 
-  libgfx_ImageType type = LIBGFX_TYPE_IMAGE;
-
-  if (options->type) {
-    if (strcmp(options->type, "tileset") == 0) {
-      type = LIBGFX_TYPE_TILESET;
-    } else if (strcmp(options->type, "image") != 0) {
-      printf("Unknown type %s.\n", options->type);
-      return 1;
-    }
-  }
-
-  libgfx_ColorFormat format = LIBGFX_FORMAT_32BIT_RGBA;
+  libgfx_ColorFormat format = LIBGFX_COLOR_32BIT_RGBA;
 
   if (options->format) {
     if (strcmp(options->format, "ci4") == 0) {
-      format = LIBGFX_FORMAT_4BIT_INDEXED;
+      format = LIBGFX_COLOR_4BIT_INDEXED;
     } else if (strcmp(options->format, "ci8") == 0) {
-      format = LIBGFX_FORMAT_8BIT_INDEXED;
+      format = LIBGFX_COLOR_8BIT_INDEXED;
     } else if (strcmp(options->format, "i4") == 0) {
-      format = LIBGFX_FORMAT_4BIT_GRAYSCALE;
+      format = LIBGFX_COLOR_4BIT_GRAYSCALE;
     } else if (strcmp(options->format, "i8") == 0) {
-      format = LIBGFX_FORMAT_8BIT_GRAYSCALE;
+      format = LIBGFX_COLOR_8BIT_GRAYSCALE;
     } else if (strcmp(options->format, "rgba16") == 0) {
-      format = LIBGFX_FORMAT_16BIT_RGBA;
+      format = LIBGFX_COLOR_16BIT_RGBA;
     } else if (strcmp(options->format, "rgb24") == 0) {
-      format = LIBGFX_FORMAT_24BIT_RGB;
+      format = LIBGFX_COLOR_24BIT_RGB;
     } else if (strcmp(options->format, "rgba32") != 0) {
       printf("Unknown format %s.\n", options->format);
       return 1;
@@ -579,7 +569,7 @@ static int encode(Options *options) {
 
   png_read_update_info(png, info);
 
-  libgfx_Image *image = libgfx_createImage(frameWidth, frameHeight, format, type);
+  libgfx_Gfx *image = libgfx_allocGfx();
 
   if (options->numPals) {
     libgfx_allocPalettes(image, options->numPals);
@@ -594,7 +584,12 @@ static int encode(Options *options) {
   }
 
   printf("Allocating %d frames\n", numFrames);
-  libgfx_allocFrames(image, numFrames);
+  libgfx_allocFramesets(image, 1);
+  libgfx_Frameset *frameset = &image->framesets[0];
+  frameset->colorFormat = format;
+  frameset->width = frameWidth;
+  frameset->height = frameHeight;
+  libgfx_allocFrames(frameset, numFrames);
 
   png_bytep *inputRowPointers = (png_bytep *) malloc(inputHeight * sizeof(png_bytep));
   for (int row = 0; row < inputHeight; ++row) {
@@ -606,7 +601,7 @@ static int encode(Options *options) {
     for (int frameCol = 0; frameCol < framesPerRow; ++frameCol) {
       int frameIndex = frameCol + frameRow * framesPerRow;
       printf("Writing frame #%d\n", frameIndex);
-      uint8_t *frame = (uint8_t *) libgfx_getFramePointer(image, frameIndex);
+      uint8_t *frame = (uint8_t *) libgfx_getFramePointer(frameset, frameIndex);
 
       for (int row = 0; row < frameHeight; ++row) {
         png_bytep inputRow = inputRowPointers[rectTop + frameRow * frameHeight + row];
@@ -669,9 +664,9 @@ static int encode(Options *options) {
           }
           
           switch (format) {
-            case LIBGFX_FORMAT_4BIT_INDEXED:
+            case LIBGFX_COLOR_4BIT_INDEXED:
               if (!isIndexed) {
-                colorIndex = findColorIndex(libgfx_getPalette(image, 0), red, green, blue, alpha);
+                colorIndex = findColorIndex(&image->palettes[0], red, green, blue, alpha);
               }
 
               if (isOdd) {
@@ -680,37 +675,37 @@ static int encode(Options *options) {
                 frame[(col + row * frameHeight) / 2] |= colorIndex;
               }
               break;
-            case LIBGFX_FORMAT_8BIT_INDEXED:
+            case LIBGFX_COLOR_8BIT_INDEXED:
               if (!isIndexed) {
-                colorIndex = findColorIndex(libgfx_getPalette(image, 0), red, green, blue, alpha);
+                colorIndex = findColorIndex(&image->palettes[0], red, green, blue, alpha);
               }
 
               frame[col + row * frameHeight] = colorIndex;
               break;
-            case LIBGFX_FORMAT_4BIT_GRAYSCALE:
+            case LIBGFX_COLOR_4BIT_GRAYSCALE:
               if (isOdd) {
                 frame[(col + row * frameHeight) / 2] |= gray << 4;
               } else {
                 frame[(col + row * frameHeight) / 2] |= gray;
               }
               break;
-            case LIBGFX_FORMAT_8BIT_GRAYSCALE:
+            case LIBGFX_COLOR_8BIT_GRAYSCALE:
               frame[col + row * frameHeight] = gray;
               break;
-            case LIBGFX_FORMAT_16BIT_RGBA: {
-              libgfx_16BitPixel *ref = (libgfx_16BitPixel *) (frame + (col + row * frameHeight) * 2);
+            case LIBGFX_COLOR_16BIT_RGBA: {
+              libgfx_16BitPixel *ref = (libgfx_16BitPixel *) (frame + (col + row * frameHeight) * 2); // buggy
               ref->red = red >> 3;
               ref->green = green >> 3;
               ref->blue = blue >> 3;
               ref->alpha = alpha >> 7;
               break;
             }
-            case LIBGFX_FORMAT_24BIT_RGB:
+            case LIBGFX_COLOR_24BIT_RGB:
               frame[(col + row * frameHeight) * 3] = red;
               frame[(col + row * frameHeight) * 3 + 1] = green;
               frame[(col + row * frameHeight) * 3 + 2] = blue;
               break;
-            case LIBGFX_FORMAT_32BIT_RGBA:
+            case LIBGFX_COLOR_32BIT_RGBA:
               frame[(col + row * frameHeight) * 4] = red;
               frame[(col + row * frameHeight) * 4 + 1] = green;
               frame[(col + row * frameHeight) * 4 + 2] = blue;
@@ -743,40 +738,46 @@ static int decode(Options *options) {
 
   printf("Reading %s\n", options->inputFile);
 
-  libgfx_Image *image = libgfx_loadImageFromFile(options->inputFile);
+  libgfx_Gfx *image = libgfx_loadImageFromFile(options->inputFile);
 
   if (!image) {
     fprintf(stderr, "input is not a valid GFX file: %s\n", libgfx_getError());
     return 1;
   }
 
-  printf("width: %d\n", image->width);
-  printf("height: %d\n", image->height);
-  printf("format: %d\n", image->colorFormat);
-  printf("type: %d\n", image->type);
-  printf("frames: %d\n", image->numFrames);
+  libgfx_Frameset *frameset = &image->framesets[0];
+
+  if (!frameset) {
+    fprintf(stderr, "image doesn't contain any frames\n");
+    return 1;
+  }
+
+  printf("width: %d\n", frameset->width);
+  printf("height: %d\n", frameset->height);
+  printf("format: %d\n", frameset->colorFormat);
+  printf("frames: %d\n", frameset->numFrames);
   printf("tiles: %d\n", image->numTiles);
   printf("anims: %d\n", image->numAnimations);
   printf("pals: %d\n", image->numTiles);
 
-  int outputWidth = image->width * image->numFrames;
-  int outputHeight = image->height;
+  int outputWidth = frameset->width * frameset->numFrames;
+  int outputHeight = frameset->height;
 
   png_bytep *outputRowPointers = (png_bytep *) malloc(outputHeight * sizeof(png_bytep));
   for (int row = 0; row < outputHeight; ++row) {
     outputRowPointers[row] = (png_byte *) malloc(4 * outputWidth * sizeof(png_byte));
   }
 
-  for (int frameIndex = 0; frameIndex < image->numFrames; ++frameIndex) {
+  for (int frameIndex = 0; frameIndex < frameset->numFrames; ++frameIndex) {
     printf("Decoding frame #%d\n", frameIndex);
-    uint8_t *frame = (uint8_t *) libgfx_getFramePointer(image, frameIndex);
+    uint8_t *frame = (uint8_t *) libgfx_getFramePointer(frameset, frameIndex);
 
-    for (int y = 0; y < image->height; ++y) {
-      for (int x = 0; x < image->width; ++x) {
-        switch (image->colorFormat) {
-          case LIBGFX_FORMAT_4BIT_INDEXED: {
+    for (int y = 0; y < frameset->height; ++y) {
+      for (int x = 0; x < frameset->width; ++x) {
+        switch (frameset->colorFormat) {
+          case LIBGFX_COLOR_4BIT_INDEXED: {
             libgfx_4BitPixel *pixels = libgfx_to4BitPixels(frame);
-            libgfx_4BitPixel pixel = pixels[(x + y * image->width) / 2];
+            libgfx_4BitPixel pixel = pixels[(x + y * frameset->width) / 2];
             int isOdd = x % 2;
             int colorIndex;
 
@@ -788,48 +789,48 @@ static int decode(Options *options) {
 
             // todo: choose color from palette, if available
 
-            outputRowPointers[y][(frameIndex * image->width + x) * 4] = (colorIndex << 4) | colorIndex;
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 1] = (colorIndex << 4) | colorIndex;
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 2] = (colorIndex << 4) | colorIndex;
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 3] = 255;
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4] = (colorIndex << 4) | colorIndex;
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 1] = (colorIndex << 4) | colorIndex;
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 2] = (colorIndex << 4) | colorIndex;
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 3] = 255;
 
             break;
           }
-          case LIBGFX_FORMAT_8BIT_INDEXED:
-            outputRowPointers[y][(frameIndex * image->width + x) * 4] = frame[x + y * image->width];
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 1] = frame[x + y * image->width];
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 2] = frame[x + y * image->width];
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 3] = 255;
+          case LIBGFX_COLOR_8BIT_INDEXED:
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4] = frame[x + y * frameset->width];
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 1] = frame[x + y * frameset->width];
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 2] = frame[x + y * frameset->width];
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 3] = 255;
             break;
-          case LIBGFX_FORMAT_4BIT_GRAYSCALE:
+          case LIBGFX_COLOR_4BIT_GRAYSCALE:
             fprintf(stderr, "Decoding 4-bit GFX file is not implemented.\n");
             return 1;
-          case LIBGFX_FORMAT_8BIT_GRAYSCALE:
-            outputRowPointers[y][(frameIndex * image->width + x) * 4] = frame[x + y * image->width];
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 1] = frame[x + y * image->width];
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 2] = frame[x + y * image->width];
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 3] = 255;
+          case LIBGFX_COLOR_8BIT_GRAYSCALE:
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4] = frame[x + y * frameset->width];
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 1] = frame[x + y * frameset->width];
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 2] = frame[x + y * frameset->width];
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 3] = 255;
             break;
-          case LIBGFX_FORMAT_16BIT_RGBA: {
+          case LIBGFX_COLOR_16BIT_RGBA: {
             libgfx_16BitPixel *rgbaFrame = libgfx_to16BitPixels(frame);
-            libgfx_16BitPixel value = rgbaFrame[x + y * image->width];
-            outputRowPointers[y][(frameIndex * image->width + x) * 4] = expand5BitTo8Bit(value.red);
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 1] = expand5BitTo8Bit(value.green);
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 2] = expand5BitTo8Bit(value.blue);
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 3] = value.alpha ? 255 : 0;
+            libgfx_16BitPixel value = rgbaFrame[x + y * frameset->width];
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4] = expand5BitTo8Bit(value.red);
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 1] = expand5BitTo8Bit(value.green);
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 2] = expand5BitTo8Bit(value.blue);
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 3] = value.alpha ? 255 : 0;
             break;
           }
-          case LIBGFX_FORMAT_24BIT_RGB:
-            outputRowPointers[y][(frameIndex * image->width + x) * 4] = frame[(x + y * image->width) * 3];
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 1] = frame[(x + y * image->width) * 3 + 1];
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 2] = frame[(x + y * image->width) * 3 + 2];
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 3] = 255;
+          case LIBGFX_COLOR_24BIT_RGB:
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4] = frame[(x + y * frameset->width) * 3];
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 1] = frame[(x + y * frameset->width) * 3 + 1];
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 2] = frame[(x + y * frameset->width) * 3 + 2];
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 3] = 255;
             break;
-          case LIBGFX_FORMAT_32BIT_RGBA:
-            outputRowPointers[y][(frameIndex * image->width + x) * 4] = frame[(x + y * image->width) * 4];
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 1] = frame[(x + y * image->width) * 4 + 1];
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 2] = frame[(x + y * image->width) * 4 + 2];
-            outputRowPointers[y][(frameIndex * image->width + x) * 4 + 3] = frame[(x + y * image->width) * 4 + 3];
+          case LIBGFX_COLOR_32BIT_RGBA:
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4] = frame[(x + y * frameset->width) * 4];
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 1] = frame[(x + y * frameset->width) * 4 + 1];
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 2] = frame[(x + y * frameset->width) * 4 + 2];
+            outputRowPointers[y][(frameIndex * frameset->width + x) * 4 + 3] = frame[(x + y * frameset->width) * 4 + 3];
             break;
         }
       }

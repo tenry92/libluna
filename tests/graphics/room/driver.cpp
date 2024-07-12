@@ -33,9 +33,10 @@ class DummyImageLoader {
   ImagePtr operator()() {
     auto reader = ResourceReader::make(mFilename.c_str());
     auto gfx = libgfx_loadImageFromCallback(readFromResource, reader.get());
-    auto image = Image::makeRgb32({gfx->width, gfx->height});
-    memcpy(image->getData(), libgfx_getFramePointer(gfx, 0), image->getByteCount());
-    libgfx_freeImage(gfx);
+    auto frameset = &gfx->framesets[0];
+    auto image = Image::makeRgb32({frameset->width, frameset->height});
+    memcpy(image->getData(), frameset->data, image->getByteCount());
+    libgfx_freeGfx(gfx);
 
     return image;
   }

@@ -12,145 +12,6 @@ extern "C"
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef enum {
-  /**
-   * @brief Image is encoded in 4 bits per pixel (16 colors).
-   *
-   * Each byte represents 2 color indices.
-   */
-  LIBGFX_FORMAT_4BIT_INDEXED = 0,
-
-  /**
-   * @brief Image is encoded in 8 bits per pixel (256 colors).
-   *
-   * Each byte represents 1 color index.
-   */
-  LIBGFX_FORMAT_8BIT_INDEXED = 1,
-
-  /**
-   * @brief Image is encoded in 4 bits per pixel (16 levels).
-   *
-   * Each byte represents 2 values.
-   */
-  LIBGFX_FORMAT_4BIT_GRAYSCALE = 2,
-  
-  /**
-   * @brief Image is encoded in 8 bits per pixel (256 levels).
-   *
-   * Each byte represents 1 value.
-   */
-  LIBGFX_FORMAT_8BIT_GRAYSCALE = 3,
-
-  /**
-   * @brief Image is encoded in 16 bits per pixel.
-   *
-   * Red, green and blue are encoded in 5 bits each (32 levels) and alpha is 1 bit.
-   */
-  LIBGFX_FORMAT_16BIT_RGBA = 4,
-
-  /**
-   * @brief Image is encoded in 24 bits per pixel.
-   *
-   * Red, green and blue are encoded in 8 bits each.
-   */
-  LIBGFX_FORMAT_24BIT_RGB = 5,
-
-  /**
-   * @brief Image is encoded in 24 bits per pixel.
-   *
-   * Red, green, blue and alpha are encoded in 8 bits each.
-   */
-  LIBGFX_FORMAT_32BIT_RGBA = 6,
-} libgfx_ColorFormat;
-
-typedef enum {
-  /**
-   * @brief Useful if the GFX file only contains palettes.
-   */
-  LIBGFX_TYPE_NONE = 0,
-  LIBGFX_TYPE_IMAGE = 1,
-  LIBGFX_TYPE_TILESET = 2,
-} libgfx_ImageType;
-
-typedef struct {
-  /**
-   * @brief Tile index to animate. 0 refers to the first defined tile.
-   */
-  int tileIndex;
-  int numFrames;
-  /**
-   * @brief List of frame or tile indices to use. 0 refers to the first defined frame.
-  */
-  int *frameIndices;
-} libgfx_Animation;
-
-typedef struct {
-  libgfx_ColorFormat colorFormat;
-  int numColors;
-  void *colors;
-} libgfx_Palette;
-
-typedef struct {
-  /**
-   * @brief Width of a single frame or tile in pixels.
-   */
-  int width;
-
-  /**
-   * @brief Height of a single frame or tile in pixels.
-   */
-  int height;
-
-  /**
-   * @brief Color format used.
-   */
-  libgfx_ColorFormat colorFormat;
-
-  /**
-   * @brief Type of image.
-   */
-  libgfx_ImageType type;
-
-  /**
-   * @brief Number of frames.
-   */
-  int numFrames;
-
-  /**
-   * @brief Number of frames that are used as the base tiles.
-   *
-   * Any frames above this numbers are meant as animation frames.
-   */
-  int numTiles;
-
-  /**
-   * @brief Number of animations.
-   *
-   * For image, animations will refer to the frames already defined.
-   *
-   * For tileset, for each animation, a tile index is specified and additional
-   * frame data is provided.
-   */
-  int numAnimations;
-
-  /**
-   * @brief Number of palettes included.
-   */
-  int numPalettes;
-
-  /**
-   * @brief List of pointers for frame or tile data.
-   *
-   * The size of each frame in bytes depends on the width, height and format of
-   * the image.
-   */
-  void *frames;
-
-  libgfx_Animation *animations;
-
-  libgfx_Palette *palettes;
-} libgfx_Image;
-
 #pragma pack(push, 1)
 typedef struct {
 #ifdef LIBGFX_BIG_ENDIAN
@@ -203,112 +64,142 @@ typedef struct {
 } libgfx_32BitPixel;
 #pragma pack(pop)
 
+typedef enum {
+  LIBGFX_COLOR_4BIT_INDEXED = 0,
+  LIBGFX_COLOR_8BIT_INDEXED = 1,
+  LIBGFX_COLOR_4BIT_GRAYSCALE = 2,
+  LIBGFX_COLOR_8BIT_GRAYSCALE = 3,
+  LIBGFX_COLOR_16BIT_RGBA = 4,
+  LIBGFX_COLOR_24BIT_RGB = 5,
+  LIBGFX_COLOR_32BIT_RGBA = 6,
+} libgfx_ColorFormat;
+
+typedef struct {
+  libgfx_ColorFormat colorFormat;
+  int numColors;
+  void *colors;
+} libgfx_Palette;
+
+/**
+ * @brief A series of individual frames that share the same dimensions.
+ */
+typedef struct {
+  libgfx_ColorFormat colorFormat;
+  uint16_t width;
+  uint16_t height;
+  uint16_t numFrames;
+  void *data;
+} libgfx_Frameset;
+
+typedef struct {
+  uint16_t numFrames;
+  uint16_t *frames;
+} libgfx_Animation;
+
+typedef struct {
+  uint16_t tileIndex;
+  uint16_t animationIndex;
+} libgfx_TileAnimation;
+
+typedef struct {
+  uint32_t codePoint;
+  uint16_t frameIndex;
+  int16_t xOffset;
+  int16_t yOffset;
+  int16_t advance;
+} libgfx_Character;
+
+typedef struct {
+  uint16_t numPalettes;
+  libgfx_Palette *palettes;
+
+  uint16_t numFramesets;
+  libgfx_Frameset *framesets;
+
+  uint16_t numTiles;
+  uint16_t *tiles;
+
+  uint16_t numAnimations;
+  libgfx_Animation *animations;
+
+  uint16_t numTileAnimations;
+  libgfx_TileAnimation *tileAnimations;
+
+  uint16_t numCharacters;
+  libgfx_Character *characters;
+} libgfx_Gfx;
+
 typedef int (*libgfx_ReadCallback)(void *dest, size_t size, void *userData);
 
 typedef int (*libgfx_WriteCallback)(const void *src, size_t size, void *userData);
 
+libgfx_Gfx *libgfx_loadImageFromFile(const char *filename);
+
+libgfx_Gfx *libgfx_loadImageFromMemory(const void *buffer, size_t bufferSize);
+
+libgfx_Gfx *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userData);
+
+int libgfx_writeImageToFile(libgfx_Gfx *gfx, const char *filename);
+
+int libgfx_writeImageToMemory(libgfx_Gfx *gfx, void *buffer, size_t bufferSize);
+
+int libgfx_writeImageToCallback(libgfx_Gfx *gfx, libgfx_WriteCallback write, void *userData);
+
 /**
  * @brief Load an image from the given filename.
  */
-libgfx_Image *libgfx_loadImageFromFile(const char *filename);
+libgfx_Gfx *libgfx_loadImageFromFile(const char *filename);
 
 /**
  * @brief Load an image from memory using the given buffer.
  */
-libgfx_Image *libgfx_loadImageFromMemory(const void *buffer, size_t bufferSize);
+libgfx_Gfx *libgfx_loadImageFromMemory(const void *buffer, size_t bufferSize);
 
 /**
  * @brief Load an image using provided callback.
  */
-libgfx_Image *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userData);
+libgfx_Gfx *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userData);
 
 /**
  * @brief Write the image to the given file.
  */
-int libgfx_writeImageToFile(libgfx_Image *image, const char *filename);
+int libgfx_writeImageToFile(libgfx_Gfx *gfx, const char *filename);
 
 /**
  * @brief Write the image into memory.
  */
-int libgfx_writeImageToMemory(libgfx_Image *image, void *buffer, size_t bufferSize);
+int libgfx_writeImageToMemory(libgfx_Gfx *gfx, void *buffer, size_t bufferSize);
 
 /**
  * @brief Write the image using the provided callback.
  */
-int libgfx_writeImageToCallback(libgfx_Image *image, libgfx_WriteCallback, void *userData);
+int libgfx_writeImageToCallback(libgfx_Gfx *gfx, libgfx_WriteCallback, void *userData);
 
-/**
- * @brief Convert an indexed image to an RGB/RGBA image using the provided palette.
- */
-int libgfx_applyPalette(libgfx_Image *image, libgfx_ColorFormat colorFormat, const void *colors);
+libgfx_Gfx *libgfx_allocGfx();
 
-/**
- * @brief Convert the image format.
- * 
- * Conversion is only allowed between indexed or non-indexed formats.
- * Conversion from or to indexed and non-indexed is not allowed.
- *
- * @see libgfx_applyPalette() for converting an indexed image to an RGB/RGBA image.
- */
-int libgfx_convertFormat(libgfx_Image *image, libgfx_ColorFormat colorFormat);
+void libgfx_freeGfx(libgfx_Gfx *gfx);
 
-/**
- * @brief Create a new empty image using the given parameters.
- */
-libgfx_Image *libgfx_createImage(int width, int height, libgfx_ColorFormat colorFormat, libgfx_ImageType type);
+int libgfx_allocPalettes(libgfx_Gfx *gfx, int numPalettes);
 
-/**
- * @brief Allocate frames or tiles for the given image.
- *
- * This operation is only allowed once per image to initialize the frame data.
- */
-int libgfx_allocFrames(libgfx_Image *image, int numFrames);
+int libgfx_allocPaletteColors(libgfx_Palette *pal, int numColors);
 
-/**
- * @brief Allocate animations for the given image.
- *
- * This operation is only allowed once per image to initialize the animation data.
- */
-int libgfx_allocAnimations(libgfx_Image *image, int numAnimations);
+int libgfx_allocFramesets(libgfx_Gfx *gfx, int numFramesets);
 
-/**
- * @brief Allocate palettes for the given image.
- *
- * This operation is only allowed once per image to initialize the palette data.
- */
-int libgfx_allocPalettes(libgfx_Image *image, int numPalettes);
+int libgfx_allocFrames(libgfx_Frameset *frameset, int numFrames);
 
-/**
- * @brief Allocate animation.
- *
- * This operation is only allowed once per animation.
- */
-int libgfx_allocAnimation(libgfx_Image *image, libgfx_Animation *animation, int numFrames);
+int libgfx_allocTiles(libgfx_Gfx *gfx, int numTiles);
 
-/**
- * @brief Allocate palette.
- *
- * This operation is only allowed once per palette.
- */
-int libgfx_allocPalette(libgfx_Image *image, libgfx_Palette *palette, libgfx_ColorFormat colorFormat, int numColors);
+int libgfx_allocAnimations(libgfx_Gfx *gfx, int numAnimations);
 
-/**
- * @brief Get pointer to the given frame index.
- */
-void *libgfx_getFramePointer(libgfx_Image *image, int frameIndex);
+int libgfx_allocAnimation(libgfx_Animation *anim, int numFrames);
 
-libgfx_Animation *libgfx_getAnimation(libgfx_Image *image, int index);
+int libgfx_allocTileAnimations(libgfx_Gfx *gfx, int numTileAnimations);
 
-libgfx_Palette *libgfx_getPalette(libgfx_Image *image, int index);
+int libgfx_allocCharacters(libgfx_Gfx *gfx, int numCharacters);
 
-/**
- * @brief Free memory that was allocated for this image.
- *
- * This also frees all memories allocated for frames, animations, palettes etc.
- */
-void libgfx_freeImage(libgfx_Image *image);
+void *libgfx_getFramePointer(libgfx_Frameset *frameset, int frameIndex);
 
-libgfx_4BitPixel *libgfx_to4BitPixels(void *pixels);
+libgfx_4BitPixel *libgfx_to4BitPixels(void *pixels) ;
 
 libgfx_16BitPixel *libgfx_to16BitPixels(void *pixels);
 
@@ -316,10 +207,9 @@ libgfx_24BitPixel *libgfx_to24BitPixels(void *pixels);
 
 libgfx_32BitPixel *libgfx_to32BitPixels(void *pixels);
 
-/**
- * @brief Get a pointer to the latest error message string or NULL if there is none.
- */
 const char *libgfx_getError();
+
+int libgfx_bigEndian();
 
 #ifdef __cplusplus
 }
