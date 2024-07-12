@@ -182,7 +182,9 @@ libgfx_Gfx *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userDat
       pal->numColors = 256;
     }
 
-    read(&pal->colorFormat, 1, userData);
+    uint8_t colorFormat;
+    read(&colorFormat, 1, userData);
+    pal->colorFormat = colorFormat;
     read(&pal->numColors, 1, userData);
 
     libgfx_allocPaletteColors(pal, pal->numColors);
@@ -192,7 +194,9 @@ libgfx_Gfx *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userDat
   libgfx_allocFramesets(gfx, gfx->numFramesets);
   for (int i = 0; i < gfx->numFramesets; ++i) {
     libgfx_Frameset *frameset = &gfx->framesets[i];
-    read(&frameset->colorFormat, 1, userData);
+    uint8_t colorFormat;
+    read(&colorFormat, 1, userData);
+    frameset->colorFormat = colorFormat;
     read_u16(&frameset->width, read, userData);
     read_u16(&frameset->height, read, userData);
     read_u16(&frameset->numFrames, read, userData);
