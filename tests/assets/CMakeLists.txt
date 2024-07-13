@@ -54,7 +54,7 @@ function(convert_gfx file params)
   set(output_file "${ASSETS_OUTPUT_PATH}/${name_rel_dir}/${name_we}.gfx")
   get_filename_component(name_dir "${output_file}" DIRECTORY)
 
-  set(command "${GFXTOOL}" -e "${ASSETS_INPUT_PATH}/${file}" -o "${output_file}")
+  set(command "${GFXTOOL}" encode)
   foreach(param ${params})
     string(REPLACE "=" ";" param_pair "${param}")
 
@@ -64,6 +64,8 @@ function(convert_gfx file params)
       list(APPEND command "--${param_pair}")
     endif()
   endforeach()
+
+  list(APPEND command -i "${ASSETS_INPUT_PATH}/${file}" -o "${output_file}")
 
   add_custom_command(
     OUTPUT "${output_file}"

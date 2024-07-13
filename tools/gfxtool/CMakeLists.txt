@@ -7,7 +7,7 @@ find_package(PNG REQUIRED)
 find_library(LIBGFX NAMES gfx REQUIRED)
 find_path(LIBGFX_INCLUDE_DIR NAMES libgfx/libgfx.h REQUIRED)
 
-add_executable(gfxtool main.c)
+add_executable(gfxtool main.c encode.c loadpng.c surface.c utils.c)
 
 # enable warnings and debug
 if(MSVC)
