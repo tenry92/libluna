@@ -302,6 +302,9 @@ static int addFont(EncodingState *state, const char *arg) {
 
   free(content);
 
+  state->gfx->font.baseLine = font->common.base;
+  state->gfx->font.lineHeight = font->common.lineHeight;
+
   printf("Reading %s as texture\n", font->pages[0].file);
 
   char *filename = strdup(arg);

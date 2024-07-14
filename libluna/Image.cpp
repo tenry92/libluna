@@ -1,13 +1,10 @@
 #include <libluna/Image.hpp>
 
-#include <cstring>
 #include <iostream>
 #include <vector>
 
 #include <libluna/ResourceReader.hpp>
 #include <libluna/String.hpp>
-
-using std::string;
 
 using namespace Luna;
 

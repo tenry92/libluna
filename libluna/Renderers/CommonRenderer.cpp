@@ -67,6 +67,7 @@ void CommonRenderer::render() {
   start2dFramebuffer(canvas);
 #endif
   renderSprites(canvas, getInternalSize());
+  renderTexts(canvas, getInternalSize());
 #ifndef N64
   end2dFramebuffer(canvas);
 #endif
@@ -179,7 +180,7 @@ Vector2i CommonRenderer::getCurrentRenderSize() const {
 void CommonRenderer::updateTextureCache([[maybe_unused]] std::shared_ptr<Stage> stage) {
   std::unordered_set<ImageResPtr> visitedImages;
   std::unordered_set<std::shared_ptr<Mesh>> visitedMeshes;
-  
+
   for (auto &&sprite : stage->getSprites()) {
     if (!sprite->getImage()) {
       continue;
@@ -198,6 +199,19 @@ void CommonRenderer::updateTextureCache([[maybe_unused]] std::shared_ptr<Stage> 
       logDebug("create texture #{} (sprite)", textureId);
       createTexture(textureId);
       loadTexture(textureId, image);
+    }
+  }
+
+  for (auto &&text : stage->getTexts()) {
+    if (!text->getFont()) {
+      continue;
+    }
+
+    auto future = text->getFont()->get();
+    auto font = future.get();
+
+    if (mLoadedFonts.count(font) == 0) {
+      mLoadedFonts.insert(font);
     }
   }
 
@@ -292,6 +306,46 @@ void CommonRenderer::renderSprites(Canvas *canvas, [[maybe_unused]] Vector2i ren
     info.size = mImageSizes.at(sprite->getImage());
     info.position = sprite->getPosition() - canvas->getCamera2d().getPosition();
     renderTexture(canvas, &info);
+  }
+}
+
+void CommonRenderer::renderTexts(Canvas *canvas, [[maybe_unused]] Vector2i renderSize) {
+  for (auto &&text : canvas->getStage()->getTexts()) {
+    auto font = text->getFont()->get().get();
+
+    int x = 0;
+    int y = font->getBaseLine();
+
+    for (auto &&cp : text->getContent()) {
+      if (cp == '\n') {
+        x = 0;
+        y += font->getLineHeight();
+        continue;
+      }
+
+      auto ch = font->getCharByCodePoint(cp);
+
+      if (!ch) {
+        // unknown character
+        continue;
+      }
+
+      RenderTextureInfo info;
+
+      if (mCharImages.count(ch) == 0) {
+        int textureId = mTextureIdAllocator.next();
+        mCharImages.emplace(ch, textureId);
+        createTexture(textureId);
+        loadTexture(textureId, ch->image);
+      }
+
+      info.textureId = mCharImages.at(ch);
+      info.size = ch->image->getSize();
+      info.position = Vector2i(x, y) + ch->offset;
+      renderTexture(canvas, &info);
+
+      x += ch->advance;
+    }
   }
 }
 

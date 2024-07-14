@@ -5,6 +5,7 @@ using namespace Luna;
 class Stage::impl {
   public:
   std::list<SpritePtr> mSprites;
+  std::list<TextPtr> mTexts;
   std::list<std::shared_ptr<Model>> mModels;
   AmbientLight mAmbientLight;
   std::list<std::shared_ptr<PointLight>> mPointLights;
@@ -23,6 +24,17 @@ SpritePtr Stage::makeSprite() {
 
 const std::list<SpritePtr> &Stage::getSprites() const {
   return mImpl->mSprites;
+}
+
+TextPtr Stage::makeText() {
+  auto text = Text::make();
+  mImpl->mTexts.emplace_back(text);
+
+  return text;
+}
+
+const std::list<TextPtr> &Stage::getTexts() const {
+  return mImpl->mTexts;
 }
 
 std::shared_ptr<Model> Stage::makeModel() {

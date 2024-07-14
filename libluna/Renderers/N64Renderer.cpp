@@ -93,6 +93,9 @@ void N64Renderer::loadTexture([[maybe_unused]] int id, [[maybe_unused]] ImagePtr
   }
 
   glBindTexture(GL_TEXTURE_2D, texture);
+  // note: on N64, a texture size that's not a power of 2, must be clamped
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   glTexImage2D(
       GL_TEXTURE_2D, 0,                              /* mipmap level */
       GL_RGB5_A1,                                    /* internal format */
@@ -113,10 +116,12 @@ void N64Renderer::renderTexture([[maybe_unused]] Canvas *canvas, [[maybe_unused]
   float displayHeight = static_cast<float>(display_get_height());
 
   float left = (info->position.x() / displayWidth * 2.0f) - 1.0f;
-  float top = (info->position.y() / displayHeight * 2.0f) - 1.0f;
+  float top = -(info->position.y() / displayHeight * 2.0f) + 1.0f;
   float right = ((info->position.x() + static_cast<float>(info->size.x())) / displayWidth * 2.0f) - 1.0f;
-  float bottom = ((info->position.y() - static_cast<float>(info->size.y())) / displayHeight * 2.0f) - 1.0f;
+  float bottom = -((info->position.y() + static_cast<float>(info->size.y())) / displayHeight * 2.0f) + 1.0f;
 
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, texture);
   glBegin(GL_TRIANGLE_FAN);

@@ -102,6 +102,11 @@ typedef struct {
 } libgfx_TileAnimation;
 
 typedef struct {
+  uint16_t baseLine;
+  uint16_t lineHeight;
+} libgfx_Font;
+
+typedef struct {
   uint32_t codePoint;
   uint16_t frameIndex;
   int16_t xOffset;
@@ -124,6 +129,8 @@ typedef struct {
 
   uint16_t numTileAnimations;
   libgfx_TileAnimation *tileAnimations;
+
+  libgfx_Font font;
 
   uint16_t numCharacters;
   libgfx_Character *characters;

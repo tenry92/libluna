@@ -4,6 +4,7 @@
 
 #include <libluna/AbstractRenderer.hpp>
 #include <libluna/IdAllocator.hpp>
+#include <libluna/Font.hpp>
 #include <libluna/Matrix.hpp>
 
 namespace Luna {
@@ -78,7 +79,7 @@ namespace Luna {
 
     /**
      * @brief Create a new empty texture for the provided ID.
-     * 
+     *
      * This may do nothing and the actual creation can be done later in
      * @ref loadTexture().
      */
@@ -91,7 +92,7 @@ namespace Luna {
 
     /**
      * @brief Load data to the given texture ID.
-     * 
+     *
      * It is guaranteed that the given texture ID was previously passed to
      * @ref createTexture().
      */
@@ -175,6 +176,8 @@ namespace Luna {
      */
     void renderSprites(Canvas *canvas, Vector2i renderSize);
 
+    void renderTexts(Canvas *canvas, Vector2i renderSize);
+
     void updateTextureCache(std::shared_ptr<Stage> stage);
 
     void start2dFramebuffer(Canvas *canvas);
@@ -186,6 +189,8 @@ namespace Luna {
     int mRenderTargetId;
     Vector2i mCurrentRenderSize;
     std::unordered_map<ImageResPtr, int> mKnownImages;
+    std::unordered_map<Font::Char *, int> mCharImages;
+    std::set<FontPtr> mLoadedFonts;
     std::unordered_map<ImageResPtr, Vector2i> mImageSizes;
     std::unordered_map<std::shared_ptr<Mesh>, int> mKnownMeshes;
   };

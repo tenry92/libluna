@@ -252,19 +252,18 @@ libgfx_Gfx *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userDat
     read_u16(&tileAnim->animationIndex, read, userData);
   }
 
+  read_u16(&gfx->font.baseLine, read, userData);
+  read_u16(&gfx->font.lineHeight, read, userData);
+
   libgfx_allocCharacters(gfx, gfx->numCharacters);
   for (int i = 0; i < gfx->numCharacters; ++i) {
     libgfx_Character *character = &gfx->characters[i];
     read_u32(&character->codePoint, read, userData);
     read_u16(&character->frameIndex, read, userData);
 
-    int16_t xOffset = (int16_t) character->xOffset;
-    int16_t yOffset = (int16_t) character->yOffset;
-    int16_t advance = (int16_t) character->advance;
-
-    read_u16(&xOffset, read, userData);
-    read_u16(&yOffset, read, userData);
-    read_u16(&advance, read, userData);
+    read_u16(&character->xOffset, read, userData);
+    read_u16(&character->yOffset, read, userData);
+    read_u16(&character->advance, read, userData);
   }
 
   return gfx;
@@ -327,6 +326,9 @@ int libgfx_writeImageToCallback(libgfx_Gfx *gfx, libgfx_WriteCallback write, voi
     write_u16(&tileAnim->tileIndex, write, userData);
     write_u16(&tileAnim->animationIndex, write, userData);
   }
+
+  write_u16(&gfx->font.baseLine, write, userData);
+  write_u16(&gfx->font.lineHeight, write, userData);
 
   for (int i = 0; i < gfx->numCharacters; ++i) {
     libgfx_Character *character = &gfx->characters[i];

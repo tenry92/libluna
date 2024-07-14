@@ -65,6 +65,7 @@ set(PUBLIC_MODULES
   Console
   Filesystem/FileReader
   Filesystem/Path
+  Font
   Image
   ImmediateGui
   InputManager
@@ -85,6 +86,7 @@ set(PUBLIC_MODULES
   Stage
   String
   System
+  Text
   Util/Zlib
   Vector
 )

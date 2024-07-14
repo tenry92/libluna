@@ -6,6 +6,7 @@
 #include <libluna/Light.hpp>
 #include <libluna/Model.hpp>
 #include <libluna/Sprite.hpp>
+#include <libluna/Text.hpp>
 
 namespace Luna {
   class Stage {
@@ -15,6 +16,9 @@ namespace Luna {
 
     SpritePtr makeSprite();
     const std::list<SpritePtr> &getSprites() const;
+
+    TextPtr makeText();
+    const std::list<TextPtr> &getTexts() const;
 
     std::shared_ptr<Model> makeModel();
     const std::list<std::shared_ptr<Model>> &getModels() const;
