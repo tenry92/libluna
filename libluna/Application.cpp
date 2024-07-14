@@ -153,6 +153,12 @@ void ApplicationImpl::mainLoop() {
 
     mDebugMetrics->frameTicker.tick();
     processEvents();
+
+    if (!hasCanvas()) {
+      // quit application
+      break;
+    }
+
     executeKeyboardShortcuts();
     mIntervalManager.executePendingIntervals();
 
