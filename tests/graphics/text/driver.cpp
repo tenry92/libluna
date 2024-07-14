@@ -77,7 +77,8 @@ int main(int argc, char **argv) {
     canvas->setVideoDriver(app.getDefaultVideoDriver());
     canvas->setStage(stage);
 
-    text = stage->makeText();
+    text = Text::make();
+    stage->add(text);
     text->setFont(make_shared<Resource<Font>>(DummyFontLoader("font.gfx")));
     text->setContent("Welcome text!\nThis is a demonstration\nfor rendering text!");
   });

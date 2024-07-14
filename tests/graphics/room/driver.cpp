@@ -123,7 +123,8 @@ int main(int argc, char **argv) {
 
     pointLight = stage->makePointLight();
 
-    model = stage->makeModel();
+    model = make_shared<Model>();
+    stage->add(model);
     model->setMesh(mesh);
 
     auto diffuseRef = make_shared<Resource<Image>>(DummyImageLoader("textures/wall_32x32.gfx"));

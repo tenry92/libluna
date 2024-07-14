@@ -30,6 +30,13 @@
 
 using namespace Luna;
 
+// helper type for the visitor #4
+template<class... Ts>
+struct overloaded : Ts... { using Ts::operator()...; };
+// explicit deduction guide (not needed as of C++20)
+template<class... Ts>
+overloaded(Ts...) -> overloaded<Ts...>;
+
 CommonRenderer::CommonRenderer() : mRenderTargetId{0} {}
 
 CommonRenderer::~CommonRenderer() {
@@ -66,8 +73,7 @@ void CommonRenderer::render() {
   // render sprites to internal texture
   start2dFramebuffer(canvas);
 #endif
-  renderSprites(canvas, getInternalSize());
-  renderTexts(canvas, getInternalSize());
+  render2d(canvas, getInternalSize());
 #ifndef N64
   end2dFramebuffer(canvas);
 #endif
@@ -210,7 +216,13 @@ void CommonRenderer::updateTextureCache([[maybe_unused]] std::shared_ptr<Stage> 
 
   std::unordered_set<std::shared_ptr<Mesh>> visitedMeshes;
 
-  for (auto &&text : stage->getTexts()) {
+  for (auto &&drawable : stage->getDrawables2d()) {
+    if (!std::holds_alternative<TextPtr>(drawable)) {
+      continue;
+    }
+
+    auto text = std::get<TextPtr>(drawable);
+
     if (!text->getFont()) {
       continue;
     }
@@ -223,7 +235,7 @@ void CommonRenderer::updateTextureCache([[maybe_unused]] std::shared_ptr<Stage> 
     }
   }
 
-  for (auto &&model : stage->getModels()) {
+  for (auto &&model : stage->getDrawables3d()) {
     visitedMeshes.emplace(model->getMesh());
 
     if (mKnownMeshes.count(model->getMesh()) == 0) {
@@ -238,17 +250,20 @@ void CommonRenderer::updateTextureCache([[maybe_unused]] std::shared_ptr<Stage> 
 std::forward_list<ImageResPtr> CommonRenderer::listImagesInUse(std::shared_ptr<Stage> stage) {
   std::forward_list<ImageResPtr> images;
 
-  for (auto &&sprite : stage->getSprites()) {
-    if (!sprite->getImage()) {
-      continue;
-    }
-
-    images.emplace_front(sprite->getImage());
+  for (auto &&drawable : stage->getDrawables2d()) {
+    std::visit(overloaded {
+      [](auto) {},
+      [&](SpritePtr sprite) {
+        if (sprite->getImage()) {
+          images.emplace_front(sprite->getImage());
+        }
+      }
+    }, drawable);
   }
 
   // todo: font characters
 
-  for (auto &&model : stage->getModels()) {
+  for (auto &&model : stage->getDrawables3d()) {
     auto diffuse = model->getMaterial().getDiffuse();
     auto normal = model->getMaterial().getNormal();
 
@@ -265,7 +280,7 @@ std::forward_list<ImageResPtr> CommonRenderer::listImagesInUse(std::shared_ptr<S
 }
 
 void CommonRenderer::renderWorld(Canvas *canvas) {
-  for (auto &&model : canvas->getStage()->getModels()) {
+  for (auto &&model : canvas->getStage()->getDrawables3d()) {
     RenderMeshInfo info;
     info.meshId = mKnownMeshes.at(model->getMesh());
     info.transform = model->getTransform();
@@ -284,54 +299,56 @@ void CommonRenderer::renderWorld(Canvas *canvas) {
   }
 }
 
-void CommonRenderer::renderSprites(Canvas *canvas, [[maybe_unused]] Vector2i renderSize) {
-  for (auto &&sprite : canvas->getStage()->getSprites()) {
-    RenderTextureInfo info;
-    auto texture = mKnownImages.at(sprite->getImage());
-    info.textureId = texture.id;
-    info.size = texture.size;
-    info.position = sprite->getPosition() - canvas->getCamera2d().getPosition();
-    renderTexture(canvas, &info);
-  }
-}
+void CommonRenderer::render2d(Canvas *canvas, [[maybe_unused]] Vector2i renderSize) {
+  for (auto &&drawable : canvas->getStage()->getDrawables2d()) {
+    std::visit(overloaded {
+      [](auto) {},
+      [&](SpritePtr sprite) {
+        RenderTextureInfo info;
+        auto texture = mKnownImages.at(sprite->getImage());
+        info.textureId = texture.id;
+        info.size = texture.size;
+        info.position = sprite->getPosition() - canvas->getCamera2d().getPosition();
+        renderTexture(canvas, &info);
+      },
+      [&](TextPtr text) {
+        auto font = text->getFont()->get().get();
 
-void CommonRenderer::renderTexts(Canvas *canvas, [[maybe_unused]] Vector2i renderSize) {
-  for (auto &&text : canvas->getStage()->getTexts()) {
-    auto font = text->getFont()->get().get();
+        int x = 0;
+        int y = font->getBaseLine();
 
-    int x = 0;
-    int y = font->getBaseLine();
+        for (auto &&cp : text->getContent()) {
+          if (cp == '\n') {
+            x = 0;
+            y += font->getLineHeight();
+            continue;
+          }
 
-    for (auto &&cp : text->getContent()) {
-      if (cp == '\n') {
-        x = 0;
-        y += font->getLineHeight();
-        continue;
+          auto ch = font->getCharByCodePoint(cp);
+
+          if (!ch) {
+            // unknown character
+            continue;
+          }
+
+          RenderTextureInfo info;
+
+          if (mCharImages.count(ch) == 0) {
+            int textureId = mTextureIdAllocator.next();
+            mCharImages.emplace(ch, textureId);
+            createTexture(textureId);
+            loadTexture(textureId, ch->image);
+          }
+
+          info.textureId = mCharImages.at(ch);
+          info.size = ch->image->getSize();
+          info.position = Vector2i(x, y) + ch->offset;
+          renderTexture(canvas, &info);
+
+          x += ch->advance;
+        }
       }
-
-      auto ch = font->getCharByCodePoint(cp);
-
-      if (!ch) {
-        // unknown character
-        continue;
-      }
-
-      RenderTextureInfo info;
-
-      if (mCharImages.count(ch) == 0) {
-        int textureId = mTextureIdAllocator.next();
-        mCharImages.emplace(ch, textureId);
-        createTexture(textureId);
-        loadTexture(textureId, ch->image);
-      }
-
-      info.textureId = mCharImages.at(ch);
-      info.size = ch->image->getSize();
-      info.position = Vector2i(x, y) + ch->offset;
-      renderTexture(canvas, &info);
-
-      x += ch->advance;
-    }
+    }, drawable);
   }
 }
 

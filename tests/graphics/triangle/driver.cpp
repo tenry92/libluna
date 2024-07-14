@@ -46,10 +46,12 @@ int main(int argc, char **argv) {
     canvas->setVideoDriver(app.getDefaultVideoDriver());
     canvas->setStage(stage);
 
-    triangleModel = stage->makeModel();
+    triangleModel = make_shared<Model>();
+    stage->add(triangleModel);
     triangleModel->setMesh(triangleMesh);
 
-    quadModel = stage->makeModel();
+    quadModel = make_shared<Model>();
+    stage->add(quadModel);
     quadModel->setMesh(quadMesh);
   });
 

@@ -113,7 +113,8 @@ int main(int argc, char **argv) {
     // libgfx_freeImage(gfx);
 
     logDebug("make sprite");
-    sprite = stage->makeSprite();
+    sprite = Sprite::make();
+    stage->add(sprite);
     sprite->setPosition({CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2});
   });
 

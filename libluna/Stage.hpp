@@ -2,6 +2,7 @@
 
 #include <list>
 #include <memory>
+#include <variant>
 
 #include <libluna/Light.hpp>
 #include <libluna/Model.hpp>
@@ -11,17 +12,20 @@
 namespace Luna {
   class Stage {
     public:
+    using Drawable2d = std::variant<SpritePtr, TextPtr>;
+    using Drawable3d = ModelPtr;
     Stage();
     ~Stage();
 
-    SpritePtr makeSprite();
-    const std::list<SpritePtr> &getSprites() const;
+    void add(SpritePtr sprite);
+    void add(TextPtr text);
+    void add(ModelPtr model);
+    void remove(SpritePtr sprite);
+    void remove(TextPtr text);
+    void remove(ModelPtr model);
 
-    TextPtr makeText();
-    const std::list<TextPtr> &getTexts() const;
-
-    std::shared_ptr<Model> makeModel();
-    const std::list<std::shared_ptr<Model>> &getModels() const;
+    const std::list<Drawable2d> &getDrawables2d() const;
+    const std::list<Drawable3d> &getDrawables3d() const;
 
     void setAmbientLight(const AmbientLight &ambientLight);
     AmbientLight getAmbientLight() const;

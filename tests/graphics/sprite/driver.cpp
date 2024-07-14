@@ -60,7 +60,8 @@ int main(int argc, char **argv) {
 
     auto imageRes = make_shared<Resource<Image>>(DummyImageLoader());
 
-    sprite = stage->makeSprite();
+    sprite = Sprite::make();
+    stage->add(sprite);
     sprite->setImage(imageRes);
     sprite->setPosition({32, 128});
   });

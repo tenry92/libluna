@@ -4,9 +4,8 @@ using namespace Luna;
 
 class Stage::impl {
   public:
-  std::list<SpritePtr> mSprites;
-  std::list<TextPtr> mTexts;
-  std::list<std::shared_ptr<Model>> mModels;
+  std::list<Drawable2d> mDrawables2d;
+  std::list<Drawable3d> mDrawables3d;
   AmbientLight mAmbientLight;
   std::list<std::shared_ptr<PointLight>> mPointLights;
 };
@@ -15,37 +14,40 @@ Stage::Stage() : mImpl{std::make_unique<impl>()} {}
 
 Stage::~Stage() = default;
 
-SpritePtr Stage::makeSprite() {
-  auto sprite = Sprite::make();
-  mImpl->mSprites.emplace_back(sprite);
-
-  return sprite;
+void Stage::add(SpritePtr sprite) {
+  mImpl->mDrawables2d.emplace_back(sprite);
 }
 
-const std::list<SpritePtr> &Stage::getSprites() const {
-  return mImpl->mSprites;
+void Stage::add(TextPtr text) {
+  mImpl->mDrawables2d.emplace_back(text);
 }
 
-TextPtr Stage::makeText() {
-  auto text = Text::make();
-  mImpl->mTexts.emplace_back(text);
-
-  return text;
+void Stage::add(ModelPtr model) {
+  mImpl->mDrawables3d.emplace_back(model);
 }
 
-const std::list<TextPtr> &Stage::getTexts() const {
-  return mImpl->mTexts;
+void Stage::remove(SpritePtr sprite) {
+  mImpl->mDrawables2d.remove_if([sprite](const auto &drawable) {
+    return std::holds_alternative<SpritePtr>(drawable) && std::get<SpritePtr>(drawable) == sprite;
+  });
 }
 
-std::shared_ptr<Model> Stage::makeModel() {
-  auto model = std::make_shared<Model>();
-  mImpl->mModels.emplace_back(model);
-
-  return model;
+void Stage::remove(TextPtr text) {
+  mImpl->mDrawables2d.remove_if([text](const auto &drawable) {
+    return std::holds_alternative<TextPtr>(drawable) && std::get<TextPtr>(drawable) == text;
+  });
 }
 
-const std::list<std::shared_ptr<Model>> &Stage::getModels() const {
-  return mImpl->mModels;
+void Stage::remove(ModelPtr model) {
+  mImpl->mDrawables3d.remove(model);
+}
+
+const std::list<Stage::Drawable2d> &Stage::getDrawables2d() const {
+  return mImpl->mDrawables2d;
+}
+
+const std::list<Stage::Drawable3d> &Stage::getDrawables3d() const {
+  return mImpl->mDrawables3d;
 }
 
 void Stage::setAmbientLight(const AmbientLight &ambientLight) {

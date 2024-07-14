@@ -63,7 +63,8 @@ int main(int argc, char **argv) {
     auto imageRef = make_shared<Resource<Image>>(DummyImageLoader());
 
     for (int i = 0; i < 4; ++i) {
-      auto sprite = sprites[i] = stage->makeSprite();
+      auto sprite = sprites[i] = Sprite::make();
+      stage->add(sprite);
       sprite->setImage(imageRef);
     }
 

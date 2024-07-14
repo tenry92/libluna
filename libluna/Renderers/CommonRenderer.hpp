@@ -175,14 +175,12 @@ namespace Luna {
     void renderWorld(Canvas *canvas);
 
     /**
-     * @brief Render all 2D sprites on the canvas.
+     * @brief Render all 2D drawables on the canvas.
      *
      * For scaling and interpolation reasons, this is usually done onto a render
      * texture and later drawn onto the canvas.
      */
-    void renderSprites(Canvas *canvas, Vector2i renderSize);
-
-    void renderTexts(Canvas *canvas, Vector2i renderSize);
+    void render2d(Canvas *canvas, Vector2i renderSize);
 
     void updateTextureCache(std::shared_ptr<Stage> stage);
 

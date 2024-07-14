@@ -7,6 +7,9 @@
 #include <libluna/Mesh.hpp>
 
 namespace Luna {
+  class Model;
+  using ModelPtr = std::shared_ptr<Model>;
+
   class Model final {
     public:
     Model();
