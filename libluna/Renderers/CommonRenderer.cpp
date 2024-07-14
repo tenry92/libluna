@@ -178,29 +178,37 @@ Vector2i CommonRenderer::getCurrentRenderSize() const {
 }
 
 void CommonRenderer::updateTextureCache([[maybe_unused]] std::shared_ptr<Stage> stage) {
+  auto images = listImagesInUse(stage);
+
   std::unordered_set<ImageResPtr> visitedImages;
-  std::unordered_set<std::shared_ptr<Mesh>> visitedMeshes;
 
-  for (auto &&sprite : stage->getSprites()) {
-    if (!sprite->getImage()) {
-      continue;
-    }
-
-    visitedImages.emplace(sprite->getImage());
-
-    if (mKnownImages.count(sprite->getImage()) == 0) {
-      auto future = sprite->getImage()->get();
+  for (auto &&imageResPtr : images) {
+    visitedImages.emplace(imageResPtr);
+    if (mKnownImages.count(imageResPtr) == 0) {
+      auto future = imageResPtr->get();
       // check with each update whether future is ready:
       // if (imageRef->isReady()):
       auto image = future.get();
       int textureId = mTextureIdAllocator.next();
-      mKnownImages.emplace(sprite->getImage(), textureId);
-      mImageSizes.emplace(sprite->getImage(), image->getSize());
-      logDebug("create texture #{} (sprite)", textureId);
+      mKnownImages.emplace(imageResPtr, Texture{textureId, image->getSize()});
+      logDebug("create texture #{}", textureId);
       createTexture(textureId);
       loadTexture(textureId, image);
     }
   }
+
+  for (auto it = mKnownImages.begin(); it != mKnownImages.end();) {
+    if (visitedImages.find(it->first) == visitedImages.end()) {
+      logDebug("destroy texture #{}", it->second.id);
+      mTextureIdAllocator.free(static_cast<uint8_t>(it->second.id));
+      destroyTexture(it->second.id);
+      it = mKnownImages.erase(it);
+    } else {
+      ++it;
+    }
+  }
+
+  std::unordered_set<std::shared_ptr<Mesh>> visitedMeshes;
 
   for (auto &&text : stage->getTexts()) {
     if (!text->getFont()) {
@@ -224,59 +232,36 @@ void CommonRenderer::updateTextureCache([[maybe_unused]] std::shared_ptr<Stage> 
       createMesh(meshId);
       loadMesh(meshId, model->getMesh());
     }
+  }
+}
 
+std::forward_list<ImageResPtr> CommonRenderer::listImagesInUse(std::shared_ptr<Stage> stage) {
+  std::forward_list<ImageResPtr> images;
+
+  for (auto &&sprite : stage->getSprites()) {
+    if (!sprite->getImage()) {
+      continue;
+    }
+
+    images.emplace_front(sprite->getImage());
+  }
+
+  // todo: font characters
+
+  for (auto &&model : stage->getModels()) {
     auto diffuse = model->getMaterial().getDiffuse();
     auto normal = model->getMaterial().getNormal();
 
     if (diffuse) {
-      visitedImages.emplace(diffuse);
-
-      if (mKnownImages.count(diffuse) == 0) {
-        int textureId = mTextureIdAllocator.next();
-        mKnownImages.emplace(diffuse, textureId);
-        logDebug("create texture #{} (diffuse)", textureId);
-        createTexture(textureId);
-
-        auto future = diffuse->get();
-        // check with each update whether future is ready:
-        // if (imageRef->isReady()):
-        auto image = future.get();
-        loadTexture(textureId, image);
-        mImageSizes.emplace(diffuse, image->getSize());
-      }
+      images.emplace_front(diffuse);
     }
 
     if (normal) {
-      visitedImages.emplace(normal);
-
-      if (mKnownImages.count(normal) == 0) {
-        int textureId = mTextureIdAllocator.next();
-        mKnownImages.emplace(normal, textureId);
-        logDebug("create texture #{} (normal)", textureId);
-        createTexture(textureId);
-
-        auto future = normal->get();
-        // check with each update whether future is ready:
-        // if (imageRef->isReady()):
-        auto image = future.get();
-        loadTexture(textureId, image);
-        mImageSizes.emplace(normal, image->getSize());
-      }
+      images.emplace_front(normal);
     }
   }
 
-  for (auto it = mKnownImages.begin(); it != mKnownImages.end();) {
-    if (visitedImages.find(it->first) == visitedImages.end()) {
-      // todo: delete all frames of an animated image
-      logDebug("destroy texture #{}", it->second);
-      mTextureIdAllocator.free(static_cast<uint8_t>(it->second));
-      destroyTexture(it->second);
-      mImageSizes.erase(it->first);
-      it = mKnownImages.erase(it);
-    } else {
-      ++it;
-    }
-  }
+  return images;
 }
 
 void CommonRenderer::renderWorld(Canvas *canvas) {
@@ -288,11 +273,11 @@ void CommonRenderer::renderWorld(Canvas *canvas) {
     auto material = model->getMaterial();
 
     if (material.getDiffuse()) {
-      info.diffuseTextureId = mKnownImages.at(material.getDiffuse());
+      info.diffuseTextureId = mKnownImages.at(material.getDiffuse()).id;
     }
 
     if (material.getNormal()) {
-      info.normalTextureId = mKnownImages.at(material.getNormal());
+      info.normalTextureId = mKnownImages.at(material.getNormal()).id;
     }
 
     renderMesh(canvas, &info);
@@ -302,8 +287,9 @@ void CommonRenderer::renderWorld(Canvas *canvas) {
 void CommonRenderer::renderSprites(Canvas *canvas, [[maybe_unused]] Vector2i renderSize) {
   for (auto &&sprite : canvas->getStage()->getSprites()) {
     RenderTextureInfo info;
-    info.textureId = mKnownImages.at(sprite->getImage());
-    info.size = mImageSizes.at(sprite->getImage());
+    auto texture = mKnownImages.at(sprite->getImage());
+    info.textureId = texture.id;
+    info.size = texture.size;
     info.position = sprite->getPosition() - canvas->getCamera2d().getPosition();
     renderTexture(canvas, &info);
   }

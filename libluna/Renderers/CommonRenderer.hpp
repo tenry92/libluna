@@ -1,5 +1,6 @@
 #pragma once
 
+#include <forward_list>
 #include <memory>
 
 #include <libluna/AbstractRenderer.hpp>
@@ -21,6 +22,11 @@ namespace Luna {
    */
   class CommonRenderer : public AbstractRenderer {
     public:
+    struct Texture {
+      int id;
+      Vector2i size;
+    };
+
     /**
      * @brief This holds information about how to render a 2D texture.
      */
@@ -180,6 +186,8 @@ namespace Luna {
 
     void updateTextureCache(std::shared_ptr<Stage> stage);
 
+    std::forward_list<ImageResPtr> listImagesInUse(std::shared_ptr<Stage> stage);
+
     void start2dFramebuffer(Canvas *canvas);
 
     void end2dFramebuffer(Canvas *canvas);
@@ -188,10 +196,9 @@ namespace Luna {
     IdAllocator<uint16_t> mMeshIdAllocator;
     int mRenderTargetId;
     Vector2i mCurrentRenderSize;
-    std::unordered_map<ImageResPtr, int> mKnownImages;
+    std::unordered_map<ImageResPtr, Texture> mKnownImages;
     std::unordered_map<Font::Char *, int> mCharImages;
     std::set<FontPtr> mLoadedFonts;
-    std::unordered_map<ImageResPtr, Vector2i> mImageSizes;
     std::unordered_map<std::shared_ptr<Mesh>, int> mKnownMeshes;
   };
 } // namespace Luna

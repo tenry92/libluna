@@ -42,5 +42,8 @@ Font::Char *Font::getCharByCodePoint(String::CodePoint codePoint) const {
 
 Font::Char *Font::makeCharForCodePoint(String::CodePoint codePoint) {
   mImpl->mChars.emplace(codePoint, Font::Char {});
-  return getCharByCodePoint(codePoint);
+  auto ch = getCharByCodePoint(codePoint);
+  ch->codePoint = codePoint;
+
+  return ch;
 }
