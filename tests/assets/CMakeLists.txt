@@ -5,6 +5,7 @@ set(ASSET_FILES
   "coin_16bit.png" "gfx" "s=32,32" "f=rgba16"
   "color-test.png" "gfx" "f=rgba32"
   "color-test_16bit.png" "gfx" "f=rgba16"
+  "font.txt" "font"
   "beat-layer1.opus" "static"
   "beat-layer2.opus" "static"
   "beat-layer3.opus" "static"
@@ -47,7 +48,7 @@ function(copy_static_file file)
   add_custom_target("copy_${target_name}" ALL DEPENDS "${output_file}")
 endfunction()
 
-function(convert_gfx file params)
+function(convert_gfx file type params)
   make_target_name("${file}" target_name)
   get_filename_component(name_we "${file}" NAME_WE)
   get_filename_component(name_rel_dir "${file}" DIRECTORY)
@@ -65,7 +66,11 @@ function(convert_gfx file params)
     endif()
   endforeach()
 
-  list(APPEND command -i "${ASSETS_INPUT_PATH}/${file}" -o "${output_file}")
+  if(type STREQUAL "font")
+    list(APPEND command --font "${ASSETS_INPUT_PATH}/${file}" -o "${output_file}")
+  else()
+    list(APPEND command -i "${ASSETS_INPUT_PATH}/${file}" -o "${output_file}")
+  endif()
 
   add_custom_command(
     OUTPUT "${output_file}"
@@ -88,7 +93,7 @@ while(i LESS num_assets)
   if(type STREQUAL "static")
     copy_static_file("${file}")
     math(EXPR i "${i} + 1")
-  elseif(type STREQUAL "gfx")
+  elseif(type STREQUAL "gfx" OR type STREQUAL "font")
     set(params "")
     math(EXPR j "${i} + 1")
     while(j LESS num_assets)
@@ -100,7 +105,7 @@ while(i LESS num_assets)
         break()
       endif()
     endwhile()
-    convert_gfx("${file}" "${params}")
+    convert_gfx("${file}" ${type} "${params}")
     set(i ${j})
   else()
     message(FATAL_ERROR "Unknown asset type: ${type}")

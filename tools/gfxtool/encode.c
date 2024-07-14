@@ -1,9 +1,14 @@
+#include <limits.h>
+#include <locale.h>
 #include <stdio.h>
 #include <string.h>
+#include <wchar.h>
 
 #include "encode.h"
+#include "surface.h"
 #include "utils.h"
 #include "loadpng.h"
+#include "bmfont.h"
 
 #include <libgfx/libgfx.h>
 
@@ -22,7 +27,7 @@ typedef struct {
   int nextAnimationIndex;
 } EncodingState;
 
-int parseStringCommaIntegers(const char *input, char *string, int *output, int size) {
+static int parseStringCommaIntegers(const char *input, char *string, int *output, int size) {
   char *buffer = strdup(input);
   int count = 0;
   char *token = strtok(buffer, ",");
@@ -45,7 +50,18 @@ int parseStringCommaIntegers(const char *input, char *string, int *output, int s
   return count;
 }
 
-int setRect(EncodingState *state, const char *arg) {
+static void replaceFilename(char *path, const char *newFilename) {
+  char *lastSlash = strrchr(path, '/');
+
+  if (lastSlash != NULL) {
+    *(lastSlash + 1) = 0;
+    strcat(path, newFilename);
+  } else {
+    strcpy(path, newFilename);
+  }
+}
+
+static int setRect(EncodingState *state, const char *arg) {
   int numbers[4];
   int count = parseCommaSeparatedIntegers(arg, numbers, 4);
 
@@ -63,7 +79,7 @@ int setRect(EncodingState *state, const char *arg) {
   return 0;
 }
 
-int setSize(EncodingState *state, const char *arg) {
+static int setSize(EncodingState *state, const char *arg) {
   int numbers[2];
   int count = parseCommaSeparatedIntegers(arg, numbers, 2);
 
@@ -78,7 +94,7 @@ int setSize(EncodingState *state, const char *arg) {
   return 0;
 }
 
-int setFormat(EncodingState *state, const char *arg) {
+static int setFormat(EncodingState *state, const char *arg) {
   if (strcmp("ci4", arg) == 0) {
     state->colorFormat = LIBGFX_COLOR_4BIT_INDEXED;
   } else if (strcmp("ci8", arg) == 0) {
@@ -101,7 +117,7 @@ int setFormat(EncodingState *state, const char *arg) {
   return 0;
 }
 
-int addPalette(EncodingState *state, const char *arg) {
+static int addPalette(EncodingState *state, const char *arg) {
   char filename[256];
   int count[2];
   count[0] = 1;
@@ -170,7 +186,7 @@ int addPalette(EncodingState *state, const char *arg) {
   return 0;
 }
 
-int addImage(EncodingState *state, const char *arg) {
+static int addImage(EncodingState *state, const char *arg) {
   char filename[256];
   int frameSize[2];
   frameSize[0] = state->frameWidth;
@@ -247,6 +263,116 @@ int addImage(EncodingState *state, const char *arg) {
   }
 
   freeSurface(surface);
+
+  return 0;
+}
+
+static int addFont(EncodingState *state, const char *arg) {
+  FILE *fp = fopen(arg, "rb");
+
+  if (!fp) {
+    fprintf(stderr, "Error opening %s\n", arg);
+    return 1;
+  }
+
+  fseek(fp, 0, SEEK_END);
+
+  long fileSize = ftell(fp);
+
+  rewind(fp);
+
+  char *content = (char *) malloc(fileSize + 1);
+
+  size_t bytesRead = fread(content, 1, fileSize, fp);
+
+  if (bytesRead != fileSize) {
+    fprintf(stderr, "Error reading file\n");
+    free(content);
+    fclose(fp);
+    return 1;
+  }
+
+  content[fileSize] = 0;
+
+  fclose(fp);
+
+  printf("Parsing %s\n", arg);
+
+  BMFont *font = parseBMFont(content);
+
+  free(content);
+
+  printf("Reading %s as texture\n", font->pages[0].file);
+
+  char *filename = strdup(arg);
+  replaceFilename(filename, font->pages[0].file);
+
+  Surface *surface = loadPng(filename);
+  free(filename);
+
+  if (!surface) {
+    return 1;
+  }
+
+  libgfx_allocFramesets(state->gfx, font->charCount);
+  libgfx_allocCharacters(state->gfx, font->charCount);
+
+  // set locale to support UTF-8
+  setlocale(LC_ALL, "");
+
+  for (int i = 0; i < font->charCount; ++i) {
+    BMFontChar *ch = &font->chars[i];
+    wchar_t wstr[2];
+    wstr[0] = (wchar_t) ch->id;
+    wstr[1] = 0;
+    char mbs[MB_CUR_MAX];
+    wcstombs(mbs, wstr, sizeof(mbs));
+    printf("Encoding char U+%04X (%s)\n", ch->id, mbs);
+
+    Surface *cropped = cropSurface(surface,
+      ch->x, ch->y, ch->width, ch->height);
+
+    libgfx_Frameset *frameset = &state->gfx->framesets[i];
+    frameset->colorFormat = state->colorFormat;
+    frameset->width = ch->width;
+    frameset->height = ch->height;
+    frameset->numFrames = 1;
+    libgfx_allocFrames(frameset, 1);
+
+    for (int py = 0; py < ch->height; ++py) {
+      for (int px = 0; px < ch->width; ++px) {
+        ColorRgba32 *color = getSurfacePixel(cropped, px, py);
+        int offset = px + py * ch->width;
+
+        switch (frameset->colorFormat) {
+          case LIBGFX_COLOR_4BIT_INDEXED:
+          case LIBGFX_COLOR_8BIT_INDEXED:
+          case LIBGFX_COLOR_4BIT_GRAYSCALE:
+          case LIBGFX_COLOR_8BIT_GRAYSCALE:
+            fprintf(stderr, "Color format not implemented\n");
+            return 1;
+          case LIBGFX_COLOR_16BIT_RGBA:
+            setColor16BitRgba(frameset->data, offset, color->red >> 3, color->green >> 3, color->blue >> 3, color->alpha >> 7);
+            break;
+          case LIBGFX_COLOR_24BIT_RGB:
+            setColor24BitRgb(frameset->data, offset, color->red, color->green, color->blue);
+            break;
+          case LIBGFX_COLOR_32BIT_RGBA:
+            setColor32BitRgba(frameset->data, offset, color->red, color->green, color->blue, color->alpha);
+            break;
+        }
+      }
+    }
+
+    freeSurface(cropped);
+
+    libgfx_Character *gfxCh = &state->gfx->characters[i];
+    gfxCh->codePoint = ch->id;
+    gfxCh->frameIndex = i;
+    gfxCh->xOffset = ch->xoffset;
+    gfxCh->yOffset = ch->yoffset;
+    gfxCh->advance = ch->xadvance;
+  }
 
   return 0;
 }
@@ -333,6 +459,14 @@ int encode(int argc, char **argv) {
 
     if (isArg(arg, "-i", "--image")) {
       if (addImage(&state, argv[++argIndex])) {
+        return 1;
+      }
+
+      continue;
+    }
+
+    if (isArg(arg, NULL, "--font")) {
+      if (addFont(&state, argv[++argIndex])) {
         return 1;
       }
 

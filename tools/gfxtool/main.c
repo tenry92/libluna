@@ -76,7 +76,20 @@ static void printUsage() {
   printf("    Convert tileset.png to output.gfx with 32 8x8 tiles\n\n");
   printf("  gfxtool encode -r 0,0,64,8 -p input.png,8\n");
   printf("  -r 0,0,320,32 -f ci4 -i input.png,32,32 -o output.gfx\n");
-  printf("    Convert input.png using color palette from same file.\n");
+  printf("    Convert input.png using color palette from same file.\n\n");
+
+  printf("Font text file (font.txt) example:\n\n");
+
+  printf("common lineHeight=16 base=12 pages=1 packed=0\n");
+  printf("page id=0 file=\"font.png\"\n");
+  printf("chars count=174\n");
+  printf("char id=32 x=0 y=0 width=0 height=0 xoffset=0 yoffset=0 xadvance=5 page=0\n");
+  printf("char id=33 x=188 y=223 width=10 height=18 xoffset=-3 yoffset=-3 xadvance=5 page=0\n");
+  printf("...\n\n");
+
+  printf("The initial info line is ignored.\n");
+  printf("gfxtool does not support packed (must be 0).\n");
+  printf("Any additional properties (e.g. chnl on char) are ignored.\n");
 }
 
 int main(int argc, char **argv) {
