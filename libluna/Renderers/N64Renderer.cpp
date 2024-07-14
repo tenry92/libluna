@@ -153,6 +153,40 @@ void N64Renderer::renderMesh([[maybe_unused]] Canvas *canvas, [[maybe_unused]] R
   auto mesh = mImpl->mMeshIdMapping.at(info->meshId);
   auto texture = mImpl->mTextureIdMapping.at(info->diffuseTextureId);
 
+  auto ambientLight = canvas->getStage()->getAmbientLight();
+  float ambient[4] = {
+    ambientLight.color.red,
+    ambientLight.color.green,
+    ambientLight.color.blue,
+    ambientLight.color.alpha
+  };
+  glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
+  glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+
+  int lightId = 0;
+
+  for (auto &&pointLight : canvas->getStage()->getPointLights()) {
+    glEnable(GL_LIGHT0 + lightId);
+    float pos[4] = {
+      pointLight->position.x(),
+      pointLight->position.y(),
+      pointLight->position.z(),
+      1
+    };
+    glLightfv(GL_LIGHT0 + lightId, GL_POSITION, pos);
+    float color[4] = {
+      pointLight->color.red, pointLight->color.green,
+      pointLight->color.blue, pointLight->color.alpha
+    };
+    glLightfv(GL_LIGHT0 + lightId, GL_DIFFUSE, color);
+    float lightRadius = 10.0f;
+    glLightf(GL_LIGHT0 + lightId, GL_LINEAR_ATTENUATION, 2.0f / lightRadius);
+    glLightf(GL_LIGHT0 + lightId, GL_QUADRATIC_ATTENUATION, 1.0f / (lightRadius * lightRadius));
+    ++lightId;
+  }
+
+  glEnable(GL_LIGHTING);
+
   glEnable(GL_TEXTURE_2D);
   glEnable(GL_DEPTH_TEST);
   glBindTexture(GL_TEXTURE_2D, texture);
