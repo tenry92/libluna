@@ -17,7 +17,7 @@ namespace Luna {
   class CanvasImpl;
 
   /**
-   * \brief Abstraction for windows (computer) and fullscreen displays.
+   * @brief Abstraction for windows (computer) and fullscreen displays.
    */
   class Canvas {
     public:

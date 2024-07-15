@@ -5,6 +5,9 @@
 #include <libluna/String.hpp>
 
 namespace Luna {
+  /**
+   * @brief Get information about system resources and capabilities.
+   */
   namespace System {
     /**
      * \brief Get number of available processors.

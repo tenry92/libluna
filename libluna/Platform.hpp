@@ -8,6 +8,9 @@
 #include <libluna/Vector.hpp>
 
 namespace Luna {
+  /**
+   * @brief Get information about the current platform.
+   */
   class Platform {
     public:
     static constexpr inline bool isLinux() {

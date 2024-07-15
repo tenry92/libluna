@@ -8,6 +8,9 @@ namespace Luna {
   class ResourceReader;
   using ResourceReaderPtr = std::unique_ptr<ResourceReader>;
 
+  /**
+   * @brief Read files from the assets.
+   */
   class ResourceReader final : public InputStream {
     public:
     static ResourceReaderPtr make(const char *name);

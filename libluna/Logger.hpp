@@ -6,7 +6,7 @@
 
 namespace Luna {
   /**
-   * \brief Use for writing debug, info and error messages to the console and
+   * @brief Use for writing debug, info and error messages to the console and
    * possibly other outputs.
    *
    * There are the following severities of logs available:
@@ -20,7 +20,7 @@ namespace Luna {
    */
 
   /**
-   * \brief Logging class.
+   * @brief Logging class.
    */
   class Logger {
     public:
@@ -28,6 +28,12 @@ namespace Luna {
 
     void log(LogLevel pLevel, const String &pMessage);
 
+    /**
+     * @brief Set identifier for current thread.
+     *
+     * The thread identifier will be added to all log messages emited from this
+     * thread.
+     */
     void setThreadIdentifier(const String &pThreadId);
 
     inline void debug(const String &pMessage) { log(kDebug, pMessage); }

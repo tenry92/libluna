@@ -10,6 +10,13 @@
 #include <libluna/Text.hpp>
 
 namespace Luna {
+  /**
+   * @brief Container for all visible items on a canvas.
+   *
+   * A stage can be assigned to multiple canvases. For example, if each canvas
+   * uses a different renderer, the same stage can be viewed and tested from
+   * different canvases.
+   */
   class Stage {
     public:
     using Drawable2d = std::variant<SpritePtr, TextPtr>;

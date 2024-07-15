@@ -13,6 +13,9 @@
 namespace Luna {
   class ApplicationImpl;
 
+  /**
+   * @brief This is the core class for the game engine.
+   */
   class Application final {
     public:
     /**
@@ -32,6 +35,14 @@ namespace Luna {
     void addVsync(std::function<void(float)> callback);
     int getOptionIndex(const String &name) const;
     bool hasOption(const String &name) const;
+
+    /**
+     * @brief Get command-line option value.
+     *
+     * If you want to get the value of `--assets`, you check for `name`
+     *
+     * @param name Parameter name, excluding preceding dashes.
+     */
     String getOptionValue(const String &name) const;
 
     Filesystem::Path getAssetsPath() const;
@@ -45,7 +56,14 @@ namespace Luna {
 
     String getDefaultVideoDriver() const;
 
+    /**
+     * @brief Set application name.
+     */
     void setName(const String &name);
+
+    /**
+     * @brief Get application name.
+     */
     const String &getName() const;
 
     std::shared_ptr<AudioNode> getAudioDestinationNode() const;

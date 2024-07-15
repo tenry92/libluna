@@ -10,8 +10,14 @@ namespace Luna::Filesystem {
   class FileReader;
   using FileReaderPtr = std::unique_ptr<FileReader>;
 
+  /**
+   * @brief Reading files from the filesystem.
+   */
   class FileReader final : public InputStream {
     public:
+    /**
+     * @brief Create a new binary file reader for the file at the given path.
+     */
     static FileReaderPtr make(const Path &filename);
     ~FileReader();
 
