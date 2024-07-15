@@ -1,6 +1,9 @@
 set(ASSET_FILES
   "test.txt" "static"
   "test32x32.png" "static"
+  "dungeon.glb" "static"
+  "dungeon.fbx" "static"
+  "dungeon.gltf" "static"
   "coin.png" "gfx" "s=32,32"
   "coin_16bit.png" "gfx" "s=32,32" "f=rgba16"
   "color-test.png" "gfx" "f=rgba32"
