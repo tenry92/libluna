@@ -171,7 +171,7 @@ Internal::GraphicsMetrics SdlRenderer::getMetrics() {
 void SdlRenderer::clearBackground(ColorRgb color) {
   auto color32 = makeColorRgb32(color);
   CHECK_SDL(SDL_SetRenderDrawColor(
-      mImpl->mRenderer.get(), color32.red, color32.green, color32.blue, SDL_ALPHA_OPAQUE
+      mImpl->mRenderer.get(), color32.red, color32.green, color32.blue, color32.alpha
   ));
   CHECK_SDL(SDL_RenderClear(mImpl->mRenderer.get()));
 }
@@ -192,7 +192,7 @@ void SdlRenderer::loadTexture(int id, ImagePtr image) {
     SDL_DestroyTexture(oldTexture);
     mImpl->mTextureIdMapping.erase(id);
   }
-  
+
   // if (!image->isTrue()) {
   //   /// @todo Get palette from sprite
   //   image = image->toTrue(nullptr);
@@ -220,6 +220,7 @@ void SdlRenderer::resizeTexture([[maybe_unused]] int id, [[maybe_unused]] Vector
   }
 
   SDL_Texture *texture = SDL_CreateTexture(mImpl->mRenderer.get(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, size.x(), size.y());
+  SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
   mImpl->mTextureIdMapping.emplace(id, texture);
 }
 
