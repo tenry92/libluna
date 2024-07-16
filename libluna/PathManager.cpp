@@ -41,8 +41,7 @@ class PathManager::impl {
 #ifdef _NDS
     mAssetsPath = Path("/assets");
 #elif defined(__3DS__) || defined(__SWITCH__)
-    // mAssetsPath = Path("romfs:/assets");
-    mAssetsPath = Path("romfs:");
+    mAssetsPath = Path("romfs:/assets");
 #elif defined(N64)
     mAssetsPath = Path("rom:/assets");
 #else
@@ -51,8 +50,8 @@ class PathManager::impl {
       // UNIX style (bin/, share/assets/)
       mAssetsPath = programPath.up().cd("share/assets");
     } else {
-      // Windows style (exe, assets/)
-      mAssetsPath = programPath.up().cd("assets");
+      // Windows style (exe, data/assets/)
+      mAssetsPath = programPath.up().cd("data/assets");
     }
 #endif
   }

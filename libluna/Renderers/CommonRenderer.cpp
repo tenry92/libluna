@@ -72,6 +72,7 @@ void CommonRenderer::render() {
 
   // render sprites to internal texture
   start2dFramebuffer(canvas);
+  // clearBackground({0.5f, 0.0f, 0.0f, 0.0f});
 #endif
   render2d(canvas, getInternalSize());
 #ifndef N64
@@ -333,17 +334,19 @@ void CommonRenderer::render2d(Canvas *canvas, [[maybe_unused]] Vector2i renderSi
 
           RenderTextureInfo info;
 
-          if (mCharImages.count(ch) == 0) {
-            int textureId = mTextureIdAllocator.next();
-            mCharImages.emplace(ch, textureId);
-            createTexture(textureId);
-            loadTexture(textureId, ch->image);
-          }
+          if (ch->image) {
+            if (mCharImages.count(ch) == 0) {
+              int textureId = mTextureIdAllocator.next();
+              mCharImages.emplace(ch, textureId);
+              createTexture(textureId);
+              loadTexture(textureId, ch->image);
+            }
 
-          info.textureId = mCharImages.at(ch);
-          info.size = ch->image->getSize();
-          info.position = Vector2i(x, y) + ch->offset;
-          renderTexture(canvas, &info);
+            info.textureId = mCharImages.at(ch);
+            info.size = ch->image->getSize();
+            info.position = Vector2i(x, y) + ch->offset;
+            renderTexture(canvas, &info);
+          }
 
           x += ch->advance;
         }

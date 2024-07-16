@@ -206,4 +206,4 @@ include(cmake/unit-tests.cmake)
 ################################################################################
 # FUNCTIONAL/INTEGRATION TESTS
 
-add_subdirectory(tests)
+add_subdirectory(examples)

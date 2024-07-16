@@ -225,6 +225,15 @@ void ApplicationImpl::processEvents() {
     switch (event.type) {
     case SDL_QUIT:
       logInfo("sdl quit event received");
+
+      for (auto &&canvas : canvases) {
+        if (canvas.expired()) {
+          continue;
+        }
+
+        canvas.lock()->close();
+      }
+
       return;
     }
 

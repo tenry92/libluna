@@ -1,4 +1,4 @@
-add_subdirectory(libs/assimp-5.4.2)
+# add_subdirectory(libs/assimp-5.4.2)
 
 if(LUNA_USE_STD_THREAD)
   find_package(Threads REQUIRED)

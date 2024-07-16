@@ -27,6 +27,8 @@ ExternalProject_Add(
   DEPENDS libgfx-native
 )
 
+set(GFXTOOL "${LUNA_INSTALL_NATIVE_DIR}/bin/gfxtool")
+
 ExternalProject_Add(
   xxd-native
   PREFIX "${LUNA_BUILD_NATIVE_DIR}"

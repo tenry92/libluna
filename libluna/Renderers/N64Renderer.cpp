@@ -84,12 +84,14 @@ void N64Renderer::loadTexture([[maybe_unused]] int id, [[maybe_unused]] ImagePtr
 
   GLenum inputFormat = GL_RGBA;
   GLenum inputType = GL_UNSIGNED_SHORT_5_5_5_1_EXT;
+  GLenum internalFormat = GL_RGB5_A1;
 
   if (image->getBitsPerPixel() == 24) {
     inputFormat = GL_RGB;
     inputType = GL_BYTE;
   } else if (image->getBitsPerPixel() == 32) {
     inputType = GL_UNSIGNED_INT_8_8_8_8_EXT;
+    internalFormat = GL_RGBA;
   }
 
   glBindTexture(GL_TEXTURE_2D, texture);
@@ -98,7 +100,7 @@ void N64Renderer::loadTexture([[maybe_unused]] int id, [[maybe_unused]] ImagePtr
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   glTexImage2D(
       GL_TEXTURE_2D, 0,                              /* mipmap level */
-      GL_RGB5_A1,                                    /* internal format */
+      internalFormat,                                /* internal format */
       image->getSize().x(), image->getSize().y(), 0, /* format (legacy) */
       inputFormat,                                   /* input format */
       inputType, image->getData()

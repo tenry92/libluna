@@ -78,11 +78,11 @@ namespace Luna {
     ImagePtr toRgb32();
 
     int getByteCount() const {
-      return getSize().x() * getSize().y() / 2 * (getBitsPerPixel() / 4);
+      return getSize().x() * getSize().y() * (getBitsPerPixel() / 4) / 2;
     }
 
     int getBytesPerRow() const {
-      return getSize().x() / 2 * (getBitsPerPixel() / 4);
+      return getSize().x() * (getBitsPerPixel() / 4) / 2;
     }
 
     /**

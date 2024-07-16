@@ -193,15 +193,24 @@ void SdlRenderer::loadTexture(int id, ImagePtr image) {
     mImpl->mTextureIdMapping.erase(id);
   }
 
-  // if (!image->isTrue()) {
-  //   /// @todo Get palette from sprite
-  //   image = image->toTrue(nullptr);
-  // }
+  uint32_t surfaceFormat = SDL_PIXELFORMAT_RGBA32;
+
+  switch (image->getBitsPerPixel()) {
+    case 16:
+      surfaceFormat = SDL_PIXELFORMAT_ABGR1555;
+      break;
+    case 24:
+      surfaceFormat = SDL_PIXELFORMAT_RGB24;
+      break;
+    case 32:
+      surfaceFormat = SDL_PIXELFORMAT_RGBA32;
+      break;
+  }
 
   SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(
       (void *)(image->getData()), image->getSize().x(),
-      image->getSize().y(), 32, image->getByteCount() / image->getSize().y(),
-      SDL_PIXELFORMAT_RGBA32
+      image->getSize().y(), image->getBitsPerPixel(), image->getBytesPerRow(),
+      surfaceFormat
   );
 
   auto texture =

@@ -240,13 +240,29 @@ void OpenglRenderer::destroyTexture(int id) {
 void OpenglRenderer::loadTexture(int id, ImagePtr image) {
   GLuint texture = mImpl->mTextureIdMapping.at(id);
 
+  GLenum inputFormat = GL_RGBA;
+  GLenum inputType = GL_UNSIGNED_BYTE;
+
+  switch (image->getBitsPerPixel()) {
+    case 16:
+      inputFormat = GL_RGBA;
+      inputType = GL_UNSIGNED_SHORT_1_5_5_5_REV;
+      break;
+    case 24:
+      inputFormat = GL_RGB;
+      break;
+    case 32:
+      inputFormat = GL_RGBA;
+      break;
+  }
+
   CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
   CHECK_GL(glTexImage2D(
       GL_TEXTURE_2D, 0,                              /* mipmap level */
       GL_RGBA,                                       /* internal format */
       image->getSize().x(), image->getSize().y(), 0, /* format (legacy) */
-      GL_RGBA,                                       /* input format */
-      GL_UNSIGNED_BYTE, image->getData()
+      inputFormat,                                   /* input format */
+      inputType, image->getData()
   ));
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

@@ -1,1 +1,0 @@
-This text is read from a text file.
