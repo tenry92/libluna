@@ -3,7 +3,8 @@
 #include <functional>
 #include <memory>
 
-#include <libluna/AudioNode.hpp>
+#include <libluna/Audio/AudioManager.hpp>
+#include <libluna/Audio/AudioNode.hpp>
 #include <libluna/Canvas.hpp>
 #include <libluna/Filesystem/Path.hpp>
 #include <libluna/Resource.hpp>
@@ -66,7 +67,9 @@ namespace Luna {
      */
     const String &getName() const;
 
-    std::shared_ptr<AudioNode> getAudioDestinationNode() const;
+    Audio::AudioManager *getAudioManager() const;
+
+    Audio::AudioNodePtr getAudioDestinationNode() const;
 
     void openDebugger(std::shared_ptr<Canvas> canvas);
 

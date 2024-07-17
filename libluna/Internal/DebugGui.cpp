@@ -7,13 +7,14 @@
 #include <chrono>
 
 #include <libluna/Application.hpp>
-#include <libluna/AudioManagerImpl.hpp>
+#include <libluna/Audio/AudioManagerImpl.hpp>
 #include <libluna/CanvasImpl.hpp>
 #include <libluna/Internal/DebugGui.hpp>
 #include <libluna/Platform.hpp>
 #include <libluna/System.hpp>
 
 using namespace Luna;
+using namespace Luna::Audio;
 using namespace Luna::Internal;
 
 DebugGui::DebugGui(std::shared_ptr<DebugMetrics> metrics) : mMetrics{metrics} {}

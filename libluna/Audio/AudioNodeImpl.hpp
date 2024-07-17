@@ -2,14 +2,15 @@
 
 #include <list>
 
-#include <libluna/AudioNode.hpp>
+#include <libluna/Audio/AudioNode.hpp>
 
-namespace Luna {
+namespace Luna::Audio {
   class AudioManager;
 
   class AudioNodeImpl {
     public:
     AudioManager *mManager;
-    std::list<std::shared_ptr<AudioNode>> mInputs;
+    std::list<AudioNodePtr> mInputs;
+    AudioNodePtr mConnectedNode;
   };
 } // namespace Luna

@@ -2,7 +2,11 @@
 
 #include <memory>
 
-namespace Luna {
+#include <libluna/Audio/DelayNode.hpp>
+#include <libluna/Audio/GainNode.hpp>
+#include <libluna/Audio/OscillatorNode.hpp>
+
+namespace Luna::Audio {
   class AudioManagerImpl;
   class AudioNode;
 
@@ -36,7 +40,20 @@ namespace Luna {
      * @brief Shut down the audio system.
      */
     void free();
+
     static AudioManager *getInstance();
+
+    double getTime() const;
+
+    int getChannelCount() const;
+
+    float getFrameRate() const;
+
+    std::shared_ptr<DelayNode> createDelay(float delay);
+
+    std::shared_ptr<GainNode> createGain(float volume);
+
+    std::shared_ptr<OscillatorNode> createOscillator(float frequency, OscillatorNode::Type type = OscillatorNode::kSine);
 
     AudioManagerImpl *getImpl() const;
 

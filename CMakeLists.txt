@@ -56,8 +56,11 @@ target_include_directories(luna PUBLIC
 set(PUBLIC_MODULES
   AbstractRenderer
   Application
-  AudioManager
-  AudioNode
+  Audio/AudioManager
+  Audio/AudioNode
+  Audio/DelayNode
+  Audio/GainNode
+  Audio/OscillatorNode
   ButtonEvent
   Camera2d
   Camera3d

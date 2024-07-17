@@ -40,7 +40,7 @@ class Luna::ApplicationImpl {
   std::list<std::weak_ptr<Canvas>> canvases;
   String mRaisedErrorMessage;
   IntervalManager mIntervalManager;
-  AudioManager mAudioManager;
+  Audio::AudioManager mAudioManager;
   PathManager mPathManager;
   String mName;
   std::shared_ptr<Internal::DebugMetrics> mDebugMetrics;

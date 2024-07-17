@@ -37,7 +37,7 @@
 #include <libluna/Internal/DebugGui.hpp>
 #endif
 
-#include <libluna/AudioManager.hpp>
+#include <libluna/Audio/AudioManager.hpp>
 #include <libluna/Console.hpp>
 #include <libluna/ImmediateGui.hpp>
 #include <libluna/InputManager.hpp>
@@ -51,6 +51,7 @@
 #include <libluna/CanvasImpl.hpp>
 
 using namespace Luna;
+using namespace Luna::Audio;
 
 static Application *gSingletonApp;
 
@@ -573,7 +574,11 @@ void Application::setName(const String &name) { mImpl->mName = name; }
 
 const String &Application::getName() const { return mImpl->mName; }
 
-std::shared_ptr<AudioNode> Application::getAudioDestinationNode() const {
+AudioManager *Application::getAudioManager() const {
+  return &mImpl->mAudioManager;
+}
+
+AudioNodePtr Application::getAudioDestinationNode() const {
   return mImpl->mAudioManager.getDestinationNode();
 }
 
