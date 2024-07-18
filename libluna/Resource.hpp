@@ -66,6 +66,17 @@
  *   }
  * }
  * ```
+ *
+ * The following table visualizes the relationship between the items:
+ *
+ * @dot
+ * digraph mygraph {
+ *   "Resource<Image>" -> "MyImageLoader"
+ *   "Resource<Image>" -> "Future<ImagePtr>"
+ *   "MyImageLoader" -> "ImagePtr"
+ *   "Future<ImagePtr>" -> "ImagePtr"
+ * }
+ * @enddot
  */
 
 namespace Luna {
