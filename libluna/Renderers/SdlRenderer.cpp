@@ -163,15 +163,13 @@ void SdlRenderer::present() {
   SDL_RenderPresent(mImpl->mRenderer.get());
 }
 
-Internal::GraphicsMetrics SdlRenderer::getMetrics() {
-  return *mImpl->mMetrics;
-}
-
+Internal::GraphicsMetrics SdlRenderer::getMetrics() { return *mImpl->mMetrics; }
 
 void SdlRenderer::clearBackground(ColorRgb color) {
   auto color32 = makeColorRgb32(color);
   CHECK_SDL(SDL_SetRenderDrawColor(
-      mImpl->mRenderer.get(), color32.red, color32.green, color32.blue, color32.alpha
+      mImpl->mRenderer.get(), color32.red, color32.green, color32.blue,
+      color32.alpha
   ));
   CHECK_SDL(SDL_RenderClear(mImpl->mRenderer.get()));
 }
@@ -196,57 +194,60 @@ void SdlRenderer::loadTexture(int id, ImagePtr image) {
   uint32_t surfaceFormat = SDL_PIXELFORMAT_RGBA32;
 
   switch (image->getBitsPerPixel()) {
-    case 16:
-      surfaceFormat = SDL_PIXELFORMAT_ABGR1555;
-      break;
-    case 24:
-      surfaceFormat = SDL_PIXELFORMAT_RGB24;
-      break;
-    case 32:
-      surfaceFormat = SDL_PIXELFORMAT_RGBA32;
-      break;
+  case 16:
+    surfaceFormat = SDL_PIXELFORMAT_ABGR1555;
+    break;
+  case 24:
+    surfaceFormat = SDL_PIXELFORMAT_RGB24;
+    break;
+  case 32:
+    surfaceFormat = SDL_PIXELFORMAT_RGBA32;
+    break;
   }
 
   SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(
-      (void *)(image->getData()), image->getSize().x(),
-      image->getSize().y(), image->getBitsPerPixel(), image->getBytesPerRow(),
-      surfaceFormat
+      (void *)(image->getData()), image->getSize().x(), image->getSize().y(),
+      image->getBitsPerPixel(), image->getBytesPerRow(), surfaceFormat
   );
 
-  auto texture =
-      SDL_CreateTextureFromSurface(mImpl->mRenderer.get(), surface);
+  auto texture = SDL_CreateTextureFromSurface(mImpl->mRenderer.get(), surface);
 
   SDL_FreeSurface(surface);
 
   mImpl->mTextureIdMapping.emplace(id, texture);
 }
 
-void SdlRenderer::resizeTexture([[maybe_unused]] int id, [[maybe_unused]] Vector2i size) {
+void SdlRenderer::resizeTexture(
+    [[maybe_unused]] int id, [[maybe_unused]] Vector2i size
+) {
   if (mImpl->mTextureIdMapping.count(id)) {
     SDL_Texture *oldTexture = mImpl->mTextureIdMapping.at(id);
     mImpl->mTextureIdMapping.erase(id);
     SDL_DestroyTexture(oldTexture);
   }
 
-  SDL_Texture *texture = SDL_CreateTexture(mImpl->mRenderer.get(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, size.x(), size.y());
+  SDL_Texture *texture = SDL_CreateTexture(
+      mImpl->mRenderer.get(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET,
+      size.x(), size.y()
+  );
   SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
   mImpl->mTextureIdMapping.emplace(id, texture);
 }
 
-void SdlRenderer::renderTexture([[maybe_unused]] Canvas *canvas, RenderTextureInfo *info) {
+void SdlRenderer::renderTexture(
+    [[maybe_unused]] Canvas *canvas, RenderTextureInfo *info
+) {
   auto texture = mImpl->mTextureIdMapping.at(info->textureId);
 
   SDL_Rect dstrect = {
-      static_cast<int>(info->position.x()), static_cast<int>(info->position.y()),
-      info->size.x(), info->size.y()};
-  CHECK_SDL(SDL_RenderCopy(
-      mImpl->mRenderer.get(), texture, nullptr, &dstrect
-  ));
+      static_cast<int>(info->position.x()),
+      static_cast<int>(info->position.y()), info->size.x(), info->size.y()};
+  CHECK_SDL(SDL_RenderCopy(mImpl->mRenderer.get(), texture, nullptr, &dstrect));
 }
 
-void SdlRenderer::setTextureFilterEnabled([[maybe_unused]] int id, [[maybe_unused]] bool enabled) {
-
-}
+void SdlRenderer::setTextureFilterEnabled(
+    [[maybe_unused]] int id, [[maybe_unused]] bool enabled
+) {}
 
 void SdlRenderer::setRenderTargetTexture(int id) {
   auto texture = mImpl->mTextureIdMapping.at(id);
@@ -266,7 +267,6 @@ void SdlRenderer::setViewport(Vector2i offset, Vector2i size) {
 
   SDL_RenderSetViewport(mImpl->mRenderer.get(), &viewport);
 }
-
 
 void SdlRenderer::imguiNewFrame() {
 #ifdef LUNA_IMGUI

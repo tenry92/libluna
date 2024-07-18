@@ -11,8 +11,8 @@
 #include <libdragon.h>
 #endif
 
-#include <thread>
 #include <filesystem>
+#include <thread>
 
 #include <libluna/Application.hpp>
 #include <libluna/System.hpp>
@@ -103,7 +103,8 @@ unsigned long System::getTotalMemorySize() {
 }
 
 std::list<String> System::getAssetFiles() {
-  auto assetsPath = Application::getInstance()->getAssetsPath().getRawPath().s_str();
+  auto assetsPath =
+      Application::getInstance()->getAssetsPath().getRawPath().s_str();
   std::list<String> list;
 
 #ifdef N64

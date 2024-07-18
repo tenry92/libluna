@@ -22,18 +22,10 @@ Material &Material::operator=(const Material &other) {
 
 Material::~Material() = default;
 
-void Material::setDiffuse(ImageResPtr image) {
-  mImpl->mDiffuse = image;
-}
+void Material::setDiffuse(ImageResPtr image) { mImpl->mDiffuse = image; }
 
-ImageResPtr Material::getDiffuse() const {
-  return mImpl->mDiffuse;
-}
+ImageResPtr Material::getDiffuse() const { return mImpl->mDiffuse; }
 
-void Material::setNormal(ImageResPtr image) {
-  mImpl->mNormal = image;
-}
+void Material::setNormal(ImageResPtr image) { mImpl->mNormal = image; }
 
-ImageResPtr Material::getNormal() const {
-  return mImpl->mNormal;
-}
+ImageResPtr Material::getNormal() const { return mImpl->mNormal; }

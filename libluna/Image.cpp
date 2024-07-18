@@ -16,15 +16,11 @@ class Image::impl {
   PalettePtr mPalette;
 };
 
-ImagePtr Image::make() {
-  return ImagePtr(new Image());
-}
+ImagePtr Image::make() { return ImagePtr(new Image()); }
 ImagePtr Image::make(int bitsPerPixel, const Vector2i &size) {
   return ImagePtr(new Image(bitsPerPixel, size));
 }
-ImagePtr Image::make(const Image &other) {
-  return ImagePtr(new Image(other));
-}
+ImagePtr Image::make(const Image &other) { return ImagePtr(new Image(other)); }
 ImagePtr Image::make(Image &&other) {
   return ImagePtr(new Image(std::move(other)));
 }
@@ -39,9 +35,7 @@ Image::Image(int bitsPerPixel, const Vector2i &size)
 }
 
 Image::Image(const Image &other)
-    : Image(
-          other.mImpl->mBitsPerPixel, other.mImpl->mSize
-      ) {
+    : Image(other.mImpl->mBitsPerPixel, other.mImpl->mSize) {
   mImpl->mData = other.mImpl->mData;
 }
 
@@ -56,17 +50,11 @@ int Image::getBitsPerPixel() const { return mImpl->mBitsPerPixel; }
 
 Vector2i Image::getSize() const { return mImpl->mSize; }
 
-void Image::setPalette(PalettePtr palette) {
-  mImpl->mPalette = palette;
-}
+void Image::setPalette(PalettePtr palette) { mImpl->mPalette = palette; }
 
-PalettePtr Image::getPalette() const {
-  return mImpl->mPalette;
-}
+PalettePtr Image::getPalette() const { return mImpl->mPalette; }
 
-uint8_t *Image::getData() const {
-  return mImpl->mData.data();
-}
+uint8_t *Image::getData() const { return mImpl->mData.data(); }
 
 ColorRgb16 *Image::getRgb16() const {
   return reinterpret_cast<ColorRgb16 *>(getData());
@@ -82,11 +70,11 @@ ColorRgb32 *Image::getRgb32() const {
 
 ImagePtr Image::toRgb16() {
   switch (mImpl->mBitsPerPixel) {
-    case 16:
-      return shared_from_this();
-    default:
-      // todo: error
-      return shared_from_this();
+  case 16:
+    return shared_from_this();
+  default:
+    // todo: error
+    return shared_from_this();
   }
 }
 

@@ -46,7 +46,8 @@ class DestinationAudioNode : public AudioNode {
 namespace {
   AudioManager *gInstance{nullptr};
 
-  [[maybe_unused]] void audioCallback(void *userData, std::uint8_t *stream, int byteCount) {
+  [[maybe_unused]] void
+  audioCallback(void *userData, std::uint8_t *stream, int byteCount) {
     auto metrics = &AudioManager::getInstance()->getImpl()->mMetrics;
 
     Logger::getInstance().setThreadIdentifier("audio");
@@ -57,8 +58,7 @@ namespace {
     auto frameCount = sampleCount / audioManager->getChannelCount();
     auto frameRate = audioManager->getFrameRate();
 
-    metrics->bufferSize =
-        static_cast<float>(frameCount) / frameRate;
+    metrics->bufferSize = static_cast<float>(frameCount) / frameRate;
 
     metrics->renderTicker.tick();
 
@@ -66,7 +66,8 @@ namespace {
         reinterpret_cast<float *>(stream), static_cast<int>(frameCount)
     );
 
-    audioManager->getImpl()->mTime += static_cast<double>(frameCount) / frameRate;
+    audioManager->getImpl()->mTime +=
+        static_cast<double>(frameCount) / frameRate;
 
     metrics->renderTicker.measure();
   }
@@ -107,7 +108,10 @@ void AudioManager::init() {
   mImpl->mFrameRate = static_cast<float>(obtained.freq);
   mImpl->mChannelCount = obtained.channels;
 
-  logDebug("obtained format: {}Hz, {} channels, {} ({})", obtained.freq, obtained.channels, obtained.format, AUDIO_F32);
+  logDebug(
+      "obtained format: {}Hz, {} channels, {} ({})", obtained.freq,
+      obtained.channels, obtained.format, AUDIO_F32
+  );
 
   if (mImpl->mSdlAudioDeviceId == 0) {
     logError(SDL_GetError());
@@ -147,17 +151,11 @@ void AudioManager::free() {
 
 AudioManager *AudioManager::getInstance() { return gInstance; }
 
-double AudioManager::getTime() const {
-  return mImpl->mTime;
-}
+double AudioManager::getTime() const { return mImpl->mTime; }
 
-int AudioManager::getChannelCount() const {
-  return mImpl->mChannelCount;
-}
+int AudioManager::getChannelCount() const { return mImpl->mChannelCount; }
 
-float AudioManager::getFrameRate() const {
-  return mImpl->mFrameRate;
-}
+float AudioManager::getFrameRate() const { return mImpl->mFrameRate; }
 
 std::shared_ptr<DelayNode> AudioManager::createDelay(float delay) {
   return std::make_shared<DelayNode>(this, delay);
@@ -167,7 +165,8 @@ std::shared_ptr<GainNode> AudioManager::createGain(float volume) {
   return std::make_shared<GainNode>(this, volume);
 }
 
-std::shared_ptr<OscillatorNode> AudioManager::createOscillator(float frequency, OscillatorNode::Type type) {
+std::shared_ptr<OscillatorNode>
+AudioManager::createOscillator(float frequency, OscillatorNode::Type type) {
   return std::make_shared<OscillatorNode>(this, frequency, type);
 }
 

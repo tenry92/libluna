@@ -4,8 +4,7 @@
 #include <stdexcept>
 
 namespace Luna {
-  template <typename T>
-  class IdAllocator {
+  template <typename T> class IdAllocator {
     public:
     T next() {
       if (!mFreeIds.empty()) {
@@ -34,4 +33,4 @@ namespace Luna {
     T mNextId{1};
     std::set<T> mFreeIds;
   };
-}
+} // namespace Luna

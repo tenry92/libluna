@@ -13,4 +13,4 @@ namespace Luna::Audio {
     private:
     float mVolume;
   };
-}
+} // namespace Luna::Audio

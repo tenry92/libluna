@@ -8,26 +8,16 @@ class Text::impl {
   String mContent;
 };
 
-TextPtr Text::make() {
-  return TextPtr(new Text());
-}
+TextPtr Text::make() { return TextPtr(new Text()); }
 
 Text::Text() : mImpl{std::make_unique<impl>()} {}
 
 Text::~Text() = default;
 
-void Text::setContent(const String &content) {
-  mImpl->mContent = content;
-}
+void Text::setContent(const String &content) { mImpl->mContent = content; }
 
-String &Text::getContent() const {
-  return mImpl->mContent;
-}
+String &Text::getContent() const { return mImpl->mContent; }
 
-void Text::setFont(FontResPtr font) {
-  mImpl->mFont = font;
-}
+void Text::setFont(FontResPtr font) { mImpl->mFont = font; }
 
-FontResPtr Text::getFont() const {
-  return mImpl->mFont;
-}
+FontResPtr Text::getFont() const { return mImpl->mFont; }

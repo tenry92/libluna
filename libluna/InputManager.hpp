@@ -20,9 +20,9 @@
  *
  * | Physical | Virtual |
  * |----------|---------|
- * | `Keyboard/Scancode/A` - `Keyboard/Scancode/Z` | `Keyboard/Keycode/a` - `Keyboard/Keycode/z`
- * | `Keyboard/Scancode/Grave` | *N/A*
- * | `Keyboard/Scancode/0` - `Keyboard/Scancode/9` | `Keyboard/Keycode/0` - `Keyboard/Keycode/9`
+ * | `Keyboard/Scancode/A` - `Keyboard/Scancode/Z` | `Keyboard/Keycode/a` - `Keyboard/Keycode/z` |
+ * | `Keyboard/Scancode/Grave` | *N/A* |
+ * | `Keyboard/Scancode/0` - `Keyboard/Scancode/9` | `Keyboard/Keycode/0` - `Keyboard/Keycode/9` |
  * | `Keyboard/Scancode/Minus` | `Keyboard/Keycode/-` |
  * | `Keyboard/Scancode/Equals` | `Keyboard/Keycode/=` |
  * | `Keyboard/Scancode/Backspace` | *N/A*

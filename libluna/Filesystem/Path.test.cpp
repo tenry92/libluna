@@ -15,7 +15,9 @@ int main(int, char **) {
     ASSERT_EQL(romfsRootPath.getRawPath().s_str(), "romfs:", "romfs:");
 
     Path romfsAssetsPath("romfs:/assets");
-    ASSERT_EQL(romfsAssetsPath.getRawPath().s_str(), "romfs:/assets", "romfs:/assets");
+    ASSERT_EQL(
+        romfsAssetsPath.getRawPath().s_str(), "romfs:/assets", "romfs:/assets"
+    );
   });
 
   TEST("cd", []() {
@@ -37,7 +39,10 @@ int main(int, char **) {
     ASSERT_EQL(rootPath.getRawPath().s_str(), "/root", "");
 
     Path romfsRootPath("romfs:");
-    ASSERT_EQL(romfsRootPath.cd("assets").getRawPath().s_str(), "romfs:/assets", "romfs:/assets");
+    ASSERT_EQL(
+        romfsRootPath.cd("assets").getRawPath().s_str(), "romfs:/assets",
+        "romfs:/assets"
+    );
   });
 
   TEST("up", []() {

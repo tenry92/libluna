@@ -4,8 +4,8 @@
 #include <memory>
 
 #include <libluna/AbstractRenderer.hpp>
-#include <libluna/IdAllocator.hpp>
 #include <libluna/Font.hpp>
+#include <libluna/IdAllocator.hpp>
 #include <libluna/Matrix.hpp>
 
 namespace Luna {
@@ -184,7 +184,8 @@ namespace Luna {
 
     void updateTextureCache(std::shared_ptr<Stage> stage);
 
-    std::forward_list<ImageResPtr> listImagesInUse(std::shared_ptr<Stage> stage);
+    std::forward_list<ImageResPtr> listImagesInUse(std::shared_ptr<Stage> stage
+    );
 
     void start2dFramebuffer(Canvas *canvas);
 

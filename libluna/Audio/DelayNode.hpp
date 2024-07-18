@@ -13,4 +13,4 @@ namespace Luna::Audio {
     class impl;
     std::unique_ptr<impl> mImpl;
   };
-}
+} // namespace Luna::Audio

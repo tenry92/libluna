@@ -44,7 +44,9 @@ int main(int, char **) {
     ASSERT_EQL(fileReader->getSize(), 36, "getSize()");
 
     std::vector<std::uint8_t> buffer(fileReader->getSize());
-    fileReader->read(buffer.data(), sizeof(std::uint8_t), fileReader->getSize());
+    fileReader->read(
+        buffer.data(), sizeof(std::uint8_t), fileReader->getSize()
+    );
     std::string contents(
         reinterpret_cast<const char *>(buffer.data()), buffer.size()
     );

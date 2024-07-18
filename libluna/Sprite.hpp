@@ -21,8 +21,7 @@ namespace Luna {
     void setImage(ImageResPtr image);
     ImageResPtr getImage() const;
 
-    void
-    setPalette(ResourcePtr<Palette> palette);
+    void setPalette(ResourcePtr<Palette> palette);
     ResourcePtr<Palette> getPalette() const;
 
     void setPosition(const Vector2f &position);

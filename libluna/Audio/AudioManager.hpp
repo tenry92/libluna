@@ -53,11 +53,13 @@ namespace Luna::Audio {
 
     std::shared_ptr<GainNode> createGain(float volume);
 
-    std::shared_ptr<OscillatorNode> createOscillator(float frequency, OscillatorNode::Type type = OscillatorNode::kSine);
+    std::shared_ptr<OscillatorNode> createOscillator(
+        float frequency, OscillatorNode::Type type = OscillatorNode::kSine
+    );
 
     AudioManagerImpl *getImpl() const;
 
     private:
     std::unique_ptr<AudioManagerImpl> mImpl;
   };
-} // namespace Luna
+} // namespace Luna::Audio

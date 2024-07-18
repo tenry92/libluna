@@ -27,5 +27,5 @@ namespace Luna {
     unsigned long getTotalMemorySize();
 
     std::list<String> getAssetFiles();
-  }
-}
+  } // namespace System
+} // namespace Luna

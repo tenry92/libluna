@@ -14,33 +14,27 @@ Stage::Stage() : mImpl{std::make_unique<impl>()} {}
 
 Stage::~Stage() = default;
 
-void Stage::add(SpritePtr sprite) {
-  mImpl->mDrawables2d.emplace_back(sprite);
-}
+void Stage::add(SpritePtr sprite) { mImpl->mDrawables2d.emplace_back(sprite); }
 
-void Stage::add(TextPtr text) {
-  mImpl->mDrawables2d.emplace_back(text);
-}
+void Stage::add(TextPtr text) { mImpl->mDrawables2d.emplace_back(text); }
 
-void Stage::add(ModelPtr model) {
-  mImpl->mDrawables3d.emplace_back(model);
-}
+void Stage::add(ModelPtr model) { mImpl->mDrawables3d.emplace_back(model); }
 
 void Stage::remove(SpritePtr sprite) {
   mImpl->mDrawables2d.remove_if([sprite](const auto &drawable) {
-    return std::holds_alternative<SpritePtr>(drawable) && std::get<SpritePtr>(drawable) == sprite;
+    return std::holds_alternative<SpritePtr>(drawable) &&
+           std::get<SpritePtr>(drawable) == sprite;
   });
 }
 
 void Stage::remove(TextPtr text) {
   mImpl->mDrawables2d.remove_if([text](const auto &drawable) {
-    return std::holds_alternative<TextPtr>(drawable) && std::get<TextPtr>(drawable) == text;
+    return std::holds_alternative<TextPtr>(drawable) &&
+           std::get<TextPtr>(drawable) == text;
   });
 }
 
-void Stage::remove(ModelPtr model) {
-  mImpl->mDrawables3d.remove(model);
-}
+void Stage::remove(ModelPtr model) { mImpl->mDrawables3d.remove(model); }
 
 const std::list<Stage::Drawable2d> &Stage::getDrawables2d() const {
   return mImpl->mDrawables2d;

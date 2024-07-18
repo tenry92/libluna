@@ -9,7 +9,8 @@ class Palette::impl {
   std::vector<uint8_t> mColors;
 };
 
-Palette::Palette(int bitsPerColor, int colorCount) : mImpl{std::make_unique<impl>()} {
+Palette::Palette(int bitsPerColor, int colorCount)
+    : mImpl{std::make_unique<impl>()} {
   mImpl->mBitsPerColor = bitsPerColor;
   mImpl->mColorCount = colorCount;
   mImpl->mColors.resize(colorCount * bitsPerColor / 8);

@@ -90,9 +90,7 @@ void Console::writeLine(const String &message) {
 #endif
 }
 
-void Console::setColor(
-    MAYBE_UNUSED Color fgColor, MAYBE_UNUSED Color bgColor
-) {
+void Console::setColor(MAYBE_UNUSED Color fgColor, MAYBE_UNUSED Color bgColor) {
 #ifdef UNIX_COLORS
   // see man Console-colors.d
   // 0: reset all color

@@ -1,8 +1,8 @@
 #include <iomanip>
 #include <iostream>
 
-#include <libluna/Matrix.hpp>
 #include <libluna/Console.hpp>
+#include <libluna/Matrix.hpp>
 #include <libluna/Test.hpp>
 
 using namespace Luna;

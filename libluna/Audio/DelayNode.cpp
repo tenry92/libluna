@@ -14,9 +14,12 @@ class DelayNode::impl {
   int mBufferOffset;
 };
 
-DelayNode::DelayNode(AudioManager *manager, float delay) : AudioNode(manager), mImpl{std::make_unique<impl>()} {
+DelayNode::DelayNode(AudioManager *manager, float delay)
+    : AudioNode(manager), mImpl{std::make_unique<impl>()} {
   mImpl->mDelay = delay;
-  mImpl->mBuffer.resize(static_cast<int>(getFrameRate() * delay) * getChannelCount());
+  mImpl->mBuffer.resize(
+      static_cast<int>(getFrameRate() * delay) * getChannelCount()
+  );
   mImpl->mBufferOffset = 0;
 }
 
@@ -34,16 +37,24 @@ void DelayNode::render(float *buffer, int frameCount) {
     }
 
     // copy previous data
-    memcpy(buffer, mImpl->mBuffer.data() + mImpl->mBufferOffset, sizeof(float) * chunkSampleCount);
+    memcpy(
+        buffer, mImpl->mBuffer.data() + mImpl->mBufferOffset,
+        sizeof(float) * chunkSampleCount
+    );
     buffer += chunkSampleCount;
 
     // render new input
     if (getImpl()->mInputs.size() > 0) {
       auto input = getImpl()->mInputs.front();
-      input->render(mImpl->mBuffer.data() + mImpl->mBufferOffset, static_cast<int>(chunkSampleCount / getChannelCount()));
+      input->render(
+          mImpl->mBuffer.data() + mImpl->mBufferOffset,
+          static_cast<int>(chunkSampleCount / getChannelCount())
+      );
     }
 
-    mImpl->mBufferOffset = static_cast<int>((mImpl->mBufferOffset + chunkSampleCount) % mImpl->mBuffer.size());
+    mImpl->mBufferOffset = static_cast<int>(
+        (mImpl->mBufferOffset + chunkSampleCount) % mImpl->mBuffer.size()
+    );
     renderedSampleCount += static_cast<int>(chunkSampleCount);
   }
 }

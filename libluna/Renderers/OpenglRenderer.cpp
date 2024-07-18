@@ -44,12 +44,12 @@
 
 #include <libluna/CanvasImpl.hpp>
 
-#include <libluna/GL/common.hpp>
 #include <libluna/GL/MeshBuffer.hpp>
 #include <libluna/GL/Shader.hpp>
 #include <libluna/GL/ShaderLib.hpp>
 #include <libluna/GL/SpriteBuffer.hpp>
 #include <libluna/GL/Uniform.hpp>
+#include <libluna/GL/common.hpp>
 
 #include <libluna/GL/shaders/3d_frag.glsl.h>
 #include <libluna/GL/shaders/3d_vert.glsl.h>
@@ -207,14 +207,15 @@ void OpenglRenderer::present() {
 #endif
 
 #ifdef LUNA_WINDOW_EGL
-  eglSwapBuffers(getCanvas()->getImpl()->egl.display, getCanvas()->getImpl()->egl.surface);
+  eglSwapBuffers(
+      getCanvas()->getImpl()->egl.display, getCanvas()->getImpl()->egl.surface
+  );
 #endif
 }
 
 Internal::GraphicsMetrics OpenglRenderer::getMetrics() {
   return *mImpl->mMetrics;
 }
-
 
 void OpenglRenderer::clearBackground(ColorRgb color) {
   CHECK_GL(glClearColor(color.red, color.green, color.blue, color.alpha));
@@ -244,16 +245,16 @@ void OpenglRenderer::loadTexture(int id, ImagePtr image) {
   GLenum inputType = GL_UNSIGNED_BYTE;
 
   switch (image->getBitsPerPixel()) {
-    case 16:
-      inputFormat = GL_RGBA;
-      inputType = GL_UNSIGNED_SHORT_1_5_5_5_REV;
-      break;
-    case 24:
-      inputFormat = GL_RGB;
-      break;
-    case 32:
-      inputFormat = GL_RGBA;
-      break;
+  case 16:
+    inputFormat = GL_RGBA;
+    inputType = GL_UNSIGNED_SHORT_1_5_5_5_REV;
+    break;
+  case 24:
+    inputFormat = GL_RGB;
+    break;
+  case 32:
+    inputFormat = GL_RGBA;
+    break;
   }
 
   CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
@@ -272,12 +273,14 @@ void OpenglRenderer::resizeTexture(int id, Vector2i size) {
   GLuint texture = mImpl->mTextureIdMapping.at(id);
   CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
   CHECK_GL(glTexImage2D(
-    GL_TEXTURE_2D, 0, GL_RGBA, size.x(), size.y(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
-    nullptr
+      GL_TEXTURE_2D, 0, GL_RGBA, size.x(), size.y(), 0, GL_RGBA,
+      GL_UNSIGNED_BYTE, nullptr
   ));
 }
 
-void OpenglRenderer::renderTexture([[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info) {
+void OpenglRenderer::renderTexture(
+    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info
+) {
   mImpl->mSpriteShader.use();
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_CULL_FACE);
@@ -286,8 +289,9 @@ void OpenglRenderer::renderTexture([[maybe_unused]] Canvas *canvas, [[maybe_unus
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   [[maybe_unused]] auto screenSize = getCurrentRenderSize();
   mImpl->mUniforms.screenSize = mImpl->mSpriteShader.getUniform("uScreenSize");
-  mImpl->mUniforms.screenSize =
-      Vector2f(static_cast<float>(screenSize.x()), static_cast<float>(screenSize.y()));
+  mImpl->mUniforms.screenSize = Vector2f(
+      static_cast<float>(screenSize.x()), static_cast<float>(screenSize.y())
+  );
 
   GLuint texture = mImpl->mTextureIdMapping.at(info->textureId);
 
@@ -295,7 +299,8 @@ void OpenglRenderer::renderTexture([[maybe_unused]] Canvas *canvas, [[maybe_unus
 
   spriteBuffer.bind();
 
-  mImpl->mUniforms.spriteTexture = mImpl->mSpriteShader.getUniform("uSpriteTexture");
+  mImpl->mUniforms.spriteTexture =
+      mImpl->mSpriteShader.getUniform("uSpriteTexture");
   mImpl->mUniforms.spriteTexture = 0;
   CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
 
@@ -313,13 +318,17 @@ void OpenglRenderer::destroyMesh([[maybe_unused]] int id) {
   mImpl->mMeshMapping.erase(id);
 }
 
-void OpenglRenderer::loadMesh([[maybe_unused]] int id, [[maybe_unused]] std::shared_ptr<Mesh> mesh) {
+void OpenglRenderer::loadMesh(
+    [[maybe_unused]] int id, [[maybe_unused]] std::shared_ptr<Mesh> mesh
+) {
   auto meshBuffer = std::make_shared<GL::MeshBuffer>(mesh);
 
   mImpl->mMeshMapping.emplace(id, meshBuffer);
 }
 
-void OpenglRenderer::renderMesh([[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info) {
+void OpenglRenderer::renderMesh(
+    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info
+) {
   mImpl->mModelShader.use();
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
@@ -364,24 +373,29 @@ void OpenglRenderer::renderMesh([[maybe_unused]] Canvas *canvas, [[maybe_unused]
     glActiveTexture(GL_TEXTURE0);
   }
 
-  mImpl->mUniforms.transformModel = mImpl->mModelShader.getUniform("uTransform.model");
+  mImpl->mUniforms.transformModel =
+      mImpl->mModelShader.getUniform("uTransform.model");
   mImpl->mUniforms.transformModel = info->transform;
 
   auto camera = canvas->getCamera3d();
 
-  mImpl->mUniforms.transformView = mImpl->mModelShader.getUniform("uTransform.view");
+  mImpl->mUniforms.transformView =
+      mImpl->mModelShader.getUniform("uTransform.view");
   mImpl->mUniforms.transformView = camera.getViewMatrix();
 
   mImpl->mUniforms.transformProjection =
       mImpl->mModelShader.getUniform("uTransform.projection");
-  mImpl->mUniforms.transformProjection = camera.getProjectionMatrix(static_cast<float>(getCurrentRenderSize().x()) / static_cast<float>(getCurrentRenderSize().y()));
+  mImpl->mUniforms.transformProjection = camera.getProjectionMatrix(
+      static_cast<float>(getCurrentRenderSize().x()) /
+      static_cast<float>(getCurrentRenderSize().y())
+  );
 
   mesh->draw();
 }
 
-void OpenglRenderer::setTextureFilterEnabled([[maybe_unused]] int id, [[maybe_unused]] bool enabled) {
-
-}
+void OpenglRenderer::setTextureFilterEnabled(
+    [[maybe_unused]] int id, [[maybe_unused]] bool enabled
+) {}
 
 void OpenglRenderer::setRenderTargetTexture(int id) {
   GLuint framebuffer;
@@ -397,8 +411,8 @@ void OpenglRenderer::setRenderTargetTexture(int id) {
 
   GLuint texture = mImpl->mTextureIdMapping.at(id);
   CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
-  CHECK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-    GL_TEXTURE_2D, texture, 0
+  CHECK_GL(glFramebufferTexture2D(
+      GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0
   ));
 
   GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -418,7 +432,6 @@ void OpenglRenderer::unsetRenderTargetTexture() {
 void OpenglRenderer::setViewport(Vector2i offset, Vector2i size) {
   CHECK_GL(glViewport(offset.x(), offset.y(), size.x(), size.y()));
 }
-
 
 void OpenglRenderer::imguiNewFrame() {
 #ifdef LUNA_IMGUI

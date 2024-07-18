@@ -60,13 +60,9 @@ namespace Luna {
     return (value << 3) | (value >> 2);
   }
 
-  inline uint8_t reduce8BitTo5Bit(uint8_t value) {
-    return (value >> 3) & 0x1f;
-  }
+  inline uint8_t reduce8BitTo5Bit(uint8_t value) { return (value >> 3) & 0x1f; }
 
-  inline ColorRgb16 makeColorRgb16(ColorRgb16 other) {
-    return other;
-  }
+  inline ColorRgb16 makeColorRgb16(ColorRgb16 other) { return other; }
 
   inline ColorRgb16 makeColorRgb16(ColorRgb24 other) {
     ColorRgb16 result;
@@ -124,9 +120,7 @@ namespace Luna {
     return result;
   }
 
-  inline ColorRgb24 makeColorRgb24(ColorRgb24 other) {
-    return other;
-  }
+  inline ColorRgb24 makeColorRgb24(ColorRgb24 other) { return other; }
 
   inline ColorRgb24 makeColorRgb24(ColorRgb32 other) {
     ColorRgb24 result;
@@ -162,9 +156,7 @@ namespace Luna {
     return result;
   }
 
-  inline ColorRgb32 makeColorRgb32(ColorRgb32 other) {
-    return other;
-  }
+  inline ColorRgb32 makeColorRgb32(ColorRgb32 other) { return other; }
 
   inline ColorRgb32 makeColorRgb32(ColorRgb other) {
     ColorRgb32 result;

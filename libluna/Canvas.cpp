@@ -88,7 +88,10 @@ class CanvasCommand : public Command {
 void CanvasImpl::setVideoDriver(const String &name) {
   logInfo("setting canvas video driver to {}", name);
 #ifdef N64
-  display_init(RESOLUTION_320x240, DEPTH_16_BPP, 3, GAMMA_NONE, FILTERS_RESAMPLE_ANTIALIAS_DEDITHER);
+  display_init(
+      RESOLUTION_320x240, DEPTH_16_BPP, 3, GAMMA_NONE,
+      FILTERS_RESAMPLE_ANTIALIAS_DEDITHER
+  );
   rdpq_init();
   mRenderer = std::make_unique<N64Renderer>();
 #endif
@@ -188,29 +191,45 @@ void CanvasImpl::createWindow([[maybe_unused]] bool opengl) {
   EGLConfig config;
   EGLint numConfigs;
   static const EGLint framebufferAttributeList[] = {
-    EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
-    EGL_RED_SIZE,     8,
-    EGL_GREEN_SIZE,   8,
-    EGL_BLUE_SIZE,    8,
-    EGL_ALPHA_SIZE,   8,
-    EGL_DEPTH_SIZE,   24,
-    EGL_STENCIL_SIZE, 8,
-    EGL_NONE
-  };
-  eglChooseConfig(this->egl.display, framebufferAttributeList, &config, 1, &numConfigs);
+      EGL_RENDERABLE_TYPE,
+      EGL_OPENGL_BIT,
+      EGL_RED_SIZE,
+      8,
+      EGL_GREEN_SIZE,
+      8,
+      EGL_BLUE_SIZE,
+      8,
+      EGL_ALPHA_SIZE,
+      8,
+      EGL_DEPTH_SIZE,
+      24,
+      EGL_STENCIL_SIZE,
+      8,
+      EGL_NONE};
+  eglChooseConfig(
+      this->egl.display, framebufferAttributeList, &config, 1, &numConfigs
+  );
 
-  this->egl.surface = eglCreateWindowSurface(this->egl.display, config, nwindowGetDefault(), nullptr);
+  this->egl.surface = eglCreateWindowSurface(
+      this->egl.display, config, nwindowGetDefault(), nullptr
+  );
 
   static const EGLint contextAttributeList[] = {
-    EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR, EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT_KHR,
-    EGL_CONTEXT_MAJOR_VERSION_KHR, 4,
-    EGL_CONTEXT_MINOR_VERSION_KHR, 3,
-    EGL_NONE
-  };
+      EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR,
+      EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT_KHR,
+      EGL_CONTEXT_MAJOR_VERSION_KHR,
+      4,
+      EGL_CONTEXT_MINOR_VERSION_KHR,
+      3,
+      EGL_NONE};
 
-  this->egl.context = eglCreateContext(this->egl.display, config, EGL_NO_CONTEXT, contextAttributeList);
+  this->egl.context = eglCreateContext(
+      this->egl.display, config, EGL_NO_CONTEXT, contextAttributeList
+  );
 
-  eglMakeCurrent(this->egl.display, this->egl.surface, this->egl.surface, this->egl.context);
+  eglMakeCurrent(
+      this->egl.display, this->egl.surface, this->egl.surface, this->egl.context
+  );
 #endif
 }
 
@@ -432,7 +451,9 @@ void Canvas::close() {
 
 #ifdef LUNA_WINDOW_EGL
   if (mImpl->egl.display) {
-    eglMakeCurrent(mImpl->egl.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+    eglMakeCurrent(
+        mImpl->egl.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT
+    );
 
     if (mImpl->egl.context) {
       eglDestroyContext(mImpl->egl.display, mImpl->egl.context);
@@ -590,8 +611,6 @@ std::queue<ButtonEvent> &Canvas::getButtonEvents() const {
   return mImpl->mButtonEvents;
 }
 
-bool Canvas::isClosed() const {
-  return mImpl->mClosed;
-}
+bool Canvas::isClosed() const { return mImpl->mClosed; }
 
 CanvasImpl *Canvas::getImpl() const { return mImpl.get(); }

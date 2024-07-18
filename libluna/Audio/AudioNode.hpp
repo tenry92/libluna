@@ -45,4 +45,4 @@ namespace Luna::Audio {
     void removeInput(AudioNodePtr input);
     std::unique_ptr<AudioNodeImpl> mImpl;
   };
-} // namespace Luna
+} // namespace Luna::Audio

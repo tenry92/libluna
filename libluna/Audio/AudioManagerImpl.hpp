@@ -30,4 +30,4 @@ namespace Luna::Audio {
     SDL_AudioDeviceID mSdlAudioDeviceId{0};
 #endif
   };
-} // namespace Luna
+} // namespace Luna::Audio

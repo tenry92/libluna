@@ -6,15 +6,11 @@
 
 namespace Luna {
 #ifdef N64
-  template <typename T>
-  class Promise;
+  template <typename T> class Promise;
 
-  template <typename T>
-  class Future {
+  template <typename T> class Future {
     public:
-    T get() {
-      return std::move(*mValue);
-    }
+    T get() { return std::move(*mValue); }
 
     private:
     std::shared_ptr<T> mValue;
@@ -22,8 +18,7 @@ namespace Luna {
     friend class Promise<T>;
   };
 
-  template <typename T>
-  class Promise {
+  template <typename T> class Promise {
     public:
     Future<T> get_future() {
       Future<T> future;
@@ -31,9 +26,7 @@ namespace Luna {
       return future;
     }
 
-    void set_value(const T &value) {
-      *mValue = value;
-    }
+    void set_value(const T &value) { *mValue = value; }
 
     private:
     std::shared_ptr<T> mValue;

@@ -13,4 +13,4 @@ namespace Luna::Audio {
     std::list<AudioNodePtr> mInputs;
     AudioNodePtr mConnectedNode;
   };
-} // namespace Luna
+} // namespace Luna::Audio

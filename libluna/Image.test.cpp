@@ -31,15 +31,11 @@ int main(int, char **) {
 
     // (2 * 2) * 3 = 12
     auto image24 = Image::make(24, {2, 2});
-    ASSERT(
-        image24->getByteCount() == 12, "image24->getByteCount() == 12"
-    );
+    ASSERT(image24->getByteCount() == 12, "image24->getByteCount() == 12");
 
     // (2 * 2) * 4 = 16
     auto image32 = Image::make(32, {2, 2});
-    ASSERT(
-        image32->getByteCount() == 16, "image32->getByteCount() == 16"
-    );
+    ASSERT(image32->getByteCount() == 16, "image32->getByteCount() == 16");
   });
 
   TEST("pixels (4bpp indexed)", []() {

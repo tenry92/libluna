@@ -26,7 +26,7 @@ int main(int, char **) {
     app.setAssetsPath(assetsPath);
 
 #ifdef N64
-  dfs_init(DFS_DEFAULT_LOCATION);
+    dfs_init(DFS_DEFAULT_LOCATION);
 #endif
 
     const char *filename = "test.txt";

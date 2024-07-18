@@ -1,8 +1,8 @@
 #pragma once
 
 #include <libluna/GL/common.hpp>
-#include <libluna/Vector.hpp>
 #include <libluna/Mesh.hpp>
+#include <libluna/Vector.hpp>
 
 namespace Luna::GL {
   class MeshBuffer {
@@ -154,7 +154,7 @@ namespace Luna::GL {
           2,        // input location = 2
           3,        // vec3
           GL_FLOAT, // vector of floats
-          GL_TRUE, // normalize input data
+          GL_TRUE,  // normalize input data
           stride,
           (void *)(5 * sizeof(float)) // offset; where data begins in the buffer
       ));

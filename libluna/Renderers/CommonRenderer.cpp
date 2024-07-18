@@ -24,18 +24,16 @@
 #include <libdragon.h>
 #endif
 
-#include <libluna/Renderers/CommonRenderer.hpp>
 #include <libluna/CanvasImpl.hpp>
 #include <libluna/Logger.hpp>
+#include <libluna/Renderers/CommonRenderer.hpp>
 
 using namespace Luna;
 
 // helper type for the visitor #4
-template<class... Ts>
-struct overloaded : Ts... { using Ts::operator()...; };
+template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 // explicit deduction guide (not needed as of C++20)
-template<class... Ts>
-overloaded(Ts...) -> overloaded<Ts...>;
+template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 CommonRenderer::CommonRenderer() : mRenderTargetId{0} {}
 
@@ -101,15 +99,21 @@ void CommonRenderer::destroyTexture([[maybe_unused]] int id) {
   // stub
 }
 
-void CommonRenderer::loadTexture([[maybe_unused]] int id, [[maybe_unused]] ImagePtr image) {
+void CommonRenderer::loadTexture(
+    [[maybe_unused]] int id, [[maybe_unused]] ImagePtr image
+) {
   // stub
 }
 
-void CommonRenderer::resizeTexture([[maybe_unused]] int id, [[maybe_unused]] Vector2i size) {
+void CommonRenderer::resizeTexture(
+    [[maybe_unused]] int id, [[maybe_unused]] Vector2i size
+) {
   // stub
 }
 
-void CommonRenderer::setViewport([[maybe_unused]] Vector2i offset, [[maybe_unused]] Vector2i size) {
+void CommonRenderer::setViewport(
+    [[maybe_unused]] Vector2i offset, [[maybe_unused]] Vector2i size
+) {
   // stub
 }
 
@@ -117,11 +121,15 @@ void CommonRenderer::imguiNewFrame() {
   // stub
 }
 
-void CommonRenderer::renderMesh([[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info) {
+void CommonRenderer::renderMesh(
+    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info
+) {
   // stub
 }
 
-void CommonRenderer::renderTexture([[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info) {
+void CommonRenderer::renderTexture(
+    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info
+) {
   // stub
 }
 
@@ -133,11 +141,15 @@ void CommonRenderer::destroyMesh([[maybe_unused]] int id) {
   // stub
 }
 
-void CommonRenderer::loadMesh([[maybe_unused]] int id, [[maybe_unused]] std::shared_ptr<Mesh> mesh) {
+void CommonRenderer::loadMesh(
+    [[maybe_unused]] int id, [[maybe_unused]] std::shared_ptr<Mesh> mesh
+) {
   // stub
 }
 
-void CommonRenderer::setTextureFilterEnabled([[maybe_unused]] int id, [[maybe_unused]] bool enabled) {
+void CommonRenderer::setTextureFilterEnabled(
+    [[maybe_unused]] int id, [[maybe_unused]] bool enabled
+) {
   // stub
 }
 
@@ -184,7 +196,9 @@ Vector2i CommonRenderer::getCurrentRenderSize() const {
   return mCurrentRenderSize;
 }
 
-void CommonRenderer::updateTextureCache([[maybe_unused]] std::shared_ptr<Stage> stage) {
+void CommonRenderer::updateTextureCache(
+    [[maybe_unused]] std::shared_ptr<Stage> stage
+) {
   auto images = listImagesInUse(stage);
 
   std::unordered_set<ImageResPtr> visitedImages;
@@ -248,18 +262,21 @@ void CommonRenderer::updateTextureCache([[maybe_unused]] std::shared_ptr<Stage> 
   }
 }
 
-std::forward_list<ImageResPtr> CommonRenderer::listImagesInUse(std::shared_ptr<Stage> stage) {
+std::forward_list<ImageResPtr>
+CommonRenderer::listImagesInUse(std::shared_ptr<Stage> stage) {
   std::forward_list<ImageResPtr> images;
 
   for (auto &&drawable : stage->getDrawables2d()) {
-    std::visit(overloaded {
-      [](auto) {},
-      [&](SpritePtr sprite) {
-        if (sprite->getImage()) {
-          images.emplace_front(sprite->getImage());
-        }
-      }
-    }, drawable);
+    std::visit(
+        overloaded{
+            [](auto) {},
+            [&](SpritePtr sprite) {
+              if (sprite->getImage()) {
+                images.emplace_front(sprite->getImage());
+              }
+            }},
+        drawable
+    );
   }
 
   // todo: font characters
@@ -300,58 +317,63 @@ void CommonRenderer::renderWorld(Canvas *canvas) {
   }
 }
 
-void CommonRenderer::render2d(Canvas *canvas, [[maybe_unused]] Vector2i renderSize) {
+void CommonRenderer::render2d(
+    Canvas *canvas, [[maybe_unused]] Vector2i renderSize
+) {
   for (auto &&drawable : canvas->getStage()->getDrawables2d()) {
-    std::visit(overloaded {
-      [](auto) {},
-      [&](SpritePtr sprite) {
-        RenderTextureInfo info;
-        auto texture = mKnownImages.at(sprite->getImage());
-        info.textureId = texture.id;
-        info.size = texture.size;
-        info.position = sprite->getPosition() - canvas->getCamera2d().getPosition();
-        renderTexture(canvas, &info);
-      },
-      [&](TextPtr text) {
-        auto font = text->getFont()->get().get();
+    std::visit(
+        overloaded{
+            [](auto) {},
+            [&](SpritePtr sprite) {
+              RenderTextureInfo info;
+              auto texture = mKnownImages.at(sprite->getImage());
+              info.textureId = texture.id;
+              info.size = texture.size;
+              info.position =
+                  sprite->getPosition() - canvas->getCamera2d().getPosition();
+              renderTexture(canvas, &info);
+            },
+            [&](TextPtr text) {
+              auto font = text->getFont()->get().get();
 
-        int x = 0;
-        int y = font->getBaseLine();
+              int x = 0;
+              int y = font->getBaseLine();
 
-        for (auto &&cp : text->getContent()) {
-          if (cp == '\n') {
-            x = 0;
-            y += font->getLineHeight();
-            continue;
-          }
+              for (auto &&cp : text->getContent()) {
+                if (cp == '\n') {
+                  x = 0;
+                  y += font->getLineHeight();
+                  continue;
+                }
 
-          auto ch = font->getCharByCodePoint(cp);
+                auto ch = font->getCharByCodePoint(cp);
 
-          if (!ch) {
-            // unknown character
-            continue;
-          }
+                if (!ch) {
+                  // unknown character
+                  continue;
+                }
 
-          RenderTextureInfo info;
+                RenderTextureInfo info;
 
-          if (ch->image) {
-            if (mCharImages.count(ch) == 0) {
-              int textureId = mTextureIdAllocator.next();
-              mCharImages.emplace(ch, textureId);
-              createTexture(textureId);
-              loadTexture(textureId, ch->image);
-            }
+                if (ch->image) {
+                  if (mCharImages.count(ch) == 0) {
+                    int textureId = mTextureIdAllocator.next();
+                    mCharImages.emplace(ch, textureId);
+                    createTexture(textureId);
+                    loadTexture(textureId, ch->image);
+                  }
 
-            info.textureId = mCharImages.at(ch);
-            info.size = ch->image->getSize();
-            info.position = Vector2i(x, y) + ch->offset;
-            renderTexture(canvas, &info);
-          }
+                  info.textureId = mCharImages.at(ch);
+                  info.size = ch->image->getSize();
+                  info.position = Vector2i(x, y) + ch->offset;
+                  renderTexture(canvas, &info);
+                }
 
-          x += ch->advance;
-        }
-      }
-    }, drawable);
+                x += ch->advance;
+              }
+            }},
+        drawable
+    );
   }
 }
 

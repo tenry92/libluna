@@ -15,7 +15,9 @@ namespace Luna::GL {
     public:
     inline Uniform() {}
 
-    inline Uniform([[maybe_unused]] GLuint program, [[maybe_unused]] const String &name) {
+    inline Uniform(
+        [[maybe_unused]] GLuint program, [[maybe_unused]] const String &name
+    ) {
       mLocation = glGetUniformLocation(program, name.c_str());
 
       if (mLocation == -1) {
