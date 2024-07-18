@@ -4,6 +4,70 @@
 #include <future>
 #include <queue>
 
+/**
+ * @page resources Resources
+ *
+ * A Resource holds information on how to load something.
+ * This can be an image, a font, a text or virtually anything.
+ *
+ * Many classes hold references to resources, so they are loaded
+ * and freed on demand.
+ * One particular use case is the Sprite and an Image. The Sprite
+ * only holds an Image Resource (`ImageResPtr`, aka
+ * `shared_ptr<Resource<Image>>`). When the active renderer of a canvas
+ * (let's say, OpenGL) wants to draw the sprite, it knows that it didn't load
+ * the referenced image as a texture into GPU memory and requests loading this.
+ * When the image is loaded into CPU memory, the renderer uploads the image
+ * into its internal GPU memory, frees the reference to the loaded Image and
+ * the Image is unloaded from the CPU memory as there are no more references
+ * to the Image shared pointer.
+ * When you now switch to another renderer (let's say, Vulkan), it won't have
+ * the texture in its context anymore. But instead of restarting the whole
+ * application in order to load all the textures, it can follow the same steps
+ * as before and ask the Resource to load the data temporarily.
+ *
+ * In code, you can do something like this:
+ *
+ * ```cpp
+ * class MyImageLoader {
+ *   public:
+ *   MyImageLoader(Vector2i size) : mSize(size) {}
+ *
+ *   // this is the important one to make the magic work
+ *   ImagePtr operator()() {
+ *     // in a real scenario, you would load the image data from somewhere and
+ *     // fill the Image accordingly before returning it
+ *     return Image::makeRgb32(mSize);
+ *   }
+ *
+ *   private:
+ *   Vector2i mSize;
+ * };
+ *
+ * void example() {
+ *   ImageResPtr resource = make_shared<Resource<Image>>(MyImageLoader{32, 32});
+ *   // resource can be assigned to sprites, materials etc.
+ *
+ *   // if a code, for example a renderer, needs access to the data
+ *   Resource<Image>::FutureType future = resource->get();
+ *
+ *   // since we are the first requesting the future, loading is initiated in
+ *   // the background (separate thread) if supported or loaded immediately
+ *   // it's important to keep reference to the future, else the data is
+ *   // immediately disposed after loading
+ *
+ *   // every frame, we can check if the resource is loaded
+ *   if (resource->isReady()) {
+ *     ImagePtr image = future.get();
+ *
+ *     // you can dispose future now
+ *     // if there are no more references to future or image, the image is
+ *     // automatically disposed from memory
+ *   }
+ * }
+ * ```
+ */
+
 namespace Luna {
 #ifdef N64
   template <typename T> class Promise;

@@ -11,6 +11,44 @@
 #include <libluna/Sprite.hpp>
 #include <libluna/String.hpp>
 
+/**
+ * @page app-structure Application structure
+ *
+ * The base structure for a Luna based application has the following structure:
+ *
+ * ```cpp
+ * #include <libluna/Application.hpp>
+ *
+ * int main(int argc, char **argv) {
+ *   Luna::Application app(argc, argv);
+ *
+ *   std::shared_ptr<Canvas> canvas;
+ *
+ *   app.whenReady([&]() {
+ *     // create a canvas (window) for rendering
+ *     canvas = app.makeCanvas(800, 600);
+ *     canvas->setVideoDriver(app.getDefaultVideoDriver());
+ *
+ *     // define a sprite
+ *     auto sprite = Luna::Sprite::make();
+ *     sprite->setPosition({16, 32});
+ *     sprite->setImage(...)
+ *
+ *     // create a stage, add the sprite to it and assign it to the canvas
+ *     auto stage = std::make_shared<Luna::Stage>();
+ *     stage->add(sprite);
+ *     canvas->setStage(stage);
+ *   });
+ *
+ *   app.addInterval(60, [&](float elapsedTime) {
+ *     // update logic
+ *   })
+ *
+ *   return app.run();
+ * }
+ * ```
+ */
+
 namespace Luna {
   class ApplicationImpl;
 
