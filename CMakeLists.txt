@@ -207,6 +207,6 @@ install(FILES ${PUBLIC_HEADERS} DESTINATION include/libluna)
 include(cmake/unit-tests.cmake)
 
 ################################################################################
-# FUNCTIONAL/INTEGRATION TESTS
+# EXAMPLES
 
 add_subdirectory(examples)
