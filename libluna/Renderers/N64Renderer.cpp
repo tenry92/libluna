@@ -8,6 +8,7 @@
 #include <libdragon.h>
 #include <rspq_profile.h>
 
+#include <libluna/Math.hpp>
 #include <libluna/Renderers/N64Renderer.hpp>
 
 using namespace Luna;
@@ -90,8 +91,14 @@ void N64Renderer::loadTexture(
 
   glBindTexture(GL_TEXTURE_2D, texture);
   // note: on N64, a texture size that's not a power of 2, must be clamped
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  if (!Math::isPowerOfTwo(image->getSize().x())) {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  }
+
+  if (!Math::isPowerOfTwo(image->getSize().y())) {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  }
+
   glTexImage2D(
       GL_TEXTURE_2D, 0,                              /* mipmap level */
       internalFormat,                                /* internal format */

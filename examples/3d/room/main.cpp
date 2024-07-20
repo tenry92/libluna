@@ -1,3 +1,4 @@
+#include <cmath>
 #include <cstring>
 
 #include <libgfx/libgfx.h>
@@ -102,6 +103,16 @@ static MeshPtr makeMesh() {
     {10.0f, 0.0f, 10.0f}, {-10.0f, 0.0f, 10.0f},
   }});
 
+  for (size_t i = 0; i < 4; ++i) {
+    mesh->getTexCoords()[i].x(mesh->getTexCoords()[i].x() * 4.f);
+    mesh->getTexCoords()[i].y(mesh->getTexCoords()[i].y() * 4.f);
+  }
+
+  for (size_t i = 4; i < mesh->getTexCoords().size(); ++i) {
+    mesh->getTexCoords()[i].x(mesh->getTexCoords()[i].x() * 4.f);
+    mesh->getTexCoords()[i].y(mesh->getTexCoords()[i].y() * 2.f);
+  }
+
   return mesh;
 }
 
@@ -116,6 +127,7 @@ int main(int argc, char **argv) {
   camera.setPosition({0.0f, 1.0f, 0.0f});
   shared_ptr<PointLight> pointLight;
   float t = 0.f;
+  float direction = 0.f;
 
   app.whenReady([&]() {
     canvas = app.makeCanvas({CANVAS_WIDTH, CANVAS_HEIGHT});
@@ -151,11 +163,13 @@ int main(int argc, char **argv) {
 
     inputManager.update(&canvas->getButtonEvents(), elapsedTime);
 
-    float speed = 1.0f;
+    float speed = 6.0f;
+    float forwardFactor = std::cos(direction);
+    float sidewardFactor = std::sin(direction);
 
-    if (inputManager.isButtonHeld("fast")) {
-      speed = 4.0f;
-    }
+    // if (inputManager.isButtonHeld("fast")) {
+    //   speed = 4.0f;
+    // }
 
     if (inputManager.isButtonHeld("up")) {
       camera.setPosition(camera.getPosition() + Vector3f::up() * elapsedTime * speed);
@@ -166,28 +180,31 @@ int main(int argc, char **argv) {
     }
 
     if (inputManager.isButtonHeld("forward")) {
-      camera.setPosition(camera.getPosition() + Vector3f::forward() * elapsedTime * speed);
+      camera.setPosition(camera.getPosition() + (Vector3f::forward() * forwardFactor + Vector3f::right() * sidewardFactor) * elapsedTime * speed);
     }
 
     if (inputManager.isButtonHeld("backward")) {
-      camera.setPosition(camera.getPosition() + Vector3f::backward() * elapsedTime * speed);
+      camera.setPosition(camera.getPosition() + (Vector3f::backward() * forwardFactor + Vector3f::left() * sidewardFactor) * elapsedTime * speed);
     }
 
     if (inputManager.isButtonHeld("left")) {
-      camera.setPosition(camera.getPosition() + Vector3f::left() * elapsedTime * speed);
+      camera.setPosition(camera.getPosition() + (Vector3f::left() * forwardFactor + Vector3f::forward() * sidewardFactor) * elapsedTime * speed);
     }
 
     if (inputManager.isButtonHeld("right")) {
-      camera.setPosition(camera.getPosition() + Vector3f::right() * elapsedTime * speed);
+      camera.setPosition(camera.getPosition() + (Vector3f::right() * forwardFactor + Vector3f::backward() * sidewardFactor) * elapsedTime * speed);
     }
 
     if (inputManager.isButtonHeld("turnLeft")) {
-      camera.rotateY(-elapsedTime * speed);
+      direction -= elapsedTime * 4.f;
     }
 
     if (inputManager.isButtonHeld("turnRight")) {
-      camera.rotateY(elapsedTime * speed);
+      direction += elapsedTime * 4.f;
     }
+
+    camera.resetRotation();
+    camera.rotateY(direction);
 
     pointLight->position = {
       sin(t) * 5.0f, 1.0f, cos(t) * 5.0f

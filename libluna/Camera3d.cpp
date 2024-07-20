@@ -25,6 +25,8 @@ Camera3d &Camera3d::operator=(const Camera3d &other) {
 
 Camera3d::~Camera3d() = default;
 
+void Camera3d::resetRotation() { mImpl->mRotation = Matrix4x4::identity(); }
+
 Vector3f Camera3d::getPosition() const { return mImpl->mPosition; }
 
 void Camera3d::setPosition(const Vector3f &position) {

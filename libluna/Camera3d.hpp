@@ -18,6 +18,7 @@ namespace Luna {
     void setPosition(const Vector3f &position);
 
     void rotateY(float angle);
+    void resetRotation();
 
     float getFov() const;
     void setFov(float fov);

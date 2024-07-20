@@ -15,24 +15,21 @@ namespace Luna::Math {
   /**
    * @brief Convert degrees (0° - 360°) to radians (0 rad - 2π rad).
    */
-  template<typename T>
-  inline constexpr T deg2rad(T degrees) {
+  template <typename T> inline constexpr T deg2rad(T degrees) {
     return degrees * static_cast<T>(kPi) / static_cast<T>(180.0);
   }
 
   /**
    * @brief Convert radians (0 rad - 2π rad) to degress (0° - 360°).
    */
-  template<typename T>
-  inline constexpr T rad2deg(T radians) {
+  template <typename T> inline constexpr T rad2deg(T radians) {
     return radians * static_cast<T>(180.0) / static_cast<T>(kPi);
   }
 
   /**
    * @brief Ping-ping @p value between @p min and @p max.
    */
-  template<typename T>
-  inline constexpr T pingPong(T value, T min, T max) {
+  template <typename T> inline constexpr T pingPong(T value, T min, T max) {
     T range = max - min;
     value -= min;
 
@@ -48,8 +45,9 @@ namespace Luna::Math {
   /**
    * @brief Test if two floating point numbers are approximately equal.
    */
-  template<typename T>
-  inline constexpr bool approxEqual(T a, T b, T epsilon = std::numeric_limits<T>::epsilon() * 100) {
+  template <typename T>
+  inline constexpr bool
+  approxEqual(T a, T b, T epsilon = std::numeric_limits<T>::epsilon() * 100) {
     return std::fabs(a - b) <= epsilon;
   }
 
@@ -83,8 +81,7 @@ namespace Luna::Math {
   /**
    * @brief Normalize an angle between 0° and 360°.
    */
-  template<typename T>
-  inline T normalizeAngle(T angle) {
+  template <typename T> inline T normalizeAngle(T angle) {
     angle = std::fmod(angle, 360.0);
 
     if (angle < 0.0) {
@@ -101,9 +98,8 @@ namespace Luna::Math {
    * @param end The end value (if @p t is 1).
    * @param t The interpolation degree.
    */
-  template<typename T>
-  inline constexpr T lerp(T start, T end, float t) {
-    return (1 - t) * start + + t * end;
+  template <typename T> inline constexpr T lerp(T start, T end, float t) {
+    return (1 - t) * start + +t * end;
   }
 
   /**
@@ -116,8 +112,7 @@ namespace Luna::Math {
    * @param end The end angle (if @p t is 1).
    * @param t The interpolation degree.
    */
-  template<typename T>
-  inline constexpr T lerpAngle(T start, T end, float T) {
+  template <typename T> inline constexpr T lerpAngle(T start, T end, float t) {
     start = normalizeAngle(start);
     end = normalizeAngle(end);
 
@@ -127,7 +122,7 @@ namespace Luna::Math {
     if (difference > 180.0) {
       difference -= 360.0;
     } else if (difference < -180.0) {
-      difference  += 360.0;
+      difference += 360.0;
     }
 
     T interpolated = start + t * difference;
@@ -143,4 +138,4 @@ namespace Luna::Math {
   constexpr double operator"" _deg(long double degrees) {
     return deg2rad(degrees);
   }
-}
+} // namespace Luna::Math
