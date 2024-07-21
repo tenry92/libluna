@@ -1,4 +1,9 @@
 **libluna** is a cross-platform game engine written in C++.
+It's in a very early stage and not meant for real usage yet.
+The API is currently very unstable.
+
+This engine is currently being implemented for Windows, Linux, the Nintendo
+Switch (using devkitpro) and the Nintendo 64 (using libdragon).
 
 ## Getting started
 
