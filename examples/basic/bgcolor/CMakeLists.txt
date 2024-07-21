@@ -1,4 +1,4 @@
-include(${CMAKE_SOURCE_DIR}/cmake/utils.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/utils.cmake)
 
 add_executable(bgcolor main.cpp)
 add_dependencies(bgcolor luna)

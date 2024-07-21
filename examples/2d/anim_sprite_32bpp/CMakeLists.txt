@@ -1,4 +1,4 @@
-include(${CMAKE_SOURCE_DIR}/cmake/utils.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/utils.cmake)
 
 set(ASSETS_INPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 set(DATA_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/data")
