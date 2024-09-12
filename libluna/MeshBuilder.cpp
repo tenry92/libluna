@@ -5,7 +5,7 @@ using namespace Luna;
 void MeshBuilder::addQuadFace(
     std::shared_ptr<Mesh> mesh, std::array<Vector3f, 4> vertices
 ) {
-  auto indexOffset = mesh->getVertices().size();
+  auto indexOffset = static_cast<uint32_t>(mesh->getVertices().size());
 
   mesh->getVertices().reserve(mesh->getVertices().size() + 4);
   mesh->getVertices().push_back(vertices.at(0)); // top-left

@@ -5,8 +5,9 @@
 
 #include <libluna/Application.hpp>
 #include <libluna/Color.hpp>
-#include <libluna/MeshBuilder.hpp>
 #include <libluna/InputManager.hpp>
+#include <libluna/Logger.hpp>
+#include <libluna/MeshBuilder.hpp>
 #include <libluna/ResourceReader.hpp>
 
 #ifdef __SWITCH__
@@ -40,9 +41,109 @@ class GfxImageLoader {
     auto frameset = &gfx->framesets[0];
 
     auto image = Image::makeRgb32({frameset->width, frameset->height});
-    memcpy(image->getData(), libgfx_getFramePointer(frameset, 0), image->getByteCount());
+    memcpy(
+        image->getData(), libgfx_getFramePointer(frameset, 0),
+        image->getByteCount()
+    );
 
     return image;
+  }
+
+  private:
+  String mAssetName;
+};
+
+static void parseObjFace(
+    const String &el, int *vertexIndex, int *texCoordsIndex, int *normalIndex
+) {
+  std::vector<String> parts;
+  el.split('/', std::back_inserter(parts));
+
+  if (parts[0].getLength() > 0) {
+    *vertexIndex = atoi(parts[0].c_str()) - 1;
+  }
+
+  if (parts[1].getLength() > 0) {
+    *texCoordsIndex = atoi(parts[1].c_str()) - 1;
+  }
+
+  if (parts[2].getLength() > 0) {
+    *normalIndex = atoi(parts[2].c_str()) - 1;
+  }
+}
+
+class ObjLoader {
+  public:
+  ObjLoader(const String &assetName) : mAssetName(assetName) {}
+
+  MeshPtr operator()() {
+    auto reader = ResourceReader::make(mAssetName.c_str());
+    std::vector<uint8_t> buffer(reader->getSize());
+    reader->read(buffer.data(), 1, buffer.size());
+    String contents(reinterpret_cast<char *>(buffer.data()), buffer.size());
+
+    std::vector<String> lines;
+    // split() is very inefficient on the N64!
+    contents.split('\n', std::back_inserter(lines));
+
+    auto mesh = std::make_shared<Mesh>();
+
+    std::vector<Vector3f> vertexCache;
+    std::vector<Vector2f> texCoordsCache;
+    std::vector<Vector3f> normalCache;
+
+    for (auto &&line : lines) {
+      if (line.getLength() < 1 || line[0] == '#') {
+        continue;
+      }
+
+      std::vector<String> parts;
+      line.split(' ', std::back_inserter(parts));
+
+      if (parts[0] == "o") {
+        logDebug("object");
+      } else if (parts[0] == "v") {
+        vertexCache.emplace_back(Vector3f(
+            atof(parts[1].c_str()), atof(parts[2].c_str()),
+            atof(parts[3].c_str())
+        ));
+      } else if (parts[0] == "vt") {
+        texCoordsCache.emplace_back(
+            Vector2f(atof(parts[1].c_str()), atof(parts[2].c_str()))
+        );
+      } else if (parts[0] == "vn") {
+        normalCache.emplace_back(Vector3f(
+            atof(parts[1].c_str()), atof(parts[2].c_str()),
+            atof(parts[3].c_str())
+        ));
+      } else if (parts[0] == "s") {
+        logDebug("s");
+      } else if (parts[0] == "f") {
+        size_t meshVertexIndex = mesh->getVertices().size();
+
+        for (int i = 0; i < 3; ++i) {
+          int vertexIndex;
+          int texCoordsIndex;
+          int normalIndex;
+
+          parseObjFace(
+              parts[i + 1], &vertexIndex, &texCoordsIndex, &normalIndex
+          );
+
+          mesh->getVertices().emplace_back(vertexCache[vertexIndex]);
+          mesh->getTexCoords().emplace_back(texCoordsCache[vertexIndex]);
+          mesh->getNormals().emplace_back(normalCache[normalIndex]);
+        }
+
+        mesh->getFaces().push_back(
+            {meshVertexIndex, meshVertexIndex + 1, meshVertexIndex + 2}
+        );
+      } else {
+        logDebug("unknown command {}", parts[0]);
+      }
+    }
+
+    return mesh;
   }
 
   private:
@@ -71,37 +172,61 @@ static void setupInput(InputManager &inputManager) {
 }
 
 static MeshPtr makeMesh() {
+  const auto roomHalfWidth = 10.0f;
+  const auto roomHalfLength = 10.0f;
+  const auto roomHeight = 3.0f;
+
   auto mesh = make_shared<Mesh>();
 
   // floor
-  MeshBuilder::addQuadFace(mesh, {{
-    {-10.0f, 0.0f, -10.0f}, {10.0f, 0.0f, -10.0f},
-    {-10.0f, 0.0f, 10.0f}, {10.0f, 0.0f, 10.0f},
-  }});
+  MeshBuilder::addQuadFace(
+      mesh, {{
+                {-roomHalfWidth, 0.0f, -roomHalfLength},
+                {roomHalfWidth, 0.0f, -roomHalfLength},
+                {-roomHalfWidth, 0.0f, roomHalfLength},
+                {roomHalfWidth, 0.0f, roomHalfLength},
+            }}
+  );
 
   // front wall
-  MeshBuilder::addQuadFace(mesh, {{
-    {-10.0f, 3.0f, -10.0f}, {10.0f, 3.0f, -10.0f},
-    {-10.0f, 0.0f, -10.0f}, {10.0f, 0.0f, -10.0f},
-  }});
+  MeshBuilder::addQuadFace(
+      mesh, {{
+                {-roomHalfWidth, roomHeight, -roomHalfLength},
+                {roomHalfWidth, roomHeight, -roomHalfLength},
+                {-roomHalfWidth, 0.0f, -roomHalfLength},
+                {roomHalfWidth, 0.0f, -roomHalfLength},
+            }}
+  );
 
   // left wall
-  MeshBuilder::addQuadFace(mesh, {{
-    {-10.0f, 3.0f, 10.0f}, {-10.0f, 3.0f, -10.0f},
-    {-10.0f, 0.0f, 10.0f}, {-10.0f, 0.0f, -10.0f},
-  }});
+  MeshBuilder::addQuadFace(
+      mesh, {{
+                {-roomHalfWidth, roomHeight, roomHalfLength},
+                {-roomHalfWidth, roomHeight, -roomHalfLength},
+                {-roomHalfWidth, 0.0f, roomHalfLength},
+                {-roomHalfWidth, 0.0f, -roomHalfLength},
+            }}
+  );
 
   // left wall
-  MeshBuilder::addQuadFace(mesh, {{
-    {10.0f, 3.0f, -10.0f}, {10.0f, 3.0f, 10.0f},
-    {10.0f, 0.0f, -10.0f}, {10.0f, 0.0f, 10.0f},
-  }});
+  MeshBuilder::addQuadFace(
+      mesh, {{
+                {roomHalfWidth, roomHeight, -roomHalfLength},
+                {roomHalfWidth, roomHeight, roomHalfLength},
+                {roomHalfWidth, 0.0f, -roomHalfLength},
+                {roomHalfWidth, 0.0f, roomHalfLength},
+            }}
+  );
 
   // back wall
-  MeshBuilder::addQuadFace(mesh, {{
-    {10.0f, 3.0f, 10.0f}, {-10.0f, 3.0f, 10.0f},
-    {10.0f, 0.0f, 10.0f}, {-10.0f, 0.0f, 10.0f},
-  }});
+  MeshBuilder::addQuadFace(
+      mesh, {{
+                {roomHalfWidth, roomHeight, roomHalfLength},
+                {-roomHalfWidth, roomHeight, roomHalfLength},
+                {roomHalfWidth, 0.0f, roomHalfLength},
+                {-roomHalfWidth, 0.0f, roomHalfLength},
+            }}
+  );
 
   for (size_t i = 0; i < 4; ++i) {
     mesh->getTexCoords()[i].x(mesh->getTexCoords()[i].x() * 4.f);
@@ -146,12 +271,35 @@ int main(int argc, char **argv) {
 
     pointLight = stage->makePointLight();
 
+    auto diffuse =
+        make_shared<Resource<Image>>(GfxImageLoader("wall_32x32.gfx"));
+
     auto model = make_shared<Model>();
     model->setMesh(makeMesh());
+    model->getMaterial().setDiffuse(diffuse);
     stage->add(model);
 
-    auto diffuse = make_shared<Resource<Image>>(GfxImageLoader("wall_32x32.gfx"));
-    model->getMaterial().setDiffuse(diffuse);
+    auto pillarResource = make_shared<Resource<Mesh>>(ObjLoader("pillar.obj"));
+    auto pillarMesh = pillarResource->get().get();
+
+    // having just two pillars (216 triangles each) already causes serious lag on N64
+    for (float z = -8.0f; z <= 8.0f; z += 4.0f) {
+      // left side
+      auto pillarModel = make_shared<Model>();
+      pillarModel->setMesh(pillarMesh);
+      pillarModel->getTransform() =
+          pillarModel->getTransform().translate({-8.0f, 0.0f, z});
+      pillarModel->getMaterial().setDiffuse(diffuse);
+      stage->add(pillarModel);
+
+      // right side
+      pillarModel = make_shared<Model>();
+      pillarModel->setMesh(pillarMesh);
+      pillarModel->getTransform() =
+          pillarModel->getTransform().translate({8.0f, 0.0f, z});
+      pillarModel->getMaterial().setDiffuse(diffuse);
+      stage->add(pillarModel);
+    }
   });
 
   app.addInterval(60, [&](float elapsedTime) {
@@ -172,27 +320,47 @@ int main(int argc, char **argv) {
     // }
 
     if (inputManager.isButtonHeld("up")) {
-      camera.setPosition(camera.getPosition() + Vector3f::up() * elapsedTime * speed);
+      camera.setPosition(
+          camera.getPosition() + Vector3f::up() * elapsedTime * speed
+      );
     }
 
     if (inputManager.isButtonHeld("down")) {
-      camera.setPosition(camera.getPosition() + Vector3f::down() * elapsedTime * speed);
+      camera.setPosition(
+          camera.getPosition() + Vector3f::down() * elapsedTime * speed
+      );
     }
 
     if (inputManager.isButtonHeld("forward")) {
-      camera.setPosition(camera.getPosition() + (Vector3f::forward() * forwardFactor + Vector3f::right() * sidewardFactor) * elapsedTime * speed);
+      camera.setPosition(
+          camera.getPosition() + (Vector3f::forward() * forwardFactor +
+                                  Vector3f::right() * sidewardFactor) *
+                                     elapsedTime * speed
+      );
     }
 
     if (inputManager.isButtonHeld("backward")) {
-      camera.setPosition(camera.getPosition() + (Vector3f::backward() * forwardFactor + Vector3f::left() * sidewardFactor) * elapsedTime * speed);
+      camera.setPosition(
+          camera.getPosition() + (Vector3f::backward() * forwardFactor +
+                                  Vector3f::left() * sidewardFactor) *
+                                     elapsedTime * speed
+      );
     }
 
     if (inputManager.isButtonHeld("left")) {
-      camera.setPosition(camera.getPosition() + (Vector3f::left() * forwardFactor + Vector3f::forward() * sidewardFactor) * elapsedTime * speed);
+      camera.setPosition(
+          camera.getPosition() + (Vector3f::left() * forwardFactor +
+                                  Vector3f::forward() * sidewardFactor) *
+                                     elapsedTime * speed
+      );
     }
 
     if (inputManager.isButtonHeld("right")) {
-      camera.setPosition(camera.getPosition() + (Vector3f::right() * forwardFactor + Vector3f::backward() * sidewardFactor) * elapsedTime * speed);
+      camera.setPosition(
+          camera.getPosition() + (Vector3f::right() * forwardFactor +
+                                  Vector3f::backward() * sidewardFactor) *
+                                     elapsedTime * speed
+      );
     }
 
     if (inputManager.isButtonHeld("turnLeft")) {
@@ -206,9 +374,7 @@ int main(int argc, char **argv) {
     camera.resetRotation();
     camera.rotateY(direction);
 
-    pointLight->position = {
-      sin(t) * 5.0f, 1.0f, cos(t) * 5.0f
-    };
+    pointLight->position = {sin(t) * 5.0f, 1.0f, cos(t) * 5.0f};
 
     canvas->setCamera3d(camera);
   });

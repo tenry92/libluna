@@ -1,8 +1,7 @@
 #pragma once
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #ifdef N64
@@ -138,19 +137,24 @@ typedef struct {
 
 typedef int (*libgfx_ReadCallback)(void *dest, size_t size, void *userData);
 
-typedef int (*libgfx_WriteCallback)(const void *src, size_t size, void *userData);
+typedef int (*libgfx_WriteCallback)(
+    const void *src, size_t size, void *userData
+);
 
 libgfx_Gfx *libgfx_loadImageFromFile(const char *filename);
 
 libgfx_Gfx *libgfx_loadImageFromMemory(const void *buffer, size_t bufferSize);
 
-libgfx_Gfx *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userData);
+libgfx_Gfx *
+libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userData);
 
 int libgfx_writeImageToFile(libgfx_Gfx *gfx, const char *filename);
 
 int libgfx_writeImageToMemory(libgfx_Gfx *gfx, void *buffer, size_t bufferSize);
 
-int libgfx_writeImageToCallback(libgfx_Gfx *gfx, libgfx_WriteCallback write, void *userData);
+int libgfx_writeImageToCallback(
+    libgfx_Gfx *gfx, libgfx_WriteCallback write, void *userData
+);
 
 /**
  * @brief Load an image from the given filename.
@@ -165,7 +169,8 @@ libgfx_Gfx *libgfx_loadImageFromMemory(const void *buffer, size_t bufferSize);
 /**
  * @brief Load an image using provided callback.
  */
-libgfx_Gfx *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userData);
+libgfx_Gfx *
+libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userData);
 
 /**
  * @brief Write the image to the given file.
@@ -180,7 +185,9 @@ int libgfx_writeImageToMemory(libgfx_Gfx *gfx, void *buffer, size_t bufferSize);
 /**
  * @brief Write the image using the provided callback.
  */
-int libgfx_writeImageToCallback(libgfx_Gfx *gfx, libgfx_WriteCallback, void *userData);
+int libgfx_writeImageToCallback(
+    libgfx_Gfx *gfx, libgfx_WriteCallback, void *userData
+);
 
 libgfx_Gfx *libgfx_allocGfx();
 
@@ -206,7 +213,7 @@ int libgfx_allocCharacters(libgfx_Gfx *gfx, int numCharacters);
 
 void *libgfx_getFramePointer(libgfx_Frameset *frameset, int frameIndex);
 
-libgfx_4BitPixel *libgfx_to4BitPixels(void *pixels) ;
+libgfx_4BitPixel *libgfx_to4BitPixels(void *pixels);
 
 libgfx_16BitPixel *libgfx_to16BitPixels(void *pixels);
 

@@ -12,7 +12,7 @@ namespace Luna {
 
   class Mesh final {
     public:
-    using Face = std::array<std::size_t, 3>;
+    using Face = std::array<uint32_t, 3>;
 
     Mesh();
     ~Mesh();

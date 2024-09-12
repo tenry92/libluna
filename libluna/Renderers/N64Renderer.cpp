@@ -18,7 +18,7 @@ class N64Renderer::impl {
   std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
 
   std::map<int, GLuint> mTextureIdMapping;
-  std::map<int, MeshPtr> mMeshIdMapping;
+  std::map<int, GLuint> mMeshIdMapping;
 };
 
 N64Renderer::N64Renderer() : mImpl{std::make_unique<impl>()} {
@@ -150,28 +150,49 @@ void N64Renderer::renderTexture(
   glEnd();
 }
 
-void N64Renderer::createMesh([[maybe_unused]] int id) {}
+void N64Renderer::createMesh([[maybe_unused]] int id) {
+  GLuint listId = glGenLists(1);
+  mImpl->mMeshIdMapping.emplace(id, listId);
+}
 
 void N64Renderer::destroyMesh([[maybe_unused]] int id) {
+  glDeleteLists(mImpl->mMeshIdMapping.at(id), 1);
   mImpl->mMeshIdMapping.erase(id);
 }
 
 void N64Renderer::loadMesh(
     [[maybe_unused]] int id, [[maybe_unused]] std::shared_ptr<Mesh> mesh
 ) {
-  mImpl->mMeshIdMapping.emplace(id, mesh);
+  auto listId = mImpl->mMeshIdMapping.at(id);
+  glNewList(listId, GL_COMPILE);
+
+  glBegin(GL_TRIANGLES);
+  for (std::size_t faceIndex = 0; faceIndex < mesh->getFaces().size();
+       ++faceIndex) {
+    for (std::size_t index : mesh->getFaces().at(faceIndex)) {
+      auto &vertex = mesh->getVertices().at(index);
+      auto &texCoords = mesh->getTexCoords().at(index);
+
+      glTexCoord2f(texCoords.x(), texCoords.y());
+      glVertex3f(vertex.x(), vertex.y(), vertex.z());
+    }
+  }
+  glEnd();
+
+  glEndList();
 }
 
 void N64Renderer::renderMesh(
     [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info
 ) {
-  auto mesh = mImpl->mMeshIdMapping.at(info->meshId);
+  auto listId = mImpl->mMeshIdMapping.at(info->meshId);
   auto texture = mImpl->mTextureIdMapping.at(info->diffuseTextureId);
 
   auto ambientLight = canvas->getStage()->getAmbientLight();
   float ambient[4] = {
       ambientLight.color.red, ambientLight.color.green, ambientLight.color.blue,
-      ambientLight.color.alpha};
+      ambientLight.color.alpha
+  };
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
   glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
 
@@ -181,11 +202,13 @@ void N64Renderer::renderMesh(
     glEnable(GL_LIGHT0 + lightId);
     float pos[4] = {
         pointLight->position.x(), pointLight->position.y(),
-        pointLight->position.z(), 1};
+        pointLight->position.z(), 1
+    };
     glLightfv(GL_LIGHT0 + lightId, GL_POSITION, pos);
     float color[4] = {
         pointLight->color.red, pointLight->color.green, pointLight->color.blue,
-        pointLight->color.alpha};
+        pointLight->color.alpha
+    };
     glLightfv(GL_LIGHT0 + lightId, GL_DIFFUSE, color);
     float lightRadius = 10.0f;
     glLightf(GL_LIGHT0 + lightId, GL_LINEAR_ATTENUATION, 2.0f / lightRadius);
@@ -212,18 +235,7 @@ void N64Renderer::renderMesh(
   glMatrixMode(GL_MODELVIEW);
   glLoadMatrixf(info->transform.getValuePointer());
 
-  glBegin(GL_TRIANGLES);
-  for (std::size_t faceIndex = 0; faceIndex < mesh->getFaces().size();
-       ++faceIndex) {
-    for (std::size_t index : mesh->getFaces().at(faceIndex)) {
-      auto &vertex = mesh->getVertices().at(index);
-      auto &texCoords = mesh->getTexCoords().at(index);
-
-      glTexCoord2f(texCoords.x(), texCoords.y());
-      glVertex3f(vertex.x(), vertex.y(), vertex.z());
-    }
-  }
-  glEnd();
+  glCallList(listId);
 }
 
 void N64Renderer::setTextureFilterEnabled(
