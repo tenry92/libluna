@@ -119,7 +119,7 @@ class ObjLoader {
       } else if (parts[0] == "s") {
         logDebug("s");
       } else if (parts[0] == "f") {
-        size_t meshVertexIndex = mesh->getVertices().size();
+        uint32_t meshVertexIndex = mesh->getVertices().size();
 
         for (int i = 0; i < 3; ++i) {
           int vertexIndex;
