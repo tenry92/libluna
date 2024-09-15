@@ -328,8 +328,9 @@ static int addFont(EncodingState *state, const char *arg) {
     wchar_t wstr[2];
     wstr[0] = (wchar_t) ch->id;
     wstr[1] = 0;
-    char mbs[MB_CUR_MAX];
-    wcstombs(mbs, wstr, sizeof(mbs));
+    char *mbs = (char *) malloc(MB_CUR_MAX);
+    wcstombs(mbs, wstr, MB_CUR_MAX);
+    free(mbs);
     printf("Encoding char U+%04X (%s)\n", ch->id, mbs);
 
     Surface *cropped = cropSurface(surface,

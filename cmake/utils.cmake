@@ -58,6 +58,7 @@ function(luna_assets_convert_gfx file type params)
 
   # output_file = ${ASSETS_OUTPUT_PATH}/path/to/asset.gfx
   set(output_file "${ASSETS_OUTPUT_PATH}/${name_rel_dir}/${name_we}.gfx")
+  string(REPLACE "//" "/" output_file "${output_file}")
 
   # ${ASSETS_OUTPUT_PATH}/path/to/asset.txt -> ${ASSETS_OUTPUT_PATH}/path/to
   get_filename_component(name_dir "${output_file}" DIRECTORY)

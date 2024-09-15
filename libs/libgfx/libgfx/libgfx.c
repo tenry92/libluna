@@ -52,6 +52,16 @@ static int read_u16(uint16_t *value, libgfx_ReadCallback read, void *userData) {
 #endif
 }
 
+static int read_s16(int16_t *value, libgfx_ReadCallback read, void *userData) {
+#ifdef LIBGFX_BIG_ENDIAN
+  int result = read(value, sizeof(int16_t), userData);
+  *value = swap_endian_16(*value);
+  return result;
+#else
+  return read(value, sizeof(int16_t), userData);
+#endif
+}
+
 static int read_u32(uint32_t *value, libgfx_ReadCallback read, void *userData) {
 #ifdef LIBGFX_BIG_ENDIAN
   int result = read(value, sizeof(uint32_t), userData);
@@ -68,6 +78,15 @@ static int write_u16(uint16_t *value, libgfx_WriteCallback write, void *userData
   return write(&swap, sizeof(uint16_t), userData);
 #else
   return write(value, sizeof(uint16_t), userData);
+#endif
+}
+
+static int write_s16(int16_t *value, libgfx_WriteCallback write, void *userData) {
+#ifdef LIBGFX_BIG_ENDIAN
+  int16_t swap = swap_endian_16(*value);
+  return write(&swap, sizeof(int16_t), userData);
+#else
+  return write(value, sizeof(int16_t), userData);
 #endif
 }
 
@@ -184,7 +203,7 @@ libgfx_Gfx *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userDat
 
     uint8_t colorFormat;
     read(&colorFormat, 1, userData);
-    pal->colorFormat = colorFormat;
+    pal->colorFormat = (libgfx_ColorFormat) colorFormat;
     read(&pal->numColors, 1, userData);
 
     libgfx_allocPaletteColors(pal, pal->numColors);
@@ -196,7 +215,7 @@ libgfx_Gfx *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userDat
     libgfx_Frameset *frameset = &gfx->framesets[i];
     uint8_t colorFormat;
     read(&colorFormat, 1, userData);
-    frameset->colorFormat = colorFormat;
+    frameset->colorFormat = (libgfx_ColorFormat) colorFormat;
     read_u16(&frameset->width, read, userData);
     read_u16(&frameset->height, read, userData);
     read_u16(&frameset->numFrames, read, userData);
@@ -261,9 +280,9 @@ libgfx_Gfx *libgfx_loadImageFromCallback(libgfx_ReadCallback read, void *userDat
     read_u32(&character->codePoint, read, userData);
     read_u16(&character->frameIndex, read, userData);
 
-    read_u16(&character->xOffset, read, userData);
-    read_u16(&character->yOffset, read, userData);
-    read_u16(&character->advance, read, userData);
+    read_s16(&character->xOffset, read, userData);
+    read_s16(&character->yOffset, read, userData);
+    read_s16(&character->advance, read, userData);
   }
 
   return gfx;
@@ -339,9 +358,9 @@ int libgfx_writeImageToCallback(libgfx_Gfx *gfx, libgfx_WriteCallback write, voi
     int16_t yOffset = (int16_t) character->yOffset;
     int16_t advance = (int16_t) character->advance;
 
-    write_u16(&xOffset, write, userData);
-    write_u16(&yOffset, write, userData);
-    write_u16(&advance, write, userData);
+    write_s16(&xOffset, write, userData);
+    write_s16(&yOffset, write, userData);
+    write_s16(&advance, write, userData);
   }
 
   return 0;
@@ -365,7 +384,7 @@ int libgfx_writeImageToMemory(libgfx_Gfx *image, void *buffer, size_t bufferSize
 }
 
 libgfx_Gfx *libgfx_allocGfx() {
-  libgfx_Gfx *gfx = calloc(1, sizeof(libgfx_Gfx));
+  libgfx_Gfx *gfx = (libgfx_Gfx *) calloc(1, sizeof(libgfx_Gfx));
 
   return gfx;
 }
@@ -417,7 +436,7 @@ void libgfx_freeGfx(libgfx_Gfx *gfx) {
 
 int libgfx_allocPalettes(libgfx_Gfx *gfx, int numPalettes) {
   gfx->numPalettes = numPalettes;
-  gfx->palettes = calloc(numPalettes, sizeof(libgfx_Palette));
+  gfx->palettes = (libgfx_Palette *) calloc(numPalettes, sizeof(libgfx_Palette));
 
   return 0;
 }
@@ -431,7 +450,7 @@ int libgfx_allocPaletteColors(libgfx_Palette *pal, int numColors) {
 
 int libgfx_allocFramesets(libgfx_Gfx *gfx, int numFramesets) {
   gfx->numFramesets = numFramesets;
-  gfx->framesets = calloc(numFramesets, sizeof(libgfx_Frameset));
+  gfx->framesets = (libgfx_Frameset *) calloc(numFramesets, sizeof(libgfx_Frameset));
 
   return 0;
 }
@@ -446,35 +465,35 @@ int libgfx_allocFrames(libgfx_Frameset *frameset, int numFrames) {
 
 int libgfx_allocTiles(libgfx_Gfx *gfx, int numTiles) {
   gfx->numTiles = numTiles;
-  gfx->tiles = calloc(numTiles, sizeof(int));
+  gfx->tiles = (uint16_t *) calloc(numTiles, sizeof(int));
 
   return 0;
 }
 
 int libgfx_allocAnimations(libgfx_Gfx *gfx, int numAnimations) {
   gfx->numAnimations = numAnimations;
-  gfx->animations = calloc(numAnimations, sizeof(libgfx_Animation));
+  gfx->animations = (libgfx_Animation *) calloc(numAnimations, sizeof(libgfx_Animation));
 
   return 0;
 }
 
 int libgfx_allocAnimation(libgfx_Animation *anim, int numFrames) {
   anim->numFrames = numFrames;
-  anim->frames = calloc(numFrames, sizeof(int));
+  anim->frames = (uint16_t *) calloc(numFrames, sizeof(int));
 
   return 0;
 }
 
 int libgfx_allocTileAnimations(libgfx_Gfx *gfx, int numTileAnimations) {
   gfx->numTileAnimations = numTileAnimations;
-  gfx->tileAnimations = calloc(numTileAnimations, sizeof(libgfx_TileAnimation));
+  gfx->tileAnimations = (libgfx_TileAnimation *) calloc(numTileAnimations, sizeof(libgfx_TileAnimation));
 
   return 0;
 }
 
 int libgfx_allocCharacters(libgfx_Gfx *gfx, int numCharacters) {
   gfx->numCharacters = numCharacters;
-  gfx->characters = calloc(numCharacters, sizeof(libgfx_Character));
+  gfx->characters = (libgfx_Character *) calloc(numCharacters, sizeof(libgfx_Character));
 
   return 0;
 }
@@ -484,7 +503,7 @@ void *libgfx_getFramePointer(libgfx_Frameset *frameset, int frameIndex) {
   int numPixels = frameset->width * frameset->height;
   int bytesPerFrame = calcColorBytes(frameset->colorFormat, numPixels);
 
-  return (void *) ptr + frameIndex * bytesPerFrame;
+  return (void *) (ptr + frameIndex * bytesPerFrame);
 }
 
 libgfx_4BitPixel *libgfx_to4BitPixels(void *pixels) {
