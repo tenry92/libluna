@@ -17,8 +17,8 @@ int main(int argc, char **argv) {
   Luna::Application app(argc, argv);
 
   // Prepare variables we will set later.
-  std::shared_ptr<Canvas> canvas;
-  std::shared_ptr<Stage> stage;
+  std::shared_ptr<Luna::Canvas> canvas;
+  std::shared_ptr<Luna::Stage> stage;
 
   // Register callback function when app is ready.
   app.whenReady([&]() {
@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
     // Create a stage.
     // This is where all the sprites and models will be.
     // The same stage can be displayed on different canvases.
-    stage = std::make_shared<Stage>();
+    stage = std::make_shared<Luna::Stage>();
 
     // Tell the canvas to use the given stage for rendering.
     canvas->setStage(stage);
