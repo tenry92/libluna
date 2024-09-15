@@ -88,8 +88,24 @@ class CanvasCommand : public Command {
 void CanvasImpl::setVideoDriver(const String &name) {
   logInfo("setting canvas video driver to {}", name);
 #ifdef N64
+  resolution_t res = RESOLUTION_320x240;
+
+  if (mSize == Vector2i(256, 240)) {
+    res = RESOLUTION_256x240;
+  } else if (mSize == Vector2i(320, 240)) {
+    res = RESOLUTION_320x240;
+  } else if (mSize == Vector2i(512, 240)) {
+    res = RESOLUTION_512x240;
+  } else if (mSize == Vector2i(640, 240)) {
+    res = RESOLUTION_640x240;
+  } else if (mSize == Vector2i(512, 480)) {
+    res = RESOLUTION_512x480;
+  } else if (mSize == Vector2i(640, 480)) {
+    res = RESOLUTION_640x480;
+  }
+
   display_init(
-      RESOLUTION_320x240, DEPTH_16_BPP, 3, GAMMA_NONE,
+      res, DEPTH_16_BPP, 3, GAMMA_NONE,
       FILTERS_RESAMPLE_ANTIALIAS_DEDITHER
   );
   rdpq_init();
