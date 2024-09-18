@@ -1,5 +1,6 @@
 #include <libluna/Image.hpp>
 
+#include <cstring>
 #include <iostream>
 #include <vector>
 
@@ -76,6 +77,25 @@ ImagePtr Image::toRgb16() {
     // todo: error
     return shared_from_this();
   }
+}
+
+ImagePtr Image::crop(Vector2i size, Vector2i offset) {
+  auto maxSize = this->getSize() - offset;
+  size = Vector2i(std::min(size.x(), maxSize.x()), std::min(size.y(), maxSize.y()));
+
+  auto croppedImage = Image::make(mImpl->mBitsPerPixel, size);
+  int bytesPerRowFull = this->getBytesPerRow();
+  int bytesPerRowCropped = croppedImage->getBytesPerRow();
+  int bytesPerPixel = this->getBitsPerPixel() / 8;
+  int xOffset = offset.x() * bytesPerPixel;
+
+  for (int y = 0; y < size.y(); ++y) {
+    auto inputRow = this->getData() + xOffset + bytesPerRowFull * (offset.y() + y);
+    auto outputRow = croppedImage->getData() + bytesPerRowCropped * y;
+    std::memcpy(outputRow, inputRow, bytesPerRowCropped);
+  }
+
+  return croppedImage;
 }
 
 uint8_t Image::getNibbleAt(int x, int y) const {

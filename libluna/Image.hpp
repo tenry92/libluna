@@ -77,6 +77,14 @@ namespace Luna {
      */
     ImagePtr toRgb32();
 
+    /**
+     * @brief Get a cropped potion of the image in the same color format.
+     *
+     * If the given size exceeds the image dimensions from offset, the cropped
+     * image may be smaller than the given size.
+     */
+    ImagePtr crop(Vector2i size, Vector2i offset = Vector2i(0, 0));
+
     int getByteCount() const {
       return getSize().x() * getSize().y() * (getBitsPerPixel() / 4) / 2;
     }
