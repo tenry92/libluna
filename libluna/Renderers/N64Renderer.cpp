@@ -1,6 +1,7 @@
 #ifdef N64
 
 #include <map>
+#include <vector>
 
 #include <GL/gl.h>
 #include <GL/gl_integration.h>
@@ -13,11 +14,27 @@
 
 using namespace Luna;
 
+namespace {
+  const Vector2i chunkSize = Vector2i(32, 32);
+
+  struct ChunkedTexture {
+    std::vector<GLuint> ids;
+    Vector2i size;
+  };
+
+  inline Vector2i countChunks(const Vector2i &size) {
+    int hChunks = (size.x() + chunkSize.x() - 1) / chunkSize.x();
+    int vChunks = (size.y() + chunkSize.y() - 1) / chunkSize.y();
+
+    return Vector2i(hChunks, vChunks);
+  }
+}
+
 class N64Renderer::impl {
   public:
   std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
 
-  std::map<int, GLuint> mTextureIdMapping;
+  std::map<int, ChunkedTexture> mTextureIdMapping;
   std::map<int, GLuint> mMeshIdMapping;
 };
 
@@ -57,25 +74,30 @@ void N64Renderer::clearBackground([[maybe_unused]] ColorRgb color) {
 }
 
 void N64Renderer::createTexture([[maybe_unused]] int id) {
-  GLuint texture;
-  glGenTextures(1, &texture);
-  mImpl->mTextureIdMapping.emplace(id, texture);
-
-  glBindTexture(GL_TEXTURE_2D, texture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  mImpl->mTextureIdMapping.emplace(id, ChunkedTexture());
 }
 
 void N64Renderer::destroyTexture([[maybe_unused]] int id) {
-  GLuint texture = mImpl->mTextureIdMapping.at(id);
+  auto texture = mImpl->mTextureIdMapping.at(id);
   mImpl->mTextureIdMapping.erase(id);
-  glDeleteTextures(1, &texture);
+  glDeleteTextures(texture.ids.size(), texture.ids.data());
 }
 
 void N64Renderer::loadTexture(
     [[maybe_unused]] int id, [[maybe_unused]] ImagePtr image
 ) {
-  GLuint texture = mImpl->mTextureIdMapping.at(id);
+  auto &texture = mImpl->mTextureIdMapping.at(id);
+
+  if (texture.ids.size() > 0) {
+    // delete any previous textures
+    glDeleteTextures(texture.ids.size(), texture.ids.data());
+  }
+
+  auto chunkCount = countChunks(image->getSize());
+  int numChunks = chunkCount.x() * chunkCount.y();
+  texture.ids.resize(numChunks);
+  glGenTextures(numChunks, texture.ids.data());
+  texture.size = image->getSize();
 
   GLenum inputFormat = GL_RGBA;
   GLenum inputType = GL_UNSIGNED_SHORT_5_5_5_1_EXT;
@@ -89,25 +111,35 @@ void N64Renderer::loadTexture(
     internalFormat = GL_RGBA;
   }
 
-  glBindTexture(GL_TEXTURE_2D, texture);
-  // note: on N64, a texture size that's not a power of 2, must be clamped
-  if (!Math::isPowerOfTwo(image->getSize().x())) {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  }
+  for (int i = 0; i < numChunks; ++i) {
+    auto imageChunk = image;
 
-  if (!Math::isPowerOfTwo(image->getSize().y())) {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  }
+    if (numChunks > 1) {
+      int hChunk = i % chunkCount.x();
+      int vChunk = i / chunkCount.x();
+      imageChunk = image->crop(Vector2i(chunkSize.x(), chunkSize.y()), Vector2i(chunkSize.x() * hChunk, chunkSize.y() * vChunk));
+    }
 
-  glTexImage2D(
-      GL_TEXTURE_2D, 0,                              /* mipmap level */
-      internalFormat,                                /* internal format */
-      image->getSize().x(), image->getSize().y(), 0, /* format (legacy) */
-      inputFormat,                                   /* input format */
-      inputType, image->getData()
-  );
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, texture.ids[i]);
+    // note: on N64, a texture size that's not a power of 2, must be clamped
+    if (!Math::isPowerOfTwo(imageChunk->getSize().x())) {
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    }
+
+    if (!Math::isPowerOfTwo(imageChunk->getSize().y())) {
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    }
+
+    glTexImage2D(
+        GL_TEXTURE_2D, 0,                                        /* mipmap level */
+        internalFormat,                                          /* internal format */
+        imageChunk->getSize().x(), imageChunk->getSize().y(), 0, /* format (legacy) */
+        inputFormat,                                             /* input format */
+        inputType, imageChunk->getData()
+    );
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  }
 }
 
 void N64Renderer::resizeTexture(
@@ -117,37 +149,53 @@ void N64Renderer::resizeTexture(
 void N64Renderer::renderTexture(
     [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info
 ) {
-  GLuint texture = mImpl->mTextureIdMapping.at(info->textureId);
+  auto texture = mImpl->mTextureIdMapping.at(info->textureId);
+
+  if (texture.ids.empty()) {
+    return;
+  }
 
   float displayWidth = static_cast<float>(display_get_width());
   float displayHeight = static_cast<float>(display_get_height());
 
-  float left = (info->position.x() / displayWidth * 2.0f) - 1.0f;
-  float top = -(info->position.y() / displayHeight * 2.0f) + 1.0f;
-  float right = ((info->position.x() + static_cast<float>(info->size.x())) /
-                 displayWidth * 2.0f) -
-                1.0f;
-  float bottom = -((info->position.y() + static_cast<float>(info->size.y())) /
-                   displayHeight * 2.0f) +
-                 1.0f;
+  auto chunkCount = countChunks(texture.size);
 
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, texture);
-  glBegin(GL_TRIANGLE_FAN);
-  glTexCoord2f(0.0f, 1.0f);
-  glVertex3f(left, bottom, 0.0f);
+  for (int vChunk = 0; vChunk < chunkCount.y(); ++vChunk) {
+    for (int hChunk = 0; hChunk < chunkCount.x(); ++hChunk) {
+      auto chunkIndex = hChunk + vChunk * chunkCount.x();
+      auto chunkOffset = Luna::Vector2i(chunkSize.x() * hChunk, chunkSize.y() * vChunk);
+      auto basePos = info->position + chunkOffset;
+      auto baseSize = info->size - chunkOffset;
+      baseSize = Vector2i(std::min(baseSize.x(), chunkSize.x()), std::min(baseSize.y(), chunkSize.y()));
 
-  glTexCoord2f(0.0f, 0.0f);
-  glVertex3f(left, top, 0.0f);
+      float left = (basePos.x() / displayWidth * 2.0f) - 1.0f;
+      float top = -(basePos.y() / displayHeight * 2.0f) + 1.0f;
+      float right = ((basePos.x() + static_cast<float>(baseSize.x())) /
+                    displayWidth * 2.0f) -
+                    1.0f;
+      float bottom = -((basePos.y() + static_cast<float>(baseSize.y())) /
+                      displayHeight * 2.0f) +
+                    1.0f;
 
-  glTexCoord2f(1.0f, 0.0f);
-  glVertex3f(right, top, 0.0f);
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D, texture.ids[chunkIndex]);
+      glBegin(GL_TRIANGLE_FAN);
+      glTexCoord2f(0.0f, 1.0f);
+      glVertex3f(left, bottom, 0.0f);
 
-  glTexCoord2f(1.0f, 1.0f);
-  glVertex3f(right, bottom, 0.0f);
-  glEnd();
+      glTexCoord2f(0.0f, 0.0f);
+      glVertex3f(left, top, 0.0f);
+
+      glTexCoord2f(1.0f, 0.0f);
+      glVertex3f(right, top, 0.0f);
+
+      glTexCoord2f(1.0f, 1.0f);
+      glVertex3f(right, bottom, 0.0f);
+      glEnd();
+    }
+  }
 }
 
 void N64Renderer::createMesh([[maybe_unused]] int id) {
@@ -223,7 +271,7 @@ void N64Renderer::renderMesh(
 
   glEnable(GL_TEXTURE_2D);
   glEnable(GL_DEPTH_TEST);
-  glBindTexture(GL_TEXTURE_2D, texture);
+  glBindTexture(GL_TEXTURE_2D, texture.ids[0]);
 
   auto camera = canvas->getCamera3d();
 
