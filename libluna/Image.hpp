@@ -111,6 +111,18 @@ namespace Luna {
 
     ColorRgb32 &rgb32At(int x, int y) const;
 
+    void setInterpolation(bool enabled);
+
+    inline void enableInterpolation() {
+      setInterpolation(true);
+    }
+
+    inline void disableInterpolation() {
+      setInterpolation(false);
+    }
+
+    bool isInterpolated() const;
+
     private:
     Image();
     Image(int bitsPerPixel, const Vector2i &size);

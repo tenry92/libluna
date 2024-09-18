@@ -15,6 +15,7 @@ class Image::impl {
   Vector2i mSize;
   std::vector<uint8_t> mData;
   PalettePtr mPalette;
+  bool mInterpolate{false};
 };
 
 ImagePtr Image::make() { return ImagePtr(new Image()); }
@@ -132,4 +133,12 @@ ColorRgb24 &Image::rgb24At(int x, int y) const {
 
 ColorRgb32 &Image::rgb32At(int x, int y) const {
   return getRgb32()[x + y * getSize().x()];
+}
+
+void Image::setInterpolation(bool enabled) {
+  mImpl->mInterpolate = enabled;
+}
+
+bool Image::isInterpolated() const {
+  return mImpl->mInterpolate;
 }

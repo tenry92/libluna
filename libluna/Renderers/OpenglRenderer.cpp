@@ -265,8 +265,8 @@ void OpenglRenderer::loadTexture(int id, ImagePtr image) {
       inputFormat,                                   /* input format */
       inputType, image->getData()
   ));
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, image->isInterpolated() ? GL_LINEAR : GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, image->isInterpolated() ? GL_LINEAR : GL_NEAREST);
 }
 
 void OpenglRenderer::resizeTexture(int id, Vector2i size) {
