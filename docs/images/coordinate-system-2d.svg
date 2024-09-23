@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="242.65225mm"
+   height="109.48267mm"
+   viewBox="0 0 242.65225 109.48267"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25)"
+   sodipodi:docname="coordinate-system-2d.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="true"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.68862935"
+     inkscape:cx="421.1264"
+     inkscape:cy="310.03616"
+     inkscape:window-width="1920"
+     inkscape:window-height="1052"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient3">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop5" />
+      <stop
+         style="stop-color:#ff0000;stop-opacity:1;"
+         offset="1"
+         id="stop6" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3-1">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3" />
+      <stop
+         style="stop-color:#00ff00;stop-opacity:1;"
+         offset="1"
+         id="stop4" />
+    </linearGradient>
+    <marker
+       style="overflow:visible"
+       id="marker2"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Dart arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         transform="scale(-0.5)"
+         id="path2" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(41.717605,-29.154543)">
+    <path
+       style="display:inline;fill:none;fill-rule:evenodd;stroke:#f60000;stroke-width:2.11667;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker2)"
+       d="M 180.73382,34.446218 H 32.883038"
+       id="path1"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="display:inline;fill:none;fill-rule:evenodd;stroke:#007f00;stroke-width:2.11667;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker2)"
+       d="M 32.883038,34.446218 V 118.4643"
+       id="path24"
+       sodipodi:nodetypes="cc" />
+    <path
+       d="m 198.5255,33.972956 2.40915,3.54397 h -1.865 l -1.62316,-2.371948 -1.6092,2.371948 h -1.8743 l 2.40915,-3.54397 -2.31614,-3.399792 h 1.86966 l 1.52083,2.237073 1.51619,-2.237073 h 1.87895 z"
+       id="text2"
+       style="font-weight:bold;font-size:9.525px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Bold';letter-spacing:0px;word-spacing:0px;fill:#ff0000;stroke-width:0.264583px"
+       aria-label="X" />
+    <path
+       d="m 29.460037,131.69346 h 1.95802 l 1.581299,2.47427 1.581299,-2.47427 h 1.962671 l -2.64635,4.01836 v 2.9254 h -1.790589 v -2.9254 z"
+       id="text3"
+       style="font-weight:bold;font-size:9.525px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Bold';letter-spacing:0px;word-spacing:0px;fill:#007f00;stroke-width:0.264583px"
+       aria-label="Y" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#0000ff;stroke-width:2.117;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker2)"
+       d="M 32.883038,34.446218 -32.363172,99.69243"
+       id="path25" />
+    <path
+       d="m -41.610634,109.68169 h 5.836853 v 1.08365 l -3.725354,4.5067 h 3.832324 v 1.35341 h -6.050793 v -1.08365 l 3.725354,-4.50671 h -3.618384 z"
+       id="text25"
+       style="font-weight:bold;font-size:9.525px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Bold';letter-spacing:0px;word-spacing:0px;fill:#0000ff;stroke-width:0.264583px"
+       aria-label="Z" />
+  </g>
+</svg>

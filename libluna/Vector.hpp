@@ -8,6 +8,9 @@
  *
  * In 2D, the X-axis goes right, the Y-axis goes down.
  * The origin is in the top-left corner of the screen.
+ * The unit is pixels.
+ *
+ * @image html coordinate-system-2d.svg "2D Coordinate System in libluna"
  *
  * In OpenGL, the Y-axis is inverted, i.e. it goes up.
  * The center of the screen is defined as (0, 0) and the screen spans from
@@ -23,6 +26,10 @@
  * - X: right
  * - Y: up
  * - Z: backward (out of the screen)
+ * 
+ * The unit usually is meters.
+ *
+ * @image html coordinate-system-3d.svg "3D Coordinate System in libluna"
  *
  * In comparison with other 3D engines, there are:
  *
