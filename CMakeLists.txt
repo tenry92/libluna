@@ -90,6 +90,7 @@ set(PUBLIC_MODULES
   String
   System
   Text
+  TextureCache
   Util/Zlib
   Vector
 )

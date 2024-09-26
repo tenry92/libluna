@@ -27,13 +27,9 @@
 #include <libluna/CanvasImpl.hpp>
 #include <libluna/Logger.hpp>
 #include <libluna/Renderers/CommonRenderer.hpp>
+#include <libluna/overloaded.hpp>
 
 using namespace Luna;
-
-// helper type for the visitor #4
-template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-// explicit deduction guide (not needed as of C++20)
-template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 CommonRenderer::CommonRenderer() : mRenderTargetId{0} {}
 
@@ -199,11 +195,11 @@ Vector2i CommonRenderer::getCurrentRenderSize() const {
 void CommonRenderer::updateTextureCache(
     [[maybe_unused]] std::shared_ptr<Stage> stage
 ) {
-  auto images = listImagesInUse(stage);
+  auto images = stage->getTextureCache()->getCache();
 
   std::unordered_set<ImageResPtr> visitedImages;
 
-  for (auto &&imageResPtr : images) {
+  for (auto &&[imageResPtr, priority] : images) {
     visitedImages.emplace(imageResPtr);
     if (mKnownImages.count(imageResPtr) == 0) {
       auto future = imageResPtr->get();
@@ -260,41 +256,6 @@ void CommonRenderer::updateTextureCache(
       loadMesh(meshId, model->getMesh());
     }
   }
-}
-
-std::forward_list<ImageResPtr>
-CommonRenderer::listImagesInUse(std::shared_ptr<Stage> stage) {
-  std::forward_list<ImageResPtr> images;
-
-  for (auto &&drawable : stage->getDrawables2d()) {
-    std::visit(
-        overloaded{
-            [](auto) {},
-            [&](SpritePtr sprite) {
-              if (sprite->getImage()) {
-                images.emplace_front(sprite->getImage());
-              }
-            }},
-        drawable
-    );
-  }
-
-  // todo: font characters
-
-  for (auto &&model : stage->getDrawables3d()) {
-    auto diffuse = model->getMaterial().getDiffuse();
-    auto normal = model->getMaterial().getNormal();
-
-    if (diffuse) {
-      images.emplace_front(diffuse);
-    }
-
-    if (normal) {
-      images.emplace_front(normal);
-    }
-  }
-
-  return images;
 }
 
 void CommonRenderer::renderWorld(Canvas *canvas) {

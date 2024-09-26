@@ -1,5 +1,9 @@
 #include <libluna/Stage.hpp>
 
+#include <forward_list>
+
+#include <libluna/overloaded.hpp>
+
 using namespace Luna;
 
 class Stage::impl {
@@ -8,7 +12,44 @@ class Stage::impl {
   std::list<Drawable3d> mDrawables3d;
   AmbientLight mAmbientLight;
   std::list<std::shared_ptr<PointLight>> mPointLights;
+  TextureCache mTextureCache;
 };
+
+namespace {
+  std::forward_list<ImageResPtr> listImagesInUse(Stage *stage) {
+    std::forward_list<ImageResPtr> images;
+
+    for (auto &&drawable : stage->getDrawables2d()) {
+      std::visit(
+          overloaded{
+              [](auto) {},
+              [&](SpritePtr sprite) {
+                if (sprite->getImage()) {
+                  images.emplace_front(sprite->getImage());
+                }
+              }},
+          drawable
+      );
+    }
+
+    // todo: font characters
+
+    for (auto &&model : stage->getDrawables3d()) {
+      auto diffuse = model->getMaterial().getDiffuse();
+      auto normal = model->getMaterial().getNormal();
+
+      if (diffuse) {
+        images.emplace_front(diffuse);
+      }
+
+      if (normal) {
+        images.emplace_front(normal);
+      }
+    }
+
+    return images;
+  }
+}
 
 Stage::Stage() : mImpl{std::make_unique<impl>()} {}
 
@@ -59,4 +100,18 @@ std::shared_ptr<PointLight> Stage::makePointLight() {
 
 const std::list<std::shared_ptr<PointLight>> &Stage::getPointLights() const {
   return mImpl->mPointLights;
+}
+
+TextureCache *Stage::getTextureCache() const {
+  return &mImpl->mTextureCache;
+}
+
+void Stage::updateTextureCache() {
+  auto images = listImagesInUse(this);
+
+  mImpl->mTextureCache.resetPriorities();
+
+  for (auto &&imageResPtr : images) {
+    mImpl->mTextureCache.addImage(imageResPtr, TextureCache::kForce);
+  }
 }

@@ -8,6 +8,7 @@
 #include <libluna/Model.hpp>
 #include <libluna/Sprite.hpp>
 #include <libluna/Text.hpp>
+#include <libluna/TextureCache.hpp>
 
 namespace Luna {
   /**
@@ -39,6 +40,9 @@ namespace Luna {
 
     std::shared_ptr<PointLight> makePointLight();
     const std::list<std::shared_ptr<PointLight>> &getPointLights() const;
+
+    TextureCache *getTextureCache() const;
+    void updateTextureCache();
 
     private:
     class impl;

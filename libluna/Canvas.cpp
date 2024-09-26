@@ -569,6 +569,10 @@ void Canvas::render() {
     return;
   }
 
+  if (mImpl->mStage) {
+    mImpl->mStage->updateTextureCache();
+  }
+
   auto command = std::make_shared<CanvasCommand>(([this]() {
 #if defined(LUNA_WINDOW_SDL2) && defined(LUNA_RENDERER_OPENGL)
     if (mImpl->sdl.glContext) {

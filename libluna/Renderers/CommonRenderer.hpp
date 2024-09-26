@@ -184,9 +184,6 @@ namespace Luna {
 
     void updateTextureCache(std::shared_ptr<Stage> stage);
 
-    std::forward_list<ImageResPtr> listImagesInUse(std::shared_ptr<Stage> stage
-    );
-
     void start2dFramebuffer(Canvas *canvas);
 
     void end2dFramebuffer(Canvas *canvas);
