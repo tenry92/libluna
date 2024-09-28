@@ -414,6 +414,10 @@ void ApplicationImpl::pushSdlEvent(SDL_Event *event) { SDL_PushEvent(event); }
 
 Application::Application(int argc, char **argv)
     : mImpl{std::make_unique<ApplicationImpl>(this)} {
+#ifdef N64
+  timer_init();
+#endif
+
   mImpl->mArgs.reserve(static_cast<std::size_t>(argc));
 
   for (int i = 0; i < argc; ++i) {

@@ -1,24 +1,23 @@
 #include <libluna/Performance/Timer.hpp>
-
-#include <chrono>
+#include <libluna/Clock.hpp>
 
 using namespace Luna::Performance;
 
 class Timer::impl {
   public:
-  std::chrono::steady_clock::time_point lastUpdate;
+  Clock::TimePoint lastUpdate;
 };
 
 Timer::Timer() : mImpl{std::make_unique<impl>()} {}
 
 Timer::~Timer() = default;
 
-void Timer::start() { mImpl->lastUpdate = std::chrono::steady_clock::now(); }
+void Timer::start() { mImpl->lastUpdate = Clock::now(); }
 
 double Timer::elapse() {
-  auto now = std::chrono::steady_clock::now();
-  auto delta = std::chrono::duration<double>(now - mImpl->lastUpdate).count();
-  mImpl->lastUpdate = std::chrono::steady_clock::now();
+  auto now = Clock::now();
+  auto delta = Clock::timeSpan(mImpl->lastUpdate, now);
+  mImpl->lastUpdate = Clock::now();
 
   return delta;
 }

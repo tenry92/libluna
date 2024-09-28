@@ -1,18 +1,16 @@
-#include <chrono>
 #include <list>
 #include <queue>
 
 #include <libluna/IntervalManager.hpp>
+#include <libluna/Clock.hpp>
 
 using namespace Luna;
-
-using TimePoint = std::chrono::time_point<std::chrono::steady_clock>;
 
 struct Interval {
   int ratePerSecond;
   IntervalManager::Callback callback;
-  TimePoint nextExecution;
-  std::chrono::steady_clock::time_point lastExecution;
+  Clock::TimePoint nextExecution;
+  Clock::TimePoint lastExecution;
 
   /**
    * @brief Check whether a is to be executed before b.
@@ -34,37 +32,33 @@ IntervalManager::~IntervalManager() = default;
 
 void IntervalManager::addInterval(int ratePerSecond, Callback callback) {
   mImpl->mIntervalQueue.emplace(Interval{
-      ratePerSecond, callback, std::chrono::steady_clock::now(),
-      std::chrono::steady_clock::now()});
+      ratePerSecond, callback, Clock::now(),
+      Clock::now()});
 }
 
 void IntervalManager::addAlways(Callback callback) {
   mImpl->mExecuteAlways.push_back(Interval{
-      0, callback, std::chrono::steady_clock::now(),
-      std::chrono::steady_clock::now()});
+      0, callback, Clock::now(),
+      Clock::now()});
 }
 
 void IntervalManager::executePendingIntervals() {
-  auto now = std::chrono::steady_clock::now();
+  auto now = Clock::now();
 
   for (auto &&currentInterval : mImpl->mExecuteAlways) {
-    auto delta = now - currentInterval.lastExecution;
-    currentInterval.lastExecution = now;
 #ifdef N64
-    float deltaSeconds = 1.0f / 60.0f;
+    float deltaSeconds = static_cast<float>(Clock::timeSpan(currentInterval.lastExecution, now));
 #else
+    auto delta = now - currentInterval.lastExecution;
     auto nanoSeconds = std::chrono::nanoseconds(delta).count();
     float deltaSeconds = static_cast<float>(nanoSeconds) / std::nano::den;
 #endif
 
+    currentInterval.lastExecution = now;
+
     currentInterval.callback(deltaSeconds);
   }
 
-#ifdef N64
-  if (!mImpl->mIntervalQueue.empty()) {
-    mImpl->mIntervalQueue.top().callback(1.0f / 60.0f);
-  }
-#else
   while (!mImpl->mIntervalQueue.empty()) {
     auto currentInterval = mImpl->mIntervalQueue.top();
 
@@ -73,21 +67,29 @@ void IntervalManager::executePendingIntervals() {
       return;
     }
 
+#ifdef N64
+    float deltaSeconds = static_cast<float>(Clock::timeSpan(currentInterval.lastExecution, now));
+#else
     auto delta = now - currentInterval.lastExecution;
-    currentInterval.lastExecution = now;
     auto nanoSeconds = std::chrono::nanoseconds(delta).count();
     float deltaSeconds = static_cast<float>(nanoSeconds) / std::nano::den;
+#endif
+
+    currentInterval.lastExecution = now;
 
     // increase nextExecution until it's in the past
     while (currentInterval.nextExecution <= now) {
+#ifdef N64
+      currentInterval.nextExecution += TICKS_PER_SECOND / currentInterval.ratePerSecond;
+#else
       currentInterval.nextExecution += std::chrono::nanoseconds(
           std::nano::den / currentInterval.ratePerSecond
       );
+#endif
     }
 
     mImpl->mIntervalQueue.pop();
     mImpl->mIntervalQueue.emplace(currentInterval);
     currentInterval.callback(deltaSeconds);
   }
-#endif
 }
