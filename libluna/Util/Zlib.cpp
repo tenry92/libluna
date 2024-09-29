@@ -1,4 +1,4 @@
-#ifndef N64
+#if !N64 && !NDS
 
 #include <cstring>
 #include <stdexcept>

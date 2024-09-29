@@ -20,6 +20,10 @@
 #include <switch.h>
 #endif
 
+#ifdef NDS
+#include <nds.h>
+#endif
+
 #ifdef N64
 #include <libdragon.h>
 #endif
@@ -38,6 +42,7 @@
 #endif
 
 #include <libluna/Audio/AudioManager.hpp>
+#include <libluna/Clock.hpp>
 #include <libluna/Console.hpp>
 #include <libluna/ImmediateGui.hpp>
 #include <libluna/InputManager.hpp>
@@ -151,6 +156,9 @@ void ApplicationImpl::mainLoop() {
       break;
     }
 #endif
+#ifdef NDS
+    swiWaitForVBlank();
+#endif
 
     mDebugMetrics->frameTicker.tick();
     processEvents();
@@ -206,6 +214,14 @@ void ApplicationImpl::mainLoop() {
       Console::update();
     }
 #endif
+#ifdef NDS
+    Console::init();
+    logError("{}", mRaisedErrorMessage);
+    while (true) {
+      Console::update();
+      swiWaitForVBlank();
+    }
+#endif
 #ifdef N64
     Console::init();
     logError("{}", mRaisedErrorMessage);
@@ -215,7 +231,7 @@ void ApplicationImpl::mainLoop() {
 #endif
   }
 
-  logInfo("existing main loop");
+  logInfo("exiting main loop");
 }
 
 void ApplicationImpl::processEvents() {
@@ -414,9 +430,7 @@ void ApplicationImpl::pushSdlEvent(SDL_Event *event) { SDL_PushEvent(event); }
 
 Application::Application(int argc, char **argv)
     : mImpl{std::make_unique<ApplicationImpl>(this)} {
-#ifdef N64
-  timer_init();
-#endif
+  Clock::init();
 
   mImpl->mArgs.reserve(static_cast<std::size_t>(argc));
 

@@ -20,6 +20,12 @@ namespace Luna::Clock {
 #endif
   }
 
+  inline void init() {
+#ifdef N64
+    timer_init();
+#endif
+  }
+
   inline double timeSpan(TimePoint start, TimePoint end) {
 #ifdef N64
     return static_cast<double>(end - start) / TICKS_PER_SECOND;

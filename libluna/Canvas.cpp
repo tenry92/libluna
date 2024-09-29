@@ -32,6 +32,10 @@
 #include <libluna/Renderers/OpenglRenderer.hpp>
 #endif
 
+#ifdef NDS
+#include <libluna/Renderers/NdsRenderer.hpp>
+#endif
+
 #ifdef N64
 #include <libdragon.h>
 #include <libluna/Renderers/N64Renderer.hpp>
@@ -87,6 +91,9 @@ class CanvasCommand : public Command {
 
 void CanvasImpl::setVideoDriver(const String &name) {
   logInfo("setting canvas video driver to {}", name);
+#ifdef NDS
+  mRenderer = std::make_unique<NdsRenderer>();
+#endif
 #ifdef N64
   resolution_t res = RESOLUTION_320x240;
 

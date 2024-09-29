@@ -5,7 +5,7 @@ if(LUNA_USE_STD_THREAD)
   target_link_libraries(luna PUBLIC Threads::Threads)
 endif()
 
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
+if(NOT (CMAKE_SYSTEM_NAME STREQUAL "Nintendo64" OR CMAKE_SYSTEM_NAME STREQUAL "NintendoDS"))
   find_package(ZLIB REQUIRED)
   target_link_libraries(luna PUBLIC ZLIB::ZLIB)
 
@@ -80,7 +80,7 @@ target_include_directories(luna PUBLIC
   /usr/include/opus
 )
 
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
+if(NOT (CMAKE_SYSTEM_NAME STREQUAL "Nintendo64" OR CMAKE_SYSTEM_NAME STREQUAL "NintendoDS"))
   target_link_libraries(luna PRIVATE glad)
 endif()
 
@@ -89,7 +89,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
-  target_include_directories(luna PRIVATE ${LIBDRAGON_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/libs/utf8)
+  target_include_directories(luna PRIVATE ${LIBDRAGON_INCLUDE_DIR})
+  # target_link_libraries(luna PRIVATE ${LIBDRAGON_LIB})
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64" OR CMAKE_SYSTEM_NAME STREQUAL "NintendoDS")
+  target_include_directories(luna PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/utf8)
   # target_link_libraries(luna PRIVATE ${LIBDRAGON_LIB})
 endif()
 

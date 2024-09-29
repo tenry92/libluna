@@ -20,7 +20,7 @@
 #define MAYBE_UNUSED
 #endif
 
-#ifdef _NDS
+#ifdef NDS
 #include <nds.h>
 #endif
 
@@ -44,7 +44,7 @@ static bool hasOriginalConsoleAttributes{false};
 using namespace Luna;
 
 void Console::init() {
-#ifdef _NDS
+#ifdef NDS
   consoleDemoInit();
 #endif
 #ifdef __3DS__

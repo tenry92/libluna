@@ -12,6 +12,10 @@
 #include <switch.h>
 #endif
 
+#ifdef NDS
+#include <nds.h>
+#endif
+
 struct Test {
   std::string description;
   std::function<void()> callback;
@@ -96,6 +100,12 @@ static int runTests() {
 
 #ifdef __SWITCH__
   while (appletMainLoop()) {
+    Luna::Console::update();
+  }
+#endif
+#ifdef NDS
+  while (true) {
+    swiWaitForVBlank();
     Luna::Console::update();
   }
 #endif

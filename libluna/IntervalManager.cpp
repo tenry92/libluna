@@ -46,7 +46,9 @@ void IntervalManager::executePendingIntervals() {
   auto now = Clock::now();
 
   for (auto &&currentInterval : mImpl->mExecuteAlways) {
-#ifdef N64
+#ifdef NDS
+    float deltaSeconds = 1.0f / 60.0f;
+#elif defined N64
     float deltaSeconds = static_cast<float>(Clock::timeSpan(currentInterval.lastExecution, now));
 #else
     auto delta = now - currentInterval.lastExecution;
@@ -62,12 +64,16 @@ void IntervalManager::executePendingIntervals() {
   while (!mImpl->mIntervalQueue.empty()) {
     auto currentInterval = mImpl->mIntervalQueue.top();
 
+#ifndef NDS
     if (currentInterval.nextExecution > now) {
       // no more intervals to be executed for now
       return;
     }
+#endif
 
-#ifdef N64
+#ifdef NDS
+    float deltaSeconds = 1.0f / 60.0f;
+#elif defined N64
     float deltaSeconds = static_cast<float>(Clock::timeSpan(currentInterval.lastExecution, now));
 #else
     auto delta = now - currentInterval.lastExecution;
@@ -77,6 +83,7 @@ void IntervalManager::executePendingIntervals() {
 
     currentInterval.lastExecution = now;
 
+#ifndef NDS
     // increase nextExecution until it's in the past
     while (currentInterval.nextExecution <= now) {
 #ifdef N64
@@ -87,9 +94,14 @@ void IntervalManager::executePendingIntervals() {
       );
 #endif
     }
+#endif
 
     mImpl->mIntervalQueue.pop();
     mImpl->mIntervalQueue.emplace(currentInterval);
     currentInterval.callback(deltaSeconds);
+
+#ifdef NDS
+    break;
+#endif
   }
 }

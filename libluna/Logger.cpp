@@ -9,13 +9,13 @@ using namespace Luna;
 using namespace Luna::Console;
 using Luna::Logger;
 
-#ifndef N64
+#if !N64 && !NDS
 static std::mutex gLogMutex;
 thread_local String gThreadIdentifier;
 #endif
 
 void Logger::log(LogLevel pLevel, const String &pMessage) {
-#ifndef N64
+#if !N64 && !NDS
   std::lock_guard<std::mutex> lock(gLogMutex);
 
   if (!gThreadIdentifier.isEmpty()) {
@@ -52,7 +52,7 @@ void Logger::log(LogLevel pLevel, const String &pMessage) {
 }
 
 void Logger::setThreadIdentifier([[maybe_unused]] const String &pThreadId) {
-#ifndef N64
+#if !N64 && !NDS
   gThreadIdentifier = pThreadId;
 #endif
 }

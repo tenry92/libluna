@@ -49,6 +49,10 @@ target_include_directories(luna PUBLIC
   ${CMAKE_CURRENT_BINARY_DIR} # for generated files like config.h
 )
 
+if(CMAKE_SYSTEM_NAME STREQUAL "NintendoDS")
+  add_compile_definitions(NDS)
+endif()
+
 ################################################################################
 # SOURCES
 
@@ -112,6 +116,10 @@ endif()
 
 if(LUNA_RENDERER_OPENGL)
   list(APPEND PRIVATE_MODULES Renderers/OpenglRenderer)
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "NintendoDS")
+  list(APPEND PRIVATE_MODULES Renderers/NdsRenderer)
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")

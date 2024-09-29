@@ -1,3 +1,5 @@
+include(cmake/utils.cmake)
+
 enable_testing()
 
 set(UNIT_TESTS
@@ -13,7 +15,7 @@ set(UNIT_TESTS
   Vector
 )
 
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
+if(NOT (CMAKE_SYSTEM_NAME STREQUAL "Nintendo64" OR CMAKE_SYSTEM_NAME STREQUAL "NintendoDS"))
   list(APPEND UNIT_TESTS
     Util/Zlib
   )
@@ -30,11 +32,5 @@ foreach(test_name ${UNIT_TESTS})
     add_test(NAME ${TEST_TARGET_NAME} COMMAND ${TEST_TARGET_NAME})
   endif()
 
-  if(CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
-    nx_create_nro(${TEST_TARGET_NAME})
-  endif()
-
-  if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
-    n64_create_rom(${TEST_TARGET_NAME})
-  endif()
+  luna_make_rom(${TEST_TARGET_NAME})
 endforeach()
