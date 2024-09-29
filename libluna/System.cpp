@@ -118,7 +118,7 @@ std::list<String> System::getAssetFiles() {
 #else
   if (fs::exists(assetsPath) && fs::is_directory(assetsPath)) {
     for (const auto &entry : fs::recursive_directory_iterator(assetsPath)) {
-      list.emplace_back(entry.path());
+      list.emplace_back(entry.path().c_str());
     }
   }
 #endif
