@@ -55,11 +55,13 @@ void setColor8Bit(void *buffer, int offset, int value) {
 }
 
 void setColor16BitRgba(void *buffer, int offset, int red, int green, int blue, int alpha) {
-  libgfx_16BitPixel *ptr = (libgfx_16BitPixel *) buffer;
-  ptr[offset].red = red;
-  ptr[offset].green = green;
-  ptr[offset].blue = blue;
-  ptr[offset].alpha = alpha;
+  // note: using Visual Studio, sizeof(libgfx_16BitPixel) may not equal 2 bytes
+  libgfx_16BitPixel *pixel = (libgfx_16BitPixel *) (&((uint16_t *) buffer)[offset]);
+
+  pixel->red = red;
+  pixel->green = green;
+  pixel->blue = blue;
+  pixel->alpha = alpha;
 }
 
 void setColor24BitRgb(void *buffer, int offset, int red, int green, int blue) {

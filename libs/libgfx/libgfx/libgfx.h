@@ -8,6 +8,7 @@ extern "C" {
 #define LIBGFX_BIG_ENDIAN
 #endif
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -21,6 +22,8 @@ typedef struct {
   uint8_t second : 4;
 #endif
 } libgfx_4BitPixel;
+
+static_assert(sizeof(libgfx_4BitPixel) == 1, "libgfx_4BitPixel must be 1 byte");
 
 typedef struct {
 #ifdef LIBGFX_BIG_ENDIAN
@@ -36,6 +39,9 @@ typedef struct {
 #endif
 } libgfx_16BitPixel;
 
+// note: using Visual Studio, sizeof(libgfx_16BitPixel) may not equal 2 bytes
+// static_assert(sizeof(libgfx_16BitPixel) == 2, "libgfx_16BitPixel must be 2 bytes");
+
 typedef struct {
 #ifdef LIBGFX_BIG_ENDIAN
   uint8_t blue;
@@ -47,6 +53,8 @@ typedef struct {
   uint8_t blue;
 #endif
 } libgfx_24BitPixel;
+
+static_assert(sizeof(libgfx_24BitPixel) == 3, "libgfx_24BitPixel must be 3 bytes");
 
 typedef struct {
 #ifdef LIBGFX_BIG_ENDIAN
@@ -62,6 +70,8 @@ typedef struct {
 #endif
 } libgfx_32BitPixel;
 #pragma pack(pop)
+
+static_assert(sizeof(libgfx_32BitPixel) == 4, "libgfx_32BitPixel must be 4 bytes");
 
 typedef enum {
   LIBGFX_COLOR_4BIT_INDEXED = 0,
