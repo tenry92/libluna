@@ -12,6 +12,22 @@ namespace Luna {
   using ImagePtr = std::shared_ptr<Image>;
   using ImageResPtr = ResourcePtr<Image>;
 
+  /**
+   * @brief Store a 2D pixel bitmap on the memory.
+   *
+   * An image is defined by its two dimensional size in pixels and number of
+   * bits per pixel (bpp).
+   *
+   * The number of bits per pixel does not imply a specific color format.
+   * In general, these bit values are associated with these possible color
+   * formats:
+   *
+   * - 4 bpp: 16 colors using palette or grayscale
+   * - 8 bpp: 256 colors using palette or grayscale
+   * - 16 bpp: RGBA16, using 5 bits for red/green/blue and 1 bit for alpha
+   * - 24 bpp: RGB24, using 8 bits for red/green/blue
+   * - 32 bpp: RGBA32, using 8 bits for red/green/blue/alpha
+   */
   class Image : public std::enable_shared_from_this<Image> {
     public:
     static ImagePtr make();
