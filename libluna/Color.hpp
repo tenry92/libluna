@@ -1,9 +1,6 @@
 #pragma once
 
-#include <array>
-#include <cstddef>
-
-#include <math.h>
+#include <cstdint>
 
 namespace Luna {
 #pragma pack(push, 1)

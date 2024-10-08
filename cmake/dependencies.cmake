@@ -18,7 +18,7 @@ if(NOT (CMAKE_SYSTEM_NAME STREQUAL "Nintendo64" OR CMAKE_SYSTEM_NAME STREQUAL "N
 
   find_path(UTF8_INCLUDE_DIR NAMES utf8.h REQUIRED HINTS ${PROJECT_SOURCE_DIR}/libs PATH_SUFFIXES utf8)
   find_path(GLM_INCLUDE_DIR NAMES glm/glm.hpp REQUIRED PATH_SUFFIXES utf8)
-  target_include_directories(luna PRIVATE ${UTF8_INCLUDE_DIR} ${GLM_INCLUDE_DIR})
+  target_include_directories(luna PUBLIC ${UTF8_INCLUDE_DIR} ${GLM_INCLUDE_DIR})
 endif()
 
 if(LUNA_WINDOW_SDL2)
@@ -94,7 +94,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64" OR CMAKE_SYSTEM_NAME STREQUAL "NintendoDS")
-  target_include_directories(luna PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/utf8)
+  target_include_directories(luna PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/utf8)
   # target_link_libraries(luna PRIVATE ${LIBDRAGON_LIB})
 endif()
 

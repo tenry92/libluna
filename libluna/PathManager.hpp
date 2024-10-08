@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include <libluna/Filesystem/Path.hpp>
 
 namespace Luna {
@@ -36,7 +34,9 @@ namespace Luna {
     void setAssetsPath(Filesystem::Path assetsPath);
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    void detectProgramPath();
+    void detectAssetsPath();
+    Filesystem::Path mProgramPath;
+    Filesystem::Path mAssetsPath;
   };
 } // namespace Luna

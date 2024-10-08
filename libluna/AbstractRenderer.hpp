@@ -1,11 +1,10 @@
 #pragma once
 
-#include <memory>
-
-#include <libluna/Canvas.hpp>
 #include <libluna/Internal/GraphicsMetrics.hpp>
 
 namespace Luna {
+  class Canvas;
+
   /**
    * @brief Base class for rendering onto a canvas.
    */
@@ -56,7 +55,6 @@ namespace Luna {
     virtual Internal::GraphicsMetrics getMetrics() = 0;
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    Canvas *mCanvas;
   };
 } // namespace Luna

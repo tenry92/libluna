@@ -1,6 +1,6 @@
 #pragma once
 
-#include <memory>
+#include <map>
 #include <queue>
 
 #include <libluna/ButtonEvent.hpp>
@@ -90,7 +90,8 @@ namespace Luna {
     void setReturnUnused(bool returnUnused = true);
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    std::map<std::string, float> mPressedActions;
+    std::map<std::string, std::string> mButtonBindings;
+    bool mReturnUnusedEvents{false};
   };
 } // namespace Luna

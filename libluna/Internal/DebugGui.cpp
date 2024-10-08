@@ -7,8 +7,6 @@
 #include <chrono>
 
 #include <libluna/Application.hpp>
-#include <libluna/Audio/AudioManagerImpl.hpp>
-#include <libluna/CanvasImpl.hpp>
 #include <libluna/Internal/DebugGui.hpp>
 #include <libluna/Platform.hpp>
 #include <libluna/System.hpp>
@@ -24,7 +22,7 @@ void DebugGui::render() {
 
   if (ImGui::Begin("Debugger", nullptr, 0)) {
     // todo: lock audio device before reading metrics
-    auto audioMetrics = &AudioManager::getInstance()->getImpl()->mMetrics;
+    auto audioMetrics = &AudioManager::getInstance()->getMetrics();
 
     if (Platform::isDebug()) {
       ImGui::Text("DEBUG BUILD");
@@ -85,7 +83,7 @@ void DebugGui::render() {
 
     for (auto &&canvas : canvases) {
       if (ImGui::BeginTabBar("CanvasTabBar")) {
-        auto metrics = canvas->getImpl()->getMetrics();
+        auto metrics = canvas->getMetrics();
 
         if (ImGui::BeginTabItem("Graphics")) {
           ImGui::Text(

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include <libluna/InputStream.hpp>
 
 namespace Luna {
@@ -21,7 +19,8 @@ namespace Luna {
     ) override;
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    void *mAddress;
+    std::size_t mSize;
+    std::size_t mPos{0};
   };
 } // namespace Luna

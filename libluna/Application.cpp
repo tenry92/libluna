@@ -1,20 +1,6 @@
 #include <libluna/config.h>
 
 #include <libluna/Application.hpp>
-#include <libluna/ApplicationImpl.hpp>
-
-#include <string.h>
-
-#include <iostream>
-#include <list>
-#include <string>
-#include <thread>
-#include <vector>
-
-#ifdef _WIN32
-#include <windows.h>
-#include <psapi.h>
-#endif
 
 #ifdef __SWITCH__
 #include <switch.h>
@@ -52,8 +38,6 @@
 #include <libluna/PathManager.hpp>
 #include <libluna/Performance/Ticker.hpp>
 #include <libluna/Platform.hpp>
-
-#include <libluna/CanvasImpl.hpp>
 
 using namespace Luna;
 using namespace Luna::Audio;
@@ -117,15 +101,8 @@ static void printArguments(const std::vector<String> &args) {
   }
 }
 
-ApplicationImpl::ApplicationImpl(Application *app) {
-  gSingletonApp = app;
-
-  mHotkeysManager.setReturnUnused(true);
-  mHotkeysManager.addButtonBinding("Toggle Debugger", "Keyboard/Scancode/F1");
-}
-
-void ApplicationImpl::executeKeyboardShortcuts() {
-  for (auto &&canvasPtr : canvases) {
+void Application::executeKeyboardShortcuts() {
+  for (auto &&canvasPtr : mCanvases) {
     if (canvasPtr.expired()) {
       continue;
     }
@@ -147,7 +124,7 @@ void ApplicationImpl::executeKeyboardShortcuts() {
   }
 }
 
-void ApplicationImpl::mainLoop() {
+void Application::mainLoop() {
   logInfo("entering main loop");
 
   while (hasCanvas() && mRaisedErrorMessage.isEmpty()) {
@@ -177,7 +154,7 @@ void ApplicationImpl::mainLoop() {
 
     mDebugMetrics->renderTicker.tick();
     // logDebug("rendering canvases");
-    for (auto &&canvas : canvases) {
+    for (auto &&canvas : mCanvases) {
       if (canvas.expired()) {
         continue;
       }
@@ -187,7 +164,7 @@ void ApplicationImpl::mainLoop() {
     mDebugMetrics->renderTicker.measure();
 
     // logDebug("syncing canvases");
-    for (auto &&canvas : canvases) {
+    for (auto &&canvas : mCanvases) {
       if (canvas.expired()) {
         continue;
       }
@@ -198,7 +175,7 @@ void ApplicationImpl::mainLoop() {
     ++mDebugMetrics->framesElapsed;
   }
 
-  for (auto &&canvas : canvases) {
+  for (auto &&canvas : mCanvases) {
     if (canvas.expired()) {
       continue;
     }
@@ -234,7 +211,7 @@ void ApplicationImpl::mainLoop() {
   logInfo("exiting main loop");
 }
 
-void ApplicationImpl::processEvents() {
+void Application::processEvents() {
 #ifdef LUNA_WINDOW_SDL2
   SDL_Event event;
 
@@ -243,7 +220,7 @@ void ApplicationImpl::processEvents() {
     case SDL_QUIT:
       logInfo("sdl quit event received");
 
-      for (auto &&canvas : canvases) {
+      for (auto &&canvas : mCanvases) {
         if (canvas.expired()) {
           continue;
         }
@@ -254,12 +231,12 @@ void ApplicationImpl::processEvents() {
       return;
     }
 
-    for (auto &&canvas : canvases) {
+    for (auto &&canvas : mCanvases) {
       if (canvas.expired()) {
         continue;
       }
 
-      if (canvas.lock()->getImpl()->processSdlEvent(&event)) {
+      if (canvas.lock()->processSdlEvent(&event)) {
         break;
       }
     }
@@ -268,18 +245,18 @@ void ApplicationImpl::processEvents() {
 #ifdef LUNA_WINDOW_GLFW
   glfwPollEvents();
 
-  for (auto &&canvas : canvases) {
-    if (canvas.expired() || !canvas.lock()->mImpl->glfw.window) {
+  for (auto &&canvas : mCanvases) {
+    if (canvas.expired() || !canvas.lock()->glfw.window) {
       continue;
     }
 
-    if (glfwWindowShouldClose(canvas.lock()->mImpl->glfw.window)) {
+    if (glfwWindowShouldClose(canvas.lock()->glfw.window)) {
       canvas.lock()->close();
     }
   }
 #endif
 #ifdef N64
-  for (auto &&canvas : canvases) {
+  for (auto &&canvas : mCanvases) {
     if (canvas.expired()) {
       continue;
     }
@@ -369,8 +346,8 @@ void ApplicationImpl::processEvents() {
 #endif
 }
 
-void ApplicationImpl::shutDown() {
-  for (auto &&canvas : canvases) {
+void Application::shutDown() {
+  for (auto &&canvas : mCanvases) {
     if (canvas.expired()) {
       continue;
     }
@@ -389,8 +366,8 @@ void ApplicationImpl::shutDown() {
 #endif
 }
 
-bool ApplicationImpl::hasCanvas() {
-  for (auto &&canvas : canvases) {
+bool Application::hasCanvas() {
+  for (auto &&canvas : mCanvases) {
     if (!canvas.expired()) {
       if (!canvas.lock()->isClosed()) {
         return true;
@@ -402,20 +379,20 @@ bool ApplicationImpl::hasCanvas() {
 }
 
 #ifdef LUNA_WINDOW_SDL2
-std::shared_ptr<Canvas> ApplicationImpl::getCanvasBySdlWindowId(Uint32 windowId
+std::shared_ptr<Canvas> Application::getCanvasBySdlWindowId(Uint32 windowId
 ) {
-  for (auto &&canvas : canvases) {
+  for (auto &&canvas : mCanvases) {
     if (canvas.expired()) {
       continue;
     }
 
     auto canvasPtr = canvas.lock();
 
-    if (canvasPtr->getImpl()->sdl.window == nullptr) {
+    if (canvasPtr->sdl.window == nullptr) {
       continue;
     }
 
-    auto canvasWindowId = SDL_GetWindowID(canvasPtr->getImpl()->sdl.window);
+    auto canvasWindowId = SDL_GetWindowID(canvasPtr->sdl.window);
 
     if (canvasWindowId == windowId) {
       return canvasPtr;
@@ -425,20 +402,24 @@ std::shared_ptr<Canvas> ApplicationImpl::getCanvasBySdlWindowId(Uint32 windowId
   return nullptr;
 }
 
-void ApplicationImpl::pushSdlEvent(SDL_Event *event) { SDL_PushEvent(event); }
+void Application::pushSdlEvent(SDL_Event *event) { SDL_PushEvent(event); }
 #endif
 
-Application::Application(int argc, char **argv)
-    : mImpl{std::make_unique<ApplicationImpl>(this)} {
+Application::Application(int argc, char **argv) {
   Clock::init();
 
-  mImpl->mArgs.reserve(static_cast<std::size_t>(argc));
+  gSingletonApp = this;
+
+  mHotkeysManager.setReturnUnused(true);
+  mHotkeysManager.addButtonBinding("Toggle Debugger", "Keyboard/Scancode/F1");
+
+  mArgs.reserve(static_cast<std::size_t>(argc));
 
   for (int i = 0; i < argc; ++i) {
-    mImpl->mArgs.emplace_back(argv[i]);
+    mArgs.emplace_back(argv[i]);
   }
 
-  mImpl->mName = APP_PRODUCT_NAME;
+  mName = APP_PRODUCT_NAME;
 }
 
 Application::~Application() = default;
@@ -456,45 +437,45 @@ int Application::run() {
 
   printCompiler();
   printDefines();
-  printArguments(mImpl->mArgs);
+  printArguments(mArgs);
 
-  mImpl->mDebugMetrics = std::make_shared<Internal::DebugMetrics>();
+  mDebugMetrics = std::make_shared<Internal::DebugMetrics>();
 
-  if (mImpl->mReadyCallback) {
+  if (mReadyCallback) {
     logInfo("calling ready callback");
-    mImpl->mReadyCallback();
+    mReadyCallback();
   }
 
-  if (mImpl->hasCanvas()) {
-    mImpl->mAudioManager.init();
-    mImpl->mainLoop();
-    mImpl->mAudioManager.free();
+  if (hasCanvas()) {
+    mAudioManager.init();
+    mainLoop();
+    mAudioManager.free();
   }
 
-  mImpl->shutDown();
+  shutDown();
 
   return 0;
 }
 
 void Application::whenReady(std::function<void()> callback) {
-  mImpl->mReadyCallback = callback;
+  mReadyCallback = callback;
 }
 
 void Application::addInterval(
     int ratePerSecond, std::function<void(float)> callback
 ) {
-  mImpl->mIntervalManager.addInterval(ratePerSecond, callback);
+  mIntervalManager.addInterval(ratePerSecond, callback);
 }
 
 void Application::addVsync(std::function<void(float)> callback) {
-  mImpl->mIntervalManager.addAlways(callback);
+  mIntervalManager.addAlways(callback);
 }
 
 int Application::getOptionIndex(const String &name) const {
   bool isLong = name.getLength() > 1;
 
-  for (int index = 1; index < static_cast<int>(mImpl->mArgs.size()); ++index) {
-    auto &arg = mImpl->mArgs[index];
+  for (int index = 1; index < static_cast<int>(mArgs.size()); ++index) {
+    auto &arg = mArgs[index];
 
     if (arg[0] != '-') {
       // not an option
@@ -530,27 +511,27 @@ bool Application::hasOption(const String &name) const {
 String Application::getOptionValue(const String &name) const {
   int optIndex = this->getOptionIndex(name);
 
-  if (optIndex == -1 || optIndex + 1 >= static_cast<int>(mImpl->mArgs.size())) {
+  if (optIndex == -1 || optIndex + 1 >= static_cast<int>(mArgs.size())) {
     return String();
   }
 
-  return mImpl->mArgs.at(optIndex + 1);
+  return mArgs.at(optIndex + 1);
 }
 
 Filesystem::Path Application::getAssetsPath() const {
-  return mImpl->mPathManager.getAssetsPath();
+  return mPathManager.getAssetsPath();
 }
 
 void Application::setAssetsPath(Filesystem::Path assetsPath) {
-  mImpl->mPathManager.setAssetsPath(assetsPath);
+  mPathManager.setAssetsPath(assetsPath);
 }
 
 std::shared_ptr<Canvas> Application::makeCanvas(const Vector2i &size) {
-  logInfo("creating canvas {}x{}", size.x(), size.y());
+  logInfo("creating canvas {}x{}", size.width, size.height);
 
   auto canvas = std::make_shared<Canvas>(size);
 
-  mImpl->canvases.emplace_back(canvas);
+  mCanvases.emplace_back(canvas);
 
   return canvas;
 }
@@ -558,7 +539,7 @@ std::shared_ptr<Canvas> Application::makeCanvas(const Vector2i &size) {
 std::list<std::shared_ptr<Canvas>> Application::getOpenCanvases() {
   std::list<std::shared_ptr<Canvas>> canvases;
 
-  for (auto &&canvas : mImpl->canvases) {
+  for (auto &&canvas : canvases) {
     canvases.emplace_back(canvas);
   }
 
@@ -566,8 +547,8 @@ std::list<std::shared_ptr<Canvas>> Application::getOpenCanvases() {
 }
 
 void Application::raiseCriticalError(const String &message) {
-  if (mImpl->mRaisedErrorMessage.isEmpty()) {
-    mImpl->mRaisedErrorMessage = message;
+  if (mRaisedErrorMessage.isEmpty()) {
+    mRaisedErrorMessage = message;
   }
 }
 
@@ -588,16 +569,16 @@ String Application::getDefaultVideoDriver() const {
   return driverName;
 }
 
-void Application::setName(const String &name) { mImpl->mName = name; }
+void Application::setName(const String &name) { mName = name; }
 
-const String &Application::getName() const { return mImpl->mName; }
+const String &Application::getName() const { return mName; }
 
-AudioManager *Application::getAudioManager() const {
-  return &mImpl->mAudioManager;
+AudioManager *Application::getAudioManager() {
+  return &mAudioManager;
 }
 
 AudioNodePtr Application::getAudioDestinationNode() const {
-  return mImpl->mAudioManager.getDestinationNode();
+  return mAudioManager.getDestinationNode();
 }
 
 void Application::openDebugger([[maybe_unused]] std::shared_ptr<Canvas> canvas
@@ -605,10 +586,8 @@ void Application::openDebugger([[maybe_unused]] std::shared_ptr<Canvas> canvas
 #ifdef LUNA_USE_IMGUI
   if (!canvas->getImmediateGui()) {
     canvas->attachImmediateGui(
-        std::make_unique<Internal::DebugGui>(mImpl->mDebugMetrics)
+        std::make_unique<Internal::DebugGui>(mDebugMetrics)
     );
   }
 #endif
 }
-
-ApplicationImpl *Application::getImpl() const { return mImpl.get(); }

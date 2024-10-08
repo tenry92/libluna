@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include <libluna/String.hpp>
 
 namespace Luna {

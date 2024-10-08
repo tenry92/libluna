@@ -1,10 +1,23 @@
 #pragma once
 
+#include <map>
+#include <vector>
+
+#include <GL/gl.h>
+#include <GL/gl_integration.h>
+#include <GL/glu.h>
+
+#include <libluna/Math.hpp>
 #include <libluna/Renderers/CommonRenderer.hpp>
 
 namespace Luna {
   class N64Renderer : public CommonRenderer {
     public:
+    struct ChunkedTexture {
+      std::vector<GLuint> ids;
+      Vector2i size;
+    };
+
     N64Renderer();
     ~N64Renderer() override;
 
@@ -40,7 +53,9 @@ namespace Luna {
     void imguiNewFrame() override;
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
+
+    std::map<int, ChunkedTexture> mTextureIdMapping;
+    std::map<int, GLuint> mMeshIdMapping;
   };
 } // namespace Luna

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include <libluna/Font.hpp>
 #include <libluna/String.hpp>
 
@@ -15,14 +13,14 @@ namespace Luna {
     ~Text();
 
     void setContent(const Luna::String &content);
-    Luna::String &getContent() const;
+    const Luna::String &getContent() const;
 
     void setFont(FontResPtr font);
     FontResPtr getFont() const;
 
     private:
     Text();
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    FontResPtr mFont;
+    String mContent;
   };
 } // namespace Luna

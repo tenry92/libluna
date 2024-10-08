@@ -2,8 +2,6 @@
 
 #include <stdint.h>
 
-#include <memory>
-
 #include <libluna/String.hpp>
 
 namespace Luna::Filesystem {
@@ -113,7 +111,6 @@ namespace Luna::Filesystem {
     Path up(std::size_t levels = 1) const;
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    std::list<String> mParts;
   };
 } // namespace Luna::Filesystem

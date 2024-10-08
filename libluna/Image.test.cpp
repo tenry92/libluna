@@ -1,5 +1,3 @@
-#include <memory>
-
 #include <libluna/Image.hpp>
 #include <libluna/Test.hpp>
 
@@ -9,15 +7,15 @@ using namespace Luna;
 int main(int, char **) {
   TEST("empty image", []() {
     auto image = Image::make();
-    ASSERT(image->getSize().x() == 0, "getWidth() == 0");
-    ASSERT(image->getSize().y() == 0, "getHeight() == 0");
+    ASSERT(image->getSize().width == 0, "getWidth() == 0");
+    ASSERT(image->getSize().height == 0, "getHeight() == 0");
   });
 
   TEST("image size", []() {
     auto image = Image::make(4, {16, 32});
     ASSERT(image->getBitsPerPixel() == 4, "getBitsPerPixel() == 4");
-    ASSERT(image->getSize().x() == 16, "getWidth() == 16");
-    ASSERT(image->getSize().y() == 32, "getHeight() == 32");
+    ASSERT(image->getSize().width == 16, "getWidth() == 16");
+    ASSERT(image->getSize().height == 32, "getHeight() == 32");
   });
 
   TEST("getByteCount()", []() {

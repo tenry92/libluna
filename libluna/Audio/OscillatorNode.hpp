@@ -17,7 +17,9 @@ namespace Luna::Audio {
     void setDuty(float duty);
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    float mFrequency;
+    Type mType;
+    float mPhase;
+    float mDuty;
   };
 } // namespace Luna::Audio

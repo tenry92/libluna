@@ -7,22 +7,22 @@ int main(int, char **) {
   TEST("initial empty Vector2i", []() {
     Vector2i myVector;
 
-    ASSERT_EQL(myVector.x(), 0, "x");
-    ASSERT_EQL(myVector.y(), 0, "y");
+    ASSERT_EQL(myVector.x, 0, "x");
+    ASSERT_EQL(myVector.y, 0, "y");
   });
 
   TEST("initial Vector2i", []() {
     Vector2i myVector(1, 2);
 
-    ASSERT_EQL(myVector.x(), 1, "x");
-    ASSERT_EQL(myVector.y(), 2, "y");
+    ASSERT_EQL(myVector.x, 1, "x");
+    ASSERT_EQL(myVector.y, 2, "y");
   });
 
   TEST("initial Vector2f", []() {
     Vector2f myVector(3.14, 5.23);
 
-    ASSERT_EQL(myVector.x(), 3.14, "x");
-    ASSERT_EQL(myVector.y(), 5.23, "y");
+    ASSERT_EQL(myVector.x, 3.14, "x");
+    ASSERT_EQL(myVector.y, 5.23, "y");
   });
 
   TEST("Vector2i + Vector2i", []() {
@@ -30,8 +30,8 @@ int main(int, char **) {
     Vector2i right(3, 4);
     Vector2i sum = left + right;
 
-    ASSERT_EQL(sum.x(), 4, "x");
-    ASSERT_EQL(sum.y(), 6, "x");
+    ASSERT_EQL(sum.x, 4, "x");
+    ASSERT_EQL(sum.y, 6, "x");
   });
 
   TEST("Vector2i + Vector2i", []() {
@@ -39,8 +39,8 @@ int main(int, char **) {
     Vector2i right(3, 4);
     Vector2i diff = left - right;
 
-    ASSERT_EQL(diff.x(), -2, "x");
-    ASSERT_EQL(diff.y(), -2, "x");
+    ASSERT_EQL(diff.x, -2, "x");
+    ASSERT_EQL(diff.y, -2, "x");
   });
 
   TEST("equals", []() {
@@ -65,12 +65,12 @@ int main(int, char **) {
     Vector2f b(2.0f, 4.0f);
 
     ASSERT_EQL(a.normalized().magnitude(), 1.0f, "");
-    ASSERT_EQL(a.normalized().x(), 1.0f, "");
-    ASSERT_EQL(a.normalized().y(), 1.0f, "");
+    ASSERT_EQL(a.normalized().x, 1.0f, "");
+    ASSERT_EQL(a.normalized().y, 1.0f, "");
 
     ASSERT_EQL(b.normalized().magnitude(), 1.0f, "");
-    ASSERT_EQL(b.normalized().x(), 1.0f, "");
-    ASSERT_EQL(b.normalized().y(), 0.894427f, "");
+    ASSERT_EQL(b.normalized().x, 1.0f, "");
+    ASSERT_EQL(b.normalized().y, 0.894427f, "");
   });
 
   return runTests();

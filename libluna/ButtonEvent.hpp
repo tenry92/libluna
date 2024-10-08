@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include <libluna/String.hpp>
 
 namespace Luna {
@@ -16,7 +14,7 @@ namespace Luna {
     bool isUp() const;
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    String mName;
+    bool mDown{false};
   };
 } // namespace Luna

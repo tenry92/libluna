@@ -1,5 +1,5 @@
 #include <cmath>
-#include <cstring>
+#include <cstring> // memcpy
 
 #include <libluna/MemoryReader.hpp>
 
@@ -7,55 +7,45 @@
 
 using namespace Luna;
 
-class MemoryReader::impl {
-  public:
-  void *mAddress;
-  std::size_t mSize;
-  std::size_t mPos{0};
-};
-
 MemoryReader::MemoryReader(void *address, std::size_t size)
-    : mImpl{std::make_unique<impl>()} {
-  mImpl->mAddress = address;
-  mImpl->mSize = size;
-}
+    : mAddress{address}, mSize{size} {}
 
 MemoryReader::~MemoryReader() = default;
 
 bool MemoryReader::isValid() const { return true; }
 
-std::size_t MemoryReader::getSize() const { return mImpl->mSize; }
+std::size_t MemoryReader::getSize() const { return mSize; }
 
-bool MemoryReader::eof() const { return mImpl->mPos >= mImpl->mSize; }
+bool MemoryReader::eof() const { return mPos >= mSize; }
 
-std::size_t MemoryReader::tell() { return mImpl->mPos; }
+std::size_t MemoryReader::tell() { return mPos; }
 
 std::size_t MemoryReader::seek(std::size_t position) {
-  mImpl->mPos = std::min(mImpl->mSize, position);
+  mPos = std::min(mSize, position);
 
-  return mImpl->mPos;
+  return mPos;
 }
 
 std::size_t MemoryReader::seekRelative(int relativePosition) {
-  return seek(mImpl->mPos + relativePosition);
+  return seek(mPos + relativePosition);
 }
 
 std::size_t MemoryReader::read(
     uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
 ) {
-  auto endPos = mImpl->mPos + objectSize * objectCount;
+  auto endPos = mPos + objectSize * objectCount;
 
-  if (endPos > mImpl->mSize) {
-    auto tooMuch = endPos - mImpl->mSize;
+  if (endPos > mSize) {
+    auto tooMuch = endPos - mSize;
     auto tooMuchObjects = (tooMuch + objectSize - 1) / objectSize;
     objectCount -= tooMuchObjects;
   }
 
-  auto sourceAddress = reinterpret_cast<char *>(mImpl->mAddress) + mImpl->mPos;
+  auto sourceAddress = reinterpret_cast<char *>(mAddress) + mPos;
 
   std::memcpy(buffer, sourceAddress, objectCount * objectSize);
 
-  mImpl->mPos += objectCount * objectSize;
+  mPos += objectCount * objectSize;
 
   return objectCount;
 }

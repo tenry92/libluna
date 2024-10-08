@@ -21,7 +21,7 @@
 #include <libluna/Logger.hpp>
 #include <libluna/MemoryReader.hpp>
 
-#include <libluna/CanvasImpl.hpp>
+#include <libluna/Canvas.hpp>
 
 #define CHECK_SDL(x)                                                           \
   {                                                                            \
@@ -35,32 +35,8 @@ using namespace Luna;
 
 static bool gDidPrintRenderDrivers{false};
 
-struct SdlDeleter {
-  void operator()(SDL_Renderer *renderer) const {
-    logVerbose("destroying SDL renderer");
-    SDL_DestroyRenderer(renderer);
-  }
-
-  void operator()(SDL_Texture *texture) const {
-    logDebug("destroying SDL texture");
-    SDL_DestroyTexture(texture);
-  }
-};
-
-class SdlRenderer::impl {
-  public:
-#ifdef LUNA_IMGUI
-  ImGuiContext *mImGuiContext{nullptr};
-#endif
-
-  std::unique_ptr<SDL_Renderer, SdlDeleter> mRenderer;
-  std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
-
-  std::map<int, SDL_Texture *> mTextureIdMapping;
-};
-
-SdlRenderer::SdlRenderer() : mImpl{std::make_unique<impl>()} {
-  mImpl->mMetrics = std::make_shared<Internal::GraphicsMetrics>();
+SdlRenderer::SdlRenderer() {
+  mMetrics = std::make_shared<Internal::GraphicsMetrics>();
 }
 
 SdlRenderer::~SdlRenderer() = default;
@@ -93,7 +69,7 @@ void SdlRenderer::initialize() {
 
   logInfo("creating SDL renderer");
   std::unique_ptr<SDL_Renderer, SdlDeleter> renderer(SDL_CreateRenderer(
-      getCanvas()->getImpl()->sdl.window,
+      getCanvas()->sdl.window,
       -1, /* -1 = most suitable driver, 0 = first available driver */
       SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
   ));
@@ -104,14 +80,14 @@ void SdlRenderer::initialize() {
   }
 
   logDebug("move renderer");
-  mImpl->mRenderer = std::move(renderer);
+  mRenderer = std::move(renderer);
   logDebug("moved renderer");
 }
 
 void SdlRenderer::initializeImmediateGui() {
 #ifdef LUNA_IMGUI
   IMGUI_CHECKVERSION();
-  mImpl->mImGuiContext = ImGui::CreateContext();
+  mImGuiContext = ImGui::CreateContext();
   ImGuiIO &io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
@@ -119,9 +95,9 @@ void SdlRenderer::initializeImmediateGui() {
   ImGui::StyleColorsDark();
 
   ImGui_ImplSDL2_InitForSDLRenderer(
-      getCanvas()->getImpl()->sdl.window, mImpl->mRenderer.get()
+      getCanvas()->sdl.window, mRenderer.get()
   );
-  ImGui_ImplSDLRenderer2_Init(mImpl->mRenderer.get());
+  ImGui_ImplSDLRenderer2_Init(mRenderer.get());
 
   // todo(?): load fonts
 #endif
@@ -129,49 +105,49 @@ void SdlRenderer::initializeImmediateGui() {
 
 void SdlRenderer::quitImmediateGui() {
 #ifdef LUNA_IMGUI
-  if (mImpl->mImGuiContext) {
+  if (mImGuiContext) {
     ImGui_ImplSDLRenderer2_Shutdown();
     ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext(mImpl->mImGuiContext);
-    mImpl->mImGuiContext = nullptr;
+    ImGui::DestroyContext(mImGuiContext);
+    mImGuiContext = nullptr;
   }
 #endif
 }
 
 void SdlRenderer::close() {
 #ifdef LUNA_IMGUI
-  if (mImpl->mImGuiContext) {
+  if (mImGuiContext) {
     ImGui_ImplSDLRenderer2_Shutdown();
 
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
-    mImpl->mImGuiContext = nullptr;
+    mImGuiContext = nullptr;
   }
 #endif
 
-  mImpl->mRenderer.reset();
+  mRenderer.reset();
 }
 
 void SdlRenderer::present() {
 #ifdef LUNA_IMGUI
-  if (mImpl->mImGuiContext) {
+  if (mImGuiContext) {
     ImGui::Render();
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
   }
 #endif
 
-  SDL_RenderPresent(mImpl->mRenderer.get());
+  SDL_RenderPresent(mRenderer.get());
 }
 
-Internal::GraphicsMetrics SdlRenderer::getMetrics() { return *mImpl->mMetrics; }
+Internal::GraphicsMetrics SdlRenderer::getMetrics() { return *mMetrics; }
 
 void SdlRenderer::clearBackground(ColorRgb color) {
   auto color32 = makeColorRgb32(color);
   CHECK_SDL(SDL_SetRenderDrawColor(
-      mImpl->mRenderer.get(), color32.red, color32.green, color32.blue,
+      mRenderer.get(), color32.red, color32.green, color32.blue,
       color32.alpha
   ));
-  CHECK_SDL(SDL_RenderClear(mImpl->mRenderer.get()));
+  CHECK_SDL(SDL_RenderClear(mRenderer.get()));
 }
 
 void SdlRenderer::createTexture([[maybe_unused]] int id) {
@@ -179,16 +155,16 @@ void SdlRenderer::createTexture([[maybe_unused]] int id) {
 }
 
 void SdlRenderer::destroyTexture(int id) {
-  SDL_Texture *texture = mImpl->mTextureIdMapping.at(id);
-  mImpl->mTextureIdMapping.erase(id);
+  SDL_Texture *texture = mTextureIdMapping.at(id);
+  mTextureIdMapping.erase(id);
   SDL_DestroyTexture(texture);
 }
 
 void SdlRenderer::loadTexture(int id, ImagePtr image) {
-  if (mImpl->mTextureIdMapping.count(id)) {
-    SDL_Texture *oldTexture = mImpl->mTextureIdMapping.at(id);
+  if (mTextureIdMapping.count(id)) {
+    SDL_Texture *oldTexture = mTextureIdMapping.at(id);
     SDL_DestroyTexture(oldTexture);
-    mImpl->mTextureIdMapping.erase(id);
+    mTextureIdMapping.erase(id);
   }
 
   uint32_t surfaceFormat = SDL_PIXELFORMAT_RGBA32;
@@ -206,43 +182,43 @@ void SdlRenderer::loadTexture(int id, ImagePtr image) {
   }
 
   SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(
-      (void *)(image->getData()), image->getSize().x(), image->getSize().y(),
+      (void *)(image->getData()), image->getSize().width, image->getSize().height,
       image->getBitsPerPixel(), image->getBytesPerRow(), surfaceFormat
   );
 
-  auto texture = SDL_CreateTextureFromSurface(mImpl->mRenderer.get(), surface);
+  auto texture = SDL_CreateTextureFromSurface(mRenderer.get(), surface);
 
   SDL_FreeSurface(surface);
 
-  mImpl->mTextureIdMapping.emplace(id, texture);
+  mTextureIdMapping.emplace(id, texture);
 }
 
 void SdlRenderer::resizeTexture(
     [[maybe_unused]] int id, [[maybe_unused]] Vector2i size
 ) {
-  if (mImpl->mTextureIdMapping.count(id)) {
-    SDL_Texture *oldTexture = mImpl->mTextureIdMapping.at(id);
-    mImpl->mTextureIdMapping.erase(id);
+  if (mTextureIdMapping.count(id)) {
+    SDL_Texture *oldTexture = mTextureIdMapping.at(id);
+    mTextureIdMapping.erase(id);
     SDL_DestroyTexture(oldTexture);
   }
 
   SDL_Texture *texture = SDL_CreateTexture(
-      mImpl->mRenderer.get(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET,
-      size.x(), size.y()
+      mRenderer.get(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET,
+      size.width, size.height
   );
   SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-  mImpl->mTextureIdMapping.emplace(id, texture);
+  mTextureIdMapping.emplace(id, texture);
 }
 
 void SdlRenderer::renderTexture(
     [[maybe_unused]] Canvas *canvas, RenderTextureInfo *info
 ) {
-  auto texture = mImpl->mTextureIdMapping.at(info->textureId);
+  auto texture = mTextureIdMapping.at(info->textureId);
 
   SDL_Rect dstrect = {
-      static_cast<int>(info->position.x()),
-      static_cast<int>(info->position.y()), info->size.x(), info->size.y()};
-  CHECK_SDL(SDL_RenderCopy(mImpl->mRenderer.get(), texture, nullptr, &dstrect));
+      static_cast<int>(info->position.x),
+      static_cast<int>(info->position.y), info->size.width, info->size.height};
+  CHECK_SDL(SDL_RenderCopy(mRenderer.get(), texture, nullptr, &dstrect));
 }
 
 void SdlRenderer::setTextureFilterEnabled(
@@ -250,27 +226,27 @@ void SdlRenderer::setTextureFilterEnabled(
 ) {}
 
 void SdlRenderer::setRenderTargetTexture(int id) {
-  auto texture = mImpl->mTextureIdMapping.at(id);
-  SDL_SetRenderTarget(mImpl->mRenderer.get(), texture);
+  auto texture = mTextureIdMapping.at(id);
+  SDL_SetRenderTarget(mRenderer.get(), texture);
 }
 
 void SdlRenderer::unsetRenderTargetTexture() {
-  SDL_SetRenderTarget(mImpl->mRenderer.get(), nullptr);
+  SDL_SetRenderTarget(mRenderer.get(), nullptr);
 }
 
 void SdlRenderer::setViewport(Vector2i offset, Vector2i size) {
   SDL_Rect viewport;
-  viewport.x = offset.x();
-  viewport.y = offset.y();
-  viewport.w = size.x();
-  viewport.h = size.y();
+  viewport.x = offset.x;
+  viewport.y = offset.y;
+  viewport.w = size.width;
+  viewport.h = size.height;
 
-  SDL_RenderSetViewport(mImpl->mRenderer.get(), &viewport);
+  SDL_RenderSetViewport(mRenderer.get(), &viewport);
 }
 
 void SdlRenderer::imguiNewFrame() {
 #ifdef LUNA_IMGUI
-  if (mImpl->mImGuiContext) {
+  if (mImGuiContext) {
     ImGui_ImplSDLRenderer2_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();

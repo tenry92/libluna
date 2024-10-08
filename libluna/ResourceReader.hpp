@@ -1,7 +1,6 @@
 #pragma once
 
-#include <memory>
-
+#include <libluna/Filesystem/FileReader.hpp>
 #include <libluna/InputStream.hpp>
 
 namespace Luna {
@@ -28,7 +27,6 @@ namespace Luna {
 
     private:
     ResourceReader(const char *name);
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    std::unique_ptr<Filesystem::FileReader> fileReader;
   };
 } // namespace Luna

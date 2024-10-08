@@ -229,13 +229,13 @@ static MeshPtr makeMesh() {
   );
 
   for (size_t i = 0; i < 4; ++i) {
-    mesh->getTexCoords()[i].x(mesh->getTexCoords()[i].x() * 4.f);
-    mesh->getTexCoords()[i].y(mesh->getTexCoords()[i].y() * 4.f);
+    mesh->getTexCoords()[i].x *= 4.f;
+    mesh->getTexCoords()[i].y *= 4.f;
   }
 
   for (size_t i = 4; i < mesh->getTexCoords().size(); ++i) {
-    mesh->getTexCoords()[i].x(mesh->getTexCoords()[i].x() * 4.f);
-    mesh->getTexCoords()[i].y(mesh->getTexCoords()[i].y() * 2.f);
+    mesh->getTexCoords()[i].x *= 4.f;
+    mesh->getTexCoords()[i].y *= 2.f;
   }
 
   return mesh;

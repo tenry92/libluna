@@ -1,6 +1,5 @@
 #include <algorithm>
 
-#include <libluna/Audio/AudioNodeImpl.hpp>
 #include <libluna/Audio/GainNode.hpp>
 
 using namespace Luna;
@@ -12,8 +11,8 @@ GainNode::GainNode(AudioManager *manager, float volume)
 GainNode::~GainNode() = default;
 
 void GainNode::render(float *buffer, int frameCount) {
-  if (getImpl()->mInputs.size() > 0) {
-    auto input = getImpl()->mInputs.front();
+  if (mInputs.size() > 0) {
+    auto input = mInputs.front();
     input->render(buffer, frameCount);
 
     std::transform(

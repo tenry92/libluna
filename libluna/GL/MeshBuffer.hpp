@@ -36,14 +36,14 @@ namespace Luna::GL {
 
       for (int i = 0; i < static_cast<int>(mesh->getVertices().size()); ++i) {
         auto &&vertex = mesh->getVertices().at(i);
-        vertices.push_back(vertex.x());
-        vertices.push_back(vertex.y());
-        vertices.push_back(vertex.z());
+        vertices.push_back(vertex.x);
+        vertices.push_back(vertex.y);
+        vertices.push_back(vertex.z);
 
         if (i < static_cast<int>(mesh->getTexCoords().size())) {
           auto &&texCoords = mesh->getTexCoords().at(i);
-          vertices.push_back(texCoords.x()); // u
-          vertices.push_back(texCoords.y()); // v
+          vertices.push_back(texCoords.x); // u
+          vertices.push_back(texCoords.y); // v
         } else {
           vertices.push_back(0.0f); // u
           vertices.push_back(0.0f); // v
@@ -51,9 +51,9 @@ namespace Luna::GL {
 
         if (i < static_cast<int>(mesh->getNormals().size())) {
           auto &&normal = mesh->getNormals().at(i);
-          vertices.push_back(normal.x());
-          vertices.push_back(normal.y());
-          vertices.push_back(normal.z());
+          vertices.push_back(normal.x);
+          vertices.push_back(normal.y);
+          vertices.push_back(normal.z);
         } else {
           vertices.push_back(0.0f);
           vertices.push_back(0.0f);
@@ -62,9 +62,9 @@ namespace Luna::GL {
 
         if (i < static_cast<int>(mesh->getTangents().size())) {
           auto &&tangent = mesh->getTangents().at(i);
-          vertices.push_back(tangent.x());
-          vertices.push_back(tangent.y());
-          vertices.push_back(tangent.z());
+          vertices.push_back(tangent.x);
+          vertices.push_back(tangent.y);
+          vertices.push_back(tangent.z);
         } else {
           vertices.push_back(0.0f);
           vertices.push_back(0.0f);
@@ -73,9 +73,9 @@ namespace Luna::GL {
 
         if (i < static_cast<int>(mesh->getBitangents().size())) {
           auto &&bitangent = mesh->getBitangents().at(i);
-          vertices.push_back(bitangent.x());
-          vertices.push_back(bitangent.y());
-          vertices.push_back(bitangent.z());
+          vertices.push_back(bitangent.x);
+          vertices.push_back(bitangent.y);
+          vertices.push_back(bitangent.z);
         } else {
           vertices.push_back(0.0f);
           vertices.push_back(0.0f);

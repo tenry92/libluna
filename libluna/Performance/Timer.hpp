@@ -1,6 +1,6 @@
 #pragma once
 
-#include <memory>
+#include <libluna/Clock.hpp>
 
 namespace Luna::Performance {
   /**
@@ -24,7 +24,6 @@ namespace Luna::Performance {
     double elapse();
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    Clock::TimePoint lastUpdate;
   };
 } // namespace Luna::Performance

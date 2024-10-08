@@ -1,16 +1,14 @@
 #include <libluna/String.hpp>
 
 #ifdef _WIN32
-#include <windows.h>
+#include <windows.h> // MultiByteToWideChar
 #endif
 
-#include <cmath>
-#include <codecvt>
-#include <cstring>
-#include <cwchar>
-#include <iostream>
-#include <locale>
-#include <stdexcept>
+#include <cmath> // ceil
+#include <codecvt> // codecvt_utf8_utf16
+#include <cstring> // memcpy, strlen
+#include <cwchar> // wcslen
+#include <locale> // wstring_convert
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
@@ -23,11 +21,6 @@
 
 using namespace Luna;
 using Luna::String;
-
-class String::impl {
-  public:
-  std::vector<utf8_int8_t> mData;
-};
 
 String::Iterator::Iterator(const void *data) : mData(data) {}
 
@@ -98,31 +91,30 @@ String::FormatOptions String::parseFormatOptions(const String &specifier
   return options;
 }
 
-String::String() : mImpl{std::make_unique<impl>()} {
-  mImpl->mData.resize(1);
-  mImpl->mData[0] = 0;
+String::String()  {
+  mData.resize(1);
+  mData[0] = 0;
 }
 
-String::String(const char *string) : mImpl{std::make_unique<impl>()} {
+String::String(const char *string) {
   if (string == nullptr) {
-    mImpl->mData.resize(1);
-    mImpl->mData[0] = 0;
+    mData.resize(1);
+    mData[0] = 0;
     return;
   }
 
   auto length = strlen(string);
 
   if (length > 0) {
-    mImpl->mData.resize(length + 1);
-    std::memcpy(mImpl->mData.data(), string, length + 1);
+    mData.resize(length + 1);
+    std::memcpy(mData.data(), string, length + 1);
   } else {
-    mImpl->mData.resize(1);
-    mImpl->mData[0] = 0;
+    mData.resize(1);
+    mData[0] = 0;
   }
 }
 
-String::String(const char *string, std::size_t size)
-    : mImpl{std::make_unique<impl>()} {
+String::String(const char *string, std::size_t size) {
   if (string == nullptr || size == 0) {
     return;
   }
@@ -130,13 +122,13 @@ String::String(const char *string, std::size_t size)
   auto length = size;
 
   if (length > 0) {
-    mImpl->mData.resize(size + 1);
-    std::memcpy(mImpl->mData.data(), string, length);
-    mImpl->mData[size] = 0;
+    mData.resize(size + 1);
+    std::memcpy(mData.data(), string, length);
+    mData[size] = 0;
   }
 }
 
-String::String(const wchar_t *string) : mImpl{std::make_unique<impl>()} {
+String::String(const wchar_t *string) {
   if (string == nullptr) {
     return;
   }
@@ -144,75 +136,75 @@ String::String(const wchar_t *string) : mImpl{std::make_unique<impl>()} {
   auto length = wcslen(string); // number of characters, not bytes!
 
   if (length > 0) {
-    mImpl->mData.resize(length * sizeof(wchar_t) + 1);
-    mImpl->mData[0] = 0;
-    auto ptr = mImpl->mData.data();
+    mData.resize(length * sizeof(wchar_t) + 1);
+    mData[0] = 0;
+    auto ptr = mData.data();
 
     for (std::size_t i = 0; i < length; ++i) {
       auto available =
-          getByteLength() - static_cast<std::size_t>(ptr - mImpl->mData.data());
+          getByteLength() - static_cast<std::size_t>(ptr - mData.data());
       ptr = reinterpret_cast<utf8_int8_t *>(
           utf8catcodepoint(ptr, string[i], available)
       );
     }
 
-    mImpl->mData.resize(utf8size(mImpl->mData.data()));
+    mData.resize(utf8size(mData.data()));
   }
 }
 
-String::String(const std::string &string) : mImpl{std::make_unique<impl>()} {
+String::String(const std::string &string) {
   if (string.size() > 0) {
-    mImpl->mData.resize(string.size() + 1);
-    std::memcpy(mImpl->mData.data(), string.data(), string.size());
-    mImpl->mData[string.size()] = 0;
+    mData.resize(string.size() + 1);
+    std::memcpy(mData.data(), string.data(), string.size());
+    mData[string.size()] = 0;
   } else {
-    mImpl->mData.resize(1);
-    mImpl->mData[0] = 0;
+    mData.resize(1);
+    mData[0] = 0;
   }
 }
 
 String::String(const String &string)
-    : String::String(string.mImpl->mData.data()) {}
+    : String::String(string.mData.data()) {}
 
-String::String(String &&string) : mImpl{std::make_unique<impl>()} {
+String::String(String &&string) {
   *this = std::move(string);
 }
 
 String::~String() {}
 
 String String::operator=(const String &other) {
-  mImpl->mData = other.mImpl->mData;
+  mData = other.mData;
 
   return *this;
 }
 
-String String::operator=(const String &&other) {
-  mImpl->mData = std::move(other.mImpl->mData);
-  other.mImpl->mData.resize(1);
-  other.mImpl->mData[0] = 0;
+String String::operator=(String &&other) {
+  mData = std::move(other.mData);
+  other.mData.resize(1);
+  other.mData[0] = 0;
 
   return *this;
 }
 
 String String::operator+(const String &other) const {
-  if (mImpl->mData.empty()) {
+  if (mData.empty()) {
     return String(other);
-  } else if (other.mImpl->mData.empty()) {
+  } else if (other.mData.empty()) {
     return String(*this);
   }
 
-  auto length1 = strlen(mImpl->mData.data());
-  auto length2 = strlen(other.mImpl->mData.data());
+  auto length1 = strlen(mData.data());
+  auto length2 = strlen(other.mData.data());
   std::vector<char> buffer(length1 + length2 + 1);
-  std::memcpy(buffer.data(), mImpl->mData.data(), length1 + 1);
-  utf8cat(buffer.data(), other.mImpl->mData.data());
+  std::memcpy(buffer.data(), mData.data(), length1 + 1);
+  utf8cat(buffer.data(), other.mData.data());
 
   return String(buffer.data());
 }
 
 String String::operator+(String::CodePoint cp) const {
   std::vector<char> buffer(getByteLength() + 4);
-  std::memcpy(buffer.data(), mImpl->mData.data(), getByteLength());
+  std::memcpy(buffer.data(), mData.data(), getByteLength());
   utf8catcodepoint(buffer.data() + getByteLength() - 1, cp, 5);
   buffer[buffer.size() - 1] = 0;
 
@@ -228,25 +220,25 @@ bool String::operator==(const String &other) const {
     return false;
   }
 
-  return utf8cmp(mImpl->mData.data(), other.mImpl->mData.data()) == 0;
+  return utf8cmp(mData.data(), other.mData.data()) == 0;
 }
 
 bool String::operator<(const String &other) const {
-  return utf8cmp(mImpl->mData.data(), other.mImpl->mData.data()) < 0;
+  return utf8cmp(mData.data(), other.mData.data()) < 0;
 }
 
 bool String::operator>(const String &other) const {
-  return utf8cmp(mImpl->mData.data(), other.mImpl->mData.data()) > 0;
+  return utf8cmp(mData.data(), other.mData.data()) > 0;
 }
 
 String::CodePoint String::operator[](std::size_t index) const {
-  if (mImpl->mData.empty()) {
+  if (mData.empty()) {
     // should not be possible since it shall always contain a null terminator
     return 0;
   }
 
   CodePoint codePoint = 0;
-  auto ptr = mImpl->mData.data();
+  auto ptr = mData.data();
 
   for (std::size_t offset = 0; offset <= index; ++offset) {
     ptr = utf8codepoint(ptr, &codePoint);
@@ -256,21 +248,21 @@ String::CodePoint String::operator[](std::size_t index) const {
 }
 
 std::size_t String::getLength() const {
-  if (mImpl->mData.empty()) {
+  if (mData.empty()) {
     return 0;
   }
 
-  return utf8nlen(mImpl->mData.data(), mImpl->mData.size());
+  return utf8nlen(mData.data(), mData.size());
 }
 
-std::size_t String::getByteLength() const { return mImpl->mData.size(); }
+std::size_t String::getByteLength() const { return mData.size(); }
 
 bool String::isEmpty() const {
-  return mImpl->mData.empty() || utf8len(mImpl->mData.data()) == 0;
+  return mData.empty() || utf8len(mData.data()) == 0;
 }
 
 String String::subString(std::size_t start) const {
-  auto ptr = mImpl->mData.data();
+  auto ptr = mData.data();
   CodePoint codePoint;
 
   if (start >= getLength()) {
@@ -285,7 +277,7 @@ String String::subString(std::size_t start) const {
 }
 
 String String::subString(std::size_t start, std::size_t end) const {
-  auto ptr = mImpl->mData.data();
+  auto ptr = mData.data();
   CodePoint codePoint;
 
   if (start > getLength()) {
@@ -348,7 +340,7 @@ String::replaceAll(const String &search, const String &replacement) const {
 
 std::optional<std::size_t>
 String::indexOf(CodePoint codePoint, std::size_t fromIndex) const {
-  if (mImpl->mData.empty()) {
+  if (mData.empty()) {
     return std::optional<std::size_t>();
   }
 
@@ -362,14 +354,14 @@ String::indexOf(CodePoint codePoint, std::size_t fromIndex) const {
     return result;
   }
 
-  auto ptr = utf8chr(mImpl->mData.data(), codePoint);
+  auto ptr = utf8chr(mData.data(), codePoint);
 
   if (ptr == nullptr) {
     return std::optional<std::size_t>();
   }
 
   size_t index = 0;
-  auto subPtr = mImpl->mData.data();
+  auto subPtr = mData.data();
 
   while (subPtr < ptr) {
     ++subPtr;
@@ -381,7 +373,7 @@ String::indexOf(CodePoint codePoint, std::size_t fromIndex) const {
 
 std::optional<std::size_t>
 String::indexOf(const String &string, std::size_t fromIndex) const {
-  if (mImpl->mData.empty() || string.mImpl->mData.empty()) {
+  if (mData.empty() || string.mData.empty()) {
     return std::optional<std::size_t>();
   }
 
@@ -395,14 +387,14 @@ String::indexOf(const String &string, std::size_t fromIndex) const {
     return result;
   }
 
-  auto ptr = utf8str(mImpl->mData.data(), string.mImpl->mData.data());
+  auto ptr = utf8str(mData.data(), string.mData.data());
 
   if (ptr == nullptr) {
     return std::optional<std::size_t>();
   }
 
   size_t index = 0;
-  auto subPtr = mImpl->mData.data();
+  auto subPtr = mData.data();
 
   while (subPtr < ptr) {
     ++subPtr;
@@ -413,17 +405,17 @@ String::indexOf(const String &string, std::size_t fromIndex) const {
 }
 
 String String::repeat(std::size_t count) const {
-  if (mImpl->mData.empty() || count == 0) {
+  if (mData.empty() || count == 0) {
     return String();
   }
 
-  auto rawLength = utf8size(mImpl->mData.data()) - 1;
+  auto rawLength = utf8size(mData.data()) - 1;
   auto totalLength = rawLength * count;
   std::vector<char> buffer(totalLength + 1);
 
   for (std::size_t i = 0; i < count; ++i) {
     auto offset = i * rawLength;
-    std::memcpy(&buffer.data()[offset], mImpl->mData.data(), rawLength);
+    std::memcpy(&buffer.data()[offset], mData.data(), rawLength);
   }
 
   buffer.data()[totalLength] = 0;
@@ -432,15 +424,15 @@ String String::repeat(std::size_t count) const {
 }
 
 String String::toLowerCase() const {
-  String output(mImpl->mData.data());
-  utf8lwr(output.mImpl->mData.data());
+  String output(mData.data());
+  utf8lwr(output.mData.data());
 
   return output;
 }
 
 String String::toUpperCase() const {
-  String output(mImpl->mData.data());
-  utf8upr(output.mImpl->mData.data());
+  String output(mData.data());
+  utf8upr(output.mData.data());
 
   return output;
 }
@@ -487,7 +479,7 @@ bool String::endsWith(const String &other) const {
   return subString(getLength() - other.getLength(), getLength()) == other;
 }
 
-const char *String::c_str() const { return mImpl->mData.data(); }
+const char *String::c_str() const { return mData.data(); }
 
 std::string String::s_str() const {
   return std::string(c_str(), getByteLength() - 1);
@@ -514,21 +506,21 @@ std::wstring String::w_str() const {
 #endif
 }
 
-String::Iterator String::begin() { return Iterator(mImpl->mData.data()); }
+String::Iterator String::begin() { return Iterator(mData.data()); }
 
 String::Iterator String::end() {
   return Iterator(reinterpret_cast<void *>(
-      mImpl->mData.data() + utf8size(mImpl->mData.data()) - 1
+      mData.data() + utf8size(mData.data()) - 1
   ));
 }
 
 String::Iterator String::cbegin() const {
-  return Iterator(mImpl->mData.data());
+  return Iterator(mData.data());
 }
 
 String::Iterator String::cend() const {
   return Iterator(reinterpret_cast<const void *>(
-      mImpl->mData.data() + utf8size(mImpl->mData.data()) - 1
+      mData.data() + utf8size(mData.data()) - 1
   ));
 }
 

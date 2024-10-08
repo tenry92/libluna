@@ -1,7 +1,6 @@
 #include <libluna/config.h>
 
 #include <libluna/ImmediateGui.hpp>
-#include <libluna/ImmediateGuiImpl.hpp>
 
 #ifdef LUNA_IMGUI
 #include <imgui/imgui.h>
@@ -12,20 +11,18 @@
 #endif
 #endif // IMGUI
 
-#include <libluna/CanvasImpl.hpp>
-
 using namespace Luna;
 
-void ImmediateGuiImpl::init(Canvas *canvas) { mCanvas = canvas; }
+void ImmediateGui::init(Canvas *canvas) { mCanvas = canvas; }
 
-void ImmediateGuiImpl::newFrame() {
+void ImmediateGui::newFrame() {
   // stub
 }
 
-void ImmediateGuiImpl::render(ImmediateGui *gui) { gui->render(); }
+void ImmediateGui::render(ImmediateGui *gui) { gui->render(); }
 
 #ifdef LUNA_WINDOW_SDL2
-bool ImmediateGuiImpl::processSdlEvent([[maybe_unused]] const SDL_Event *event
+bool ImmediateGui::processSdlEvent([[maybe_unused]] const SDL_Event *event
 ) {
 #ifdef LUNA_IMGUI
   return ImGui_ImplSDL2_ProcessEvent(event);
@@ -35,8 +32,6 @@ bool ImmediateGuiImpl::processSdlEvent([[maybe_unused]] const SDL_Event *event
 }
 #endif
 
-ImmediateGui::ImmediateGui() : mImpl{std::make_unique<ImmediateGuiImpl>()} {}
+ImmediateGui::ImmediateGui() = default;
 
 ImmediateGui::~ImmediateGui() = default;
-
-ImmediateGuiImpl *ImmediateGui::getImpl() const { return mImpl.get(); }

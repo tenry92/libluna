@@ -6,38 +6,18 @@
 
 using namespace Luna;
 
-struct Interval {
-  int ratePerSecond;
-  IntervalManager::Callback callback;
-  Clock::TimePoint nextExecution;
-  Clock::TimePoint lastExecution;
-
-  /**
-   * @brief Check whether a is to be executed before b.
-   */
-  friend bool operator<(const Interval &a, const Interval &b) {
-    return a.nextExecution > b.nextExecution;
-  }
-};
-
-class IntervalManager::impl {
-  public:
-  std::priority_queue<Interval> mIntervalQueue;
-  std::list<Interval> mExecuteAlways;
-};
-
-IntervalManager::IntervalManager() : mImpl{std::make_unique<impl>()} {}
+IntervalManager::IntervalManager() = default;
 
 IntervalManager::~IntervalManager() = default;
 
 void IntervalManager::addInterval(int ratePerSecond, Callback callback) {
-  mImpl->mIntervalQueue.emplace(Interval{
+  mIntervalQueue.emplace(Interval{
       ratePerSecond, callback, Clock::now(),
       Clock::now()});
 }
 
 void IntervalManager::addAlways(Callback callback) {
-  mImpl->mExecuteAlways.push_back(Interval{
+  mExecuteAlways.push_back(Interval{
       0, callback, Clock::now(),
       Clock::now()});
 }
@@ -45,7 +25,7 @@ void IntervalManager::addAlways(Callback callback) {
 void IntervalManager::executePendingIntervals() {
   auto now = Clock::now();
 
-  for (auto &&currentInterval : mImpl->mExecuteAlways) {
+  for (auto &&currentInterval : mExecuteAlways) {
 #ifdef NDS
     float deltaSeconds = 1.0f / 60.0f;
 #elif defined N64
@@ -61,8 +41,8 @@ void IntervalManager::executePendingIntervals() {
     currentInterval.callback(deltaSeconds);
   }
 
-  while (!mImpl->mIntervalQueue.empty()) {
-    auto currentInterval = mImpl->mIntervalQueue.top();
+  while (!mIntervalQueue.empty()) {
+    auto currentInterval = mIntervalQueue.top();
 
 #ifndef NDS
     if (currentInterval.nextExecution > now) {
@@ -96,8 +76,8 @@ void IntervalManager::executePendingIntervals() {
     }
 #endif
 
-    mImpl->mIntervalQueue.pop();
-    mImpl->mIntervalQueue.emplace(currentInterval);
+    mIntervalQueue.pop();
+    mIntervalQueue.emplace(currentInterval);
     currentInterval.callback(deltaSeconds);
 
 #ifdef NDS

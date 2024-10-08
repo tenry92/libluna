@@ -2,22 +2,16 @@
 
 using namespace Luna;
 
-class Text::impl {
-  public:
-  FontResPtr mFont;
-  String mContent;
-};
-
 TextPtr Text::make() { return TextPtr(new Text()); }
 
-Text::Text() : mImpl{std::make_unique<impl>()} {}
+Text::Text() = default;
 
 Text::~Text() = default;
 
-void Text::setContent(const String &content) { mImpl->mContent = content; }
+void Text::setContent(const String &content) { mContent = content; }
 
-String &Text::getContent() const { return mImpl->mContent; }
+const String &Text::getContent() const { return mContent; }
 
-void Text::setFont(FontResPtr font) { mImpl->mFont = font; }
+void Text::setFont(FontResPtr font) { mFont = font; }
 
-FontResPtr Text::getFont() const { return mImpl->mFont; }
+FontResPtr Text::getFont() const { return mFont; }

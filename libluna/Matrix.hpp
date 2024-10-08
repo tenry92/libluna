@@ -1,8 +1,14 @@
 #pragma once
 
 #include <array>
-#include <memory>
+#include <cmath>
+#include <iostream>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <libluna/Matrix.hpp>
 #include <libluna/Vector.hpp>
 
 namespace Luna {
@@ -15,8 +21,9 @@ namespace Luna {
     bool operator==(const Matrix4x4 &other) const;
     Matrix4x4 &operator=(const Matrix4x4 &other);
     Matrix4x4 operator*(const Matrix4x4 &other) const;
-    float &at(int row, int column) const;
-    float *getValuePointer() const;
+    float &at(int row, int column);
+    float at(int row, int column) const;
+    const float *getValuePointer() const;
 
     Matrix4x4 translate(Vector3f vector) const;
     Matrix4x4 rotateX(float angle) const;
@@ -28,7 +35,6 @@ namespace Luna {
     perspective(float fov, float aspect, float near, float far);
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    glm::mat4 mMatrix;
   };
 } // namespace Luna

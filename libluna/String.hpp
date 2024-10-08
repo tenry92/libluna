@@ -8,11 +8,19 @@
 
 #include <stdint.h>
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+#include <utf8.h>
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
 #include <algorithm>
 #include <functional>
 #include <iostream>
 #include <list>
-#include <memory>
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -220,7 +228,7 @@ namespace Luna {
 
     String operator=(const String &other);
 
-    String operator=(const String &&other);
+    String operator=(String &&other);
 
     /**
      * \brief Concatenate two strings.
@@ -671,8 +679,7 @@ namespace Luna {
     }
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    std::vector<utf8_int8_t> mData;
   };
 
   namespace Literals {

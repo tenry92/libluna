@@ -136,7 +136,7 @@ namespace Luna {
      */
     using LoaderType = std::function<ResultType()>;
 
-#if NDS || NDS
+#if N64 || NDS
     using FutureType = Future<ResultType>;
 
     using PromiseType = Promise<ResultType>;

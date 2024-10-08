@@ -7,20 +7,13 @@
 
 using namespace Luna;
 
-class InputManager::impl {
-  public:
-  std::map<std::string, float> mPressedActions;
-  std::map<std::string, std::string> mButtonBindings;
-  bool mReturnUnusedEvents{false};
-};
-
-InputManager::InputManager() : mImpl{std::make_unique<impl>()} {}
+InputManager::InputManager() = default;
 
 InputManager::~InputManager() = default;
 
 void InputManager::update(std::queue<ButtonEvent> *queue, float deltaTime) {
   std::for_each(
-      mImpl->mPressedActions.begin(), mImpl->mPressedActions.end(),
+      mPressedActions.begin(), mPressedActions.end(),
       [deltaTime](auto &pair) { pair.second += deltaTime; }
   );
 
@@ -32,20 +25,20 @@ void InputManager::update(std::queue<ButtonEvent> *queue, float deltaTime) {
 
     auto buttonName = event.getName().s_str();
 
-    if (mImpl->mButtonBindings.count(buttonName)) {
-      auto actionName = mImpl->mButtonBindings.at(buttonName);
+    if (mButtonBindings.count(buttonName)) {
+      auto actionName = mButtonBindings.at(buttonName);
 
       if (event.isDown()) {
-        mImpl->mPressedActions.emplace(actionName, 0.0f);
+        mPressedActions.emplace(actionName, 0.0f);
       } else {
-        mImpl->mPressedActions.erase(actionName);
+        mPressedActions.erase(actionName);
       }
-    } else if (mImpl->mReturnUnusedEvents) {
+    } else if (mReturnUnusedEvents) {
       unusedQueue.push(event);
     }
   }
 
-  if (mImpl->mReturnUnusedEvents) {
+  if (mReturnUnusedEvents) {
     *queue = std::move(unusedQueue);
   }
 }
@@ -53,29 +46,29 @@ void InputManager::update(std::queue<ButtonEvent> *queue, float deltaTime) {
 void InputManager::addButtonBinding(
     const String &actionName, const String &buttonName
 ) {
-  mImpl->mButtonBindings.emplace(buttonName.s_str(), actionName.s_str());
+  mButtonBindings.emplace(buttonName.s_str(), actionName.s_str());
 }
 
 bool InputManager::isButtonPressed(const String &actionName, float buffer) {
-  if (!mImpl->mPressedActions.count(actionName.s_str())) {
+  if (!mPressedActions.count(actionName.s_str())) {
     return false;
   }
 
-  float duration = mImpl->mPressedActions.at(actionName.s_str());
+  float duration = mPressedActions.at(actionName.s_str());
 
   return duration <= buffer;
 }
 
 bool InputManager::isButtonHeld(const String &actionName, float duration) {
-  if (!mImpl->mPressedActions.count(actionName.s_str())) {
+  if (!mPressedActions.count(actionName.s_str())) {
     return false;
   }
 
-  float presedDuration = mImpl->mPressedActions.at(actionName.s_str());
+  float presedDuration = mPressedActions.at(actionName.s_str());
 
   return presedDuration >= duration;
 }
 
 void InputManager::setReturnUnused(bool returnUnused) {
-  mImpl->mReturnUnusedEvents = returnUnused;
+  mReturnUnusedEvents = returnUnused;
 }

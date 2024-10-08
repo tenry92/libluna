@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 
+#include <zlib.h>
+
 #include <libluna/InputStream.hpp>
 
 namespace Luna::Util {
@@ -14,7 +16,10 @@ namespace Luna::Util {
     std::vector<uint8_t> inflate();
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    void init();
+    void end();
+
+    std::unique_ptr<Luna::InputStream> mReader;
+    z_stream mStream;
   };
 } // namespace Luna::Util
