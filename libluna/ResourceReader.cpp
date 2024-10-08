@@ -18,9 +18,7 @@ ResourceReader::~ResourceReader() = default;
 
 bool ResourceReader::isValid() const { return fileReader->isValid(); }
 
-std::size_t ResourceReader::getSize() const {
-  return fileReader->getSize();
-}
+std::size_t ResourceReader::getSize() const { return fileReader->getSize(); }
 
 bool ResourceReader::eof() const { return fileReader->eof(); }
 

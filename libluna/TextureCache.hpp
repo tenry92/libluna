@@ -37,4 +37,4 @@ namespace Luna {
     private:
     std::unordered_map<ImageResPtr, Priority> mCache;
   };
-}
+} // namespace Luna

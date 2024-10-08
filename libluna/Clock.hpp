@@ -33,4 +33,4 @@ namespace Luna::Clock {
     return std::chrono::duration<double>(end - start).count();
 #endif
   }
-}
+} // namespace Luna::Clock

@@ -24,7 +24,7 @@ namespace {
 
     return Vector2i(hChunks, vChunks);
   }
-}
+} // namespace
 
 N64Renderer::N64Renderer() {
   mMetrics = std::make_shared<Internal::GraphicsMetrics>();
@@ -105,7 +105,10 @@ void N64Renderer::loadTexture(
     if (numChunks > 1) {
       int hChunk = i % chunkCount.x;
       int vChunk = i / chunkCount.x;
-      imageChunk = image->crop(Vector2i(chunkSize.width, chunkSize.height), Vector2i(chunkSize.width * hChunk, chunkSize.height * vChunk));
+      imageChunk = image->crop(
+          Vector2i(chunkSize.width, chunkSize.height),
+          Vector2i(chunkSize.width * hChunk, chunkSize.height * vChunk)
+      );
     }
 
     glBindTexture(GL_TEXTURE_2D, texture.ids[i]);
@@ -119,14 +122,21 @@ void N64Renderer::loadTexture(
     }
 
     glTexImage2D(
-        GL_TEXTURE_2D, 0,                                             /* mipmap level */
-        internalFormat,                                               /* internal format */
-        imageChunk->getSize().width, imageChunk->getSize().height, 0, /* format (legacy) */
-        inputFormat,                                                  /* input format */
+        GL_TEXTURE_2D, 0, /* mipmap level */
+        internalFormat,   /* internal format */
+        imageChunk->getSize().width, imageChunk->getSize().height,
+        0,           /* format (legacy) */
+        inputFormat, /* input format */
         inputType, imageChunk->getData()
     );
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, image->isInterpolated() ? GL_LINEAR : GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, image->isInterpolated() ? GL_LINEAR : GL_NEAREST);
+    glTexParameteri(
+        GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+        image->isInterpolated() ? GL_LINEAR : GL_NEAREST
+    );
+    glTexParameteri(
+        GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+        image->isInterpolated() ? GL_LINEAR : GL_NEAREST
+    );
   }
 }
 
@@ -151,19 +161,23 @@ void N64Renderer::renderTexture(
   for (int vChunk = 0; vChunk < chunkCount.y; ++vChunk) {
     for (int hChunk = 0; hChunk < chunkCount.x; ++hChunk) {
       auto chunkIndex = hChunk + vChunk * chunkCount.x;
-      auto chunkOffset = Luna::Vector2i(chunkSize.width * hChunk, chunkSize.height * vChunk);
+      auto chunkOffset =
+          Luna::Vector2i(chunkSize.width * hChunk, chunkSize.height * vChunk);
       auto basePos = info->position + chunkOffset;
       auto baseSize = info->size - chunkOffset;
-      baseSize = Vector2i(std::min(baseSize.width, chunkSize.width), std::min(baseSize.height, chunkSize.height));
+      baseSize = Vector2i(
+          std::min(baseSize.width, chunkSize.width),
+          std::min(baseSize.height, chunkSize.height)
+      );
 
       float left = (basePos.x / displayWidth * 2.0f) - 1.0f;
       float top = -(basePos.y / displayHeight * 2.0f) + 1.0f;
       float right = ((basePos.x + static_cast<float>(baseSize.width)) /
-                    displayWidth * 2.0f) -
+                     displayWidth * 2.0f) -
                     1.0f;
       float bottom = -((basePos.y + static_cast<float>(baseSize.height)) /
-                      displayHeight * 2.0f) +
-                    1.0f;
+                       displayHeight * 2.0f) +
+                     1.0f;
 
       glEnable(GL_BLEND);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -227,8 +241,7 @@ void N64Renderer::renderMesh(
   auto ambientLight = canvas->getStage()->getAmbientLight();
   float ambient[4] = {
       ambientLight.color.red, ambientLight.color.green, ambientLight.color.blue,
-      ambientLight.color.alpha
-  };
+      ambientLight.color.alpha};
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
   glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
 
@@ -237,14 +250,12 @@ void N64Renderer::renderMesh(
   for (auto &&pointLight : canvas->getStage()->getPointLights()) {
     glEnable(GL_LIGHT0 + lightId);
     float pos[4] = {
-        pointLight->position.x, pointLight->position.y,
-        pointLight->position.z, 1
-    };
+        pointLight->position.x, pointLight->position.y, pointLight->position.z,
+        1};
     glLightfv(GL_LIGHT0 + lightId, GL_POSITION, pos);
     float color[4] = {
         pointLight->color.red, pointLight->color.green, pointLight->color.blue,
-        pointLight->color.alpha
-    };
+        pointLight->color.alpha};
     glLightfv(GL_LIGHT0 + lightId, GL_DIFFUSE, color);
     float lightRadius = 10.0f;
     glLightf(GL_LIGHT0 + lightId, GL_LINEAR_ATTENUATION, 2.0f / lightRadius);

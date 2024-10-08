@@ -167,10 +167,6 @@ AudioManager::createOscillator(float frequency, OscillatorNode::Type type) {
   return std::make_shared<OscillatorNode>(this, frequency, type);
 }
 
-Internal::AudioMetrics &AudioManager::getMetrics() {
-  return mMetrics;
-}
+Internal::AudioMetrics &AudioManager::getMetrics() { return mMetrics; }
 
-void AudioManager::advanceTime(double time) {
-  mTime += time;
-}
+void AudioManager::advanceTime(double time) { mTime += time; }

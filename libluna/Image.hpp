@@ -133,13 +133,9 @@ namespace Luna {
 
     void setInterpolation(bool enabled);
 
-    inline void enableInterpolation() {
-      setInterpolation(true);
-    }
+    inline void enableInterpolation() { setInterpolation(true); }
 
-    inline void disableInterpolation() {
-      setInterpolation(false);
-    }
+    inline void disableInterpolation() { setInterpolation(false); }
 
     bool isInterpolated() const;
 

@@ -1,4 +1,4 @@
-#include <stdio.h> // fgets, fopen
+#include <stdio.h>  // fgets, fopen
 #include <string.h> // strncmp, strlen
 
 #ifdef _WIN32

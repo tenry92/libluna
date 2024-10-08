@@ -13,21 +13,13 @@ NdsRenderer::NdsRenderer() : mImpl{std::make_unique<impl>()} {}
 
 NdsRenderer::~NdsRenderer() = default;
 
-void NdsRenderer::initialize() {
-  videoSetMode(MODE_0_2D);
-}
+void NdsRenderer::initialize() { videoSetMode(MODE_0_2D); }
 
-void NdsRenderer::initializeImmediateGui() {
+void NdsRenderer::initializeImmediateGui() {}
 
-}
+void NdsRenderer::quitImmediateGui() {}
 
-void NdsRenderer::quitImmediateGui() {
-
-}
-
-void NdsRenderer::close() {
-
-}
+void NdsRenderer::close() {}
 
 void NdsRenderer::render() {
   auto canvas = getCanvas();
@@ -40,10 +32,6 @@ void NdsRenderer::render() {
   }
 }
 
-void NdsRenderer::present() {
-  swiWaitForVBlank();
-}
+void NdsRenderer::present() { swiWaitForVBlank(); }
 
-Internal::GraphicsMetrics NdsRenderer::getMetrics() {
-  return *mImpl->mMetrics;
-}
+Internal::GraphicsMetrics NdsRenderer::getMetrics() { return *mImpl->mMetrics; }

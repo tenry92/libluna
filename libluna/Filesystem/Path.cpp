@@ -8,9 +8,7 @@ using Luna::String;
 
 Path::Path() = default;
 
-Path::Path(const Path &other) {
-  mParts = other.mParts;
-}
+Path::Path(const Path &other) { mParts = other.mParts; }
 
 Path::Path(const String &path) {
   auto uniformPath = path.replaceAll("\\", "/");
@@ -48,8 +46,7 @@ bool Path::isAbsolute() const {
 }
 
 bool Path::isEmpty() const {
-  return mParts.size() == 0 ||
-         (mParts.size() == 1 && mParts.front() == "");
+  return mParts.size() == 0 || (mParts.size() == 1 && mParts.front() == "");
 }
 
 Path Path::cd(const Path &other) const {

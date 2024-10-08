@@ -10,8 +10,7 @@ FileReaderPtr FileReader::make(const Path &filename) {
 }
 
 FileReader::FileReader(const Path &filename) {
-  mStream =
-      std::ifstream(filename.getRawPath().c_str(), std::ios::binary);
+  mStream = std::ifstream(filename.getRawPath().c_str(), std::ios::binary);
 
   if (!mStream.good()) {
     throw std::runtime_error(String("unable to open file \"{}\" for reading")
@@ -64,9 +63,7 @@ std::size_t FileReader::read(
     objectCount = (mSize - startPos) / objectSize;
   }
 
-  mStream.read(
-      reinterpret_cast<char *>(buffer), objectSize * objectCount
-  );
+  mStream.read(reinterpret_cast<char *>(buffer), objectSize * objectCount);
   int endPos = static_cast<int>(mStream.tellg());
 
   if (endPos == -1) {

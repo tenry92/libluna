@@ -8,8 +8,8 @@
 
 #include <SDL2/SDL.h>
 
-#include <libluna/Renderers/CommonRenderer.hpp>
 #include <libluna/Logger.hpp>
+#include <libluna/Renderers/CommonRenderer.hpp>
 
 namespace Luna {
   struct SdlDeleter {

@@ -379,8 +379,7 @@ bool Application::hasCanvas() {
 }
 
 #ifdef LUNA_WINDOW_SDL2
-std::shared_ptr<Canvas> Application::getCanvasBySdlWindowId(Uint32 windowId
-) {
+std::shared_ptr<Canvas> Application::getCanvasBySdlWindowId(Uint32 windowId) {
   for (auto &&canvas : mCanvases) {
     if (canvas.expired()) {
       continue;
@@ -573,9 +572,7 @@ void Application::setName(const String &name) { mName = name; }
 
 const String &Application::getName() const { return mName; }
 
-AudioManager *Application::getAudioManager() {
-  return &mAudioManager;
-}
+AudioManager *Application::getAudioManager() { return &mAudioManager; }
 
 AudioNodePtr Application::getAudioDestinationNode() const {
   return mAudioManager.getDestinationNode();

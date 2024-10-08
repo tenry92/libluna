@@ -40,7 +40,7 @@ namespace {
 
     return images;
   }
-}
+} // namespace
 
 Stage::Stage() = default;
 
@@ -93,9 +93,7 @@ const std::list<std::shared_ptr<PointLight>> &Stage::getPointLights() const {
   return mPointLights;
 }
 
-TextureCache *Stage::getTextureCache() {
-  return &mTextureCache;
-}
+TextureCache *Stage::getTextureCache() { return &mTextureCache; }
 
 void Stage::updateTextureCache() {
   auto images = listImagesInUse(this);

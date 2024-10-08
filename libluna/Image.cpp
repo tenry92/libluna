@@ -26,8 +26,7 @@ Image::Image(int bitsPerPixel, const Vector2i &size) {
   mData.resize(getByteCount());
 }
 
-Image::Image(const Image &other)
-    : Image(other.mBitsPerPixel, other.mSize) {
+Image::Image(const Image &other) : Image(other.mBitsPerPixel, other.mSize) {
   mData = other.mData;
 }
 
@@ -89,7 +88,9 @@ ImagePtr Image::toRgb16() {
 
 ImagePtr Image::crop(Vector2i size, Vector2i offset) {
   auto maxSize = this->getSize() - offset;
-  size = Vector2i(std::min(size.width, maxSize.width), std::min(size.height, maxSize.height));
+  size = Vector2i(
+      std::min(size.width, maxSize.width), std::min(size.height, maxSize.height)
+  );
 
   auto croppedImage = Image::make(mBitsPerPixel, size);
   int bytesPerRowFull = this->getBytesPerRow();
@@ -98,7 +99,8 @@ ImagePtr Image::crop(Vector2i size, Vector2i offset) {
   int xOffset = offset.x * bytesPerPixel;
 
   for (int y = 0; y < size.height; ++y) {
-    auto inputRow = this->getData() + xOffset + bytesPerRowFull * (offset.y + y);
+    auto inputRow =
+        this->getData() + xOffset + bytesPerRowFull * (offset.y + y);
     auto outputRow = croppedImage->getData() + bytesPerRowCropped * y;
     std::memcpy(outputRow, inputRow, bytesPerRowCropped);
   }
@@ -142,10 +144,6 @@ ColorRgb32 &Image::rgb32At(int x, int y) {
   return getRgb32()[x + y * getSize().width];
 }
 
-void Image::setInterpolation(bool enabled) {
-  mInterpolate = enabled;
-}
+void Image::setInterpolation(bool enabled) { mInterpolate = enabled; }
 
-bool Image::isInterpolated() const {
-  return mInterpolate;
-}
+bool Image::isInterpolated() const { return mInterpolate; }

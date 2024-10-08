@@ -1,5 +1,5 @@
-#include <libluna/Performance/Timer.hpp>
 #include <libluna/Clock.hpp>
+#include <libluna/Performance/Timer.hpp>
 
 using namespace Luna::Performance;
 

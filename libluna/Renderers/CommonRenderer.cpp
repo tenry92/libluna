@@ -26,8 +26,8 @@
 
 #include <libluna/Canvas.hpp>
 #include <libluna/Logger.hpp>
-#include <libluna/overloaded.hpp>
 #include <libluna/Renderers/CommonRenderer.hpp>
+#include <libluna/overloaded.hpp>
 
 using namespace Luna;
 
@@ -162,14 +162,10 @@ Vector2i CommonRenderer::getCanvasSize() const {
   int canvasHeight = 1080;
 
 #ifdef LUNA_WINDOW_SDL2
-  SDL_GetWindowSize(
-      getCanvas()->sdl.window, &canvasWidth, &canvasHeight
-  );
+  SDL_GetWindowSize(getCanvas()->sdl.window, &canvasWidth, &canvasHeight);
 #endif
 #ifdef LUNA_WINDOW_GLFW
-  glfwGetFramebufferSize(
-      getCanvas()->glfw.window, &canvasWidth, &canvasHeight
-  );
+  glfwGetFramebufferSize(getCanvas()->glfw.window, &canvasWidth, &canvasHeight);
 #endif
 #ifdef __SWITCH__
   ViDisplay display;

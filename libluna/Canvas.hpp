@@ -135,7 +135,7 @@ namespace Luna {
     std::map<std::string, float> mAxisValues;
     bool mClosed{false};
 
-   std::queue<std::shared_ptr<Command>> mCommandQueue;
+    std::queue<std::shared_ptr<Command>> mCommandQueue;
 
 #ifdef LUNA_THREADED_CANVAS
     /**

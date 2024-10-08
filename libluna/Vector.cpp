@@ -7,8 +7,7 @@ using namespace Luna;
 
 template <typename T> Vector2<T>::Vector2() = default;
 
-template <typename T>
-Vector2<T>::Vector2(const Vector2<T> &other) {
+template <typename T> Vector2<T>::Vector2(const Vector2<T> &other) {
   this->x = other.x;
   this->y = other.y;
 }
@@ -20,8 +19,7 @@ Vector2<T>::Vector2(const Vector2<U> &other) {
   this->y = static_cast<T>(other.y);
 }
 
-template <typename T>
-Vector2<T>::Vector2(T pX, T pY) {
+template <typename T> Vector2<T>::Vector2(T pX, T pY) {
   this->x = pX;
   this->y = pY;
 }
@@ -64,9 +62,7 @@ template <typename T> Vector2<T> Vector2<T>::operator/(T scale) const {
 }
 
 template <typename T> T Vector2<T>::magnitude() const {
-  return static_cast<T>(
-      std::sqrt(std::pow(this->x, 2) + std::pow(this->y, 2))
-  );
+  return static_cast<T>(std::sqrt(std::pow(this->x, 2) + std::pow(this->y, 2)));
 }
 
 template <typename T> Vector2<T> Vector2<T>::normalized() const {
@@ -81,10 +77,8 @@ template <typename T> Vector2<T> Vector2<T>::absolute() const {
 
 template <typename T>
 Vector2<T> Vector2<T>::scaleToFit(const Vector2<T> &other) const {
-  float scaleWidth =
-      static_cast<float>(other.x) / static_cast<float>(this->x);
-  float scaleHeight =
-      static_cast<float>(other.y) / static_cast<float>(this->y);
+  float scaleWidth = static_cast<float>(other.x) / static_cast<float>(this->x);
+  float scaleHeight = static_cast<float>(other.y) / static_cast<float>(this->y);
 
   float scaleFactor = std::min(scaleWidth, scaleHeight);
 
@@ -105,15 +99,13 @@ template Luna::Vector2<float>::Vector2(const Vector2<int> &);
 
 template <typename T> Vector3<T>::Vector3() = default;
 
-template <typename T>
-Vector3<T>::Vector3(const Vector3<T> &other) {
+template <typename T> Vector3<T>::Vector3(const Vector3<T> &other) {
   this->x = other.x;
   this->y = other.y;
   this->z = other.z;
 }
 
-template <typename T>
-Vector3<T>::Vector3(T pX, T pY, T pZ) {
+template <typename T> Vector3<T>::Vector3(T pX, T pY, T pZ) {
   this->x = pX;
   this->y = pY;
   this->z = pZ;
@@ -132,22 +124,17 @@ Vector3<T> &Vector3<T>::operator=(const Vector3<T> &other) {
 
 template <typename T>
 bool Vector3<T>::operator==(const Vector3<T> &other) const {
-  return this->x == other.x && this->y == other.y &&
-         this->z == other.z;
+  return this->x == other.x && this->y == other.y && this->z == other.z;
 }
 
 template <typename T>
 Vector3<T> Vector3<T>::operator+(const Vector3<T> &other) const {
-  return Vector3<T>(
-      this->x + other.x, this->y + other.y, this->z + other.z
-  );
+  return Vector3<T>(this->x + other.x, this->y + other.y, this->z + other.z);
 }
 
 template <typename T>
 Vector3<T> Vector3<T>::operator-(const Vector3<T> &other) const {
-  return Vector3<T>(
-      this->x - other.x, this->y - other.y, this->z - other.z
-  );
+  return Vector3<T>(this->x - other.x, this->y - other.y, this->z - other.z);
 }
 
 template <typename T> Vector3<T> Vector3<T>::operator-() const {
@@ -182,8 +169,7 @@ T Vector3<T>::distance(const Vector3<T> &left, const Vector3<T> &right) {
 template <typename T>
 Vector3<T> Vector3<T>::cross(const Vector3<T> &a, const Vector3<T> &b) {
   return Vector3<T>(
-      a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z,
-      a.x * b.y - a.y * b.x
+      a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x
   );
 }
 

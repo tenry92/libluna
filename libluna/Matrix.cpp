@@ -60,9 +60,8 @@ const float *Matrix4x4::getValuePointer() const {
 Matrix4x4 Matrix4x4::translate(Vector3f vector) const {
   Matrix4x4 matrix = *this;
 
-  matrix.mMatrix = glm::translate(
-      matrix.mMatrix, glm::vec3(vector.x, vector.y, vector.z)
-  );
+  matrix.mMatrix =
+      glm::translate(matrix.mMatrix, glm::vec3(vector.x, vector.y, vector.z));
 
   return matrix;
 }
@@ -103,8 +102,7 @@ Matrix4x4
 Matrix4x4::perspective(float fov, float aspect, float near, float far) {
   Matrix4x4 matrix;
 
-  matrix.mMatrix =
-      glm::perspective(glm::radians(fov), aspect, near, far);
+  matrix.mMatrix = glm::perspective(glm::radians(fov), aspect, near, far);
 
   return matrix;
 }

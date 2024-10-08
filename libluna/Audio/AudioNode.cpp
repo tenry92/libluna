@@ -18,9 +18,7 @@ class AudioCommand : public Command {
   std::function<void()> mCallback;
 };
 
-AudioNode::AudioNode(AudioManager *manager) {
-  mManager = manager;
-}
+AudioNode::AudioNode(AudioManager *manager) { mManager = manager; }
 
 AudioNode::~AudioNode() = default;
 
@@ -37,18 +35,10 @@ void AudioNode::disconnect() {
   }
 }
 
-void AudioNode::addInput(AudioNodePtr input) {
-  mInputs.emplace_back(input);
-}
+void AudioNode::addInput(AudioNodePtr input) { mInputs.emplace_back(input); }
 
-void AudioNode::removeInput(AudioNodePtr input) {
-  mInputs.remove(input);
-}
+void AudioNode::removeInput(AudioNodePtr input) { mInputs.remove(input); }
 
-int AudioNode::getChannelCount() const {
-  return mManager->getChannelCount();
-}
+int AudioNode::getChannelCount() const { return mManager->getChannelCount(); }
 
-float AudioNode::getFrameRate() const {
-  return mManager->getFrameRate();
-}
+float AudioNode::getFrameRate() const { return mManager->getFrameRate(); }

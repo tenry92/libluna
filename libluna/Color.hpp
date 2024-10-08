@@ -109,8 +109,7 @@ namespace Luna {
     return result;
   }
 
-  template<typename T>
-  inline uint16_t makeColorUint16(T other) {
+  template <typename T> inline uint16_t makeColorUint16(T other) {
     ColorRgb16 tmp = makeColorRgb16(other);
 
     return tmp.red | (tmp.green << 5) | (tmp.blue << 10) | (tmp.alpha << 15);

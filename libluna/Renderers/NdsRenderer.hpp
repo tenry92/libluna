@@ -21,4 +21,4 @@ namespace Luna {
     class impl;
     std::unique_ptr<impl> mImpl;
   };
-}
+} // namespace Luna

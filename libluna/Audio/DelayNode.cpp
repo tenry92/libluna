@@ -6,12 +6,9 @@
 using namespace Luna;
 using namespace Luna::Audio;
 
-DelayNode::DelayNode(AudioManager *manager, float delay)
-    : AudioNode(manager) {
+DelayNode::DelayNode(AudioManager *manager, float delay) : AudioNode(manager) {
   mDelay = delay;
-  mBuffer.resize(
-      static_cast<int>(getFrameRate() * delay) * getChannelCount()
-  );
+  mBuffer.resize(static_cast<int>(getFrameRate() * delay) * getChannelCount());
   mBufferOffset = 0;
 }
 
@@ -30,8 +27,7 @@ void DelayNode::render(float *buffer, int frameCount) {
 
     // copy previous data
     memcpy(
-        buffer, mBuffer.data() + mBufferOffset,
-        sizeof(float) * chunkSampleCount
+        buffer, mBuffer.data() + mBufferOffset, sizeof(float) * chunkSampleCount
     );
     buffer += chunkSampleCount;
 
@@ -44,9 +40,8 @@ void DelayNode::render(float *buffer, int frameCount) {
       );
     }
 
-    mBufferOffset = static_cast<int>(
-        (mBufferOffset + chunkSampleCount) % mBuffer.size()
-    );
+    mBufferOffset =
+        static_cast<int>((mBufferOffset + chunkSampleCount) % mBuffer.size());
     renderedSampleCount += static_cast<int>(chunkSampleCount);
   }
 }

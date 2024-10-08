@@ -390,9 +390,7 @@ void Canvas::close() {
 
 #ifdef LUNA_WINDOW_EGL
   if (egl.display) {
-    eglMakeCurrent(
-        egl.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT
-    );
+    eglMakeCurrent(egl.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 
     if (egl.context) {
       eglDestroyContext(egl.display, egl.context);
@@ -438,8 +436,7 @@ void Canvas::setVideoDriver(const String &name) {
     }
 
     display_init(
-        res, DEPTH_16_BPP, 3, GAMMA_NONE,
-        FILTERS_RESAMPLE_ANTIALIAS_DEDITHER
+        res, DEPTH_16_BPP, 3, GAMMA_NONE, FILTERS_RESAMPLE_ANTIALIAS_DEDITHER
     );
     rdpq_init();
     mRenderer = std::make_unique<N64Renderer>();
@@ -525,9 +522,7 @@ void Canvas::attachImmediateGui(std::unique_ptr<ImmediateGui> gui) {
   processCommandQueue();
 }
 
-ImmediateGui *Canvas::getImmediateGui() const {
-  return mImmediateGui.get();
-}
+ImmediateGui *Canvas::getImmediateGui() const { return mImmediateGui.get(); }
 
 void Canvas::setStage(std::shared_ptr<Stage> stage) { mStage = stage; }
 
@@ -541,9 +536,7 @@ void Canvas::setCamera3d(const Camera3d &camera) { mCamera3d = camera; }
 
 Camera3d Canvas::getCamera3d() const { return mCamera3d; }
 
-void Canvas::setBackgroundColor(ColorRgb color) {
-  mBackgroundColor = color;
-}
+void Canvas::setBackgroundColor(ColorRgb color) { mBackgroundColor = color; }
 
 ColorRgb Canvas::getBackgroundColor() const { return mBackgroundColor; }
 
@@ -614,9 +607,8 @@ void Canvas::sync() {
 #endif
 
   if (!mCommandQueue.empty()) {
-    bool result = mCv.wait_for(lock, 4s, [this]() {
-      return mCommandQueue.empty();
-    });
+    bool result =
+        mCv.wait_for(lock, 4s, [this]() { return mCommandQueue.empty(); });
 
     if (!result) {
       logError("wait timeout expired and predicate still false");
@@ -625,12 +617,8 @@ void Canvas::sync() {
 #endif
 }
 
-std::queue<ButtonEvent> &Canvas::getButtonEvents() {
-  return mButtonEvents;
-}
+std::queue<ButtonEvent> &Canvas::getButtonEvents() { return mButtonEvents; }
 
 bool Canvas::isClosed() const { return mClosed; }
 
-Vector2i Canvas::getOriginalSize() const {
-  return mOriginalSize;
-}
+Vector2i Canvas::getOriginalSize() const { return mOriginalSize; }

@@ -4,11 +4,11 @@
 #include <windows.h> // MultiByteToWideChar
 #endif
 
-#include <cmath> // ceil
+#include <cmath>   // ceil
 #include <codecvt> // codecvt_utf8_utf16
 #include <cstring> // memcpy, strlen
-#include <cwchar> // wcslen
-#include <locale> // wstring_convert
+#include <cwchar>  // wcslen
+#include <locale>  // wstring_convert
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
@@ -91,7 +91,7 @@ String::FormatOptions String::parseFormatOptions(const String &specifier
   return options;
 }
 
-String::String()  {
+String::String() {
   mData.resize(1);
   mData[0] = 0;
 }
@@ -163,12 +163,9 @@ String::String(const std::string &string) {
   }
 }
 
-String::String(const String &string)
-    : String::String(string.mData.data()) {}
+String::String(const String &string) : String::String(string.mData.data()) {}
 
-String::String(String &&string) {
-  *this = std::move(string);
-}
+String::String(String &&string) { *this = std::move(string); }
 
 String::~String() {}
 
@@ -509,19 +506,17 @@ std::wstring String::w_str() const {
 String::Iterator String::begin() { return Iterator(mData.data()); }
 
 String::Iterator String::end() {
-  return Iterator(reinterpret_cast<void *>(
-      mData.data() + utf8size(mData.data()) - 1
-  ));
+  return Iterator(
+      reinterpret_cast<void *>(mData.data() + utf8size(mData.data()) - 1)
+  );
 }
 
-String::Iterator String::cbegin() const {
-  return Iterator(mData.data());
-}
+String::Iterator String::cbegin() const { return Iterator(mData.data()); }
 
 String::Iterator String::cend() const {
-  return Iterator(reinterpret_cast<const void *>(
-      mData.data() + utf8size(mData.data()) - 1
-  ));
+  return Iterator(
+      reinterpret_cast<const void *>(mData.data() + utf8size(mData.data()) - 1)
+  );
 }
 
 String Literals::operator"" _s(const char *string, size_t length) {

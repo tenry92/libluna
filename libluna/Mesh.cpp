@@ -16,6 +16,4 @@ std::vector<Vector3f> &Mesh::getNormals() { return mNormals; }
 
 std::vector<Vector3f> &Mesh::getTangents() { return mTangents; }
 
-std::vector<Vector3f> &Mesh::getBitangents() {
-  return mBiTangents;
-}
+std::vector<Vector3f> &Mesh::getBitangents() { return mBiTangents; }

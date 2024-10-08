@@ -70,13 +70,10 @@ void OpenglRenderer::initialize() {
     logError("gladLoadGL() failed");
   }
 
-  glGetIntegerv(
-      GL_MAX_RECTANGLE_TEXTURE_SIZE, &mMetrics->maxTextureSize
-  );
+  glGetIntegerv(GL_MAX_RECTANGLE_TEXTURE_SIZE, &mMetrics->maxTextureSize);
   glGetIntegerv(GL_MAJOR_VERSION, &mMetrics->glMajor);
   glGetIntegerv(GL_MINOR_VERSION, &mMetrics->glMinor);
-  mMetrics->vendor =
-      reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+  mMetrics->vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
   mMetrics->shadingLangVersion =
       reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
 
@@ -173,15 +170,11 @@ void OpenglRenderer::present() {
 #endif
 
 #ifdef LUNA_WINDOW_EGL
-  eglSwapBuffers(
-      getCanvas()->egl.display, getCanvas()->egl.surface
-  );
+  eglSwapBuffers(getCanvas()->egl.display, getCanvas()->egl.surface);
 #endif
 }
 
-Internal::GraphicsMetrics OpenglRenderer::getMetrics() {
-  return *mMetrics;
-}
+Internal::GraphicsMetrics OpenglRenderer::getMetrics() { return *mMetrics; }
 
 void OpenglRenderer::clearBackground(ColorRgb color) {
   CHECK_GL(glClearColor(color.red, color.green, color.blue, color.alpha));
@@ -231,8 +224,14 @@ void OpenglRenderer::loadTexture(int id, ImagePtr image) {
       inputFormat,                                        /* input format */
       inputType, image->getData()
   ));
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, image->isInterpolated() ? GL_LINEAR : GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, image->isInterpolated() ? GL_LINEAR : GL_NEAREST);
+  glTexParameteri(
+      GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+      image->isInterpolated() ? GL_LINEAR : GL_NEAREST
+  );
+  glTexParameteri(
+      GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+      image->isInterpolated() ? GL_LINEAR : GL_NEAREST
+  );
 }
 
 void OpenglRenderer::resizeTexture(int id, Vector2i size) {
@@ -256,7 +255,8 @@ void OpenglRenderer::renderTexture(
   [[maybe_unused]] auto screenSize = getCurrentRenderSize();
   mUniforms.screenSize = mSpriteShader.getUniform("uScreenSize");
   mUniforms.screenSize = Vector2f(
-      static_cast<float>(screenSize.width), static_cast<float>(screenSize.height)
+      static_cast<float>(screenSize.width),
+      static_cast<float>(screenSize.height)
   );
 
   GLuint texture = mTextureIdMapping.at(info->textureId);
@@ -265,8 +265,7 @@ void OpenglRenderer::renderTexture(
 
   spriteBuffer.bind();
 
-  mUniforms.spriteTexture =
-      mSpriteShader.getUniform("uSpriteTexture");
+  mUniforms.spriteTexture = mSpriteShader.getUniform("uSpriteTexture");
   mUniforms.spriteTexture = 0;
   CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
 
@@ -301,8 +300,7 @@ void OpenglRenderer::renderMesh(
   glEnable(GL_MULTISAMPLE);
 
   auto ambientLight = canvas->getStage()->getAmbientLight();
-  mUniforms.ambientLightColor =
-      mModelShader.getUniform("uAmbientLight.color");
+  mUniforms.ambientLightColor = mModelShader.getUniform("uAmbientLight.color");
   mUniforms.ambientLightIntensity =
       mModelShader.getUniform("uAmbientLight.intensity");
   mUniforms.ambientLightColor = ambientLight.color;
@@ -339,14 +337,12 @@ void OpenglRenderer::renderMesh(
     glActiveTexture(GL_TEXTURE0);
   }
 
-  mUniforms.transformModel =
-      mModelShader.getUniform("uTransform.model");
+  mUniforms.transformModel = mModelShader.getUniform("uTransform.model");
   mUniforms.transformModel = info->transform;
 
   auto camera = canvas->getCamera3d();
 
-  mUniforms.transformView =
-      mModelShader.getUniform("uTransform.view");
+  mUniforms.transformView = mModelShader.getUniform("uTransform.view");
   mUniforms.transformView = camera.getViewMatrix();
 
   mUniforms.transformProjection =

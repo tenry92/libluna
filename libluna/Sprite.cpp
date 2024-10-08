@@ -14,14 +14,10 @@ void Sprite::setImage(ImageResPtr image) { mImage = image; }
 
 ImageResPtr Sprite::getImage() const { return mImage; }
 
-void Sprite::setPalette(ResourcePtr<Palette> palette) {
-  mPalette = palette;
-}
+void Sprite::setPalette(ResourcePtr<Palette> palette) { mPalette = palette; }
 
 ResourcePtr<Palette> Sprite::getPalette() const { return mPalette; }
 
-void Sprite::setPosition(const Vector2f &position) {
-  mPosition = position;
-}
+void Sprite::setPosition(const Vector2f &position) { mPosition = position; }
 
 Vector2f Sprite::getPosition() const { return mPosition; }

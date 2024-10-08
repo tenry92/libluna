@@ -94,9 +94,7 @@ void SdlRenderer::initializeImmediateGui() {
 
   ImGui::StyleColorsDark();
 
-  ImGui_ImplSDL2_InitForSDLRenderer(
-      getCanvas()->sdl.window, mRenderer.get()
-  );
+  ImGui_ImplSDL2_InitForSDLRenderer(getCanvas()->sdl.window, mRenderer.get());
   ImGui_ImplSDLRenderer2_Init(mRenderer.get());
 
   // todo(?): load fonts
@@ -144,8 +142,7 @@ Internal::GraphicsMetrics SdlRenderer::getMetrics() { return *mMetrics; }
 void SdlRenderer::clearBackground(ColorRgb color) {
   auto color32 = makeColorRgb32(color);
   CHECK_SDL(SDL_SetRenderDrawColor(
-      mRenderer.get(), color32.red, color32.green, color32.blue,
-      color32.alpha
+      mRenderer.get(), color32.red, color32.green, color32.blue, color32.alpha
   ));
   CHECK_SDL(SDL_RenderClear(mRenderer.get()));
 }
@@ -182,8 +179,9 @@ void SdlRenderer::loadTexture(int id, ImagePtr image) {
   }
 
   SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(
-      (void *)(image->getData()), image->getSize().width, image->getSize().height,
-      image->getBitsPerPixel(), image->getBytesPerRow(), surfaceFormat
+      (void *)(image->getData()), image->getSize().width,
+      image->getSize().height, image->getBitsPerPixel(),
+      image->getBytesPerRow(), surfaceFormat
   );
 
   auto texture = SDL_CreateTextureFromSurface(mRenderer.get(), surface);
@@ -216,8 +214,8 @@ void SdlRenderer::renderTexture(
   auto texture = mTextureIdMapping.at(info->textureId);
 
   SDL_Rect dstrect = {
-      static_cast<int>(info->position.x),
-      static_cast<int>(info->position.y), info->size.width, info->size.height};
+      static_cast<int>(info->position.x), static_cast<int>(info->position.y),
+      info->size.width, info->size.height};
   CHECK_SDL(SDL_RenderCopy(mRenderer.get(), texture, nullptr, &dstrect));
 }
 

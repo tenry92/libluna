@@ -24,8 +24,7 @@ void PathManager::detectProgramPath() {
 #else
   char selfPath[PATH_MAX];
   auto length =
-      static_cast<std::size_t>(readlink("/proc/self/exe", selfPath, PATH_MAX)
-      );
+      static_cast<std::size_t>(readlink("/proc/self/exe", selfPath, PATH_MAX));
 
   if (length <= 0) {
     throw std::runtime_error("unable to read link at /proc/self/exe");

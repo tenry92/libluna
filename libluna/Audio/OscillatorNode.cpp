@@ -58,9 +58,7 @@ void OscillatorNode::render(float *buffer, int frameCount) {
   }
 }
 
-void OscillatorNode::setFrequency(float frequency) {
-  mFrequency = frequency;
-}
+void OscillatorNode::setFrequency(float frequency) { mFrequency = frequency; }
 
 void OscillatorNode::setType(Type type) { mType = type; }
 
