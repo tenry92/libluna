@@ -24,6 +24,69 @@
 #include <libluna/String.hpp>
 
 /**
+ * @mainpage Luna Game Engine
+ *
+ * ## Major classes
+ *
+ * These classes make the foundation of any Luna based application.
+ * There is a single Application instance, usually one or two Canvas instances
+ * and a Stage assigned to a Canvas.
+ *
+ * - @ref Luna::Application "Application" - The core class for the game engine.
+ * - @ref Luna::Canvas "Canvas" - Abstraction for windows (computer) and fullscreen displays.
+ * - @ref Luna::Stage "Stage" - Container for anything that can be drawn on a canvas
+ *
+ * ## Resources
+ *
+ * - @ref Luna::Resource "Resource" - Resource loading abstraction.
+ * - @ref Luna::Image "Image" - Container for storing 2D image data.
+ * - @ref Luna::Font "Font"
+ * - @ref Luna::Mesh "Mesh" - 3D mesh containing vertices and faces and more.
+ * - @ref Luna::Material "Material" - Material for 3D objects.
+ *
+ * ## On the stage
+ *
+ * - Drawables:
+ *   - @ref Luna::Sprite "Sprite" - 2D object on the screen.
+ *   - @ref Luna::Text "Text" - Text on the screen.
+ *   - @ref Luna::Model "Model" - 3D model in the world.
+ * - Manipulation:
+ *   - @ref Luna::Camera2d "Camera2d" - Manipulating the 2D view.
+ *   - @ref Luna::Camera3d "Camera3d" - Manipulating the 3D view.
+ *
+ * ## Images and colors
+ *
+ * - General color representation:
+ *   - @ref Luna::ColorRgb "ColorRgb" - General RGBA color, using floats for each component.
+ *   - @ref Luna::ColorHsv "ColorHsv" - General HSV color.
+ *   - @ref Luna::ColorHsl "ColorHsl" - General HSL color.
+ *   - @ref Luna::ColorYuv "ColorYuv" - General YUV color.
+ * - Low-level color representation:
+ *   - @ref Luna::ColorRgb16 "ColorRgb16" - 16-bit RGBA color.
+ *   - @ref Luna::ColorRgb24 "ColorRgb24" - 24-bit RGB color.
+ *   - @ref Luna::ColorRgb32 "ColorRgb32" - 32-bit RGBA color.
+ *
+ * ## Utilities
+ *
+ * - @ref Luna::Logger "Logger" - Logging utility.
+ * - @ref Luna::Platform "Platform" - Platform detection.
+ * - @ref Luna::String "String" - UTF-8 encoded string.
+ * - @ref Luna::Vector2 "Vector2" - 2D vector utility.
+ * - @ref Luna::Vector3 "Vector3" - 3D vector utility.
+ * - @ref Luna::Matrix4 "Matrix4" - 4x4 matrix utility.
+ * - @ref Luna::IdAllocator "IdAllocator" - ID allocator.
+ *
+ * ## Files
+ *
+ * - @ref Luna::Filesystem::Path "Path" - Path to a filesystem entry.
+ * - @ref Luna::PathManager "PathManager" - Utility class for finding.
+ * - @ref Luna::InputStream "InputStream" - Base class for binary input streams.
+ *   - @ref Luna::Filesystem::FileReader "FileReader" - Read any file from the filesystem.
+ *   - @ref Luna::MemoryReader "MemoryReader" - Read a section of memory like a file.
+ *   - @ref Luna::ResourceReader "ResourceReader" - Read a resource.
+ */
+
+/**
  * @page app-structure Application structure
  *
  * The base structure for a Luna based application has the following structure:

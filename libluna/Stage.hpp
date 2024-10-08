@@ -13,6 +13,20 @@ namespace Luna {
   /**
    * @brief Container for all visible items on a canvas.
    *
+   * A stage contains 2D and 3D objects simultaneously.
+   *
+   * 2D objects are
+   * positioned on the screen using 2D pixel coordinates, originating form the
+   * top-left corner.
+   *
+   * @image html coordinate-system-2d.svg "2D Coordinate System in libluna"
+   *
+   * 3D objects are positioned in a 3D world, coordinates usually in meters.
+   * In 3D, the x-axis points to the right, the y-axis points up and the z-axis
+   * points towards the viewer (backwards).
+   *
+   * @image html coordinate-system-3d.svg "3D Coordinate System in libluna"
+   *
    * A stage can be assigned to multiple canvases. For example, if each canvas
    * uses a different renderer, the same stage can be viewed and tested from
    * different canvases.

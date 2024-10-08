@@ -49,6 +49,14 @@ namespace Luna {
 
   /**
    * @brief Abstraction for windows (computer) and fullscreen displays.
+   *
+   * A canvas simply provides the interface to render graphics and receive input.
+   * In order to see anything on the canvas, a stage must be assigned to it.
+   * A stage contains all the objects that are drawn on the canvas, including
+   * 2D sprites and 3D models.
+   *
+   * The same stage can be assigned to multiple canvases, for example to render
+   * the same screen using different renderers or cameras.
    */
   class Canvas {
     public:
