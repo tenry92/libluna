@@ -24,10 +24,10 @@
 #include <libdragon.h>
 #endif
 
-#include <libluna/CanvasImpl.hpp>
+#include <libluna/Canvas.hpp>
 #include <libluna/Logger.hpp>
-#include <libluna/Renderers/CommonRenderer.hpp>
 #include <libluna/overloaded.hpp>
+#include <libluna/Renderers/CommonRenderer.hpp>
 
 using namespace Luna;
 
@@ -163,12 +163,12 @@ Vector2i CommonRenderer::getCanvasSize() const {
 
 #ifdef LUNA_WINDOW_SDL2
   SDL_GetWindowSize(
-      getCanvas()->getImpl()->sdl.window, &canvasWidth, &canvasHeight
+      getCanvas()->sdl.window, &canvasWidth, &canvasHeight
   );
 #endif
 #ifdef LUNA_WINDOW_GLFW
   glfwGetFramebufferSize(
-      getCanvas()->getImpl()->glfw.window, &canvasWidth, &canvasHeight
+      getCanvas()->glfw.window, &canvasWidth, &canvasHeight
   );
 #endif
 #ifdef __SWITCH__
@@ -185,7 +185,7 @@ Vector2i CommonRenderer::getCanvasSize() const {
 }
 
 Vector2i CommonRenderer::getInternalSize() const {
-  return getCanvas()->getImpl()->mOriginalSize;
+  return getCanvas()->getOriginalSize();
 }
 
 Vector2i CommonRenderer::getCurrentRenderSize() const {
@@ -355,10 +355,10 @@ void CommonRenderer::end2dFramebuffer([[maybe_unused]] Canvas *canvas) {
   auto scaledSize = getInternalSize().scaleToFit(getCanvasSize());
   Vector2f pos{0, 0};
 
-  if (getCanvasSize().x() > scaledSize.x()) {
-    pos.x(static_cast<float>(getCanvasSize().x() - scaledSize.x()) / 2);
+  if (getCanvasSize().width > scaledSize.width) {
+    pos.x = static_cast<float>(getCanvasSize().width - scaledSize.width) / 2;
   } else {
-    pos.y(static_cast<float>(getCanvasSize().y() - scaledSize.y()) / 2);
+    pos.y = static_cast<float>(getCanvasSize().height - scaledSize.height) / 2;
   }
 
   RenderTextureInfo info;

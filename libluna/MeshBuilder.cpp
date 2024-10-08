@@ -43,20 +43,20 @@ void MeshBuilder::addQuadFace(
   // avoid division by 0 exception
   float f = 1.0f;
 #else
-  float f = 1.0f / (deltaUv1.x() * deltaUv2.y() - deltaUv2.x() - deltaUv1.y());
+  float f = 1.0f / (deltaUv1.x * deltaUv2.y - deltaUv2.x - deltaUv1.y);
 #endif
 
   for (int i = 0; i < 4; ++i) {
     mesh->getTangents().push_back(
-        {f * (deltaUv2.y() * edge1.x() - deltaUv1.y() * edge2.x()),
-         f * (deltaUv2.y() * edge1.y() - deltaUv1.y() * edge2.y()),
-         f * (deltaUv2.y() * edge1.z() - deltaUv1.y() * edge2.z())}
+        {f * (deltaUv2.y * edge1.x - deltaUv1.y * edge2.x),
+         f * (deltaUv2.y * edge1.y - deltaUv1.y * edge2.y),
+         f * (deltaUv2.y * edge1.z - deltaUv1.y * edge2.z)}
     );
 
     mesh->getBitangents().push_back(
-        {f * (-deltaUv2.x() * edge1.x() + deltaUv1.x() * edge2.x()),
-         f * (-deltaUv2.x() * edge1.y() + deltaUv1.x() * edge2.y()),
-         f * (-deltaUv2.x() * edge1.z() + deltaUv1.x() * edge2.z())}
+        {f * (-deltaUv2.x * edge1.x + deltaUv1.x * edge2.x),
+         f * (-deltaUv2.x * edge1.y + deltaUv1.x * edge2.y),
+         f * (-deltaUv2.x * edge1.z + deltaUv1.x * edge2.z)}
     );
   }
 }

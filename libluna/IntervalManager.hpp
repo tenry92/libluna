@@ -1,7 +1,8 @@
 #pragma once
 
 #include <functional>
-#include <memory>
+
+#include <libluna/Clock.hpp>
 
 namespace Luna {
   /**
@@ -34,7 +35,21 @@ namespace Luna {
     void executePendingIntervals();
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    struct Interval {
+      int ratePerSecond;
+      IntervalManager::Callback callback;
+      Clock::TimePoint nextExecution;
+      Clock::TimePoint lastExecution;
+
+      /**
+       * @brief Check whether a is to be executed before b.
+       */
+      friend bool operator<(const Interval &a, const Interval &b) {
+        return a.nextExecution > b.nextExecution;
+      }
+    };
+
+    std::priority_queue<Interval> mIntervalQueue;
+    std::list<Interval> mExecuteAlways;
   };
 } // namespace Luna

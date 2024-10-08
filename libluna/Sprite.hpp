@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include <libluna/Color.hpp>
 #include <libluna/Image.hpp>
 #include <libluna/Palette.hpp>
@@ -29,7 +27,8 @@ namespace Luna {
 
     private:
     Sprite();
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    ImageResPtr mImage;
+    std::shared_ptr<Resource<Palette>> mPalette;
+    Vector2f mPosition;
   };
 } // namespace Luna

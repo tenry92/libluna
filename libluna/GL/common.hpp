@@ -13,7 +13,7 @@
       logError("opengl error [" #x "]: {}", getGlErrorString(err));            \
   }
 
-const char *getGlErrorString(GLenum err) {
+inline const char *getGlErrorString(GLenum err) {
   switch (err) {
   default:
     return "unknown";

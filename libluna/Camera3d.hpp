@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <tuple>
 
 #include <libluna/Matrix.hpp>
@@ -10,8 +9,6 @@ namespace Luna {
   class Camera3d {
     public:
     Camera3d();
-    Camera3d(const Camera3d &other);
-    Camera3d &operator=(const Camera3d &other);
     ~Camera3d();
 
     Vector3f getPosition() const;
@@ -30,7 +27,10 @@ namespace Luna {
     Matrix4x4 getViewMatrix() const;
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    Vector3f mPosition;
+    float mFov{45.0f};
+    float mClipNear{0.1f};
+    float mClipFar{1000.0f};
+    Matrix4x4 mRotation;
   };
 } // namespace Luna

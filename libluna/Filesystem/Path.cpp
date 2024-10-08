@@ -6,36 +6,31 @@
 using namespace Luna::Filesystem;
 using Luna::String;
 
-class Path::impl {
-  public:
-  std::list<String> parts;
-};
+Path::Path() = default;
 
-Path::Path() : mImpl{std::make_unique<impl>()} {}
-
-Path::Path(const Path &other) : mImpl{std::make_unique<impl>()} {
-  mImpl->parts = other.mImpl->parts;
+Path::Path(const Path &other) {
+  mParts = other.mParts;
 }
 
-Path::Path(const String &path) : mImpl{std::make_unique<impl>()} {
+Path::Path(const String &path) {
   auto uniformPath = path.replaceAll("\\", "/");
   /// @todo Remove multiple consequent slashes?
-  uniformPath.split("/", std::back_inserter(mImpl->parts));
+  uniformPath.split("/", std::back_inserter(mParts));
 }
 
 Path::~Path() = default;
 
 Path Path::operator=(const Path &other) {
-  mImpl->parts = other.mImpl->parts;
+  mParts = other.mParts;
 
   return *this;
 }
 
 String Path::getRawPath() const {
-  return String::join("/", mImpl->parts.cbegin(), mImpl->parts.cend());
+  return String::join("/", mParts.cbegin(), mParts.cend());
 }
 
-String Path::basename() const { return mImpl->parts.back(); }
+String Path::basename() const { return mParts.back(); }
 
 String Path::extname() const {
   auto parts = basename().split('.');
@@ -48,34 +43,34 @@ String Path::extname() const {
 }
 
 bool Path::isAbsolute() const {
-  return (mImpl->parts.size() > 1 && mImpl->parts.front() == "") ||
-         mImpl->parts.front().endsWith(":");
+  return (mParts.size() > 1 && mParts.front() == "") ||
+         mParts.front().endsWith(":");
 }
 
 bool Path::isEmpty() const {
-  return mImpl->parts.size() == 0 ||
-         (mImpl->parts.size() == 1 && mImpl->parts.front() == "");
+  return mParts.size() == 0 ||
+         (mParts.size() == 1 && mParts.front() == "");
 }
 
 Path Path::cd(const Path &other) const {
   Path newPath;
 
   if (other.isAbsolute()) {
-    newPath.mImpl->parts = other.mImpl->parts;
+    newPath.mParts = other.mParts;
   } else {
-    newPath.mImpl->parts = mImpl->parts;
+    newPath.mParts = mParts;
 
-    for (auto &&part : other.mImpl->parts) {
+    for (auto &&part : other.mParts) {
       if (part == ".") {
         continue;
       }
 
       if (part == "..") {
-        if (newPath.mImpl->parts.size() > 0) {
-          newPath.mImpl->parts.pop_back();
+        if (newPath.mParts.size() > 0) {
+          newPath.mParts.pop_back();
         }
       } else {
-        newPath.mImpl->parts.push_back(part);
+        newPath.mParts.push_back(part);
       }
     }
   }
@@ -86,8 +81,8 @@ Path Path::cd(const Path &other) const {
 Path Path::up(std::size_t levels) const {
   Path newPath(*this);
 
-  for (std::size_t i = 0; i < levels && newPath.mImpl->parts.size() > 0; ++i) {
-    newPath.mImpl->parts.pop_back();
+  for (std::size_t i = 0; i < levels && newPath.mParts.size() > 0; ++i) {
+    newPath.mParts.pop_back();
   }
 
   return newPath;

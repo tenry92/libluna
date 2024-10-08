@@ -2,7 +2,9 @@
 
 #include <libluna/String.hpp>
 
-#include <memory>
+#include <chrono>
+#include <deque>
+#include <map>
 
 namespace Luna::Performance {
   /**
@@ -56,7 +58,9 @@ namespace Luna::Performance {
     static Ticker *getTickerByName(const String &name);
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    unsigned long mTickCount = 0;
+    std::deque<std::chrono::steady_clock::time_point> mTicks;
+    std::deque<std::chrono::steady_clock::duration> mTickTimes;
+    String mName;
   };
 } // namespace Luna::Performance

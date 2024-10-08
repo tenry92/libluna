@@ -1,12 +1,13 @@
 #pragma once
 
 #include <forward_list>
-#include <memory>
 
 #include <libluna/AbstractRenderer.hpp>
 #include <libluna/Font.hpp>
 #include <libluna/IdAllocator.hpp>
 #include <libluna/Matrix.hpp>
+#include <libluna/Mesh.hpp>
+#include <libluna/Stage.hpp>
 
 namespace Luna {
   /**

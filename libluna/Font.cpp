@@ -4,34 +4,26 @@
 
 using namespace Luna;
 
-class Font::impl {
-  public:
-  int mLineHeight;
-  int mBaseLine;
-
-  std::map<String::CodePoint, Font::Char> mChars;
-};
-
-Font::Font() : mImpl{std::make_unique<impl>()} {}
+Font::Font() = default;
 
 FontPtr Font::make() { return FontPtr(new Font()); }
 
 Font::~Font() = default;
 
-int Font::getLineHeight() const { return mImpl->mLineHeight; }
+int Font::getLineHeight() const { return mLineHeight; }
 
-void Font::setLineHeight(int lineHeight) { mImpl->mLineHeight = lineHeight; }
+void Font::setLineHeight(int lineHeight) { mLineHeight = lineHeight; }
 
-int Font::getBaseLine() const { return mImpl->mBaseLine; }
+int Font::getBaseLine() const { return mBaseLine; }
 
-void Font::setBaseLine(int baseLine) { mImpl->mBaseLine = baseLine; }
+void Font::setBaseLine(int baseLine) { mBaseLine = baseLine; }
 
-Font::Char *Font::getCharByCodePoint(String::CodePoint codePoint) const {
-  return &mImpl->mChars.at(codePoint);
+Font::Char *Font::getCharByCodePoint(String::CodePoint codePoint) {
+  return &mChars.at(codePoint);
 }
 
 Font::Char *Font::makeCharForCodePoint(String::CodePoint codePoint) {
-  mImpl->mChars.emplace(codePoint, Font::Char{});
+  mChars.emplace(codePoint, Font::Char{});
   auto ch = getCharByCodePoint(codePoint);
   ch->codePoint = codePoint;
   ch->image = nullptr;

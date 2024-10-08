@@ -57,10 +57,14 @@ namespace Luna {
     void setPalette(PalettePtr palette);
     PalettePtr getPalette() const;
 
-    uint8_t *getData() const;
-    ColorRgb16 *getRgb16() const;
-    ColorRgb24 *getRgb24() const;
-    ColorRgb32 *getRgb32() const;
+    const uint8_t *getData() const;
+    uint8_t *getData();
+    const ColorRgb16 *getRgb16() const;
+    ColorRgb16 *getRgb16();
+    const ColorRgb24 *getRgb24() const;
+    ColorRgb24 *getRgb24();
+    const ColorRgb32 *getRgb32() const;
+    ColorRgb32 *getRgb32();
 
     /**
      * @brief Convert the image to RGB16.
@@ -102,11 +106,11 @@ namespace Luna {
     ImagePtr crop(Vector2i size, Vector2i offset = Vector2i(0, 0));
 
     int getByteCount() const {
-      return getSize().x() * getSize().y() * (getBitsPerPixel() / 4) / 2;
+      return getSize().width * getSize().height * (getBitsPerPixel() / 4) / 2;
     }
 
     int getBytesPerRow() const {
-      return getSize().x() * (getBitsPerPixel() / 4) / 2;
+      return getSize().width * (getBitsPerPixel() / 4) / 2;
     }
 
     /**
@@ -119,13 +123,13 @@ namespace Luna {
 
     void setNibbleAt(int x, int y, uint8_t value);
 
-    uint8_t &byteAt(int x, int y) const;
+    uint8_t &byteAt(int x, int y);
 
-    ColorRgb16 &rgb16At(int x, int y) const;
+    ColorRgb16 &rgb16At(int x, int y);
 
-    ColorRgb24 &rgb24At(int x, int y) const;
+    ColorRgb24 &rgb24At(int x, int y);
 
-    ColorRgb32 &rgb32At(int x, int y) const;
+    ColorRgb32 &rgb32At(int x, int y);
 
     void setInterpolation(bool enabled);
 
@@ -144,7 +148,11 @@ namespace Luna {
     Image(int bitsPerPixel, const Vector2i &size);
     Image(const Image &other);
     Image(Image &&other);
-    class impl;
-    std::unique_ptr<impl> mImpl;
+
+    int mBitsPerPixel; ///< Should be (indexed) 4, 8, (true) 24 or 32.
+    Vector2i mSize;
+    std::vector<uint8_t> mData;
+    PalettePtr mPalette;
+    bool mInterpolate{false};
   };
 } // namespace Luna

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 
 /**
@@ -48,12 +47,6 @@ namespace Luna {
     Vector2(T x, T y);
     ~Vector2();
 
-    void x(T value);
-    T x() const;
-
-    void y(T value);
-    T y() const;
-
     Vector2<T> &operator=(const Vector2<T> &other);
     bool operator==(const Vector2<T> &other) const;
     inline bool operator!=(const Vector2<T> &other) const {
@@ -80,9 +73,10 @@ namespace Luna {
     static constexpr Vector2<T> up() { return Vector2<T>(0, -1); }
     static constexpr Vector2<T> down() { return Vector2<T>(0, 1); }
 
-    private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    T x{0};
+    T y{0};
+    T &width = x;
+    T &height = y;
   };
 
   template <typename T> class Vector3 {
@@ -91,15 +85,6 @@ namespace Luna {
     Vector3(const Vector3<T> &other);
     Vector3(T x, T y, T z);
     ~Vector3();
-
-    void x(T value);
-    T x() const;
-
-    void y(T value);
-    T y() const;
-
-    void z(T value);
-    T z() const;
 
     Vector3<T> &operator=(const Vector3<T> &other);
     bool operator==(const Vector3<T> &other) const;
@@ -127,9 +112,9 @@ namespace Luna {
     static constexpr Vector3<T> forward() { return Vector3<T>(0, 0, -1); }
     static constexpr Vector3<T> backward() { return Vector3<T>(0, 0, 1); }
 
-    private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    T x{0};
+    T y{0};
+    T z{0};
   };
 
   using Vector2i = Vector2<int>;

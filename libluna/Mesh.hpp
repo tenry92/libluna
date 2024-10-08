@@ -17,15 +17,19 @@ namespace Luna {
     Mesh();
     ~Mesh();
 
-    std::vector<Vector3f> &getVertices() const;
-    std::vector<Face> &getFaces() const;
-    std::vector<Vector2f> &getTexCoords() const;
-    std::vector<Vector3f> &getNormals() const;
-    std::vector<Vector3f> &getTangents() const;
-    std::vector<Vector3f> &getBitangents() const;
+    std::vector<Vector3f> &getVertices();
+    std::vector<Face> &getFaces();
+    std::vector<Vector2f> &getTexCoords();
+    std::vector<Vector3f> &getNormals();
+    std::vector<Vector3f> &getTangents();
+    std::vector<Vector3f> &getBitangents();
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    std::vector<Vector3f> mVertices;
+    std::vector<Face> mFaces;
+    std::vector<Vector2f> mTexCoords;
+    std::vector<Vector3f> mNormals;
+    std::vector<Vector3f> mTangents;
+    std::vector<Vector3f> mBiTangents;
   };
 } // namespace Luna

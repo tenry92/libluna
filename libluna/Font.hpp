@@ -1,6 +1,6 @@
 #pragma once
 
-#include <memory>
+#include <map>
 
 #include <libluna/Image.hpp>
 #include <libluna/Resource.hpp>
@@ -33,13 +33,15 @@ namespace Luna {
 
     void setBaseLine(int baseLine);
 
-    Char *getCharByCodePoint(String::CodePoint codePoint) const;
+    Char *getCharByCodePoint(String::CodePoint codePoint);
 
     Char *makeCharForCodePoint(String::CodePoint codePoint);
 
     private:
     Font();
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    int mLineHeight;
+    int mBaseLine;
+
+    std::map<String::CodePoint, Font::Char> mChars;
   };
 } // namespace Luna

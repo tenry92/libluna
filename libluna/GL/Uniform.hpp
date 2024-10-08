@@ -46,12 +46,12 @@ namespace Luna::GL {
     }
 
     inline Luna::Vector2f operator=(Luna::Vector2f value) const {
-      glUniform2f(mLocation, value.x(), value.y());
+      glUniform2f(mLocation, value.x, value.y);
       return value;
     }
 
     inline Luna::Vector3f operator=(Luna::Vector3f value) const {
-      glUniform3f(mLocation, value.x(), value.y(), value.z());
+      glUniform3f(mLocation, value.x, value.y, value.z);
       return value;
     }
 

@@ -5,43 +5,37 @@
 
 using namespace Luna;
 
-class ResourceReader::impl {
-  public:
-  std::unique_ptr<Filesystem::FileReader> fileReader;
-};
-
 ResourceReaderPtr ResourceReader::make(const char *name) {
   return ResourceReaderPtr(new ResourceReader(name));
 }
 
-ResourceReader::ResourceReader(const char *name)
-    : mImpl{std::make_unique<impl>()} {
+ResourceReader::ResourceReader(const char *name) {
   auto filePath = Application::getInstance()->getAssetsPath().cd(name);
-  mImpl->fileReader = Filesystem::FileReader::make(filePath);
+  fileReader = Filesystem::FileReader::make(filePath);
 }
 
 ResourceReader::~ResourceReader() = default;
 
-bool ResourceReader::isValid() const { return mImpl->fileReader->isValid(); }
+bool ResourceReader::isValid() const { return fileReader->isValid(); }
 
 std::size_t ResourceReader::getSize() const {
-  return mImpl->fileReader->getSize();
+  return fileReader->getSize();
 }
 
-bool ResourceReader::eof() const { return mImpl->fileReader->eof(); }
+bool ResourceReader::eof() const { return fileReader->eof(); }
 
-std::size_t ResourceReader::tell() { return mImpl->fileReader->tell(); }
+std::size_t ResourceReader::tell() { return fileReader->tell(); }
 
 std::size_t ResourceReader::seek(std::size_t position) {
-  return mImpl->fileReader->seek(position);
+  return fileReader->seek(position);
 }
 
 std::size_t ResourceReader::seekRelative(int relativePosition) {
-  return mImpl->fileReader->seekRelative(relativePosition);
+  return fileReader->seekRelative(relativePosition);
 }
 
 std::size_t ResourceReader::read(
     uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
 ) {
-  return mImpl->fileReader->read(buffer, objectSize, objectCount);
+  return fileReader->read(buffer, objectSize, objectCount);
 }

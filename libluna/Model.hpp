@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include <libluna/Material.hpp>
 #include <libluna/Matrix.hpp>
 #include <libluna/Mesh.hpp>
@@ -19,12 +17,13 @@ namespace Luna {
     std::shared_ptr<Mesh> getMesh() const;
 
     void setMaterial(Material material);
-    Material &getMaterial() const;
+    Material &getMaterial();
 
-    Matrix4x4 &getTransform() const;
+    Matrix4x4 &getTransform();
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    std::shared_ptr<Mesh> mMesh;
+    Matrix4x4 mTransform;
+    Material mMaterial;
   };
 } // namespace Luna

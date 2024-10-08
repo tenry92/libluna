@@ -1,9 +1,7 @@
 #include <cstring>
 
 #include <libluna/Application.hpp>
-#include <libluna/Audio/AudioManagerImpl.hpp>
 #include <libluna/Audio/AudioNode.hpp>
-#include <libluna/Audio/AudioNodeImpl.hpp>
 #include <libluna/Logger.hpp>
 #include <libluna/ResourceReader.hpp>
 
@@ -20,40 +18,37 @@ class AudioCommand : public Command {
   std::function<void()> mCallback;
 };
 
-AudioNode::AudioNode(AudioManager *manager)
-    : mImpl{std::make_unique<AudioNodeImpl>()} {
-  mImpl->mManager = manager;
+AudioNode::AudioNode(AudioManager *manager) {
+  mManager = manager;
 }
 
 AudioNode::~AudioNode() = default;
 
 void AudioNode::connect(AudioNodePtr destination) {
   disconnect();
-  mImpl->mConnectedNode = destination;
+  mConnectedNode = destination;
   destination->addInput(shared_from_this());
 }
 
 void AudioNode::disconnect() {
-  if (mImpl->mConnectedNode) {
-    mImpl->mConnectedNode->removeInput(shared_from_this());
-    mImpl->mConnectedNode = nullptr;
+  if (mConnectedNode) {
+    mConnectedNode->removeInput(shared_from_this());
+    mConnectedNode = nullptr;
   }
 }
 
 void AudioNode::addInput(AudioNodePtr input) {
-  mImpl->mInputs.emplace_back(input);
+  mInputs.emplace_back(input);
 }
 
 void AudioNode::removeInput(AudioNodePtr input) {
-  mImpl->mInputs.remove(input);
+  mInputs.remove(input);
 }
 
 int AudioNode::getChannelCount() const {
-  return mImpl->mManager->getChannelCount();
+  return mManager->getChannelCount();
 }
 
 float AudioNode::getFrameRate() const {
-  return mImpl->mManager->getFrameRate();
+  return mManager->getFrameRate();
 }
-
-AudioNodeImpl *AudioNode::getImpl() const { return mImpl.get(); }

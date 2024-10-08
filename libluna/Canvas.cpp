@@ -16,7 +16,6 @@
 
 #include <libluna/AbstractRenderer.hpp>
 #include <libluna/Application.hpp>
-#include <libluna/ApplicationImpl.hpp>
 #include <libluna/Console.hpp>
 #include <libluna/Internal/Keyboard.hpp>
 #include <libluna/Logger.hpp>
@@ -40,9 +39,6 @@
 #include <libdragon.h>
 #include <libluna/Renderers/N64Renderer.hpp>
 #endif
-
-#include <libluna/CanvasImpl.hpp>
-#include <libluna/ImmediateGuiImpl.hpp>
 
 using namespace Luna;
 using namespace Luna::Internal;
@@ -89,85 +85,7 @@ class CanvasCommand : public Command {
   std::function<void()> mCallback;
 };
 
-void CanvasImpl::setVideoDriver(const String &name) {
-  logInfo("setting canvas video driver to {}", name);
-#ifdef NDS
-  mRenderer = std::make_unique<NdsRenderer>();
-#endif
-#ifdef N64
-  resolution_t res = RESOLUTION_320x240;
-
-  if (mSize == Vector2i(256, 240)) {
-    res = RESOLUTION_256x240;
-  } else if (mSize == Vector2i(320, 240)) {
-    res = RESOLUTION_320x240;
-  } else if (mSize == Vector2i(512, 240)) {
-    res = RESOLUTION_512x240;
-  } else if (mSize == Vector2i(640, 240)) {
-    res = RESOLUTION_640x240;
-  } else if (mSize == Vector2i(512, 480)) {
-    res = RESOLUTION_512x480;
-  } else if (mSize == Vector2i(640, 480)) {
-    res = RESOLUTION_640x480;
-  }
-
-  display_init(
-      res, DEPTH_16_BPP, 3, GAMMA_NONE,
-      FILTERS_RESAMPLE_ANTIALIAS_DEDITHER
-  );
-  rdpq_init();
-  mRenderer = std::make_unique<N64Renderer>();
-#endif
-
-#ifdef LUNA_WINDOW_SDL2
-#ifdef LUNA_RENDERER_OPENGL
-  if (name == "opengl") {
-    this->sdl.glContext = SDL_GL_CreateContext(this->sdl.window);
-    SDL_GL_MakeCurrent(this->sdl.window, this->sdl.glContext);
-    SDL_GL_SetSwapInterval(1); // enable vsync
-    mRenderer = std::make_unique<OpenglRenderer>();
-  }
-#endif
-
-  if (name == "sdl") {
-    mRenderer = std::make_unique<SdlRenderer>();
-  }
-#endif
-#ifdef LUNA_USE_GLFW
-  setGlAttributes();
-
-  this->glfw.window = glfwCreateWindow(
-      mSize.x(), mSize.y(),
-      String("{} ({})")
-          .format(Application::getInstance()->getName(), name)
-          .c_str(),
-      nullptr, nullptr
-  );
-
-  if (!this->glfw.window) {
-    logError("error creating glfw window");
-  }
-
-  if (name == "opengl") {
-    glfwMakeContextCurrent(this->glfw.window);
-    glfwSwapInterval(1);
-    mRenderer = std::make_unique<OpenglGraphicsDriver>();
-  }
-#endif
-#ifdef LUNA_WINDOW_EGL
-  mRenderer = std::make_unique<OpenglRenderer>();
-#endif
-
-  if (!mRenderer) {
-    return;
-  }
-
-  mRenderer->setCanvas(mCanvas);
-
-  mRenderer->initialize();
-}
-
-void CanvasImpl::createWindow([[maybe_unused]] bool opengl) {
+void Canvas::createWindow([[maybe_unused]] bool opengl) {
   Console::quit();
 
 #ifdef LUNA_WINDOW_SDL2
@@ -180,7 +98,7 @@ void CanvasImpl::createWindow([[maybe_unused]] bool opengl) {
     this->sdl.window = nullptr;
   }
 
-  logInfo("creating SDL window ({}x{} pixels)", mSize.x(), mSize.y());
+  logInfo("creating SDL window ({}x{} pixels)", mSize.width, mSize.height);
 
   Uint32 windowFlags = SDL_WINDOW_RESIZABLE;
 
@@ -198,7 +116,7 @@ void CanvasImpl::createWindow([[maybe_unused]] bool opengl) {
 #if SDL_MAJOR_VERSION == 2
       SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 #endif
-      this->mSize.x(), this->mSize.y(), windowFlags
+      this->mSize.width, this->mSize.height, windowFlags
   );
 
   if (!this->sdl.window) {
@@ -256,7 +174,7 @@ void CanvasImpl::createWindow([[maybe_unused]] bool opengl) {
 #endif
 }
 
-void CanvasImpl::processCommandQueue() {
+void Canvas::processCommandQueue() {
 #ifdef LUNA_THREADED_CANVAS
   mCv.notify_one();
 #else
@@ -268,7 +186,7 @@ void CanvasImpl::processCommandQueue() {
 #endif
 }
 
-Internal::GraphicsMetrics CanvasImpl::getMetrics() {
+Internal::GraphicsMetrics Canvas::getMetrics() {
   if (!mRenderer) {
     return {};
   }
@@ -279,7 +197,7 @@ Internal::GraphicsMetrics CanvasImpl::getMetrics() {
 #ifdef LUNA_THREADED_CANVAS
 static int gNextThreadId = 0;
 
-void CanvasImpl::renderThread() {
+void Canvas::renderThread() {
   int threadId = ++gNextThreadId;
   Logger::getInstance().setThreadIdentifier(String("Render {}").format(threadId)
   );
@@ -318,7 +236,7 @@ void CanvasImpl::renderThread() {
 #endif
 
 #ifdef LUNA_WINDOW_SDL2
-bool CanvasImpl::processSdlEvent(const SDL_Event *event) {
+bool Canvas::processSdlEvent(const SDL_Event *event) {
   if (!sdlEventTargetsThis(event)) {
     return false;
   }
@@ -331,7 +249,7 @@ bool CanvasImpl::processSdlEvent(const SDL_Event *event) {
   case SDL_WINDOWEVENT: {
     switch (event->window.event) {
     case SDL_WINDOWEVENT_CLOSE: {
-      mCanvas->close();
+      close();
       return true;
     }
     }
@@ -373,7 +291,7 @@ bool CanvasImpl::processSdlEvent(const SDL_Event *event) {
   return false;
 }
 
-bool CanvasImpl::sdlEventTargetsThis(const SDL_Event *event) {
+bool Canvas::sdlEventTargetsThis(const SDL_Event *event) {
   auto myWindowId = SDL_GetWindowID(this->sdl.window);
 
   switch (event->type) {
@@ -396,16 +314,16 @@ bool CanvasImpl::sdlEventTargetsThis(const SDL_Event *event) {
   return true;
 }
 
-bool CanvasImpl::sendSdlEventToImmediateGui(const SDL_Event *event) {
+bool Canvas::sendSdlEventToImmediateGui(const SDL_Event *event) {
   if (mImmediateGui) {
     bool result{false};
     auto command = std::make_shared<CanvasCommand>(([this, &result, event]() {
-      result = mImmediateGui->getImpl()->processSdlEvent(event);
+      result = mImmediateGui->processSdlEvent(event);
     }));
 
     mCommandQueue.emplace(command);
     processCommandQueue();
-    mCanvas->sync();
+    sync();
 
     // note: ImGui always returns true if it can handle the event, even if there
     // is no focus
@@ -418,11 +336,9 @@ bool CanvasImpl::sendSdlEventToImmediateGui(const SDL_Event *event) {
 }
 #endif
 
-Canvas::Canvas(const Vector2i &size)
-    : mImpl{std::make_unique<CanvasImpl>(size)} {
-  mImpl->mCanvas = this;
+Canvas::Canvas(const Vector2i &size) : mSize{size}, mOriginalSize{size} {
 #ifdef LUNA_THREADED_CANVAS
-  mImpl->mThread = std::thread(&CanvasImpl::renderThread, mImpl.get());
+  mThread = std::thread(&Canvas::renderThread, this);
   this->sync();
 #endif
 }
@@ -430,135 +346,210 @@ Canvas::Canvas(const Vector2i &size)
 Canvas::~Canvas() { this->close(); }
 
 void Canvas::close() {
-  if (mImpl->mImmediateGui) {
-    mImpl->mImmediateGui.reset();
+  if (mImmediateGui) {
+    mImmediateGui.reset();
   }
 
 #ifdef LUNA_THREADED_CANVAS
-  if (mImpl->mThread.joinable()) {
+  if (mThread.joinable()) {
     {
-      std::lock_guard lock(mImpl->mMutex);
-      mImpl->mExitRequested = true;
+      std::lock_guard lock(mMutex);
+      mExitRequested = true;
     }
-    mImpl->mCv.notify_one();
-    mImpl->mThread.join();
+    mCv.notify_one();
+    mThread.join();
   }
 #else
-  if (mImpl->mRenderer) {
-    mImpl->mRenderer->close();
-    mImpl->mRenderer.reset();
+  if (mRenderer) {
+    mRenderer->close();
+    mRenderer.reset();
   }
 #endif
 
 #ifdef LUNA_WINDOW_SDL2
-  if (mImpl->sdl.window) {
+  if (sdl.window) {
     logInfo("destorying SDL window");
 
 #ifdef LUNA_RENDERER_OPENGL
-    if (mImpl->sdl.glContext) {
-      SDL_GL_DeleteContext(mImpl->sdl.glContext);
-      mImpl->sdl.glContext = nullptr;
+    if (sdl.glContext) {
+      SDL_GL_DeleteContext(sdl.glContext);
+      sdl.glContext = nullptr;
     }
 #endif
-    SDL_DestroyWindow(mImpl->sdl.window);
-    mImpl->sdl.window = nullptr;
+    SDL_DestroyWindow(sdl.window);
+    sdl.window = nullptr;
   }
 #endif
 
 #ifdef LUNA_USE_GLFW
-  if (mImpl->glfw.window) {
-    glfwDestroyWindow(mImpl->glfw.window);
-    mImpl->glfw.window = nullptr;
+  if (glfw.window) {
+    glfwDestroyWindow(glfw.window);
+    glfw.window = nullptr;
   }
 #endif
 
 #ifdef LUNA_WINDOW_EGL
-  if (mImpl->egl.display) {
+  if (egl.display) {
     eglMakeCurrent(
-        mImpl->egl.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT
+        egl.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT
     );
 
-    if (mImpl->egl.context) {
-      eglDestroyContext(mImpl->egl.display, mImpl->egl.context);
-      mImpl->egl.context = nullptr;
+    if (egl.context) {
+      eglDestroyContext(egl.display, egl.context);
+      egl.context = nullptr;
     }
 
-    if (mImpl->egl.surface) {
-      eglDestroySurface(mImpl->egl.display, mImpl->egl.surface);
-      mImpl->egl.surface = nullptr;
+    if (egl.surface) {
+      eglDestroySurface(egl.display, egl.surface);
+      egl.surface = nullptr;
     }
 
-    // eglTerminate(mImpl->egl.display);
-    // mImpl->egl.display = nullptr;
+    // eglTerminate(egl.display);
+    // egl.display = nullptr;
   }
 #endif
 
-  mImpl->mClosed = true;
+  mClosed = true;
 }
 
 void Canvas::setVideoDriver(const String &name) {
   auto command = std::make_shared<CanvasCommand>(([this, name]() {
-    mImpl->createWindow(name == "opengl");
-    mImpl->setVideoDriver(name);
+    createWindow(name == "opengl");
+
+    logInfo("setting canvas video driver to {}", name);
+#ifdef NDS
+    mRenderer = std::make_unique<NdsRenderer>();
+#endif
+#ifdef N64
+    resolution_t res = RESOLUTION_320x240;
+
+    if (mSize == Vector2i(256, 240)) {
+      res = RESOLUTION_256x240;
+    } else if (mSize == Vector2i(320, 240)) {
+      res = RESOLUTION_320x240;
+    } else if (mSize == Vector2i(512, 240)) {
+      res = RESOLUTION_512x240;
+    } else if (mSize == Vector2i(640, 240)) {
+      res = RESOLUTION_640x240;
+    } else if (mSize == Vector2i(512, 480)) {
+      res = RESOLUTION_512x480;
+    } else if (mSize == Vector2i(640, 480)) {
+      res = RESOLUTION_640x480;
+    }
+
+    display_init(
+        res, DEPTH_16_BPP, 3, GAMMA_NONE,
+        FILTERS_RESAMPLE_ANTIALIAS_DEDITHER
+    );
+    rdpq_init();
+    mRenderer = std::make_unique<N64Renderer>();
+#endif
+
+#ifdef LUNA_WINDOW_SDL2
+#ifdef LUNA_RENDERER_OPENGL
+    if (name == "opengl") {
+      this->sdl.glContext = SDL_GL_CreateContext(this->sdl.window);
+      SDL_GL_MakeCurrent(this->sdl.window, this->sdl.glContext);
+      SDL_GL_SetSwapInterval(1); // enable vsync
+      mRenderer = std::make_unique<OpenglRenderer>();
+    }
+#endif
+
+    if (name == "sdl") {
+      mRenderer = std::make_unique<SdlRenderer>();
+    }
+#endif
+#ifdef LUNA_USE_GLFW
+    setGlAttributes();
+
+    this->glfw.window = glfwCreateWindow(
+        mSize.width, mSize.height,
+        String("{} ({})")
+            .format(Application::getInstance()->getName(), name)
+            .c_str(),
+        nullptr, nullptr
+    );
+
+    if (!this->glfw.window) {
+      logError("error creating glfw window");
+    }
+
+    if (name == "opengl") {
+      glfwMakeContextCurrent(this->glfw.window);
+      glfwSwapInterval(1);
+      mRenderer = std::make_unique<OpenglGraphicsDriver>();
+    }
+#endif
+#ifdef LUNA_WINDOW_EGL
+    mRenderer = std::make_unique<OpenglRenderer>();
+#endif
+
+    if (!mRenderer) {
+      return;
+    }
+
+    mRenderer->setCanvas(this);
+
+    mRenderer->initialize();
   }));
 
-  mImpl->mCommandQueue.emplace(command);
+  mCommandQueue.emplace(command);
 
-  mImpl->processCommandQueue();
+  processCommandQueue();
 }
 
 void Canvas::attachImmediateGui(std::unique_ptr<ImmediateGui> gui) {
-  if (mImpl->mImmediateGui) {
+  if (mImmediateGui) {
     auto command = std::make_shared<CanvasCommand>(([this]() {
-      mImpl->mImmediateGui->getImpl()->init(this);
-      mImpl->mRenderer->quitImmediateGui();
+      mImmediateGui->init(this);
+      mRenderer->quitImmediateGui();
     }));
 
-    mImpl->mCommandQueue.emplace(command);
-    mImpl->processCommandQueue();
+    mCommandQueue.emplace(command);
+    processCommandQueue();
     this->sync();
   }
 
-  mImpl->mImmediateGui = std::move(gui);
+  mImmediateGui = std::move(gui);
 
-  if (!mImpl->mImmediateGui) {
+  if (!mImmediateGui) {
     return;
   }
 
   auto command = std::make_shared<CanvasCommand>(([this]() {
-    mImpl->mImmediateGui->getImpl()->init(this);
-    mImpl->mRenderer->initializeImmediateGui();
+    mImmediateGui->init(this);
+    mRenderer->initializeImmediateGui();
   }));
 
-  mImpl->mCommandQueue.emplace(command);
-  mImpl->processCommandQueue();
+  mCommandQueue.emplace(command);
+  processCommandQueue();
 }
 
 ImmediateGui *Canvas::getImmediateGui() const {
-  return mImpl->mImmediateGui.get();
+  return mImmediateGui.get();
 }
 
-void Canvas::setStage(std::shared_ptr<Stage> stage) { mImpl->mStage = stage; }
+void Canvas::setStage(std::shared_ptr<Stage> stage) { mStage = stage; }
 
-std::shared_ptr<Stage> Canvas::getStage() const { return mImpl->mStage; }
+std::shared_ptr<Stage> Canvas::getStage() const { return mStage; }
 
-void Canvas::setCamera2d(const Camera2d &camera) { mImpl->mCamera2d = camera; }
+void Canvas::setCamera2d(const Camera2d &camera) { mCamera2d = camera; }
 
-Camera2d Canvas::getCamera2d() const { return mImpl->mCamera2d; }
+Camera2d Canvas::getCamera2d() const { return mCamera2d; }
 
-void Canvas::setCamera3d(const Camera3d &camera) { mImpl->mCamera3d = camera; }
+void Canvas::setCamera3d(const Camera3d &camera) { mCamera3d = camera; }
 
-Camera3d Canvas::getCamera3d() const { return mImpl->mCamera3d; }
+Camera3d Canvas::getCamera3d() const { return mCamera3d; }
 
 void Canvas::setBackgroundColor(ColorRgb color) {
-  mImpl->mBackgroundColor = color;
+  mBackgroundColor = color;
 }
 
-ColorRgb Canvas::getBackgroundColor() const { return mImpl->mBackgroundColor; }
+ColorRgb Canvas::getBackgroundColor() const { return mBackgroundColor; }
 
 #ifdef LUNA_WINDOW_SDL2
 ImagePtr Canvas::captureScreenshot() {
-  SDL_Surface *surface = SDL_GetWindowSurface(mImpl->sdl.window);
+  SDL_Surface *surface = SDL_GetWindowSurface(sdl.window);
   // returns nullptr if SDL_FRAMEBUFFER_ACCELERATION=0 env is not set
 
   std::cout << "surface size: " << surface->w << "x" << surface->h << std::endl;
@@ -572,39 +563,39 @@ ImagePtr Canvas::captureScreenshot() {
 #endif
 
 void Canvas::render() {
-  if (!mImpl->mRenderer) {
+  if (!mRenderer) {
     return;
   }
 
-  if (mImpl->mStage) {
-    mImpl->mStage->updateTextureCache();
+  if (mStage) {
+    mStage->updateTextureCache();
   }
 
   auto command = std::make_shared<CanvasCommand>(([this]() {
 #if defined(LUNA_WINDOW_SDL2) && defined(LUNA_RENDERER_OPENGL)
-    if (mImpl->sdl.glContext) {
-      SDL_GL_MakeCurrent(mImpl->sdl.window, mImpl->sdl.glContext);
+    if (sdl.glContext) {
+      SDL_GL_MakeCurrent(sdl.window, sdl.glContext);
     }
 #endif
 
-    mImpl->mRenderer->render();
+    mRenderer->render();
 
-    if (mImpl->mImmediateGui) {
-      mImpl->mImmediateGui->getImpl()->render(mImpl->mImmediateGui.get());
+    if (mImmediateGui) {
+      mImmediateGui->render(mImmediateGui.get());
     }
 
-    mImpl->mRenderer->present();
+    mRenderer->present();
   }));
 
-  mImpl->mCommandQueue.emplace(command);
-  mImpl->processCommandQueue();
+  mCommandQueue.emplace(command);
+  processCommandQueue();
 }
 
 void Canvas::sync() {
 #ifdef LUNA_THREADED_CANVAS
   using namespace std::chrono_literals;
 
-  std::unique_lock lock(mImpl->mMutex);
+  std::unique_lock lock(mMutex);
 
 #ifdef LUNA_WINDOW_SDL2
   // on Linux, SDL events are sent to the main thread only
@@ -613,18 +604,18 @@ void Canvas::sync() {
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
-      Application::getInstance()->getImpl()->pushSdlEvent(&event);
+      Application::getInstance()->pushSdlEvent(&event);
     }
   }));
 
-  mImpl->mCommandQueue.emplace(command);
+  mCommandQueue.emplace(command);
 
-  mImpl->processCommandQueue();
+  processCommandQueue();
 #endif
 
-  if (!mImpl->mCommandQueue.empty()) {
-    bool result = mImpl->mCv.wait_for(lock, 4s, [this]() {
-      return mImpl->mCommandQueue.empty();
+  if (!mCommandQueue.empty()) {
+    bool result = mCv.wait_for(lock, 4s, [this]() {
+      return mCommandQueue.empty();
     });
 
     if (!result) {
@@ -634,10 +625,12 @@ void Canvas::sync() {
 #endif
 }
 
-std::queue<ButtonEvent> &Canvas::getButtonEvents() const {
-  return mImpl->mButtonEvents;
+std::queue<ButtonEvent> &Canvas::getButtonEvents() {
+  return mButtonEvents;
 }
 
-bool Canvas::isClosed() const { return mImpl->mClosed; }
+bool Canvas::isClosed() const { return mClosed; }
 
-CanvasImpl *Canvas::getImpl() const { return mImpl.get(); }
+Vector2i Canvas::getOriginalSize() const {
+  return mOriginalSize;
+}

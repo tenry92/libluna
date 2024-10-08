@@ -5,47 +5,40 @@
 
 using namespace Luna::Filesystem;
 
-class FileReader::impl {
-  public:
-  Path path;
-  std::ifstream stream;
-  std::size_t size;
-};
-
 FileReaderPtr FileReader::make(const Path &filename) {
   return FileReaderPtr(new FileReader(filename));
 }
 
-FileReader::FileReader(const Path &filename) : mImpl{std::make_unique<impl>()} {
-  mImpl->stream =
+FileReader::FileReader(const Path &filename) {
+  mStream =
       std::ifstream(filename.getRawPath().c_str(), std::ios::binary);
 
-  if (!mImpl->stream.good()) {
+  if (!mStream.good()) {
     throw std::runtime_error(String("unable to open file \"{}\" for reading")
                                  .format(filename.getRawPath())
                                  .s_str());
   }
 
-  mImpl->stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-  mImpl->stream.seekg(0, std::ios_base::end);
-  mImpl->size = static_cast<std::size_t>(mImpl->stream.tellg());
-  mImpl->stream.seekg(0, std::ios_base::beg);
+  mStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+  mStream.seekg(0, std::ios_base::end);
+  mSize = static_cast<std::size_t>(mStream.tellg());
+  mStream.seekg(0, std::ios_base::beg);
 }
 
 FileReader::~FileReader() = default;
 
-bool FileReader::isValid() const { return !mImpl->path.isEmpty(); }
+bool FileReader::isValid() const { return !mPath.isEmpty(); }
 
-std::size_t FileReader::getSize() const { return mImpl->size; }
+std::size_t FileReader::getSize() const { return mSize; }
 
-bool FileReader::eof() const { return mImpl->stream.eof(); }
+bool FileReader::eof() const { return mStream.eof(); }
 
 std::size_t FileReader::tell() {
-  return static_cast<std::size_t>(mImpl->stream.tellg());
+  return static_cast<std::size_t>(mStream.tellg());
 }
 
 std::size_t FileReader::seek(std::size_t position) {
-  mImpl->stream.seekg(position);
+  mStream.seekg(position);
 
   return tell();
 }
@@ -57,7 +50,7 @@ std::size_t FileReader::seekRelative(int position) {
     position = 0;
   }
 
-  mImpl->stream.seekg(position, std::ios_base::cur);
+  mStream.seekg(position, std::ios_base::cur);
 
   return tell();
 }
@@ -65,16 +58,16 @@ std::size_t FileReader::seekRelative(int position) {
 std::size_t FileReader::read(
     std::uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
 ) {
-  int startPos = static_cast<int>(mImpl->stream.tellg());
+  int startPos = static_cast<int>(mStream.tellg());
 
-  if (startPos + objectSize * objectCount > mImpl->size) {
-    objectCount = (mImpl->size - startPos) / objectSize;
+  if (startPos + objectSize * objectCount > mSize) {
+    objectCount = (mSize - startPos) / objectSize;
   }
 
-  mImpl->stream.read(
+  mStream.read(
       reinterpret_cast<char *>(buffer), objectSize * objectCount
   );
-  int endPos = static_cast<int>(mImpl->stream.tellg());
+  int endPos = static_cast<int>(mStream.tellg());
 
   if (endPos == -1) {
     // error

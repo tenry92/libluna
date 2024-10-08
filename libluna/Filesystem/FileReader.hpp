@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <fstream>
 #include <memory>
 
 #include <libluna/Filesystem/Path.hpp>
@@ -33,7 +34,8 @@ namespace Luna::Filesystem {
 
     private:
     explicit FileReader(const Path &filename);
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    Path mPath;
+    std::ifstream mStream;
+    std::size_t mSize;
   };
 } // namespace Luna::Filesystem

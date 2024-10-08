@@ -10,7 +10,8 @@ namespace Luna::Audio {
     void render(float *buffer, int frameCount) override;
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    float mDelay;
+    std::vector<float> mBuffer;
+    int mBufferOffset;
   };
 } // namespace Luna::Audio

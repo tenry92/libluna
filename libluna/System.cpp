@@ -1,9 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdio.h> // fgets, fopen
+#include <string.h> // strncmp, strlen
 
 #ifdef _WIN32
-#include <windows.h>
+#include <windows.h> // GetCurrentProcess, GetProcessMemoryInfo, GetSystemInfo
 #include <psapi.h>
 #endif
 

@@ -1,13 +1,14 @@
 #pragma once
 
-#include <memory>
+#include <libluna/config.h>
 
 #include <libluna/Audio/DelayNode.hpp>
 #include <libluna/Audio/GainNode.hpp>
 #include <libluna/Audio/OscillatorNode.hpp>
+#include <libluna/Command.hpp>
+#include <libluna/Internal/AudioMetrics.hpp>
 
 namespace Luna::Audio {
-  class AudioManagerImpl;
   class AudioNode;
 
   /**
@@ -57,9 +58,23 @@ namespace Luna::Audio {
         float frequency, OscillatorNode::Type type = OscillatorNode::kSine
     );
 
-    AudioManagerImpl *getImpl() const;
+    Internal::AudioMetrics &getMetrics();
+
+    void advanceTime(double time);
 
     private:
-    std::unique_ptr<AudioManagerImpl> mImpl;
+    inline void pushCommand(std::shared_ptr<Command> command) {
+      mCommandQueue.push(command);
+    }
+
+    AudioNodePtr mDestinationNode;
+    std::queue<std::shared_ptr<Command>> mCommandQueue;
+    double mTime;
+    float mFrameRate;
+    int mChannelCount;
+    Internal::AudioMetrics mMetrics;
+#ifdef LUNA_AUDIO_SDL2
+    SDL_AudioDeviceID mSdlAudioDeviceId{0};
+#endif
   };
 } // namespace Luna::Audio

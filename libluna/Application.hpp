@@ -1,12 +1,24 @@
 #pragma once
 
+#include <libluna/config.h>
+
 #include <functional>
-#include <memory>
+#include <list>
+#include <queue>
+#include <vector>
+
+#ifdef LUNA_WINDOW_SDL2
+#include <SDL2/SDL.h>
+#endif
 
 #include <libluna/Audio/AudioManager.hpp>
 #include <libluna/Audio/AudioNode.hpp>
 #include <libluna/Canvas.hpp>
 #include <libluna/Filesystem/Path.hpp>
+#include <libluna/InputManager.hpp>
+#include <libluna/Internal/DebugMetrics.hpp>
+#include <libluna/IntervalManager.hpp>
+#include <libluna/PathManager.hpp>
 #include <libluna/Resource.hpp>
 #include <libluna/Sprite.hpp>
 #include <libluna/String.hpp>
@@ -105,15 +117,34 @@ namespace Luna {
      */
     const String &getName() const;
 
-    Audio::AudioManager *getAudioManager() const;
+    Audio::AudioManager *getAudioManager();
 
     Audio::AudioNodePtr getAudioDestinationNode() const;
 
     void openDebugger(std::shared_ptr<Canvas> canvas);
 
-    ApplicationImpl *getImpl() const;
+#ifdef LUNA_WINDOW_SDL2
+    std::shared_ptr<Canvas> getCanvasBySdlWindowId(Uint32 windowId);
+    void pushSdlEvent(SDL_Event *event);
+#endif
 
     private:
-    std::unique_ptr<ApplicationImpl> mImpl;
+    void executeKeyboardShortcuts();
+
+    void mainLoop();
+    void processEvents();
+    void shutDown();
+    bool hasCanvas();
+
+    std::vector<String> mArgs;
+    std::function<void()> mReadyCallback;
+    std::list<std::weak_ptr<Canvas>> mCanvases;
+    String mRaisedErrorMessage;
+    IntervalManager mIntervalManager;
+    Audio::AudioManager mAudioManager;
+    PathManager mPathManager;
+    String mName;
+    std::shared_ptr<Internal::DebugMetrics> mDebugMetrics;
+    InputManager mHotkeysManager;
   };
 } // namespace Luna

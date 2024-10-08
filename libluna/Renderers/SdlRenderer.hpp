@@ -1,10 +1,29 @@
 #pragma once
 
-#include <libluna/Renderers/CommonRenderer.hpp>
+#include <libluna/config.h>
 
-#include <memory>
+#ifdef LUNA_IMGUI
+#include <imgui/imgui.h>
+#endif
+
+#include <SDL2/SDL.h>
+
+#include <libluna/Renderers/CommonRenderer.hpp>
+#include <libluna/Logger.hpp>
 
 namespace Luna {
+  struct SdlDeleter {
+    void operator()(SDL_Renderer *renderer) const {
+      logVerbose("destroying SDL renderer");
+      SDL_DestroyRenderer(renderer);
+    }
+
+    void operator()(SDL_Texture *texture) const {
+      logDebug("destroying SDL texture");
+      SDL_DestroyTexture(texture);
+    }
+  };
+
   class SdlRenderer : public CommonRenderer {
     public:
     SdlRenderer();
@@ -33,7 +52,13 @@ namespace Luna {
     void imguiNewFrame() override;
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+#ifdef LUNA_IMGUI
+    ImGuiContext *mImGuiContext{nullptr};
+#endif
+
+    std::unique_ptr<SDL_Renderer, SdlDeleter> mRenderer;
+    std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
+
+    std::map<int, SDL_Texture *> mTextureIdMapping;
   };
 } // namespace Luna

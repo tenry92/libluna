@@ -1,7 +1,6 @@
 #pragma once
 
 #include <list>
-#include <memory>
 #include <variant>
 
 #include <libluna/Light.hpp>
@@ -41,11 +40,14 @@ namespace Luna {
     std::shared_ptr<PointLight> makePointLight();
     const std::list<std::shared_ptr<PointLight>> &getPointLights() const;
 
-    TextureCache *getTextureCache() const;
+    TextureCache *getTextureCache();
     void updateTextureCache();
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    std::list<Drawable2d> mDrawables2d;
+    std::list<Drawable3d> mDrawables3d;
+    AmbientLight mAmbientLight;
+    std::list<std::shared_ptr<PointLight>> mPointLights;
+    TextureCache mTextureCache;
   };
 } // namespace Luna

@@ -7,7 +7,6 @@
 namespace Luna::Audio {
   class AudioNode;
   using AudioNodePtr = std::shared_ptr<AudioNode>;
-  class AudioNodeImpl;
   class AudioManager;
 
   /**
@@ -35,14 +34,15 @@ namespace Luna::Audio {
 
     float getFrameRate() const;
 
-    AudioNodeImpl *getImpl() const;
-
     protected:
+    friend class AudioManager;
     AudioNode();
+    std::list<AudioNodePtr> mInputs;
+    AudioManager *mManager;
+    AudioNodePtr mConnectedNode;
 
     private:
     void addInput(AudioNodePtr input);
     void removeInput(AudioNodePtr input);
-    std::unique_ptr<AudioNodeImpl> mImpl;
   };
 } // namespace Luna::Audio

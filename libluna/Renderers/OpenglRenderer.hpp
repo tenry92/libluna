@@ -1,8 +1,19 @@
 #pragma once
 
-#include <libluna/Renderers/CommonRenderer.hpp>
+#include <libluna/config.h>
 
-#include <memory>
+#ifdef LUNA_IMGUI
+#include <imgui/imgui.h>
+#endif
+
+#include <libluna/GL/MeshBuffer.hpp>
+#include <libluna/GL/Shader.hpp>
+#include <libluna/GL/ShaderLib.hpp>
+#include <libluna/GL/SpriteBuffer.hpp>
+#include <libluna/GL/Uniform.hpp>
+#include <libluna/GL/common.hpp>
+
+#include <libluna/Renderers/CommonRenderer.hpp>
 
 namespace Luna {
   class OpenglRenderer : public CommonRenderer {
@@ -39,7 +50,35 @@ namespace Luna {
     void imguiNewFrame() override;
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+#ifdef LUNA_IMGUI
+    ImGuiContext *mImGuiContext{nullptr};
+#endif
+
+    GL::Shader mSpriteShader;
+    GL::Shader mModelShader;
+    // std::unique_ptr<TextureCacheType> mTextureCache;
+    std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
+
+    struct {
+      GL::Uniform screenSize;
+      GL::Uniform spritePos;
+      GL::Uniform spriteTexture;
+      GL::Uniform transformModel;
+      GL::Uniform transformView;
+      GL::Uniform transformProjection;
+      GL::Uniform materialDiffuseMap;
+      GL::Uniform materialNormalMap;
+      GL::Uniform ambientLightColor;
+      GL::Uniform ambientLightIntensity;
+      GL::Uniform pointLightsEnabled;
+      GL::Uniform pointLightsColor;
+      GL::Uniform pointLightsPosition;
+      GL::Uniform viewPos;
+    } mUniforms;
+
+    std::map<int, GLuint> mTextureIdMapping;
+    std::map<int, GLuint> mFramebuffers;
+    std::map<int, std::shared_ptr<GL::MeshBuffer>> mMeshMapping;
+    bool mUsingFramebuffer{false};
   };
 } // namespace Luna

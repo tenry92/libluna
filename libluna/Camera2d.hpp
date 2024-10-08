@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include <libluna/Vector.hpp>
 
 namespace Luna {
@@ -17,7 +15,6 @@ namespace Luna {
     void setPosition(const Vector2f &position);
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    Vector2f mPosition;
   };
 } // namespace Luna

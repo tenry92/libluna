@@ -4,31 +4,24 @@
 
 using namespace Luna;
 
-class Sprite::impl {
-  public:
-  ImageResPtr mImage;
-  std::shared_ptr<Resource<Palette>> mPalette;
-  Vector2f mPosition;
-};
-
 SpritePtr Sprite::make() { return SpritePtr(new Sprite()); }
 
-Sprite::Sprite() : mImpl{std::make_unique<impl>()} {}
+Sprite::Sprite() = default;
 
 Sprite::~Sprite() = default;
 
-void Sprite::setImage(ImageResPtr image) { mImpl->mImage = image; }
+void Sprite::setImage(ImageResPtr image) { mImage = image; }
 
-ImageResPtr Sprite::getImage() const { return mImpl->mImage; }
+ImageResPtr Sprite::getImage() const { return mImage; }
 
 void Sprite::setPalette(ResourcePtr<Palette> palette) {
-  mImpl->mPalette = palette;
+  mPalette = palette;
 }
 
-ResourcePtr<Palette> Sprite::getPalette() const { return mImpl->mPalette; }
+ResourcePtr<Palette> Sprite::getPalette() const { return mPalette; }
 
 void Sprite::setPosition(const Vector2f &position) {
-  mImpl->mPosition = position;
+  mPosition = position;
 }
 
-Vector2f Sprite::getPosition() const { return mImpl->mPosition; }
+Vector2f Sprite::getPosition() const { return mPosition; }

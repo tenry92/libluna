@@ -32,10 +32,9 @@ namespace Luna {
     void addImage(ImageResPtr image, Priority priority = kHigh);
     void removeImage(ImageResPtr image);
     void resetPriorities();
-    std::unordered_map<ImageResPtr, Priority> &getCache() const;
+    const std::unordered_map<ImageResPtr, Priority> &getCache() const;
 
     private:
-    class impl;
-    std::unique_ptr<impl> mImpl;
+    std::unordered_map<ImageResPtr, Priority> mCache;
   };
 }
