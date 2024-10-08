@@ -6,6 +6,7 @@ Luna Game Engine
 
    project-structure
    build-layout
+   coding-guidelines
 
 Getting started
 ---------------
