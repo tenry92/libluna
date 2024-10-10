@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
   Application app(argc, argv);
 
   shared_ptr<Canvas> canvas;
-  shared_ptr<Sprite> sprite;
+  Sprite *sprite;
   ResourceReaderPtr reader;
   DiscreteAnimation<ImageResPtr> animation;
 
@@ -90,11 +90,9 @@ int main(int argc, char **argv) {
 
     animation = DiscreteAnimation<ImageResPtr>(frames, 30.0f);
 
-    sprite = Sprite::make();
-    sprite->setPosition({CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2});
-
     auto stage = make_shared<Stage>();
-    stage->add(sprite);
+    sprite = stage->createSprite();
+    sprite->setPosition({CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2});
     canvas->setStage(stage);
   });
 

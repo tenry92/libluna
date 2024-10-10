@@ -4,8 +4,6 @@
 
 using namespace Luna;
 
-SpritePtr Sprite::make() { return SpritePtr(new Sprite()); }
-
 Sprite::Sprite() = default;
 
 Sprite::~Sprite() = default;

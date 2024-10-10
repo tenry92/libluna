@@ -9,7 +9,7 @@ namespace Luna {
 
   class Text final {
     public:
-    static TextPtr make();
+    Text();
     ~Text();
 
     void setContent(const Luna::String &content);
@@ -19,7 +19,6 @@ namespace Luna {
     FontResPtr getFont() const;
 
     private:
-    Text();
     FontResPtr mFont;
     String mContent;
   };

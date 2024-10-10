@@ -2,8 +2,6 @@
 
 using namespace Luna;
 
-TextPtr Text::make() { return TextPtr(new Text()); }
-
 Text::Text() = default;
 
 Text::~Text() = default;

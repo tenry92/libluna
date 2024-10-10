@@ -274,10 +274,9 @@ int main(int argc, char **argv) {
     auto diffuse =
         make_shared<Resource<Image>>(GfxImageLoader("wall_32x32.gfx"));
 
-    auto model = make_shared<Model>();
+    auto model = stage->createModel();
     model->setMesh(makeMesh());
     model->getMaterial().setDiffuse(diffuse);
-    stage->add(model);
 
     auto pillarResource = make_shared<Resource<Mesh>>(ObjLoader("pillar.obj"));
     auto pillarMesh = pillarResource->get().get();
@@ -285,20 +284,18 @@ int main(int argc, char **argv) {
     // having just two pillars (216 triangles each) already causes serious lag on N64
     for (float z = -8.0f; z <= 8.0f; z += 4.0f) {
       // left side
-      auto pillarModel = make_shared<Model>();
+      auto pillarModel = stage->createModel();
       pillarModel->setMesh(pillarMesh);
       pillarModel->getTransform() =
           pillarModel->getTransform().translate({-8.0f, 0.0f, z});
       pillarModel->getMaterial().setDiffuse(diffuse);
-      stage->add(pillarModel);
 
       // right side
-      pillarModel = make_shared<Model>();
+      pillarModel = stage->createModel();
       pillarModel->setMesh(pillarMesh);
       pillarModel->getTransform() =
           pillarModel->getTransform().translate({8.0f, 0.0f, z});
       pillarModel->getMaterial().setDiffuse(diffuse);
-      stage->add(pillarModel);
     }
   });
 

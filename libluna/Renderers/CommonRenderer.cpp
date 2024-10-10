@@ -224,11 +224,11 @@ void CommonRenderer::updateTextureCache(
   std::unordered_set<std::shared_ptr<Mesh>> visitedMeshes;
 
   for (auto &&drawable : stage->getDrawables2d()) {
-    if (!std::holds_alternative<TextPtr>(drawable)) {
+    if (!std::holds_alternative<Text *>(drawable)) {
       continue;
     }
 
-    auto text = std::get<TextPtr>(drawable);
+    auto text = std::get<Text *>(drawable);
 
     if (!text->getFont()) {
       continue;
@@ -281,7 +281,7 @@ void CommonRenderer::render2d(
     std::visit(
         overloaded{
             [](auto) {},
-            [&](SpritePtr sprite) {
+            [&](Sprite *sprite) {
               RenderTextureInfo info;
               auto texture = mKnownImages.at(sprite->getImage());
               info.textureId = texture.id;
@@ -290,7 +290,7 @@ void CommonRenderer::render2d(
                   sprite->getPosition() - canvas->getCamera2d().getPosition();
               renderTexture(canvas, &info);
             },
-            [&](TextPtr text) {
+            [&](Text *text) {
               auto font = text->getFont()->get().get();
 
               int x = 0;

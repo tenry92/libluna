@@ -33,17 +33,19 @@ namespace Luna {
    */
   class Stage {
     public:
-    using Drawable2d = std::variant<SpritePtr, TextPtr>;
-    using Drawable3d = ModelPtr;
+    using Drawable2d = std::variant<Sprite *, Text *>;
+    using Drawable3d = Model *;
     Stage();
     ~Stage();
 
-    void add(SpritePtr sprite);
-    void add(TextPtr text);
-    void add(ModelPtr model);
-    void remove(SpritePtr sprite);
-    void remove(TextPtr text);
-    void remove(ModelPtr model);
+    Sprite *createSprite();
+    void destroySprite(Sprite *sprite);
+
+    Text *createText();
+    void destroyText(Text *text);
+
+    Model *createModel();
+    void destroyModel(Model *model);
 
     const std::list<Drawable2d> &getDrawables2d() const;
     const std::list<Drawable3d> &getDrawables3d() const;

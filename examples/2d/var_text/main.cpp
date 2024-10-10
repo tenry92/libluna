@@ -72,12 +72,10 @@ int main(int argc, char **argv) {
     canvas->setVideoDriver(app.getDefaultVideoDriver());
     canvas->setBackgroundColor({0.0f, 0.9f, 0.6f, 1.0f});
 
-    auto text = Text::make();
+    auto stage = make_shared<Stage>();
+    auto text = stage->createText();
     text->setFont(make_shared<Resource<Font>>(GfxFontLoader("font.gfx")));
     text->setContent("Welcome text!\nThis is a demonstration\nfor rendering text!");
-
-    auto stage = make_shared<Stage>();
-    stage->add(text);
     canvas->setStage(stage);
   });
 

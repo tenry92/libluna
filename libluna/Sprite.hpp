@@ -13,7 +13,7 @@ namespace Luna {
 
   class Sprite final {
     public:
-    static SpritePtr make();
+    Sprite();
     ~Sprite();
 
     void setImage(ImageResPtr image);
@@ -26,7 +26,6 @@ namespace Luna {
     Vector2f getPosition() const;
 
     private:
-    Sprite();
     ImageResPtr mImage;
     std::shared_ptr<Resource<Palette>> mPalette;
     Vector2f mPosition;

@@ -14,7 +14,7 @@ namespace {
       std::visit(
           overloaded{
               [](auto) {},
-              [&](SpritePtr sprite) {
+              [&](Sprite *sprite) {
                 if (sprite->getImage()) {
                   images.emplace_front(sprite->getImage());
                 }
@@ -46,27 +46,44 @@ Stage::Stage() = default;
 
 Stage::~Stage() = default;
 
-void Stage::add(SpritePtr sprite) { mDrawables2d.emplace_back(sprite); }
+Sprite *Stage::createSprite() {
+  auto sprite = new Sprite();
+  mDrawables2d.emplace_back(sprite);
 
-void Stage::add(TextPtr text) { mDrawables2d.emplace_back(text); }
+  return sprite;
+}
 
-void Stage::add(ModelPtr model) { mDrawables3d.emplace_back(model); }
-
-void Stage::remove(SpritePtr sprite) {
+void Stage::destroySprite(Sprite *sprite) {
   mDrawables2d.remove_if([sprite](const auto &drawable) {
-    return std::holds_alternative<SpritePtr>(drawable) &&
-           std::get<SpritePtr>(drawable) == sprite;
+    return std::holds_alternative<Sprite *>(drawable) &&
+           std::get<Sprite *>(drawable) == sprite;
   });
 }
 
-void Stage::remove(TextPtr text) {
+Text *Stage::createText() {
+  auto text = new Text();
+  mDrawables2d.emplace_back(text);
+
+  return text;
+}
+
+void Stage::destroyText(Text *text) {
   mDrawables2d.remove_if([text](const auto &drawable) {
-    return std::holds_alternative<TextPtr>(drawable) &&
-           std::get<TextPtr>(drawable) == text;
+    return std::holds_alternative<Text *>(drawable) &&
+           std::get<Text *>(drawable) == text;
   });
 }
 
-void Stage::remove(ModelPtr model) { mDrawables3d.remove(model); }
+Model *Stage::createModel() {
+  auto model = new Model();
+  mDrawables3d.emplace_back(model);
+
+  return model;
+}
+
+void Stage::destroyModel(Model *model) {
+  mDrawables3d.remove(model);
+}
 
 const std::list<Stage::Drawable2d> &Stage::getDrawables2d() const {
   return mDrawables2d;
