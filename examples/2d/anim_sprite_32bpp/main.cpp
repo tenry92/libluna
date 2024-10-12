@@ -30,9 +30,9 @@ template<typename T>
 class DiscreteAnimation {
   public:
   DiscreteAnimation() {}
-  DiscreteAnimation(const std::vector<T> &frames, float frameRate) : mFrames(frames), mFrameRate(frameRate) {}
+  DiscreteAnimation(std::vector<T> &&frames, float frameRate) : mFrames(std::move(frames)), mFrameRate(frameRate) {}
 
-  T advance(float seconds) {
+  T &advance(float seconds) {
     mCurrentFrame = static_cast<float>(std::fmod(
       mCurrentFrame + mFrameRate * seconds, mFrames.size()
     ));
@@ -50,11 +50,11 @@ class GfxImageLoader {
   public:
   GfxImageLoader(libgfx_Gfx *gfx, int frameIndex) : mGfx(gfx), mFrameIndex(frameIndex) {}
 
-  ImagePtr operator()() {
+  Image operator()() {
     auto frameset = &mGfx->framesets[0];
 
-    auto image = Image::makeRgb32({frameset->width, frameset->height});
-    memcpy(image->getData(), libgfx_getFramePointer(frameset, mFrameIndex), image->getByteCount());
+    auto image = Image(32, {frameset->width, frameset->height});
+    memcpy(image.getData(), libgfx_getFramePointer(frameset, mFrameIndex), image.getByteCount());
 
     return image;
   }
@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
   shared_ptr<Canvas> canvas;
   Sprite *sprite;
   ResourceReaderPtr reader;
-  DiscreteAnimation<ImageResPtr> animation;
+  DiscreteAnimation<Image> animation;
 
   app.whenReady([&]() {
     canvas = app.makeCanvas({CANVAS_WIDTH, CANVAS_HEIGHT});
@@ -81,14 +81,14 @@ int main(int argc, char **argv) {
     auto gfx = libgfx_loadImageFromCallback(readFromResource, reader.get());
     auto frameset = &gfx->framesets[0];
 
-    std::vector<ImageResPtr> frames;
+    std::vector<Image> frames;
     frames.reserve(frameset->numFrames);
 
     for (int i = 0; i < frameset->numFrames; ++i) {
-      frames.emplace_back(make_shared<Resource<Image>>(GfxImageLoader(gfx, i)));
+      frames.emplace_back(GfxImageLoader(gfx, i)());
     }
 
-    animation = DiscreteAnimation<ImageResPtr>(frames, 30.0f);
+    animation = DiscreteAnimation<Image>(std::move(frames), 30.0f);
 
     auto stage = make_shared<Stage>();
     sprite = stage->createSprite();
@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
   });
 
   app.addInterval(60, [&](float elapsedTime) {
-    sprite->setImage(animation.advance(elapsedTime));
+    sprite->setImage(&animation.advance(elapsedTime));
   });
 
   return app.run();

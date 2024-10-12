@@ -103,7 +103,7 @@ namespace Luna {
      * It is guaranteed that the given texture ID was previously passed to
      * @ref createTexture().
      */
-    virtual void loadTexture(int id, ImagePtr image);
+    virtual void loadTexture(int id, Image *image);
 
     /**
      * @brief Resize the texture for the provided ID.
@@ -193,7 +193,7 @@ namespace Luna {
     IdAllocator<uint16_t> mMeshIdAllocator;
     int mRenderTargetId;
     Vector2i mCurrentRenderSize;
-    std::unordered_map<ImageResPtr, Texture> mKnownImages;
+    std::unordered_map<Image *, Texture> mKnownImages;
     std::unordered_map<Font::Char *, int> mCharImages;
     std::set<FontPtr> mLoadedFonts;
     std::unordered_map<std::shared_ptr<Mesh>, int> mKnownMeshes;

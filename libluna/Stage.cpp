@@ -7,8 +7,8 @@
 using namespace Luna;
 
 namespace {
-  std::forward_list<ImageResPtr> listImagesInUse(Stage *stage) {
-    std::forward_list<ImageResPtr> images;
+  std::forward_list<Image *> listImagesInUse(Stage *stage) {
+    std::forward_list<Image *> images;
 
     for (auto &&drawable : stage->getDrawables2d()) {
       std::visit(
@@ -117,7 +117,7 @@ void Stage::updateTextureCache() {
 
   mTextureCache.resetPriorities();
 
-  for (auto &&imageResPtr : images) {
-    mTextureCache.addImage(imageResPtr, TextureCache::kForce);
+  for (auto &&image : images) {
+    mTextureCache.addImage(image, TextureCache::kForce);
   }
 }

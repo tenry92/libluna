@@ -45,8 +45,8 @@ class GfxFontLoader {
       auto ch = font->makeCharForCodePoint(gfxCh->codePoint);
 
       if (frameset->width > 0 && frameset->height > 0) {
-        ch->image = Image::makeRgb32({frameset->width, frameset->height});
-        memcpy(ch->image->getData(), frameset->data, ch->image->getByteCount());
+        ch->image = Image(32, {frameset->width, frameset->height});
+        memcpy(ch->image.getData(), frameset->data, ch->image.getByteCount());
       }
 
       ch->offset = Vector2i(gfxCh->xOffset, gfxCh->yOffset);

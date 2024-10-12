@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include <libluna/Color.hpp>
 #include <libluna/Palette.hpp>
 #include <libluna/Resource.hpp>
@@ -28,30 +26,30 @@ namespace Luna {
    * - 24 bpp: RGB24, using 8 bits for red/green/blue
    * - 32 bpp: RGBA32, using 8 bits for red/green/blue/alpha
    */
-  class Image : public std::enable_shared_from_this<Image> {
+  class Image {
     public:
-    static ImagePtr make();
-    static ImagePtr make(int bitsPerPixel, const Vector2i &size);
-    static ImagePtr make(const Image &other);
-    static ImagePtr make(Image &&other);
+    /**
+     * @brief Create an empty image.
+     */
+    Image();
 
-    static inline ImagePtr makeIndexed4(const Vector2i &size) {
-      return make(4, size);
-    }
-    static inline ImagePtr makeIndexed8(const Vector2i &size) {
-      return make(8, size);
-    }
-    static inline ImagePtr makeRgb16(const Vector2i &size) {
-      return make(16, size);
-    }
-    static inline ImagePtr makeRgb24(const Vector2i &size) {
-      return make(24, size);
-    }
-    static inline ImagePtr makeRgb32(const Vector2i &size) {
-      return make(32, size);
-    }
+    /**
+     * @brief Create an image with given bits per pixel and size.
+     */
+    Image(int bitsPerPixel, const Vector2i &size);
+
+    Image(const Image &other);
+
+    Image(Image &&other);
+
+    Image operator=(const Image &other);
+
+    Image &operator=(Image &&other);
+
     ~Image();
+
     int getBitsPerPixel() const;
+
     Vector2i getSize() const;
 
     void setPalette(PalettePtr palette);
@@ -74,7 +72,7 @@ namespace Luna {
      * returned.
      * If the image is using a palette, a palette must be assigned first.
      */
-    ImagePtr toRgb16();
+    Image toRgb16();
 
     /**
      * @brief Convert the image to RGB24.
@@ -85,7 +83,7 @@ namespace Luna {
      * returned.
      * If the image is using a palette, a palette must be assigned first.
      */
-    ImagePtr toRgb24();
+    Image toRgb24();
 
     /**
      * @brief Convert the image to RGB32.
@@ -95,7 +93,7 @@ namespace Luna {
      * returned.
      * If the image is using a palette, a palette must be assigned first.
      */
-    ImagePtr toRgb32();
+    Image toRgb32();
 
     /**
      * @brief Get a cropped potion of the image in the same color format.
@@ -103,7 +101,7 @@ namespace Luna {
      * If the given size exceeds the image dimensions from offset, the cropped
      * image may be smaller than the given size.
      */
-    ImagePtr crop(Vector2i size, Vector2i offset = Vector2i(0, 0));
+    Image crop(Vector2i size, Vector2i offset = Vector2i(0, 0));
 
     int getByteCount() const {
       return getSize().width * getSize().height * (getBitsPerPixel() / 4) / 2;
@@ -140,11 +138,6 @@ namespace Luna {
     bool isInterpolated() const;
 
     private:
-    Image();
-    Image(int bitsPerPixel, const Vector2i &size);
-    Image(const Image &other);
-    Image(Image &&other);
-
     int mBitsPerPixel; ///< Should be (indexed) 4, 8, (true) 24 or 32.
     Vector2i mSize;
     std::vector<uint8_t> mData;

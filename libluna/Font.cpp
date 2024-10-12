@@ -26,7 +26,6 @@ Font::Char *Font::makeCharForCodePoint(String::CodePoint codePoint) {
   mChars.emplace(codePoint, Font::Char{});
   auto ch = getCharByCodePoint(codePoint);
   ch->codePoint = codePoint;
-  ch->image = nullptr;
 
   return ch;
 }

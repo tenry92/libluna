@@ -197,7 +197,7 @@ void OpenglRenderer::destroyTexture(int id) {
   CHECK_GL(glDeleteTextures(1, &texture));
 }
 
-void OpenglRenderer::loadTexture(int id, ImagePtr image) {
+void OpenglRenderer::loadTexture(int id, Image *image) {
   GLuint texture = mTextureIdMapping.at(id);
 
   GLenum inputFormat = GL_RGBA;

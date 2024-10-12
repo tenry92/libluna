@@ -29,12 +29,12 @@ namespace Luna {
     TextureCache();
     ~TextureCache();
 
-    void addImage(ImageResPtr image, Priority priority = kHigh);
-    void removeImage(ImageResPtr image);
+    void addImage(Image *image, Priority priority = kHigh);
+    void removeImage(Image *image);
     void resetPriorities();
-    const std::unordered_map<ImageResPtr, Priority> &getCache() const;
+    const std::unordered_map<Image *, Priority> &getCache() const;
 
     private:
-    std::unordered_map<ImageResPtr, Priority> mCache;
+    std::unordered_map<Image *, Priority> mCache;
   };
 } // namespace Luna

@@ -30,14 +30,14 @@ class GfxImageLoader {
   public:
   GfxImageLoader(const String &assetName) : mAssetName(assetName) {}
 
-  ImagePtr operator()() {
+  Image operator()() {
     auto reader = ResourceReader::make(mAssetName.c_str());
     auto gfx = libgfx_loadImageFromCallback(readFromResource, reader.get());
 
     auto frameset = &gfx->framesets[0];
 
-    auto image = Image::makeRgb16({frameset->width, frameset->height});
-    memcpy(image->getData(), libgfx_getFramePointer(frameset, 0), image->getByteCount());
+    auto image = Image(16, {frameset->width, frameset->height});
+    memcpy(image.getData(), libgfx_getFramePointer(frameset, 0), image.getByteCount());
 
     return image;
   }
@@ -50,6 +50,7 @@ int main(int argc, char **argv) {
   Application app(argc, argv);
 
   shared_ptr<Canvas> canvas;
+  Image img;
 
   app.whenReady([&]() {
     canvas = app.makeCanvas({CANVAS_WIDTH, CANVAS_HEIGHT});
@@ -59,7 +60,8 @@ int main(int argc, char **argv) {
     auto stage = make_shared<Stage>();
     auto sprite = stage->createSprite();
     sprite->setPosition({CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2});
-    sprite->setImage(make_shared<Resource<Image>>(GfxImageLoader("color-test_16bit.gfx")));
+    img = GfxImageLoader("color-test_16bit.gfx")();
+    sprite->setImage(&img);
     canvas->setStage(stage);
   });
 

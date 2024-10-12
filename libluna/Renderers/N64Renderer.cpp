@@ -72,7 +72,7 @@ void N64Renderer::destroyTexture([[maybe_unused]] int id) {
 }
 
 void N64Renderer::loadTexture(
-    [[maybe_unused]] int id, [[maybe_unused]] ImagePtr image
+    [[maybe_unused]] int id, [[maybe_unused]] Image *image
 ) {
   auto &texture = mTextureIdMapping.at(id);
 
@@ -100,15 +100,17 @@ void N64Renderer::loadTexture(
   }
 
   for (int i = 0; i < numChunks; ++i) {
+    Image croppedImage;
     auto imageChunk = image;
 
     if (numChunks > 1) {
       int hChunk = i % chunkCount.x;
       int vChunk = i / chunkCount.x;
-      imageChunk = image->crop(
+      croppedImage = image->crop(
           Vector2i(chunkSize.width, chunkSize.height),
           Vector2i(chunkSize.width * hChunk, chunkSize.height * vChunk)
       );
+      imageChunk = &croppedImage;
     }
 
     glBindTexture(GL_TEXTURE_2D, texture.ids[i]);

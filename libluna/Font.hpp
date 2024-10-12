@@ -16,7 +16,7 @@ namespace Luna {
     public:
     struct Char {
       String::CodePoint codePoint;
-      ImagePtr image;
+      Image image;
       Vector2i offset;
       int advance;
     };

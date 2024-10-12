@@ -9,14 +9,14 @@ namespace Luna {
     Material();
     ~Material();
 
-    void setDiffuse(ImageResPtr image);
-    ImageResPtr getDiffuse() const;
+    void setDiffuse(Image *image);
+    Image *getDiffuse() const;
 
-    void setNormal(ImageResPtr image);
-    ImageResPtr getNormal() const;
+    void setNormal(Image *image);
+    Image *getNormal() const;
 
     private:
-    ImageResPtr mDiffuse;
-    ImageResPtr mNormal;
+    Image *mDiffuse{nullptr};
+    Image *mNormal{nullptr};
   };
 } // namespace Luna

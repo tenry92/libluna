@@ -39,7 +39,7 @@ namespace Luna {
     void clearBackground(ColorRgb color) override;
     void createTexture(int id) override;
     void destroyTexture(int id) override;
-    void loadTexture(int id, ImagePtr image) override;
+    void loadTexture(int id, Image *image) override;
     void resizeTexture(int id, Vector2i size) override;
     void renderTexture(Canvas *canvas, RenderTextureInfo *info) override;
 

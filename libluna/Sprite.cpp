@@ -8,9 +8,9 @@ Sprite::Sprite() = default;
 
 Sprite::~Sprite() = default;
 
-void Sprite::setImage(ImageResPtr image) { mImage = image; }
+void Sprite::setImage(Image *image) { mImage = image; }
 
-ImageResPtr Sprite::getImage() const { return mImage; }
+Image *Sprite::getImage() const { return mImage; }
 
 void Sprite::setPalette(ResourcePtr<Palette> palette) { mPalette = palette; }
 

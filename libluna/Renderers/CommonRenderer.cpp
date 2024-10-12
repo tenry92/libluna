@@ -96,7 +96,7 @@ void CommonRenderer::destroyTexture([[maybe_unused]] int id) {
 }
 
 void CommonRenderer::loadTexture(
-    [[maybe_unused]] int id, [[maybe_unused]] ImagePtr image
+    [[maybe_unused]] int id, [[maybe_unused]] Image *image
 ) {
   // stub
 }
@@ -193,17 +193,17 @@ void CommonRenderer::updateTextureCache(
 ) {
   auto images = stage->getTextureCache()->getCache();
 
-  std::unordered_set<ImageResPtr> visitedImages;
+  std::unordered_set<Image *> visitedImages;
 
-  for (auto &&[imageResPtr, priority] : images) {
-    visitedImages.emplace(imageResPtr);
-    if (mKnownImages.count(imageResPtr) == 0) {
-      auto future = imageResPtr->get();
-      // check with each update whether future is ready:
-      // if (imageRef->isReady()):
-      auto image = future.get();
+  for (auto &&[image, priority] : images) {
+    if (image->getSize().width == 0 || image->getSize().height == 0) {
+      continue;
+    }
+
+    visitedImages.emplace(image);
+    if (mKnownImages.count(image) == 0) {
       int textureId = mTextureIdAllocator.next();
-      mKnownImages.emplace(imageResPtr, Texture{textureId, image->getSize()});
+      mKnownImages.emplace(image, Texture{textureId, image->getSize()});
       logDebug("create texture #{}", textureId);
       createTexture(textureId);
       loadTexture(textureId, image);
@@ -312,16 +312,17 @@ void CommonRenderer::render2d(
 
                 RenderTextureInfo info;
 
-                if (ch->image) {
+                if (ch->image.getSize().width > 0 &&
+                    ch->image.getSize().height > 0) {
                   if (mCharImages.count(ch) == 0) {
                     int textureId = mTextureIdAllocator.next();
                     mCharImages.emplace(ch, textureId);
                     createTexture(textureId);
-                    loadTexture(textureId, ch->image);
+                    loadTexture(textureId, &ch->image);
                   }
 
                   info.textureId = mCharImages.at(ch);
-                  info.size = ch->image->getSize();
+                  info.size = ch->image.getSize();
                   info.position = Vector2i(x, y) + ch->offset;
                   renderTexture(canvas, &info);
                 }

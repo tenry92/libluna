@@ -6,11 +6,11 @@ TextureCache::TextureCache() = default;
 
 TextureCache::~TextureCache() = default;
 
-void TextureCache::addImage(ImageResPtr image, Priority priority) {
+void TextureCache::addImage(Image *image, Priority priority) {
   mCache.insert_or_assign(image, priority);
 }
 
-void TextureCache::removeImage(ImageResPtr image) { mCache.erase(image); }
+void TextureCache::removeImage(Image *image) { mCache.erase(image); }
 
 void TextureCache::resetPriorities() {
   for (const auto &[image, priority] : mCache) {
@@ -20,7 +20,7 @@ void TextureCache::resetPriorities() {
   }
 }
 
-const std::unordered_map<ImageResPtr, TextureCache::Priority> &
+const std::unordered_map<Image *, TextureCache::Priority> &
 TextureCache::getCache() const {
   return mCache;
 }

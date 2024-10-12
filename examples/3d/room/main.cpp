@@ -34,16 +34,16 @@ class GfxImageLoader {
   public:
   GfxImageLoader(const String &assetName) : mAssetName(assetName) {}
 
-  ImagePtr operator()() {
+  Image operator()() {
     auto reader = ResourceReader::make(mAssetName.c_str());
     auto gfx = libgfx_loadImageFromCallback(readFromResource, reader.get());
 
     auto frameset = &gfx->framesets[0];
 
-    auto image = Image::makeRgb32({frameset->width, frameset->height});
+    auto image = Image(32, {frameset->width, frameset->height});
     memcpy(
-        image->getData(), libgfx_getFramePointer(frameset, 0),
-        image->getByteCount()
+        image.getData(), libgfx_getFramePointer(frameset, 0),
+        image.getByteCount()
     );
 
     return image;
@@ -249,6 +249,7 @@ int main(int argc, char **argv) {
 
   shared_ptr<Canvas> canvas;
   Camera3d camera;
+  Image diffuse;
   camera.setPosition({0.0f, 1.0f, 0.0f});
   shared_ptr<PointLight> pointLight;
   float t = 0.f;
@@ -271,12 +272,11 @@ int main(int argc, char **argv) {
 
     pointLight = stage->makePointLight();
 
-    auto diffuse =
-        make_shared<Resource<Image>>(GfxImageLoader("wall_32x32.gfx"));
+    diffuse = GfxImageLoader("wall_32x32.gfx")();
 
     auto model = stage->createModel();
     model->setMesh(makeMesh());
-    model->getMaterial().setDiffuse(diffuse);
+    model->getMaterial().setDiffuse(&diffuse);
 
     auto pillarResource = make_shared<Resource<Mesh>>(ObjLoader("pillar.obj"));
     auto pillarMesh = pillarResource->get().get();
@@ -288,14 +288,14 @@ int main(int argc, char **argv) {
       pillarModel->setMesh(pillarMesh);
       pillarModel->getTransform() =
           pillarModel->getTransform().translate({-8.0f, 0.0f, z});
-      pillarModel->getMaterial().setDiffuse(diffuse);
+      pillarModel->getMaterial().setDiffuse(&diffuse);
 
       // right side
       pillarModel = stage->createModel();
       pillarModel->setMesh(pillarMesh);
       pillarModel->getTransform() =
           pillarModel->getTransform().translate({8.0f, 0.0f, z});
-      pillarModel->getMaterial().setDiffuse(diffuse);
+      pillarModel->getMaterial().setDiffuse(&diffuse);
     }
   });
 

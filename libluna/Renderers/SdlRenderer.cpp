@@ -157,7 +157,7 @@ void SdlRenderer::destroyTexture(int id) {
   SDL_DestroyTexture(texture);
 }
 
-void SdlRenderer::loadTexture(int id, ImagePtr image) {
+void SdlRenderer::loadTexture(int id, Image *image) {
   if (mTextureIdMapping.count(id)) {
     SDL_Texture *oldTexture = mTextureIdMapping.at(id);
     SDL_DestroyTexture(oldTexture);
