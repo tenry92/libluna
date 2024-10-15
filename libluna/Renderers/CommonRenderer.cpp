@@ -188,6 +188,10 @@ Vector2i CommonRenderer::getCurrentRenderSize() const {
   return mCurrentRenderSize;
 }
 
+Vector2i CommonRenderer::getTextureSize(int id) const {
+  return mTextureIdMapping.at(id).size;
+}
+
 void CommonRenderer::updateTextureCache(
     [[maybe_unused]] std::shared_ptr<Stage> stage
 ) {
@@ -204,6 +208,9 @@ void CommonRenderer::updateTextureCache(
     if (mKnownImages.count(image) == 0) {
       int textureId = mTextureIdAllocator.next();
       mKnownImages.emplace(image, Texture{textureId, image->getSize()});
+      mTextureIdMapping.emplace(
+          textureId, Texture{textureId, image->getSize()}
+      );
       logDebug("create texture #{}", textureId);
       createTexture(textureId);
       loadTexture(textureId, image);
@@ -216,6 +223,7 @@ void CommonRenderer::updateTextureCache(
       mTextureIdAllocator.free(static_cast<uint8_t>(it->second.id));
       destroyTexture(it->second.id);
       it = mKnownImages.erase(it);
+      mTextureIdMapping.erase(it->second.id);
     } else {
       ++it;
     }
@@ -289,6 +297,31 @@ void CommonRenderer::render2d(
               info.position =
                   sprite->getPosition() - canvas->getCamera2d().getPosition();
               renderTexture(canvas, &info);
+            },
+            [&](Tilemap *tilemap) {
+              auto tileset = tilemap->getTileset();
+              auto texture = mKnownImages.at(tileset->getImage());
+
+              for (int y = 0; y < tilemap->getSize().height; ++y) {
+                for (int x = 0; x < tilemap->getSize().width; ++x) {
+                  auto tile = tilemap->at({x, y});
+                  if (tile == 0) {
+                    continue;
+                  }
+
+                  RenderTextureInfo info;
+                  info.textureId = texture.id;
+                  info.crop = {
+                      tile % tileset->getColumns() * tileset->getTileSize(),
+                      tile / tileset->getColumns() * tileset->getTileSize(),
+                      tileset->getTileSize(), tileset->getTileSize()};
+                  info.size = {tileset->getTileSize(), tileset->getTileSize()};
+                  info.position = {
+                      static_cast<float>(x * tileset->getTileSize()),
+                      static_cast<float>(y * tileset->getTileSize())};
+                  renderTexture(canvas, &info);
+                }
+              }
             },
             [&](Text *text) {
               auto font = text->getFont()->get().get();

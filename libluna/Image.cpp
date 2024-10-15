@@ -35,7 +35,10 @@ Image::Image(Image &&other) {
 }
 
 Image Image::operator=(const Image &other) {
-  logWarn("copy image {}x{} {}bpp", other.mSize.width, other.mSize.height, other.mBitsPerPixel);
+  logWarn(
+      "copy image {}x{} {}bpp", other.mSize.width, other.mSize.height,
+      other.mBitsPerPixel
+  );
   mBitsPerPixel = other.mBitsPerPixel;
   mSize = other.mSize;
   mData = other.mData;

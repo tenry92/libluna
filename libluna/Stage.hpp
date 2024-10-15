@@ -8,6 +8,7 @@
 #include <libluna/Sprite.hpp>
 #include <libluna/Text.hpp>
 #include <libluna/TextureCache.hpp>
+#include <libluna/Tilemap.hpp>
 
 namespace Luna {
   /**
@@ -33,7 +34,7 @@ namespace Luna {
    */
   class Stage {
     public:
-    using Drawable2d = std::variant<Sprite *, Text *>;
+    using Drawable2d = std::variant<Sprite *, Text *, Tilemap *>;
     using Drawable3d = Model *;
     Stage();
     ~Stage();
@@ -43,6 +44,9 @@ namespace Luna {
 
     Text *createText();
     void destroyText(Text *text);
+
+    Tilemap *createTilemap();
+    void destroyTilemap(Tilemap *tilemap);
 
     Model *createModel();
     void destroyModel(Model *model);

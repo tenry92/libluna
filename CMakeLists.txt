@@ -88,6 +88,7 @@ set(PUBLIC_MODULES
   Performance/Ticker
   Performance/Timer
   Platform
+  Rect
   ResourceReader
   Sprite
   Stage
@@ -95,6 +96,8 @@ set(PUBLIC_MODULES
   System
   Text
   TextureCache
+  Tilemap
+  Tileset
   Util/Zlib
   Vector
 )

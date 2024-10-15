@@ -213,10 +213,17 @@ void SdlRenderer::renderTexture(
 ) {
   auto texture = mTextureIdMapping.at(info->textureId);
 
+  SDL_Rect srcrect = {
+      info->crop.x, info->crop.y, info->crop.width, info->crop.height};
+
   SDL_Rect dstrect = {
       static_cast<int>(info->position.x), static_cast<int>(info->position.y),
       info->size.width, info->size.height};
-  CHECK_SDL(SDL_RenderCopy(mRenderer.get(), texture, nullptr, &dstrect));
+  if (srcrect.w == 0 || srcrect.h == 0) {
+    CHECK_SDL(SDL_RenderCopy(mRenderer.get(), texture, nullptr, &dstrect));
+  } else {
+    CHECK_SDL(SDL_RenderCopy(mRenderer.get(), texture, &srcrect, &dstrect));
+  }
 }
 
 void SdlRenderer::setTextureFilterEnabled(

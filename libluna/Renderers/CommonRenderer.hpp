@@ -7,6 +7,7 @@
 #include <libluna/IdAllocator.hpp>
 #include <libluna/Matrix.hpp>
 #include <libluna/Mesh.hpp>
+#include <libluna/Rect.hpp>
 #include <libluna/Stage.hpp>
 
 namespace Luna {
@@ -36,6 +37,11 @@ namespace Luna {
        * @brief The texture ID to render.
        */
       int textureId;
+
+      /**
+       * @brief The crop rectangle in pixels. If empty, the whole texture is used.
+       */
+      Recti crop;
 
       /**
        * @brief The output position. Origin is the top left corner.
@@ -167,6 +173,8 @@ namespace Luna {
 
     Vector2i getCurrentRenderSize() const;
 
+    Vector2i getTextureSize(int id) const;
+
     private:
     /**
      * @brief Render all 3D mesh on the canvas.
@@ -194,6 +202,7 @@ namespace Luna {
     int mRenderTargetId;
     Vector2i mCurrentRenderSize;
     std::unordered_map<Image *, Texture> mKnownImages;
+    std::map<int, Texture> mTextureIdMapping;
     std::unordered_map<Font::Char *, int> mCharImages;
     std::set<FontPtr> mLoadedFonts;
     std::unordered_map<std::shared_ptr<Mesh>, int> mKnownMeshes;

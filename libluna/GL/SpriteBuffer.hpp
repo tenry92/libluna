@@ -1,13 +1,24 @@
 #pragma once
 
 #include <libluna/GL/common.hpp>
+#include <libluna/Rect.hpp>
 #include <libluna/Vector.hpp>
 
 namespace Luna::GL {
   class SpriteBuffer {
     public:
-    SpriteBuffer(Luna::Vector2i size, bool flipVertical = false) {
+    /**
+     * @brief Create a sprite buffer.
+     * 
+     * @param crop The crop rectangle in normalized UV coordinates.
+     * @param size The size of the sprite in pixels.
+     * @param flipVertical If true, the sprite will be flipped vertically.
+     */
+    SpriteBuffer(
+        Luna::Rectf crop, Luna::Vector2i size, bool flipVertical = false
+    ) {
       mFlipVertical = flipVertical;
+      mCrop = crop;
 
       unsigned int buffers[2];
       CHECK_GL(glGenBuffers(2, buffers));
@@ -34,23 +45,22 @@ namespace Luna::GL {
     void resize(Luna::Vector2i size) {
       mSize = size;
 
-      float vertices[] = {/* x, y, u, v */
-                          0.f,
-                          0.f,
-                          0.f,
-                          mFlipVertical ? 1.0f : 0.f,
-                          static_cast<float>(mSize.width),
-                          0.f,
-                          1.0f,
-                          mFlipVertical ? 1.0f : 0.f,
-                          static_cast<float>(mSize.width),
-                          static_cast<float>(mSize.height),
-                          1.f,
-                          mFlipVertical ? 0.0f : 1.f,
-                          0.f,
-                          static_cast<float>(mSize.height),
-                          0.f,
-                          mFlipVertical ? 0.0f : 1.f};
+      float vertices[] = {
+          /* x, y, u, v */
+          // top-left
+          0.f, 0.f, mCrop.x, mFlipVertical ? 1.f - mCrop.y : mCrop.y,
+          // top-right
+          static_cast<float>(mSize.width), 0.f, mCrop.x + mCrop.width,
+          mFlipVertical ? 1.f - mCrop.y : mCrop.y,
+          // bottom-right
+          static_cast<float>(mSize.width), static_cast<float>(mSize.height),
+          mCrop.x + mCrop.width,
+          mFlipVertical ? 1.f - (mCrop.y + mCrop.height)
+                        : mCrop.y + mCrop.height,
+          // bottom-left
+          0.f, static_cast<float>(mSize.height), mCrop.x,
+          mFlipVertical ? 1.f - (mCrop.y + mCrop.height)
+                        : mCrop.y + mCrop.height};
 
       CHECK_GL(glBufferData(
           GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW
@@ -109,6 +119,7 @@ namespace Luna::GL {
       CHECK_GL(glEnableVertexAttribArray(1));
     }
 
+    Luna::Rectf mCrop;
     Luna::Vector2i mSize;
     bool mFlipVertical;
     unsigned int mVertexBuffer;

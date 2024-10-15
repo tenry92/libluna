@@ -261,7 +261,21 @@ void OpenglRenderer::renderTexture(
 
   GLuint texture = mTextureIdMapping.at(info->textureId);
 
-  GL::SpriteBuffer spriteBuffer(info->size, !mUsingFramebuffer);
+  Rectf crop = {0.f, 0.f, 1.f, 1.f};
+
+  if (info->crop.area() > 0) {
+    auto tetureSize = getTextureSize(info->textureId);
+    crop.x =
+        static_cast<float>(info->crop.x) / static_cast<float>(tetureSize.width);
+    crop.y = static_cast<float>(info->crop.y) /
+             static_cast<float>(tetureSize.height);
+    crop.width = static_cast<float>(info->crop.width) /
+                 static_cast<float>(tetureSize.width);
+    crop.height = static_cast<float>(info->crop.height) /
+                  static_cast<float>(tetureSize.height);
+  }
+
+  GL::SpriteBuffer spriteBuffer(crop, info->size, !mUsingFramebuffer);
 
   spriteBuffer.bind();
 

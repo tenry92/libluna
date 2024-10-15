@@ -159,18 +159,62 @@ void N64Renderer::renderTexture(
   float displayHeight = static_cast<float>(display_get_height());
 
   auto chunkCount = countChunks(texture.size);
+  int hStartChunk = 0;
+  int hEndChunk = chunkCount.x - 1;
+  int vStartChunk = 0;
+  int vEndChunk = chunkCount.y - 1;
 
-  for (int vChunk = 0; vChunk < chunkCount.y; ++vChunk) {
-    for (int hChunk = 0; hChunk < chunkCount.x; ++hChunk) {
+  if (info->crop.area() > 0) {
+    hStartChunk = info->crop.x / chunkSize.width;
+    hEndChunk = (info->crop.x + info->crop.width - 1) / chunkSize.width;
+    vStartChunk = info->crop.y / chunkSize.height;
+    vEndChunk = (info->crop.y + info->crop.height - 1) / chunkSize.height;
+  }
+
+  for (int vChunk = vStartChunk; vChunk <= vEndChunk; ++vChunk) {
+    for (int hChunk = hStartChunk; hChunk <= hEndChunk; ++hChunk) {
       auto chunkIndex = hChunk + vChunk * chunkCount.x;
-      auto chunkOffset =
-          Luna::Vector2i(chunkSize.width * hChunk, chunkSize.height * vChunk);
+      auto chunkOffset = Vector2i(
+          chunkSize.width * (hChunk - hStartChunk),
+          chunkSize.height * (vChunk - vStartChunk)
+      );
       auto basePos = info->position + chunkOffset;
       auto baseSize = info->size - chunkOffset;
       baseSize = Vector2i(
           std::min(baseSize.width, chunkSize.width),
           std::min(baseSize.height, chunkSize.height)
       );
+
+      Vector2f uvTopLeft(0.0f, 0.0f);
+      Vector2f uvBottomRight(1.0f, 1.0f);
+
+      if (info->crop.area() > 0) {
+        if (hChunk == hStartChunk) {
+          uvTopLeft.x = static_cast<float>(info->crop.x % chunkSize.width) /
+                        static_cast<float>(chunkSize.width);
+        }
+
+        if (hChunk == hEndChunk) {
+          uvBottomRight.x =
+              static_cast<float>(
+                  (info->crop.x + info->crop.width - 1) % chunkSize.width + 1
+              ) /
+              static_cast<float>(chunkSize.width);
+        }
+
+        if (vChunk == vStartChunk) {
+          uvTopLeft.y = static_cast<float>(info->crop.y % chunkSize.height) /
+                        static_cast<float>(chunkSize.height);
+        }
+
+        if (vChunk == vEndChunk) {
+          uvBottomRight.y =
+              static_cast<float>(
+                  (info->crop.y + info->crop.height - 1) % chunkSize.height + 1
+              ) /
+              static_cast<float>(chunkSize.height);
+        }
+      }
 
       float left = (basePos.x / displayWidth * 2.0f) - 1.0f;
       float top = -(basePos.y / displayHeight * 2.0f) + 1.0f;
@@ -186,16 +230,16 @@ void N64Renderer::renderTexture(
       glEnable(GL_TEXTURE_2D);
       glBindTexture(GL_TEXTURE_2D, texture.ids[chunkIndex]);
       glBegin(GL_TRIANGLE_FAN);
-      glTexCoord2f(0.0f, 1.0f);
+      glTexCoord2f(uvTopLeft.x, uvBottomRight.y);
       glVertex3f(left, bottom, 0.0f);
 
-      glTexCoord2f(0.0f, 0.0f);
+      glTexCoord2f(uvTopLeft.x, uvTopLeft.y);
       glVertex3f(left, top, 0.0f);
 
-      glTexCoord2f(1.0f, 0.0f);
+      glTexCoord2f(uvBottomRight.x, uvTopLeft.y);
       glVertex3f(right, top, 0.0f);
 
-      glTexCoord2f(1.0f, 1.0f);
+      glTexCoord2f(uvBottomRight.x, uvBottomRight.y);
       glVertex3f(right, bottom, 0.0f);
       glEnd();
     }
