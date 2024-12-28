@@ -14,13 +14,13 @@ namespace {
       std::visit(
           overloaded{
               [](auto) {},
-              [&](Sprite *sprite) {
-                if (sprite->getImage()) {
-                  images.emplace_front(sprite->getImage());
+              [&](const Sprite &sprite) {
+                if (sprite.getImage()) {
+                  images.emplace_front(sprite.getImage());
                 }
               },
-              [&](Tilemap *tilemap) {
-                auto tileset = tilemap->getTileset();
+              [&](const Tilemap &tilemap) {
+                auto tileset = tilemap.getTileset();
                 if (tileset->getImage()) {
                   images.emplace_front(tileset->getImage());
                 }
@@ -54,54 +54,54 @@ Stage::Stage() = default;
 Stage::~Stage() = default;
 
 Sprite *Stage::createSprite() {
-  // todo: use smart pointers
-  auto sprite = new Sprite();
-  mDrawables2d.emplace_back(sprite);
+  auto drawable2d = mDrawables2d.acquire();
+  drawable2d->emplace<Sprite>();
 
-  return sprite;
+  return &std::get<Sprite>(*drawable2d);
 }
 
 void Stage::destroySprite(Sprite *sprite) {
-  mDrawables2d.remove_if([sprite](const auto &drawable) {
-    return std::holds_alternative<Sprite *>(drawable) &&
-           std::get<Sprite *>(drawable) == sprite;
-  });
-
-  delete sprite;
+  for (auto &&drawable : mDrawables2d) {
+    if (std::holds_alternative<Sprite>(drawable) &&
+        &std::get<Sprite>(drawable) == sprite) {
+      mDrawables2d.release(&drawable);
+      break;
+    }
+  }
 }
 
 Text *Stage::createText() {
-  // todo: use smart pointers
-  auto text = new Text();
-  mDrawables2d.emplace_back(text);
+  auto drawable2d = mDrawables2d.acquire();
+  drawable2d->emplace<Text>();
 
-  return text;
+  return &std::get<Text>(*drawable2d);
 }
 
 void Stage::destroyText(Text *text) {
-  mDrawables2d.remove_if([text](const auto &drawable) {
-    return std::holds_alternative<Text *>(drawable) &&
-           std::get<Text *>(drawable) == text;
-  });
-
-  delete text;
+  for (auto &&drawable : mDrawables2d) {
+    if (std::holds_alternative<Text>(drawable) &&
+        &std::get<Text>(drawable) == text) {
+      mDrawables2d.release(&drawable);
+      break;
+    }
+  }
 }
 
 Tilemap *Stage::createTilemap() {
-  // todo: use smart pointers
-  auto tilemap = new Tilemap();
-  mDrawables2d.emplace_back(tilemap);
+  auto drawable2d = mDrawables2d.acquire();
+  drawable2d->emplace<Tilemap>();
 
-  return tilemap;
+  return &std::get<Tilemap>(*drawable2d);
 }
 
 void Stage::destroyTilemap(Tilemap *tilemap) {
-  mDrawables2d.remove_if([tilemap](const auto &drawable) {
-    return std::holds_alternative<Tilemap *>(drawable) &&
-           std::get<Tilemap *>(drawable) == tilemap;
-  });
-
-  delete tilemap;
+  for (auto &&drawable : mDrawables2d) {
+    if (std::holds_alternative<Tilemap>(drawable) &&
+        &std::get<Tilemap>(drawable) == tilemap) {
+      mDrawables2d.release(&drawable);
+      break;
+    }
+  }
 }
 
 Model *Stage::createModel() {
@@ -117,7 +117,7 @@ void Stage::destroyModel(Model *model) {
   delete model;
 }
 
-const std::list<Stage::Drawable2d> &Stage::getDrawables2d() const {
+const Pool<Stage::Drawable2d, 32> &Stage::getDrawables2d() const {
   return mDrawables2d;
 }
 

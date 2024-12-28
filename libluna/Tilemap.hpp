@@ -26,6 +26,10 @@ namespace Luna {
       return mTileData[position.y * mSize.width + position.x];
     }
 
+    inline TileData at(Vector2i position) const {
+      return mTileData[position.y * mSize.width + position.x];
+    }
+
     private:
     Tileset *mTileset;
     Vector2i mSize;

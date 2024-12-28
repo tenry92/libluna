@@ -8,13 +8,20 @@
     "${workspaceFolder}/libs",
     "${workspaceFolder}/libs/imgui",
     "${workspaceFolder}/libs/libgfx",
+    "${workspaceFolder}/libs/utf8",
     "${workspaceFolder}/libs/glad-4.3/include"
   ],
   "cmake.configureOnOpen": false,
   "files.associations": {
     "*.rc": "cpp",
     "chrono": "cpp",
-    "iostream": "cpp"
+    "iostream": "cpp",
+    "*.def": "cpp",
+    "format": "cpp",
+    "functional": "cpp",
+    "istream": "cpp",
+    "ostream": "cpp",
+    "ranges": "cpp"
   },
   "files.exclude": {
     "**/.DS_Store": true,

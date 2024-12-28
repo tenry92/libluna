@@ -5,6 +5,7 @@
 
 #include <libluna/Light.hpp>
 #include <libluna/Model.hpp>
+#include <libluna/Pool.hpp>
 #include <libluna/Sprite.hpp>
 #include <libluna/Text.hpp>
 #include <libluna/TextureCache.hpp>
@@ -34,7 +35,7 @@ namespace Luna {
    */
   class Stage {
     public:
-    using Drawable2d = std::variant<Sprite *, Text *, Tilemap *>;
+    using Drawable2d = std::variant<Sprite, Text, Tilemap>;
     using Drawable3d = Model *;
     Stage();
     ~Stage();
@@ -51,7 +52,7 @@ namespace Luna {
     Model *createModel();
     void destroyModel(Model *model);
 
-    const std::list<Drawable2d> &getDrawables2d() const;
+    const Pool<Drawable2d, 32> &getDrawables2d() const;
     const std::list<Drawable3d> &getDrawables3d() const;
 
     void setAmbientLight(const AmbientLight &ambientLight);
@@ -64,7 +65,7 @@ namespace Luna {
     void updateTextureCache();
 
     private:
-    std::list<Drawable2d> mDrawables2d;
+    Pool<Drawable2d, 32> mDrawables2d;
     std::list<Drawable3d> mDrawables3d;
     AmbientLight mAmbientLight;
     std::list<std::shared_ptr<PointLight>> mPointLights;

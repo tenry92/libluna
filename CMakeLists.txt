@@ -147,6 +147,7 @@ list(APPEND PUBLIC_HEADERS
   libluna/Color.hpp
   libluna/InputStream.hpp
   libluna/Palette.hpp
+  libluna/Pool.hpp
   libluna/Resource.hpp
   libs/imgui/imgui.h
   libs/imgui/imconfig.h

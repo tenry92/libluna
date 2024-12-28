@@ -232,17 +232,17 @@ void CommonRenderer::updateTextureCache(
   std::unordered_set<std::shared_ptr<Mesh>> visitedMeshes;
 
   for (auto &&drawable : stage->getDrawables2d()) {
-    if (!std::holds_alternative<Text *>(drawable)) {
+    if (!std::holds_alternative<Text>(drawable)) {
       continue;
     }
 
-    auto text = std::get<Text *>(drawable);
+    auto &text = std::get<Text>(drawable);
 
-    if (!text->getFont()) {
+    if (!text.getFont()) {
       continue;
     }
 
-    auto future = text->getFont()->get();
+    auto future = text.getFont()->get();
     auto font = future.get();
 
     if (mLoadedFonts.count(font) == 0) {
@@ -289,22 +289,22 @@ void CommonRenderer::render2d(
     std::visit(
         overloaded{
             [](auto) {},
-            [&](Sprite *sprite) {
+            [&](const Sprite &sprite) {
               RenderTextureInfo info;
-              auto texture = mKnownImages.at(sprite->getImage());
+              auto texture = mKnownImages.at(sprite.getImage());
               info.textureId = texture.id;
               info.size = texture.size;
               info.position =
-                  sprite->getPosition() - canvas->getCamera2d().getPosition();
+                  sprite.getPosition() - canvas->getCamera2d().getPosition();
               renderTexture(canvas, &info);
             },
-            [&](Tilemap *tilemap) {
-              auto tileset = tilemap->getTileset();
+            [&](const Tilemap &tilemap) {
+              auto tileset = tilemap.getTileset();
               auto texture = mKnownImages.at(tileset->getImage());
 
-              for (int y = 0; y < tilemap->getSize().height; ++y) {
-                for (int x = 0; x < tilemap->getSize().width; ++x) {
-                  auto tile = tilemap->at({x, y});
+              for (int y = 0; y < tilemap.getSize().height; ++y) {
+                for (int x = 0; x < tilemap.getSize().width; ++x) {
+                  auto tile = tilemap.at({x, y});
                   if (tile == 0) {
                     continue;
                   }
@@ -323,13 +323,13 @@ void CommonRenderer::render2d(
                 }
               }
             },
-            [&](Text *text) {
-              auto font = text->getFont()->get().get();
+            [&](const Text &text) {
+              auto font = text.getFont()->get().get();
 
               int x = 0;
               int y = font->getBaseLine();
 
-              for (auto &&cp : text->getContent()) {
+              for (auto &&cp : text.getContent()) {
                 if (cp == '\n') {
                   x = 0;
                   y += font->getLineHeight();
