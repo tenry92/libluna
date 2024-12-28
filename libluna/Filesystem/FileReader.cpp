@@ -43,7 +43,7 @@ std::size_t FileReader::seek(std::size_t position) {
 }
 
 std::size_t FileReader::seekRelative(int position) {
-  if (position > static_cast<int>(tell())) {
+  if (position > static_cast<int>(getSize())) {
     position = static_cast<int>(tell());
   } else if (position < 0) {
     position = 0;
