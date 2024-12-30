@@ -45,6 +45,8 @@ using namespace Luna::Internal;
 using Luna::String;
 
 namespace {
+  std::map<Stage *, std::list<Canvas *>> gCanvasByStage;
+
 #ifdef LUNA_RENDERER_OPENGL
   [[maybe_unused]] void setGlAttributes() {
 #ifdef LUNA_WINDOW_SDL2
@@ -346,6 +348,8 @@ Canvas::Canvas(const Vector2i &size) : mSize{size}, mOriginalSize{size} {
 Canvas::~Canvas() { this->close(); }
 
 void Canvas::close() {
+  setStage(nullptr);
+
   if (mImmediateGui) {
     mImmediateGui.reset();
   }
@@ -524,9 +528,25 @@ void Canvas::attachImmediateGui(std::unique_ptr<ImmediateGui> gui) {
 
 ImmediateGui *Canvas::getImmediateGui() const { return mImmediateGui.get(); }
 
-void Canvas::setStage(std::shared_ptr<Stage> stage) { mStage = stage; }
+void Canvas::setStage(Stage *stage) {
+  if (stage == mStage) {
+    return;
+  }
 
-std::shared_ptr<Stage> Canvas::getStage() const { return mStage; }
+  mStage = stage;
+
+  if (stage) {
+    gCanvasByStage[stage].push_back(this);
+  } else {
+    gCanvasByStage[stage].remove(this);
+
+    if (gCanvasByStage[stage].empty()) {
+      gCanvasByStage.erase(stage);
+    }
+  }
+}
+
+Stage *Canvas::getStage() const { return mStage; }
 
 void Canvas::setCamera2d(const Camera2d &camera) { mCamera2d = camera; }
 
@@ -622,3 +642,5 @@ std::queue<ButtonEvent> &Canvas::getButtonEvents() { return mButtonEvents; }
 bool Canvas::isClosed() const { return mClosed; }
 
 Vector2i Canvas::getOriginalSize() const { return mOriginalSize; }
+
+const std::list<Canvas *> Canvas::getCanvasByStage(Stage *stage) { return gCanvasByStage[stage]; }

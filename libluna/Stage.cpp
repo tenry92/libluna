@@ -7,22 +7,22 @@
 using namespace Luna;
 
 namespace {
-  std::forward_list<Image *> listImagesInUse(Stage *stage) {
-    std::forward_list<Image *> images;
+  std::forward_list<ImageLoader *> listImagesInUse(Stage *stage) {
+    std::forward_list<ImageLoader *> imageLoaders;
 
     for (auto &&drawable : stage->getDrawables2d()) {
       std::visit(
           overloaded{
               [](auto) {},
               [&](const Sprite &sprite) {
-                if (sprite.getImage()) {
-                  images.emplace_front(sprite.getImage());
+                if (sprite.getImageLoader()) {
+                  imageLoaders.emplace_front(sprite.getImageLoader());
                 }
               },
               [&](const Tilemap &tilemap) {
                 auto tileset = tilemap.getTileset();
                 if (tileset->getImage()) {
-                  images.emplace_front(tileset->getImage());
+                  imageLoaders.emplace_front(tileset->getImage());
                 }
               },
           },
@@ -37,15 +37,15 @@ namespace {
       auto normal = model->getMaterial().getNormal();
 
       if (diffuse) {
-        images.emplace_front(diffuse);
+        imageLoaders.emplace_front(diffuse);
       }
 
       if (normal) {
-        images.emplace_front(normal);
+        imageLoaders.emplace_front(normal);
       }
     }
 
-    return images;
+    return imageLoaders;
   }
 } // namespace
 

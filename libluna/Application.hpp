@@ -19,6 +19,7 @@
 #include <libluna/Internal/DebugMetrics.hpp>
 #include <libluna/IntervalManager.hpp>
 #include <libluna/PathManager.hpp>
+#include <libluna/Pool.hpp>
 #include <libluna/Resource.hpp>
 #include <libluna/Sprite.hpp>
 #include <libluna/String.hpp>
@@ -130,7 +131,7 @@ namespace Luna {
   /**
    * @brief This is the core class for the game engine.
    */
-  class Application final {
+  class Application {
     public:
     /**
      * @brief Create application.
@@ -139,12 +140,11 @@ namespace Luna {
      */
     Application(int argc, char **argv);
 
-    ~Application();
+    virtual ~Application();
 
     static Application *getInstance();
 
     int run();
-    void whenReady(std::function<void()> callback);
     void addInterval(int ratePerSecond, std::function<void(float)> callback);
     void addVsync(std::function<void(float)> callback);
     int getOptionIndex(const String &name) const;
@@ -163,8 +163,8 @@ namespace Luna {
 
     void setAssetsPath(Filesystem::Path assetsPath);
 
-    std::shared_ptr<Canvas> makeCanvas(const Vector2i &size);
-    std::list<std::shared_ptr<Canvas>> getOpenCanvases();
+    Canvas *makeCanvas(const Vector2i &size);
+    std::list<Canvas *> getOpenCanvases();
 
     void raiseCriticalError(const String &message);
 
@@ -184,12 +184,17 @@ namespace Luna {
 
     Audio::AudioNodePtr getAudioDestinationNode() const;
 
-    void openDebugger(std::shared_ptr<Canvas> canvas);
+    void openDebugger(Canvas *canvas);
 
 #ifdef LUNA_WINDOW_SDL2
-    std::shared_ptr<Canvas> getCanvasBySdlWindowId(Uint32 windowId);
+    Canvas *getCanvasBySdlWindowId(Uint32 windowId);
     void pushSdlEvent(SDL_Event *event);
 #endif
+
+    protected:
+    virtual void init() = 0;
+
+    virtual void update(float deltaTime) = 0;
 
     private:
     void executeKeyboardShortcuts();
@@ -200,8 +205,7 @@ namespace Luna {
     bool hasCanvas();
 
     std::vector<String> mArgs;
-    std::function<void()> mReadyCallback;
-    std::list<std::weak_ptr<Canvas>> mCanvases;
+    Pool<Canvas, 4> mCanvases;
     String mRaisedErrorMessage;
     IntervalManager mIntervalManager;
     Audio::AudioManager mAudioManager;

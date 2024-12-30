@@ -10,6 +10,6 @@ void Tileset::setTileSize(int tileSize) { mTileSize = tileSize; }
 
 int Tileset::getTileSize() const { return mTileSize; }
 
-void Tileset::setImage(Image *image) { mImage = image; }
+void Tileset::setImage(ImageLoader *image) { mImage = image; }
 
-Image *Tileset::getImage() const { return mImage; }
+ImageLoader *Tileset::getImage() const { return mImage; }

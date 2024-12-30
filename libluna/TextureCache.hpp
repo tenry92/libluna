@@ -2,7 +2,8 @@
 
 #include <unordered_map>
 
-#include <libluna/Image.hpp>
+#include <libluna/ImageLoader.hpp>
+#include <libluna/Sprite.hpp>
 
 namespace Luna {
   class TextureCache {
@@ -29,12 +30,12 @@ namespace Luna {
     TextureCache();
     ~TextureCache();
 
-    void addImage(Image *image, Priority priority = kHigh);
-    void removeImage(Image *image);
+    void addImage(ImageLoader *image, Priority priority = kHigh);
+    void removeImage(ImageLoader *image);
     void resetPriorities();
-    const std::unordered_map<Image *, Priority> &getCache() const;
+    const std::unordered_map<ImageLoader *, Priority> &getCache() const;
 
     private:
-    std::unordered_map<Image *, Priority> mCache;
+    std::unordered_map<ImageLoader *, Priority> mCache;
   };
 } // namespace Luna

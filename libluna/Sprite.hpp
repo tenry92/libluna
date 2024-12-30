@@ -2,6 +2,7 @@
 
 #include <libluna/Color.hpp>
 #include <libluna/Image.hpp>
+#include <libluna/ImageLoader.hpp>
 #include <libluna/Palette.hpp>
 #include <libluna/Resource.hpp>
 #include <libluna/String.hpp>
@@ -16,8 +17,8 @@ namespace Luna {
     Sprite();
     ~Sprite();
 
-    void setImage(Image *image);
-    Image *getImage() const;
+    void setImageLoader(ImageLoader *loader);
+    ImageLoader *getImageLoader() const;
 
     void setPalette(ResourcePtr<Palette> palette);
     ResourcePtr<Palette> getPalette() const;
@@ -26,7 +27,7 @@ namespace Luna {
     Vector2f getPosition() const;
 
     private:
-    Image *mImage;
+    ImageLoader *mImageLoader;
     std::shared_ptr<Resource<Palette>> mPalette;
     Vector2f mPosition;
   };

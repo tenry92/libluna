@@ -2,6 +2,7 @@
 
 #include <libluna/config.h>
 
+#include <list>
 #include <map>
 #include <queue>
 #include <set>
@@ -70,8 +71,8 @@ namespace Luna {
     void attachImmediateGui(std::unique_ptr<ImmediateGui> gui);
     ImmediateGui *getImmediateGui() const;
 
-    void setStage(std::shared_ptr<Stage> stage);
-    std::shared_ptr<Stage> getStage() const;
+    void setStage(Stage *stage);
+    Stage *getStage() const;
 
     void setCamera2d(const Camera2d &camera);
     Camera2d getCamera2d() const;
@@ -100,6 +101,8 @@ namespace Luna {
     bool isClosed() const;
 
     Vector2i getOriginalSize() const;
+
+    static const std::list<Canvas *> getCanvasByStage(Stage *stage);
 
     Internal::GraphicsMetrics getMetrics();
 
@@ -133,7 +136,7 @@ namespace Luna {
 
     Vector2i mSize;
     Vector2i mOriginalSize;
-    std::shared_ptr<Stage> mStage;
+    Stage *mStage;
     std::unique_ptr<AbstractRenderer> mRenderer;
     std::unique_ptr<ImmediateGui> mImmediateGui;
     Camera2d mCamera2d;

@@ -20,11 +20,11 @@ namespace Luna {
       Iterator(Pool *pool, size_t index) : mPool(pool), mIndex(index) {}
 
       T *operator->() {
-        return &mPool->mObjects[mIndex];
+        return &mPool->at(mIndex);
       }
 
       T &operator*() {
-        return mPool->mObjects[mIndex];
+        return mPool->at(mIndex);
       }
 
       Iterator &operator++() {
@@ -65,11 +65,11 @@ namespace Luna {
       ConstIterator(const Pool *pool, size_t index) : mPool(pool), mIndex(index) {}
 
       const T *operator->() {
-        return &mPool->mObjects[mIndex];
+        return &mPool->at(mIndex);
       }
 
       const T &operator*() {
-        return mPool->mObjects[mIndex];
+        return mPool->at(mIndex);
       }
 
       ConstIterator &operator++() {
@@ -102,7 +102,7 @@ namespace Luna {
     ~Pool() {
       for (size_t i = 0; i < N; i++) {
         if (mInUse[i]) {
-          mObjects[i].~T();
+          this->at(i).~T();
         }
       }
     }
@@ -112,13 +112,14 @@ namespace Luna {
      * 
      * @return A pointer to the object, or nullptr if the pool is full.
      */
-    T *acquire() {
+    template <typename... ArgTypes>
+    T *acquire(ArgTypes... args) {
       for (size_t i = 0; i < N; i++) {
         if (!mInUse[i]) {
           mInUse[i] = true;
-          new (&mObjects[i]) T();
+          new (&this->at(i)) T(args...);
 
-          return &mObjects[i];
+          return &this->at(i);
         }
       }
 
@@ -127,13 +128,29 @@ namespace Luna {
 
     void release(T *object) {
       for (size_t i = 0; i < N; i++) {
-        if (&mObjects[i] == object) {
+        if (&this->at(i) == object) {
           mInUse[i] = false;
-          mObjects[i].~T();
+          this->at(i).~T();
 
           break;
         }
       }
+    }
+
+    T &at(size_t index) {
+      return *reinterpret_cast<T *>(&mData[sizeof(T) * index]);
+    }
+
+    const T &at(size_t index) const {
+      return *reinterpret_cast<const T *>(&mData[sizeof(T) * index]);
+    }
+
+    T &operator[](size_t index) {
+      return this->at(index);
+    }
+
+    const T &operator[](size_t index) const {
+      return this->at(index);
     }
 
     Iterator begin() {
@@ -165,7 +182,7 @@ namespace Luna {
     }
 
     private:
-    std::array<T, N> mObjects;
+    std::array<std::byte, sizeof(T) * N> mData;
     std::array<bool, N> mInUse{false};
   };
 }

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <libluna/Image.hpp>
+#include <libluna/ImageLoader.hpp>
 #include <libluna/Resource.hpp>
+#include <libluna/Sprite.hpp>
 
 namespace Luna {
   class Material {
@@ -9,14 +10,14 @@ namespace Luna {
     Material();
     ~Material();
 
-    void setDiffuse(Image *image);
-    Image *getDiffuse() const;
+    void setDiffuse(ImageLoader *image);
+    ImageLoader *getDiffuse() const;
 
-    void setNormal(Image *image);
-    Image *getNormal() const;
+    void setNormal(ImageLoader *image);
+    ImageLoader *getNormal() const;
 
     private:
-    Image *mDiffuse{nullptr};
-    Image *mNormal{nullptr};
+    ImageLoader *mDiffuse{nullptr};
+    ImageLoader *mNormal{nullptr};
   };
 } // namespace Luna

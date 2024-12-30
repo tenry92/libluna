@@ -102,23 +102,18 @@ static void printArguments(const std::vector<String> &args) {
 }
 
 void Application::executeKeyboardShortcuts() {
-  for (auto &&canvasPtr : mCanvases) {
-    if (canvasPtr.expired()) {
-      continue;
-    }
-
-    auto canvas = canvasPtr.lock();
-    auto &queue = canvas->getButtonEvents();
+  for (auto &&canvas : mCanvases) {
+    auto &queue = canvas.getButtonEvents();
 
     // note: since we are not using input buffer, the time period (0.1f) does
     // not matter
     mHotkeysManager.update(&queue, 0.1f);
 
     if (mHotkeysManager.isButtonPressed("Toggle Debugger")) {
-      if (canvas->getImmediateGui()) {
-        canvas->attachImmediateGui(nullptr);
+      if (canvas.getImmediateGui()) {
+        canvas.attachImmediateGui(nullptr);
       } else {
-        Application::getInstance()->openDebugger(canvas);
+        Application::getInstance()->openDebugger(&canvas);
       }
     }
   }
@@ -126,6 +121,10 @@ void Application::executeKeyboardShortcuts() {
 
 void Application::mainLoop() {
   logInfo("entering main loop");
+
+  mIntervalManager.addAlways([this](float deltaTime) {
+    this->update(deltaTime);
+  });
 
   while (hasCanvas() && mRaisedErrorMessage.isEmpty()) {
 #ifdef __SWITCH__
@@ -155,32 +154,20 @@ void Application::mainLoop() {
     mDebugMetrics->renderTicker.tick();
     // logDebug("rendering canvases");
     for (auto &&canvas : mCanvases) {
-      if (canvas.expired()) {
-        continue;
-      }
-
-      canvas.lock()->render();
+      canvas.render();
     }
     mDebugMetrics->renderTicker.measure();
 
     // logDebug("syncing canvases");
     for (auto &&canvas : mCanvases) {
-      if (canvas.expired()) {
-        continue;
-      }
-
-      canvas.lock()->sync();
+      canvas.sync();
     }
 
     ++mDebugMetrics->framesElapsed;
   }
 
   for (auto &&canvas : mCanvases) {
-    if (canvas.expired()) {
-      continue;
-    }
-
-    canvas.lock()->close();
+    canvas.close();
   }
 
   if (!mRaisedErrorMessage.isEmpty()) {
@@ -221,22 +208,14 @@ void Application::processEvents() {
       logInfo("sdl quit event received");
 
       for (auto &&canvas : mCanvases) {
-        if (canvas.expired()) {
-          continue;
-        }
-
-        canvas.lock()->close();
+        canvas.close();
       }
 
       return;
     }
 
     for (auto &&canvas : mCanvases) {
-      if (canvas.expired()) {
-        continue;
-      }
-
-      if (canvas.lock()->processSdlEvent(&event)) {
+      if (canvas.processSdlEvent(&event)) {
         break;
       }
     }
@@ -246,22 +225,18 @@ void Application::processEvents() {
   glfwPollEvents();
 
   for (auto &&canvas : mCanvases) {
-    if (canvas.expired() || !canvas.lock()->glfw.window) {
+    if (!canvas.glfw.window) {
       continue;
     }
 
-    if (glfwWindowShouldClose(canvas.lock()->glfw.window)) {
-      canvas.lock()->close();
+    if (glfwWindowShouldClose(canvas.glfw.window)) {
+      canvas.close();
     }
   }
 #endif
 #ifdef N64
   for (auto &&canvas : mCanvases) {
-    if (canvas.expired()) {
-      continue;
-    }
-
-    auto &events = canvas.lock()->getButtonEvents();
+    auto &events = canvas.getButtonEvents();
 
     joypad_poll();
 
@@ -348,11 +323,7 @@ void Application::processEvents() {
 
 void Application::shutDown() {
   for (auto &&canvas : mCanvases) {
-    if (canvas.expired()) {
-      continue;
-    }
-
-    canvas.lock()->close();
+    canvas.close();
   }
 
 #ifdef LUNA_WINDOW_SDL2
@@ -368,10 +339,8 @@ void Application::shutDown() {
 
 bool Application::hasCanvas() {
   for (auto &&canvas : mCanvases) {
-    if (!canvas.expired()) {
-      if (!canvas.lock()->isClosed()) {
-        return true;
-      }
+    if (!canvas.isClosed()) {
+      return true;
     }
   }
 
@@ -379,22 +348,16 @@ bool Application::hasCanvas() {
 }
 
 #ifdef LUNA_WINDOW_SDL2
-std::shared_ptr<Canvas> Application::getCanvasBySdlWindowId(Uint32 windowId) {
+Canvas *Application::getCanvasBySdlWindowId(Uint32 windowId) {
   for (auto &&canvas : mCanvases) {
-    if (canvas.expired()) {
+    if (canvas.sdl.window == nullptr) {
       continue;
     }
 
-    auto canvasPtr = canvas.lock();
-
-    if (canvasPtr->sdl.window == nullptr) {
-      continue;
-    }
-
-    auto canvasWindowId = SDL_GetWindowID(canvasPtr->sdl.window);
+    auto canvasWindowId = SDL_GetWindowID(canvas.sdl.window);
 
     if (canvasWindowId == windowId) {
-      return canvasPtr;
+      return &canvas;
     }
   }
 
@@ -440,10 +403,7 @@ int Application::run() {
 
   mDebugMetrics = std::make_shared<Internal::DebugMetrics>();
 
-  if (mReadyCallback) {
-    logInfo("calling ready callback");
-    mReadyCallback();
-  }
+  this->init();
 
   if (hasCanvas()) {
     mAudioManager.init();
@@ -454,10 +414,6 @@ int Application::run() {
   shutDown();
 
   return 0;
-}
-
-void Application::whenReady(std::function<void()> callback) {
-  mReadyCallback = callback;
 }
 
 void Application::addInterval(
@@ -525,18 +481,16 @@ void Application::setAssetsPath(Filesystem::Path assetsPath) {
   mPathManager.setAssetsPath(assetsPath);
 }
 
-std::shared_ptr<Canvas> Application::makeCanvas(const Vector2i &size) {
+Canvas *Application::makeCanvas(const Vector2i &size) {
   logInfo("creating canvas {}x{}", size.width, size.height);
 
-  auto canvas = std::make_shared<Canvas>(size);
-
-  mCanvases.emplace_back(canvas);
+  auto canvas = mCanvases.acquire(size);
 
   return canvas;
 }
 
-std::list<std::shared_ptr<Canvas>> Application::getOpenCanvases() {
-  std::list<std::shared_ptr<Canvas>> canvases;
+std::list<Canvas *> Application::getOpenCanvases() {
+  std::list<Canvas *> canvases;
 
   for (auto &&canvas : canvases) {
     canvases.emplace_back(canvas);
@@ -578,7 +532,7 @@ AudioNodePtr Application::getAudioDestinationNode() const {
   return mAudioManager.getDestinationNode();
 }
 
-void Application::openDebugger([[maybe_unused]] std::shared_ptr<Canvas> canvas
+void Application::openDebugger([[maybe_unused]] Canvas *canvas
 ) {
 #ifdef LUNA_USE_IMGUI
   if (!canvas->getImmediateGui()) {

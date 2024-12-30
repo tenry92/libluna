@@ -5,6 +5,7 @@
 #include <libluna/AbstractRenderer.hpp>
 #include <libluna/Font.hpp>
 #include <libluna/IdAllocator.hpp>
+#include <libluna/ImageLoader.hpp>
 #include <libluna/Matrix.hpp>
 #include <libluna/Mesh.hpp>
 #include <libluna/Rect.hpp>
@@ -191,7 +192,7 @@ namespace Luna {
      */
     void render2d(Canvas *canvas, Vector2i renderSize);
 
-    void updateTextureCache(std::shared_ptr<Stage> stage);
+    void updateTextureCache(Stage *stage);
 
     void start2dFramebuffer(Canvas *canvas);
 
@@ -201,7 +202,7 @@ namespace Luna {
     IdAllocator<uint16_t> mMeshIdAllocator;
     int mRenderTargetId;
     Vector2i mCurrentRenderSize;
-    std::unordered_map<Image *, Texture> mKnownImages;
+    std::unordered_map<ImageLoader *, Texture> mKnownImages;
     std::map<int, Texture> mTextureIdMapping;
     std::unordered_map<Font::Char *, int> mCharImages;
     std::set<FontPtr> mLoadedFonts;

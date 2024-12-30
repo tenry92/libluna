@@ -193,32 +193,30 @@ Vector2i CommonRenderer::getTextureSize(int id) const {
 }
 
 void CommonRenderer::updateTextureCache(
-    [[maybe_unused]] std::shared_ptr<Stage> stage
+    [[maybe_unused]] Stage *stage
 ) {
-  auto images = stage->getTextureCache()->getCache();
+  auto imagesLoaderCache = stage->getTextureCache()->getCache();
 
-  std::unordered_set<Image *> visitedImages;
+  std::unordered_set<ImageLoader *> visitedImageLoaders;
 
-  for (auto &&[image, priority] : images) {
-    if (image->getSize().width == 0 || image->getSize().height == 0) {
-      continue;
-    }
+  for (auto &&[imageLoader, priority] : imagesLoaderCache) {
+    visitedImageLoaders.emplace(imageLoader);
+    if (mKnownImages.count(imageLoader) == 0) {
+      auto image = imageLoader->load();
 
-    visitedImages.emplace(image);
-    if (mKnownImages.count(image) == 0) {
       int textureId = mTextureIdAllocator.next();
-      mKnownImages.emplace(image, Texture{textureId, image->getSize()});
+      mKnownImages.emplace(imageLoader, Texture{textureId, image.getSize()});
       mTextureIdMapping.emplace(
-          textureId, Texture{textureId, image->getSize()}
+          textureId, Texture{textureId, image.getSize()}
       );
       logDebug("create texture #{}", textureId);
       createTexture(textureId);
-      loadTexture(textureId, image);
+      loadTexture(textureId, &image);
     }
   }
 
   for (auto it = mKnownImages.begin(); it != mKnownImages.end();) {
-    if (visitedImages.find(it->first) == visitedImages.end()) {
+    if (visitedImageLoaders.find(it->first) == visitedImageLoaders.end()) {
       logDebug("destroy texture #{}", it->second.id);
       mTextureIdAllocator.free(static_cast<uint8_t>(it->second.id));
       destroyTexture(it->second.id);
@@ -290,8 +288,12 @@ void CommonRenderer::render2d(
         overloaded{
             [](auto) {},
             [&](const Sprite &sprite) {
+              if (!sprite.getImageLoader() || !mKnownImages.count(sprite.getImageLoader())) {
+                return;
+              }
+
               RenderTextureInfo info;
-              auto texture = mKnownImages.at(sprite.getImage());
+              auto texture = mKnownImages.at(sprite.getImageLoader());
               info.textureId = texture.id;
               info.size = texture.size;
               info.position =
