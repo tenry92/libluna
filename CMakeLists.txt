@@ -217,9 +217,13 @@ install(FILES ${PUBLIC_HEADERS} DESTINATION include/libluna)
 ################################################################################
 # UNIT TESTS
 
-include(cmake/unit-tests.cmake)
+if(LUNA_BUILD_TESTS)
+  include(cmake/unit-tests.cmake)
+endif()
 
 ################################################################################
 # EXAMPLES
 
-add_subdirectory(examples)
+if(LUNA_BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()

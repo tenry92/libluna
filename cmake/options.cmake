@@ -1,3 +1,6 @@
+option(LUNA_BUILD_TESTS "Build tests" ON)
+option(LUNA_BUILD_EXAMPLES "Build examples" ON)
+
 set(LUNA_WINDOW ${LUNA_DEFAULT_WINDOW} CACHE STRING "Choose one of: sdl2, glfw, egl, none")
 set_property(CACHE LUNA_WINDOW PROPERTY STRINGS "sdl2;glfw;egl;none")
 if(LUNA_WINDOW STREQUAL "sdl2")
