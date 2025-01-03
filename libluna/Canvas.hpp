@@ -100,6 +100,7 @@ namespace Luna {
 
     bool isClosed() const;
 
+    void setOriginalSize(Vector2i size);
     Vector2i getOriginalSize() const;
 
     static const std::list<Canvas *> getCanvasByStage(Stage *stage);

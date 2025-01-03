@@ -7,6 +7,11 @@
 #include <libluna/Vector.hpp>
 
 namespace Luna {
+  /**
+   * @brief A 2D tilemap.
+   *
+   * @ingroup drawables2d
+   */
   class Tilemap final {
     public:
     using TileData = std::uint16_t;

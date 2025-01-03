@@ -1,5 +1,6 @@
 #pragma once
 
+#include <forward_list>
 #include <list>
 #include <variant>
 
@@ -17,17 +18,42 @@ namespace Luna {
    *
    * A stage contains 2D and 3D objects simultaneously.
    *
-   * 2D objects are
-   * positioned on the screen using 2D pixel coordinates, originating form the
-   * top-left corner.
+   * ```cpp
+   * class GameApp : public Luna::Application {
+   *   public:
+   *   using Application::Application;
    *
-   * @image html coordinate-system-2d.svg "2D Coordinate System in libluna"
+   *   protected:
+   *   void init() override final {
+   *     // first, create a canvas where the stage will be rendered
+   *     mCanvas = this->makeCanvas({800, 600});
+   *     mCanvas->setVideoDriver(this->getDefaultVideoDriver());
    *
-   * 3D objects are positioned in a 3D world, coordinates usually in meters.
-   * In 3D, the x-axis points to the right, the y-axis points up and the z-axis
-   * points towards the viewer (backwards).
+   *     // then, assign our stage to the canvas
+   *     mCanvas->setStage(&mStage);
    *
-   * @image html coordinate-system-3d.svg "3D Coordinate System in libluna"
+   *     // and create stuff to draw
+   *     Luna::Sprite *sprite = mStage.createSprite();
+   *     sprite->setImageLoader(YourImageLoader("player.png"));
+   *     sprite->setPosition({400, 300});
+   *
+   *     // sprite will automatically be rendered on the canvas
+   *   }
+   *
+   *   void update(float deltaTime) override final {}
+   *
+   *   private:
+   *   Luna::Canvas *mCanvas;
+   *   Luna::Stage mStage;
+   * };
+   * ```
+   *
+   * The following table shows the coordinate systems used in libluna:
+   *
+   * | Coordinate System | Origin | X-Axis | Y-Axis | Z-Axis | Unit | Image |
+   * |-------------------|--------|--------|--------|--------|------|-------|
+   * | 2D                | Top-left corner | Right | Down | Higher values are drawn above lower values | Pixels | @image html coordinate-system-2d.svg "2D Coordinate System in libluna" |
+   * | 3D                | Center of the world | Right | Up | Backwards | Meters | @image html coordinate-system-3d.svg "3D Coordinate System in libluna" |
    *
    * A stage can be assigned to multiple canvases. For example, if each canvas
    * uses a different renderer, the same stage can be viewed and tested from
@@ -53,6 +79,7 @@ namespace Luna {
     void destroyModel(Model *model);
 
     const Pool<Drawable2d, 32> &getDrawables2d() const;
+    const std::forward_list<Drawable2d> getSortedDrawables2d() const;
     const std::list<Drawable3d> &getDrawables3d() const;
 
     void setAmbientLight(const AmbientLight &ambientLight);

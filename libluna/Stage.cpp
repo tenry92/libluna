@@ -1,5 +1,6 @@
 #include <libluna/Stage.hpp>
 
+#include <algorithm>
 #include <forward_list>
 
 #include <libluna/overloaded.hpp>
@@ -119,6 +120,31 @@ void Stage::destroyModel(Model *model) {
 
 const Pool<Stage::Drawable2d, 32> &Stage::getDrawables2d() const {
   return mDrawables2d;
+}
+
+const std::forward_list<Stage::Drawable2d> Stage::getSortedDrawables2d() const {
+  std::forward_list<Drawable2d> sortedDrawables;
+
+  for (auto &&drawable : mDrawables2d) {
+    sortedDrawables.emplace_front(drawable);
+  }
+
+  sortedDrawables.sort([](const Drawable2d &a, const Drawable2d &b) {
+    float priorityA = 0;
+    float priorityB = 0;
+
+    if (std::holds_alternative<Sprite>(a)) {
+      priorityA = std::get<Sprite>(a).getPriority();
+    }
+
+    if (std::holds_alternative<Sprite>(b)) {
+      priorityB = std::get<Sprite>(b).getPriority();
+    }
+
+    return priorityA < priorityB;
+  });
+
+  return sortedDrawables;
 }
 
 const std::list<Stage::Drawable3d> &Stage::getDrawables3d() const {

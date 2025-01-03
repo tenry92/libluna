@@ -641,6 +641,8 @@ std::queue<ButtonEvent> &Canvas::getButtonEvents() { return mButtonEvents; }
 
 bool Canvas::isClosed() const { return mClosed; }
 
+void Canvas::setOriginalSize(Vector2i size) { mOriginalSize = size; }
+
 Vector2i Canvas::getOriginalSize() const { return mOriginalSize; }
 
 const std::list<Canvas *> Canvas::getCanvasByStage(Stage *stage) { return gCanvasByStage[stage]; }

@@ -283,7 +283,7 @@ void CommonRenderer::renderWorld(Canvas *canvas) {
 void CommonRenderer::render2d(
     Canvas *canvas, [[maybe_unused]] Vector2i renderSize
 ) {
-  for (auto &&drawable : canvas->getStage()->getDrawables2d()) {
+  for (auto &&drawable : canvas->getStage()->getSortedDrawables2d()) {
     std::visit(
         overloaded{
             [](auto) {},

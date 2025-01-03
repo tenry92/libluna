@@ -7,6 +7,11 @@ namespace Luna {
   class Text;
   using TextPtr = std::shared_ptr<Text>;
 
+  /**
+   * @brief A 2D text.
+   *
+   * @ingroup drawables2d
+   */
   class Text final {
     public:
     Text();
