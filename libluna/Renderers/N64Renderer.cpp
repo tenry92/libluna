@@ -266,6 +266,10 @@ void N64Renderer::renderShape(
   float displayWidth = static_cast<float>(display_get_width());
   float displayHeight = static_cast<float>(display_get_height());
 
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(0.0, displayWidth, displayHeight, 0.0, -1.0, 1.0);
+
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_CULL_FACE);
   glEnable(GL_BLEND);
@@ -278,8 +282,8 @@ void N64Renderer::renderShape(
   glBegin(GL_LINE_STRIP);
 
   for (auto &&vertex : shape->getVertices()) {
-    float x = ((info->position.x + vertex.x) / displayWidth * 2.0f) - 1.0f;
-    float y = -((info->position.y + vertex.y) / displayHeight * 2.0f) + 1.0f;
+    float x = info->position.x + vertex.x;
+    float y = info->position.y + vertex.y;
 
     glVertex2f(x, y);
   }
