@@ -263,6 +263,9 @@ void N64Renderer::renderShape(
 ) {
   auto shape = mShapeIdMapping.at(info->shapeId);
 
+  float displayWidth = static_cast<float>(display_get_width());
+  float displayHeight = static_cast<float>(display_get_height());
+
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_CULL_FACE);
   glEnable(GL_BLEND);
@@ -273,8 +276,12 @@ void N64Renderer::renderShape(
   glBindTexture(GL_TEXTURE_2D, 0);
 
   glBegin(GL_LINE_STRIP);
+
   for (auto &&vertex : shape->getVertices()) {
-    glVertex2f(info->position.x + vertex.x, info->position.y + vertex.y);
+    float x = ((info->position.x + vertex.x) / displayWidth * 2.0f) - 1.0f;
+    float y = -((info->position.y + vertex.y) / displayHeight * 2.0f) + 1.0f;
+
+    glVertex2f(x, y);
   }
   glEnd();
 
