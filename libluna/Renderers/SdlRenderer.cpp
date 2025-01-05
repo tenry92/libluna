@@ -5,6 +5,7 @@
 
 #include <list>
 #include <map>
+#include <vector>
 
 #ifdef LUNA_WINDOW_GLFW
 #define GLFW_INCLUDE_NONE
@@ -224,6 +225,33 @@ void SdlRenderer::renderTexture(
   } else {
     CHECK_SDL(SDL_RenderCopy(mRenderer.get(), texture, &srcrect, &dstrect));
   }
+}
+
+void SdlRenderer::createShape([[maybe_unused]] int id) {}
+
+void SdlRenderer::destroyShape([[maybe_unused]] int id) {
+  mShapeIdMapping.erase(id);
+}
+
+void SdlRenderer::loadShape([[maybe_unused]] int id, [[maybe_unused]] Shape *shape) {
+  mShapeIdMapping.emplace(id, shape);
+}
+
+void SdlRenderer::renderShape(
+    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderShapeInfo *info
+) {
+  auto shape = mShapeIdMapping.at(info->shapeId);
+
+  SDL_SetRenderDrawColor(mRenderer.get(), 255, 0, 0, 255);
+
+  std::vector<SDL_FPoint> points;
+  points.reserve(shape->getVertices().size());
+
+  for (auto &point : shape->getVertices()) {
+    points.push_back({info->position.x + point.x, info->position.y + point.y});
+  }
+
+  SDL_RenderDrawLinesF(mRenderer.get(), points.data(), static_cast<int>(points.size()));
 }
 
 void SdlRenderer::setTextureFilterEnabled(

@@ -136,6 +136,6 @@ namespace Luna::Math {
    * For example, `360_deg` would yield the value of 2π.
    */
   constexpr double operator"" _deg(long double degrees) {
-    return deg2rad(degrees);
+    return static_cast<double>(deg2rad(degrees));
   }
 } // namespace Luna::Math

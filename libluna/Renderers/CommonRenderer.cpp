@@ -107,6 +107,20 @@ void CommonRenderer::resizeTexture(
   // stub
 }
 
+void CommonRenderer::createShape([[maybe_unused]] int id) {
+  // stub
+}
+
+void CommonRenderer::destroyShape([[maybe_unused]] int id) {
+  // stub
+}
+
+void CommonRenderer::loadShape(
+    [[maybe_unused]] int id, [[maybe_unused]] Shape *shape
+) {
+  // stub
+}
+
 void CommonRenderer::setViewport(
     [[maybe_unused]] Vector2i offset, [[maybe_unused]] Vector2i size
 ) {
@@ -125,6 +139,12 @@ void CommonRenderer::renderMesh(
 
 void CommonRenderer::renderTexture(
     [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info
+) {
+  // stub
+}
+
+void CommonRenderer::renderShape(
+    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderShapeInfo *info
 ) {
   // stub
 }
@@ -218,7 +238,7 @@ void CommonRenderer::updateTextureCache(
   for (auto it = mKnownImages.begin(); it != mKnownImages.end();) {
     if (visitedImageLoaders.find(it->first) == visitedImageLoaders.end()) {
       logDebug("destroy texture #{}", it->second.id);
-      mTextureIdAllocator.free(static_cast<uint8_t>(it->second.id));
+      mTextureIdAllocator.free(static_cast<uint16_t>(it->second.id));
       destroyTexture(it->second.id);
       it = mKnownImages.erase(it);
       mTextureIdMapping.erase(it->second.id);
@@ -227,7 +247,38 @@ void CommonRenderer::updateTextureCache(
     }
   }
 
-  std::unordered_set<std::shared_ptr<Mesh>> visitedMeshes;
+  std::unordered_set<Shape *> visitedShapes;
+
+  for (auto &&drawable : stage->getDrawables2d()) {
+    if (!std::holds_alternative<Primitive>(drawable)) {
+      continue;
+    }
+
+    auto &primitive = std::get<Primitive>(drawable);
+
+    if (primitive.getShape() == nullptr) {
+      continue;
+    }
+
+    visitedShapes.emplace(primitive.getShape());
+
+    if (mKnownShapes.count(primitive.getShape()) == 0) {
+      int shapeId = mShapeIdAllocator.next();
+      mKnownShapes.emplace(primitive.getShape(), shapeId);
+      createShape(shapeId);
+      loadShape(shapeId, primitive.getShape());
+    }
+  }
+
+  for (auto it = mKnownShapes.begin(); it != mKnownShapes.end();) {
+    if (visitedShapes.find(it->first) == visitedShapes.end()) {
+      mShapeIdAllocator.free(static_cast<uint16_t>(it->second));
+      destroyShape(it->second);
+      it = mKnownShapes.erase(it);
+    } else {
+      ++it;
+    }
+  }
 
   for (auto &&drawable : stage->getDrawables2d()) {
     if (!std::holds_alternative<Text>(drawable)) {
@@ -247,6 +298,8 @@ void CommonRenderer::updateTextureCache(
       mLoadedFonts.insert(font);
     }
   }
+
+  std::unordered_set<std::shared_ptr<Mesh>> visitedMeshes;
 
   for (auto &&model : stage->getDrawables3d()) {
     visitedMeshes.emplace(model->getMesh());
@@ -299,6 +352,16 @@ void CommonRenderer::render2d(
               info.position =
                   sprite.getPosition() - canvas->getCamera2d().getPosition();
               renderTexture(canvas, &info);
+            },
+            [&](const Primitive &primitive) {
+              if (!primitive.getShape() || !mKnownShapes.count(primitive.getShape())) {
+                return;
+              }
+
+              RenderShapeInfo info;
+              info.shapeId = mKnownShapes.at(primitive.getShape());
+              info.position = primitive.getPosition();
+              renderShape(canvas, &info);
             },
             [&](const Tilemap &tilemap) {
               auto tileset = tilemap.getTileset();

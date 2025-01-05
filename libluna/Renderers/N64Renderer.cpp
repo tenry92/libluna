@@ -246,6 +246,39 @@ void N64Renderer::renderTexture(
   }
 }
 
+void N64Renderer::createShape([[maybe_unused]] int id) {}
+
+void N64Renderer::destroyShape([[maybe_unused]] int id) {
+  mShapeIdMapping.erase(id);
+}
+
+void N64Renderer::loadShape(
+    [[maybe_unused]] int id, [[maybe_unused]] Shape *shape
+) {
+  mShapeIdMapping.emplace(id, shape);
+}
+
+void N64Renderer::renderShape(
+    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderShapeInfo *info
+) {
+  auto shape = mShapeIdMapping.at(info->shapeId);
+
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_CULL_FACE);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  glColor3f(1.0f, 0.0f, 0.0f);
+
+  glBegin(GL_LINE_STRIP);
+  for (auto &&vertex : shape->getVertices()) {
+    glVertex2f(vertex.x, vertex.y);
+  }
+  glEnd();
+
+  glColor3f(1.0f, 1.0f, 1.0f);
+}
+
 void N64Renderer::createMesh([[maybe_unused]] int id) {
   GLuint listId = glGenLists(1);
   mMeshIdMapping.emplace(id, listId);

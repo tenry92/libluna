@@ -54,6 +54,8 @@
 #include <libluna/GL/shaders/3d_frag.glsl.h>
 #include <libluna/GL/shaders/3d_vert.glsl.h>
 #include <libluna/GL/shaders/common3d.glsl.h>
+#include <libluna/GL/shaders/primitive_frag.glsl.h>
+#include <libluna/GL/shaders/primitive_vert.glsl.h>
 #include <libluna/GL/shaders/sprite_frag.glsl.h>
 #include <libluna/GL/shaders/sprite_vert.glsl.h>
 
@@ -87,6 +89,14 @@ void OpenglRenderer::initialize() {
       std::make_unique<MemoryReader>(sprite_frag_glsl, sprite_frag_glsl_len)
   );
   shaderLib.registerShader(
+      "primitive_vert.glsl",
+      std::make_unique<MemoryReader>(primitive_vert_glsl, primitive_vert_glsl_len)
+  );
+  shaderLib.registerShader(
+      "primitive_frag.glsl",
+      std::make_unique<MemoryReader>(primitive_frag_glsl, primitive_frag_glsl_len)
+  );
+  shaderLib.registerShader(
       "3d_vert.glsl",
       std::make_unique<MemoryReader>(__3d_vert_glsl, __3d_vert_glsl_len)
   );
@@ -101,6 +111,8 @@ void OpenglRenderer::initialize() {
 
   mSpriteShader =
       shaderLib.compileShader("sprite_vert.glsl", "sprite_frag.glsl");
+  mPrimitiveShader =
+      shaderLib.compileShader("primitive_vert.glsl", "primitive_frag.glsl");
   mModelShader = shaderLib.compileShader("3d_vert.glsl", "3d_frag.glsl");
 }
 
@@ -252,7 +264,8 @@ void OpenglRenderer::renderTexture(
   glDisable(GL_MULTISAMPLE);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  [[maybe_unused]] auto screenSize = getCurrentRenderSize();
+
+  auto screenSize = getCurrentRenderSize();
   mUniforms.screenSize = mSpriteShader.getUniform("uScreenSize");
   mUniforms.screenSize = Vector2f(
       static_cast<float>(screenSize.width),
@@ -367,6 +380,70 @@ void OpenglRenderer::renderMesh(
   );
 
   mesh->draw();
+}
+
+void OpenglRenderer::createShape([[maybe_unused]] int id) {}
+
+void OpenglRenderer::destroyShape([[maybe_unused]] int id) {
+  mShapeIdMapping.erase(id);
+}
+
+void OpenglRenderer::loadShape(
+    [[maybe_unused]] int id, [[maybe_unused]] Shape *shape
+) {
+  mShapeIdMapping.emplace(id, shape);
+}
+
+void OpenglRenderer::renderShape(
+    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderShapeInfo *info
+) {
+  auto shape = mShapeIdMapping.at(info->shapeId);
+
+  mPrimitiveShader.use();
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_CULL_FACE);
+  glDisable(GL_MULTISAMPLE);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  auto screenSize = getCurrentRenderSize();
+  mUniforms.screenSize = mPrimitiveShader.getUniform("uScreenSize");
+  mUniforms.screenSize = Vector2f(
+      static_cast<float>(screenSize.width),
+      static_cast<float>(screenSize.height)
+  );
+
+  unsigned int vertexAttribConf;
+  unsigned int pointBuffer;
+  CHECK_GL(glGenVertexArrays(1, &vertexAttribConf));
+  CHECK_GL(glGenBuffers(1, &pointBuffer));
+
+  CHECK_GL(glBindVertexArray(vertexAttribConf));
+  CHECK_GL(glBindBuffer(GL_ARRAY_BUFFER, pointBuffer));
+
+  CHECK_GL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0));
+  CHECK_GL(glEnableVertexAttribArray(0));
+
+  std::vector<float> vertices;
+  vertices.reserve(shape->getVertices().size() * 2);
+
+  for (auto &&vertex : shape->getVertices()) {
+    vertices.push_back(vertex.x);
+    vertices.push_back(vertex.y);
+  }
+
+  CHECK_GL(glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW));
+
+  mUniforms.primitiveColor = mPrimitiveShader.getUniform("uPrimitiveColor");
+  mUniforms.primitiveColor = Luna::ColorRgb{1.0f, 0.f, 0.f, 1.f};
+
+  mUniforms.uPrimitivePos = mPrimitiveShader.getUniform("uPrimitivePos");
+  mUniforms.uPrimitivePos = info->position;
+
+  CHECK_GL(glDrawArrays(GL_LINE_STRIP, 0, static_cast<int>(shape->getVertices().size())));
+
+  CHECK_GL(glDeleteBuffers(1, &pointBuffer));
+  CHECK_GL(glDeleteVertexArrays(1, &vertexAttribConf));
 }
 
 void OpenglRenderer::setTextureFilterEnabled(

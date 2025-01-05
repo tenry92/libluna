@@ -71,6 +71,23 @@ void Stage::destroySprite(Sprite *sprite) {
   }
 }
 
+Primitive *Stage::createPrimitive() {
+  auto drawable2d = mDrawables2d.acquire();
+  drawable2d->emplace<Primitive>();
+
+  return &std::get<Primitive>(*drawable2d);
+}
+
+void Stage::destroyPrimitive(Primitive *primitive) {
+  for (auto &&drawable : mDrawables2d) {
+    if (std::holds_alternative<Primitive>(drawable) &&
+        &std::get<Primitive>(drawable) == primitive) {
+      mDrawables2d.release(&drawable);
+      break;
+    }
+  }
+}
+
 Text *Stage::createText() {
   auto drawable2d = mDrawables2d.acquire();
   drawable2d->emplace<Text>();
@@ -118,7 +135,7 @@ void Stage::destroyModel(Model *model) {
   delete model;
 }
 
-const Pool<Stage::Drawable2d, 32> &Stage::getDrawables2d() const {
+const Pool<Stage::Drawable2d, 64> &Stage::getDrawables2d() const {
   return mDrawables2d;
 }
 
@@ -137,8 +154,16 @@ const std::forward_list<Stage::Drawable2d> Stage::getSortedDrawables2d() const {
       priorityA = std::get<Sprite>(a).getPriority();
     }
 
+    if (std::holds_alternative<Primitive>(a)) {
+      priorityA = std::get<Primitive>(a).getPriority();
+    }
+
     if (std::holds_alternative<Sprite>(b)) {
       priorityB = std::get<Sprite>(b).getPriority();
+    }
+
+    if (std::holds_alternative<Primitive>(b)) {
+      priorityB = std::get<Primitive>(b).getPriority();
     }
 
     return priorityA < priorityB;

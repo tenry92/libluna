@@ -43,6 +43,11 @@ namespace Luna {
     void resizeTexture(int id, Vector2i size) override;
     void renderTexture(Canvas *canvas, RenderTextureInfo *info) override;
 
+    void createShape(int id) override;
+    void destroyShape(int id) override;
+    void loadShape(int id, Shape *shape) override;
+    void renderShape(Canvas *canvas, RenderShapeInfo *info) override;
+
     void setTextureFilterEnabled(int id, bool enabled) override;
     void setRenderTargetTexture(int id) override;
     void unsetRenderTargetTexture() override;
@@ -60,5 +65,6 @@ namespace Luna {
     std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
 
     std::map<int, SDL_Texture *> mTextureIdMapping;
+    std::map<int, Luna::Shape *> mShapeIdMapping;
   };
 } // namespace Luna

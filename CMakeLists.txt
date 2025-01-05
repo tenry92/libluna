@@ -88,8 +88,10 @@ set(PUBLIC_MODULES
   Performance/Ticker
   Performance/Timer
   Platform
+  Primitive
   Rect
   ResourceReader
+  Shape
   Sprite
   Stage
   String
@@ -181,6 +183,8 @@ include(cmake/dependencies.cmake)
 set(SHADER_SOURCE_FILES
   sprite_vert.glsl
   sprite_frag.glsl
+  primitive_vert.glsl
+  primitive_frag.glsl
   3d_vert.glsl
   3d_frag.glsl
   common3d.glsl

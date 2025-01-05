@@ -9,6 +9,7 @@
 #include <libluna/Matrix.hpp>
 #include <libluna/Mesh.hpp>
 #include <libluna/Rect.hpp>
+#include <libluna/Shape.hpp>
 #include <libluna/Stage.hpp>
 
 namespace Luna {
@@ -53,6 +54,12 @@ namespace Luna {
        * @brief The output size in pixels.
        */
       Vector2i size;
+    };
+
+    struct RenderShapeInfo {
+      int shapeId;
+
+      Vector2f position;
     };
 
     /**
@@ -121,6 +128,14 @@ namespace Luna {
      * @brief Draw a texture on the canvas.
      */
     virtual void renderTexture(Canvas *canvas, RenderTextureInfo *info);
+
+    virtual void createShape(int id);
+
+    virtual void destroyShape(int id);
+
+    virtual void loadShape(int id, Shape *shape);
+
+    virtual void renderShape(Canvas *canvas, RenderShapeInfo *info);
 
     /**
      * @brief Create a new empty mesh for the provided ID.
@@ -199,11 +214,13 @@ namespace Luna {
     void end2dFramebuffer(Canvas *canvas);
 
     IdAllocator<uint16_t> mTextureIdAllocator;
+    IdAllocator<uint16_t> mShapeIdAllocator;
     IdAllocator<uint16_t> mMeshIdAllocator;
     int mRenderTargetId;
     Vector2i mCurrentRenderSize;
     std::unordered_map<ImageLoader *, Texture> mKnownImages;
     std::map<int, Texture> mTextureIdMapping;
+    std::unordered_map<Shape *, int> mKnownShapes;
     std::unordered_map<Font::Char *, int> mCharImages;
     std::set<FontPtr> mLoadedFonts;
     std::unordered_map<std::shared_ptr<Mesh>, int> mKnownMeshes;

@@ -7,6 +7,7 @@
 #include <libluna/Light.hpp>
 #include <libluna/Model.hpp>
 #include <libluna/Pool.hpp>
+#include <libluna/Primitive.hpp>
 #include <libluna/Sprite.hpp>
 #include <libluna/Text.hpp>
 #include <libluna/TextureCache.hpp>
@@ -61,13 +62,16 @@ namespace Luna {
    */
   class Stage {
     public:
-    using Drawable2d = std::variant<Sprite, Text, Tilemap>;
+    using Drawable2d = std::variant<Sprite, Primitive, Text, Tilemap>;
     using Drawable3d = Model *;
     Stage();
     ~Stage();
 
     Sprite *createSprite();
     void destroySprite(Sprite *sprite);
+
+    Primitive *createPrimitive();
+    void destroyPrimitive(Primitive *primitive);
 
     Text *createText();
     void destroyText(Text *text);
@@ -78,7 +82,7 @@ namespace Luna {
     Model *createModel();
     void destroyModel(Model *model);
 
-    const Pool<Drawable2d, 32> &getDrawables2d() const;
+    const Pool<Drawable2d, 64> &getDrawables2d() const;
     const std::forward_list<Drawable2d> getSortedDrawables2d() const;
     const std::list<Drawable3d> &getDrawables3d() const;
 
@@ -92,7 +96,7 @@ namespace Luna {
     void updateTextureCache();
 
     private:
-    Pool<Drawable2d, 32> mDrawables2d;
+    Pool<Drawable2d, 64> mDrawables2d;
     std::list<Drawable3d> mDrawables3d;
     AmbientLight mAmbientLight;
     std::list<std::shared_ptr<PointLight>> mPointLights;
