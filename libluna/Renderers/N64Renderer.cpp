@@ -269,10 +269,12 @@ void N64Renderer::renderShape(
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   glColor3f(1.0f, 0.0f, 0.0f);
+  glLineWidth(1.0f);
+  glBindTexture(GL_TEXTURE_2D, 0);
 
   glBegin(GL_LINE_STRIP);
   for (auto &&vertex : shape->getVertices()) {
-    glVertex2f(vertex.x, vertex.y);
+    glVertex2f(info->position.x + vertex.x, info->position.y + vertex.y);
   }
   glEnd();
 
