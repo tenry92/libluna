@@ -171,6 +171,10 @@ void N64Renderer::renderTexture(
     vEndChunk = (info->crop.y + info->crop.height - 1) / chunkSize.height;
   }
 
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(0.0, displayWidth, displayHeight, 0.0, -1.0, 1.0);
+
   for (int vChunk = vStartChunk; vChunk <= vEndChunk; ++vChunk) {
     for (int hChunk = hStartChunk; hChunk <= hEndChunk; ++hChunk) {
       auto chunkIndex = hChunk + vChunk * chunkCount.x;
@@ -216,14 +220,10 @@ void N64Renderer::renderTexture(
         }
       }
 
-      float left = (basePos.x / displayWidth * 2.0f) - 1.0f;
-      float top = -(basePos.y / displayHeight * 2.0f) + 1.0f;
-      float right = ((basePos.x + static_cast<float>(baseSize.width)) /
-                     displayWidth * 2.0f) -
-                    1.0f;
-      float bottom = -((basePos.y + static_cast<float>(baseSize.height)) /
-                       displayHeight * 2.0f) +
-                     1.0f;
+      float left = basePos.x;
+      float top = basePos.y;
+      float right = basePos.x + static_cast<float>(baseSize.width);
+      float bottom = basePos.y + static_cast<float>(baseSize.height);
 
       glEnable(GL_BLEND);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
