@@ -126,7 +126,7 @@ void OpenglRenderer::initializeImmediateGui() {
 
   ImGui::StyleColorsDark();
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
   ImGui_ImplSDL2_InitForOpenGL(
       getCanvas()->sdl.window, getCanvas()->sdl.glContext
   );
@@ -142,7 +142,7 @@ void OpenglRenderer::quitImmediateGui() {
 #ifdef LUNA_IMGUI
   if (mImGuiContext) {
     ImGui_ImplOpenGL3_Shutdown();
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
     ImGui_ImplSDL2_Shutdown();
 #endif
     ImGui::DestroyContext(mImGuiContext);
@@ -156,7 +156,7 @@ void OpenglRenderer::close() {
   if (mImGuiContext) {
     ImGui_ImplOpenGL3_Shutdown();
 
-#ifdef LUNA_USE_SDL
+#ifdef LUNA_WINDOW_SDL2
     ImGui_ImplSDL2_Shutdown();
 #endif
     ImGui::DestroyContext();

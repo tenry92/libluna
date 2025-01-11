@@ -534,7 +534,7 @@ AudioNodePtr Application::getAudioDestinationNode() const {
 
 void Application::openDebugger([[maybe_unused]] Canvas *canvas
 ) {
-#ifdef LUNA_USE_IMGUI
+#ifdef LUNA_IMGUI
   if (!canvas->getImmediateGui()) {
     canvas->attachImmediateGui(
         std::make_unique<Internal::DebugGui>(mDebugMetrics)
