@@ -341,6 +341,10 @@ void CommonRenderer::render2d(
         overloaded{
             [](auto) {},
             [&](const Sprite &sprite) {
+              if (!sprite.isVisible()) {
+                return;
+              }
+
               if (!sprite.getImageLoader() || !mKnownImages.count(sprite.getImageLoader())) {
                 return;
               }

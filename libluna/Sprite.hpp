@@ -52,10 +52,16 @@ namespace Luna {
     float getPriority() const;
     ///@}
 
+    ///@{
+    void setVisible(bool visible);
+    bool isVisible() const;
+    ///@}
+
     private:
     ImageLoader *mImageLoader;
     std::shared_ptr<Resource<Palette>> mPalette;
     Vector2f mPosition;
     float mPriority{0};
+    bool mVisible{true};
   };
 } // namespace Luna

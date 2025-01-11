@@ -23,3 +23,7 @@ Vector2f Sprite::getPosition() const { return mPosition; }
 void Sprite::setPriority(float priority) { mPriority = priority; }
 
 float Sprite::getPriority() const { return mPriority; }
+
+void Sprite::setVisible(bool visible) { mVisible = visible; }
+
+bool Sprite::isVisible() const { return mVisible; }
