@@ -221,7 +221,6 @@ namespace Luna {
     std::unordered_map<ImageLoader *, Texture> mKnownImages;
     std::map<int, Texture> mTextureIdMapping;
     std::unordered_map<Shape *, int> mKnownShapes;
-    std::unordered_map<Font::Char *, int> mCharImages;
     std::set<FontPtr> mLoadedFonts;
     std::unordered_map<std::shared_ptr<Mesh>, int> mKnownMeshes;
   };

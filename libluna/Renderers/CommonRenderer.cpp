@@ -280,25 +280,6 @@ void CommonRenderer::updateTextureCache(
     }
   }
 
-  for (auto &&drawable : stage->getDrawables2d()) {
-    if (!std::holds_alternative<Text>(drawable)) {
-      continue;
-    }
-
-    auto &text = std::get<Text>(drawable);
-
-    if (!text.getFont()) {
-      continue;
-    }
-
-    auto future = text.getFont()->get();
-    auto font = future.get();
-
-    if (mLoadedFonts.count(font) == 0) {
-      mLoadedFonts.insert(font);
-    }
-  }
-
   std::unordered_set<std::shared_ptr<Mesh>> visitedMeshes;
 
   for (auto &&model : stage->getDrawables3d()) {
@@ -393,7 +374,7 @@ void CommonRenderer::render2d(
               }
             },
             [&](const Text &text) {
-              auto font = text.getFont()->get().get();
+              auto font = text.getFont();
 
               int x = 0;
               int y = font->getBaseLine();
@@ -405,31 +386,31 @@ void CommonRenderer::render2d(
                   continue;
                 }
 
-                auto ch = font->getCharByCodePoint(cp);
+                auto glyph = font->getGlyphByCodePoint(cp);
 
-                if (!ch) {
-                  // unknown character
+                if (!glyph) {
+                  // unknown glyph
                   continue;
                 }
 
-                RenderTextureInfo info;
+                if (glyph->imageLoader) {
+                  RenderTextureInfo info;
+                  auto texture = mKnownImages.at(glyph->imageLoader);
 
-                if (ch->image.getSize().width > 0 &&
-                    ch->image.getSize().height > 0) {
-                  if (mCharImages.count(ch) == 0) {
-                    int textureId = mTextureIdAllocator.next();
-                    mCharImages.emplace(ch, textureId);
-                    createTexture(textureId);
-                    loadTexture(textureId, &ch->image);
+                  info.textureId = texture.id;
+                  info.position = Vector2i(x, y) + glyph->offset;
+
+                  if (glyph->crop.area() > 0) {
+                    info.size = {glyph->crop.width, glyph->crop.height};
+                    info.crop = glyph->crop;
+                  } else {
+                    info.size = texture.size;
                   }
 
-                  info.textureId = mCharImages.at(ch);
-                  info.size = ch->image.getSize();
-                  info.position = Vector2i(x, y) + ch->offset;
                   renderTexture(canvas, &info);
                 }
 
-                x += ch->advance;
+                x += glyph->advance;
               }
             }},
         drawable

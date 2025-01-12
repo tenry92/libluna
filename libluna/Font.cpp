@@ -4,12 +4,6 @@
 
 using namespace Luna;
 
-Font::Font() = default;
-
-FontPtr Font::make() { return FontPtr(new Font()); }
-
-Font::~Font() = default;
-
 int Font::getLineHeight() const { return mLineHeight; }
 
 void Font::setLineHeight(int lineHeight) { mLineHeight = lineHeight; }
@@ -18,14 +12,18 @@ int Font::getBaseLine() const { return mBaseLine; }
 
 void Font::setBaseLine(int baseLine) { mBaseLine = baseLine; }
 
-Font::Char *Font::getCharByCodePoint(String::CodePoint codePoint) {
-  return &mChars.at(codePoint);
+Font::Glyph *Font::getGlyphByCodePoint(String::CodePoint codePoint) {
+  return &mGlyphs.at(codePoint);
 }
 
-Font::Char *Font::makeCharForCodePoint(String::CodePoint codePoint) {
-  mChars.emplace(codePoint, Font::Char{});
-  auto ch = getCharByCodePoint(codePoint);
-  ch->codePoint = codePoint;
+Font::Glyph *Font::makeGlyphForCodePoint(String::CodePoint codePoint) {
+  mGlyphs.emplace(codePoint, Font::Glyph{});
+  auto glyph = getGlyphByCodePoint(codePoint);
+  glyph->codePoint = codePoint;
 
-  return ch;
+  return glyph;
+}
+
+const std::map<String::CodePoint, Font::Glyph> &Font::getGlyphs() const {
+  return mGlyphs;
 }

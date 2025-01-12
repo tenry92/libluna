@@ -20,6 +20,15 @@ namespace {
                   imageLoaders.emplace_front(sprite.getImageLoader());
                 }
               },
+              [&](const Text &text) {
+                if (text.getFont()) {
+                  for (auto &&[codePoint, glyph] : text.getFont()->getGlyphs()) {
+                    if (glyph.imageLoader) {
+                      imageLoaders.emplace_front(glyph.imageLoader);
+                    }
+                  }
+                }
+              },
               [&](const Tilemap &tilemap) {
                 auto tileset = tilemap.getTileset();
                 if (tileset->getImage()) {
@@ -30,8 +39,6 @@ namespace {
           drawable
       );
     }
-
-    // todo: font characters
 
     for (auto &&model : stage->getDrawables3d()) {
       auto diffuse = model->getMaterial().getDiffuse();

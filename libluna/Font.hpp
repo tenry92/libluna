@@ -3,27 +3,24 @@
 #include <map>
 
 #include <libluna/Image.hpp>
-#include <libluna/Resource.hpp>
+#include <libluna/ImageLoader.hpp>
+#include <libluna/Rect.hpp>
 #include <libluna/String.hpp>
 #include <libluna/Vector.hpp>
 
 namespace Luna {
   class Font;
   using FontPtr = std::shared_ptr<Font>;
-  using FontResPtr = ResourcePtr<Font>;
 
   class Font {
     public:
-    struct Char {
+    struct Glyph {
       String::CodePoint codePoint;
-      Image image;
+      ImageLoader *imageLoader;
+      Recti crop;
       Vector2i offset;
       int advance;
     };
-
-    static FontPtr make();
-
-    ~Font();
 
     int getLineHeight() const;
 
@@ -33,15 +30,18 @@ namespace Luna {
 
     void setBaseLine(int baseLine);
 
-    Char *getCharByCodePoint(String::CodePoint codePoint);
+    Glyph *getGlyphByCodePoint(String::CodePoint codePoint);
 
-    Char *makeCharForCodePoint(String::CodePoint codePoint);
+    Glyph *makeGlyphForCodePoint(String::CodePoint codePoint);
+
+    const std::map<String::CodePoint, Glyph> &getGlyphs() const;
 
     private:
     Font();
     int mLineHeight;
     int mBaseLine;
 
-    std::map<String::CodePoint, Font::Char> mChars;
+    std::map<String::CodePoint, Font::Glyph> mGlyphs;
+
   };
 } // namespace Luna

@@ -10,6 +10,6 @@ void Text::setContent(const String &content) { mContent = content; }
 
 const String &Text::getContent() const { return mContent; }
 
-void Text::setFont(FontResPtr font) { mFont = font; }
+void Text::setFont(Font *font) { mFont = font; }
 
-FontResPtr Text::getFont() const { return mFont; }
+Font *Text::getFont() const { return mFont; }

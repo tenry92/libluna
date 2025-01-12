@@ -20,11 +20,11 @@ namespace Luna {
     void setContent(const Luna::String &content);
     const Luna::String &getContent() const;
 
-    void setFont(FontResPtr font);
-    FontResPtr getFont() const;
+    void setFont(Font *font);
+    Font *getFont() const;
 
     private:
-    FontResPtr mFont;
+    Font *mFont;
     String mContent;
   };
 } // namespace Luna
