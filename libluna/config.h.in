@@ -1,32 +1,75 @@
 #pragma once
 
-// this file is configured by CMake
+/**
+ * @file config.h.in
+ *
+ * @brief This file is configured by CMake.
+ */
 
 ////////////////////////////////////////////////////////////////////////////////
 // VERSION
 
+/**
+ * @brief The version of the project.
+ */
 #define VERSION_STRING "@PROJECT_VERSION@"
+
+/**
+ * @brief The version of the project with a null terminator.
+ */
 #define VERSION_STRING_NUL "@PROJECT_VERSION@\0"
 
+/**
+ * @brief The short version of the project (major.minor).
+ */
 #define VERSION_STRING_SHORT "@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@"
+
+/**
+ * @brief The short version of the project with a null terminator (major.minor).
+ */
 #define VERSION_STRING_SHORT_NUL "@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@\0"
 
+/**
+ * @brief The version of the project as a number.
+ */
 #define VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+
+/**
+ * @brief The version of the project as a number.
+ */
 #define VERSION_MINOR @PROJECT_VERSION_MINOR@
+
+/**
+ * @brief The version of the project as a number.
+ */
 #define VERSION_BUILD @PROJECT_VERSION_PATCH@
+
+/**
+ * @brief The version of the project as a number.
+ */
 #define VERSION_REVISION @PROJECT_VERSION_TWEAK@
 
 ////////////////////////////////////////////////////////////////////////////////
 // META
 
-// internal name, all lowercase, no whitespace
+/**
+ * @brief The internal name of the project, all lowercase, no whitespace.
+ */
 #define APP_NAME "@APP_NAME@"
 
-// product name, may contain uppercase letters and whitespace
+/**
+ * @brief The product name of the project, may contain uppercase letters and whitespace.
+ */
 #define APP_PRODUCT_NAME "@APP_PRODUCT_NAME@"
 
+/**
+ * @brief The description of the project.
+ */
 #define APP_DESCRIPTION "@APP_DESCRIPTION@"
 
+/**
+ * @brief The original filename of the executable.
+ */
 #define APP_ORIGINAL_FILENAME "@APP_ORIGINAL_FILENAME@"
 
 ////////////////////////////////////////////////////////////////////////////////

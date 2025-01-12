@@ -13,6 +13,8 @@ namespace Luna::Filesystem {
 
   /**
    * @brief Reading files from the filesystem.
+   *
+   * @ingroup streams
    */
   class FileReader final : public InputStream {
     public:

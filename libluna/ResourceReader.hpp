@@ -9,6 +9,8 @@ namespace Luna {
 
   /**
    * @brief Read files from the assets.
+   * 
+   * @ingroup streams
    */
   class ResourceReader final : public InputStream {
     public:
