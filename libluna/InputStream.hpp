@@ -175,5 +175,32 @@ namespace Luna {
           reinterpret_cast<uint8_t *>(buffer), sizeof(BufferType), objectCount
       );
     }
+
+    bool readLine(char *buffer, std::size_t bufferSize) {
+      if (bufferSize == 0) {
+        return false;
+      }
+
+      for (std::size_t i = 0; i < bufferSize; i++) {
+        if (read(&buffer[i]) == 0) {
+          // end of file reached
+          buffer[i] = '\0';
+
+          if (i == 0) {
+            return false;
+          }
+
+          break;
+        }
+
+        if (buffer[i] == '\n') {
+          // end of line reached
+          buffer[i] = '\0';
+          break;
+        }
+      }
+
+      return true;
+    }
   };
 } // namespace Luna
