@@ -26,6 +26,7 @@ namespace Luna {
     std::size_t read(
         uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
     ) override;
+    using InputStream::read;
 
     private:
     ResourceReader(const char *name);

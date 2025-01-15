@@ -33,6 +33,7 @@ namespace Luna::Filesystem {
     std::size_t read(
         std::uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
     ) final override;
+    using InputStream::read;
 
     private:
     explicit FileReader(const Path &filename);
