@@ -177,6 +177,11 @@ void N64Renderer::renderTexture(
 
   for (int vChunk = vStartChunk; vChunk <= vEndChunk; ++vChunk) {
     for (int hChunk = hStartChunk; hChunk <= hEndChunk; ++hChunk) {
+      auto thisChunkSize = Vector2i(
+          std::min(chunkSize.width, texture.size.width - hChunk * chunkSize.width),
+          std::min(chunkSize.height, texture.size.height - vChunk * chunkSize.height)
+      );
+
       auto chunkIndex = hChunk + vChunk * chunkCount.x;
       auto chunkOffset = Vector2i(
           chunkSize.width * (hChunk - hStartChunk),
@@ -194,29 +199,29 @@ void N64Renderer::renderTexture(
 
       if (info->crop.area() > 0) {
         if (hChunk == hStartChunk) {
-          uvTopLeft.x = static_cast<float>(info->crop.x % chunkSize.width) /
-                        static_cast<float>(chunkSize.width);
+          uvTopLeft.x = static_cast<float>(info->crop.x % thisChunkSize.width) /
+                        static_cast<float>(thisChunkSize.width);
         }
 
         if (hChunk == hEndChunk) {
           uvBottomRight.x =
               static_cast<float>(
-                  (info->crop.x + info->crop.width - 1) % chunkSize.width + 1
+                  (info->crop.x + info->crop.width - 1) % thisChunkSize.width + 1
               ) /
-              static_cast<float>(chunkSize.width);
+              static_cast<float>(thisChunkSize.width);
         }
 
         if (vChunk == vStartChunk) {
-          uvTopLeft.y = static_cast<float>(info->crop.y % chunkSize.height) /
-                        static_cast<float>(chunkSize.height);
+          uvTopLeft.y = static_cast<float>(info->crop.y % thisChunkSize.height) /
+                        static_cast<float>(thisChunkSize.height);
         }
 
         if (vChunk == vEndChunk) {
           uvBottomRight.y =
               static_cast<float>(
-                  (info->crop.y + info->crop.height - 1) % chunkSize.height + 1
+                  (info->crop.y + info->crop.height - 1) % thisChunkSize.height + 1
               ) /
-              static_cast<float>(chunkSize.height);
+              static_cast<float>(thisChunkSize.height);
         }
       }
 

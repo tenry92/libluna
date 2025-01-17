@@ -393,7 +393,7 @@ void CommonRenderer::render2d(
                   continue;
                 }
 
-                if (glyph->imageLoader) {
+                if (cp != ' ' && glyph->imageLoader) {
                   RenderTextureInfo info;
                   auto texture = mKnownImages.at(glyph->imageLoader);
 

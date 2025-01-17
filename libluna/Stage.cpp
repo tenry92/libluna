@@ -165,12 +165,20 @@ const std::forward_list<Stage::Drawable2d> Stage::getSortedDrawables2d() const {
       priorityA = std::get<Primitive>(a).getPriority();
     }
 
+    if (std::holds_alternative<Text>(a)) {
+      priorityA = std::get<Text>(a).getPriority();
+    }
+
     if (std::holds_alternative<Sprite>(b)) {
       priorityB = std::get<Sprite>(b).getPriority();
     }
 
     if (std::holds_alternative<Primitive>(b)) {
       priorityB = std::get<Primitive>(b).getPriority();
+    }
+
+    if (std::holds_alternative<Text>(b)) {
+      priorityB = std::get<Text>(b).getPriority();
     }
 
     return priorityA < priorityB;

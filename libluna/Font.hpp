@@ -37,11 +37,9 @@ namespace Luna {
     const std::map<String::CodePoint, Glyph> &getGlyphs() const;
 
     private:
-    Font();
     int mLineHeight;
     int mBaseLine;
 
     std::map<String::CodePoint, Font::Glyph> mGlyphs;
-
   };
 } // namespace Luna
