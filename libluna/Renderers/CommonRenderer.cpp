@@ -407,8 +407,7 @@ void CommonRenderer::render2d(
                     auto &slice = slicedTexture.slices[y * slicedTexture.sliceCount.x + x];
                     info.textureId = slice.id;
                     info.size = slice.size;
-                    info.crop = {
-                        x * info.size.x, y * info.size.y, info.size.x, info.size.y};
+                    info.crop = {0, 0, info.size.x, info.size.y};
                     renderTexture(canvas, &info);
 
                     info.position.x += static_cast<float>(info.size.x);
@@ -481,10 +480,11 @@ void CommonRenderer::render2d(
                 }
 
                 if (cp != ' ' && glyph->imageLoader) {
-                  RenderTextureInfo info;
                   auto &textureOrSlices = mKnownImages.at(glyph->imageLoader);
 
                   if (std::holds_alternative<Texture>(textureOrSlices)) {
+                    RenderTextureInfo info;
+
                     auto &texture = std::get<Texture>(textureOrSlices);
 
                     info.textureId = texture.id;

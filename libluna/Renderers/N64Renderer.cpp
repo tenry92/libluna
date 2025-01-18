@@ -157,23 +157,25 @@ void N64Renderer::renderTexture(
   Vector2f uvBottomRight(1.0f, 1.0f);
 
   if (info->crop.area() > 0) {
-    uvTopLeft.x = static_cast<float>(info->crop.x % info->size.width) /
-                  static_cast<float>(info->size.width);
+    auto textureSize = getTextureSize(info->textureId);
+
+    uvTopLeft.x = static_cast<float>(info->crop.x) /
+                  static_cast<float>(textureSize.width);
 
     uvBottomRight.x =
         static_cast<float>(
-            (info->crop.x + info->crop.width - 1) % info->size.width + 1
+            info->crop.x + info->crop.width
         ) /
-        static_cast<float>(info->size.width);
+        static_cast<float>(textureSize.width);
 
-    uvTopLeft.y = static_cast<float>(info->crop.y % info->size.height) /
-                  static_cast<float>(info->size.height);
+    uvTopLeft.y = static_cast<float>(info->crop.y) /
+                  static_cast<float>(textureSize.height);
 
     uvBottomRight.y =
         static_cast<float>(
-            (info->crop.y + info->crop.height - 1) % info->size.height + 1
+            info->crop.y + info->crop.height
         ) /
-        static_cast<float>(info->size.height);
+        static_cast<float>(textureSize.height);
   }
 
   float left = info->position.x;
