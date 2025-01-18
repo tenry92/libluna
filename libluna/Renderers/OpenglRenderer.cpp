@@ -230,10 +230,10 @@ void OpenglRenderer::loadTexture(int id, Image *image) {
 
   CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
   CHECK_GL(glTexImage2D(
-      GL_TEXTURE_2D, 0,                                   /* mipmap level */
-      GL_RGBA,                                            /* internal format */
-      image->getSize().width, image->getSize().height, 0, /* format (legacy) */
-      inputFormat,                                        /* input format */
+      GL_TEXTURE_2D, 0,                         /* mipmap level */
+      GL_RGBA,                                  /* internal format */
+      image->getWidth(), image->getHeight(), 0, /* format (legacy) */
+      inputFormat,                              /* input format */
       inputType, image->getData()
   ));
   glTexParameteri(

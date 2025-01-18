@@ -68,6 +68,20 @@ namespace Luna::Math {
   }
 
   /**
+   * @brief Get the lower power of two for @p n.
+   *
+   * If n is already a power of two, n is returned.
+   * If n is 0, 1 is returned.
+   */
+  inline constexpr unsigned int previousPowerOfTwo(unsigned int n) {
+    if (n == 0) {
+      return 1;
+    }
+
+    return 1 << static_cast<unsigned int>(std::log2(n));
+  }
+
+  /**
    * @brief Check if @p n is a power of two.
    */
   inline constexpr bool isPowerOfTwo(unsigned int n) {

@@ -130,6 +130,28 @@ Image Image::crop(Vector2i size, Vector2i offset) {
   return croppedImage;
 }
 
+std::vector<Image> Image::slice(Vector2i maxSliceSize, Vector2i &sliceCount) {
+  std::vector<Image> slices;
+
+  // add 1 to round integer calculation up up
+  sliceCount.x = (getSize().width + maxSliceSize.width - 1) / maxSliceSize.width;
+  sliceCount.y = (getSize().height + maxSliceSize.height - 1) / maxSliceSize.height;
+
+  slices.reserve(sliceCount.x * sliceCount.y);
+
+  for (int y = 0; y < getSize().height; y += maxSliceSize.height) {
+    for (int x = 0; x < getSize().width; x += maxSliceSize.width) {
+      auto sliceSize = Vector2i(
+          std::min(maxSliceSize.width, getSize().width - x),
+          std::min(maxSliceSize.height, getSize().height - y)
+      );
+      slices.push_back(crop(sliceSize, Vector2i(x, y)));
+    }
+  }
+
+  return slices;
+}
+
 uint8_t Image::getNibbleAt(int x, int y) const {
   auto &byte = getData()[(x + y * getSize().width) / 2];
 

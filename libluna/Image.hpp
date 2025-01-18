@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <libluna/Color.hpp>
 #include <libluna/Palette.hpp>
 #include <libluna/Resource.hpp>
@@ -52,6 +54,10 @@ namespace Luna {
 
     Vector2i getSize() const;
 
+    inline int getWidth() const { return getSize().width; }
+
+    inline int getHeight() const { return getSize().height; }
+
     void setPalette(PalettePtr palette);
     PalettePtr getPalette() const;
 
@@ -102,6 +108,13 @@ namespace Luna {
      * image may be smaller than the given size.
      */
     Image crop(Vector2i size, Vector2i offset = Vector2i(0, 0));
+
+    /**
+     * @brief Slice an image into smaller images.
+     *
+     * The slices are from left to right, then top to bottom.
+     */
+    std::vector<Image> slice(Vector2i maxSliceSize, Vector2i &sliceCount);
 
     int getByteCount() const {
       return getSize().width * getSize().height * (getBitsPerPixel() / 4) / 2;

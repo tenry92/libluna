@@ -1,6 +1,8 @@
 #pragma once
 
 #include <forward_list>
+#include <variant>
+#include <vector>
 
 #include <libluna/AbstractRenderer.hpp>
 #include <libluna/Font.hpp>
@@ -30,6 +32,13 @@ namespace Luna {
       int id;
       Vector2i size;
     };
+
+    struct SlicedTexture {
+      Vector2i sliceCount;
+      std::vector<Texture> slices;
+    };
+
+    using TextureOrSlices = std::variant<Texture, SlicedTexture>;
 
     /**
      * @brief This holds information about how to render a 2D texture.
@@ -97,6 +106,13 @@ namespace Luna {
     virtual void endRender();
 
     virtual void clearBackground(ColorRgb color);
+
+    /**
+     * @brief Slice an image before loading as textures.
+     *
+     * Returns true if the image was sliced, false otherwise.
+     */
+    virtual bool sliceTexture(Image *image, std::vector<Image> &slices, Vector2i &sliceCount);
 
     /**
      * @brief Create a new empty texture for the provided ID.
@@ -218,7 +234,7 @@ namespace Luna {
     IdAllocator<uint16_t> mMeshIdAllocator;
     int mRenderTargetId;
     Vector2i mCurrentRenderSize;
-    std::unordered_map<ImageLoader *, Texture> mKnownImages;
+    std::unordered_map<ImageLoader *, TextureOrSlices> mKnownImages;
     std::map<int, Texture> mTextureIdMapping;
     std::unordered_map<Shape *, int> mKnownShapes;
     std::set<FontPtr> mLoadedFonts;
