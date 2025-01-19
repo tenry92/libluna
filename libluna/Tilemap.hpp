@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <vector>
 
+#include <libluna/Drawable2d.hpp>
 #include <libluna/Tileset.hpp>
 #include <libluna/Vector.hpp>
 
@@ -12,7 +13,7 @@ namespace Luna {
    *
    * @ingroup drawables2d
    */
-  class Tilemap final {
+  class Tilemap final : public Drawable2d {
     public:
     using TileData = std::uint16_t;
 

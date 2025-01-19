@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libluna/Color.hpp>
+#include <libluna/Drawable2d.hpp>
 #include <libluna/Image.hpp>
 #include <libluna/ImageLoader.hpp>
 #include <libluna/Palette.hpp>
@@ -22,7 +23,7 @@ namespace Luna {
    *
    * @ingroup drawables2d
    */
-  class Sprite final {
+  class Sprite final : public Drawable2d {
     public:
     Sprite();
     ~Sprite();
@@ -37,31 +38,8 @@ namespace Luna {
     ResourcePtr<Palette> getPalette() const;
     ///@}
 
-    ///@{
-    void setPosition(const Vector2f &position);
-    Vector2f getPosition() const;
-    ///@}
-
-    /**
-     * @name Priority
-     *
-     * Low values (negative) are drawn behind other drawables with higher values.
-     */
-    ///@{
-    void setPriority(float priority);
-    float getPriority() const;
-    ///@}
-
-    ///@{
-    void setVisible(bool visible);
-    bool isVisible() const;
-    ///@}
-
     private:
     ImageLoader *mImageLoader;
     std::shared_ptr<Resource<Palette>> mPalette;
-    Vector2f mPosition;
-    float mPriority{0};
-    bool mVisible{true};
   };
 } // namespace Luna

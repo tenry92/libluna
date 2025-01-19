@@ -15,15 +15,3 @@ ImageLoader *Sprite::getImageLoader() const { return mImageLoader; }
 void Sprite::setPalette(ResourcePtr<Palette> palette) { mPalette = palette; }
 
 ResourcePtr<Palette> Sprite::getPalette() const { return mPalette; }
-
-void Sprite::setPosition(const Vector2f &position) { mPosition = position; }
-
-Vector2f Sprite::getPosition() const { return mPosition; }
-
-void Sprite::setPriority(float priority) { mPriority = priority; }
-
-float Sprite::getPriority() const { return mPriority; }
-
-void Sprite::setVisible(bool visible) { mVisible = visible; }
-
-bool Sprite::isVisible() const { return mVisible; }

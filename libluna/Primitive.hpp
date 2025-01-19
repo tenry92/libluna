@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libluna/Drawable2d.hpp>
 #include <libluna/Shape.hpp>
 #include <libluna/Vector.hpp>
 
@@ -9,7 +10,7 @@ namespace Luna {
    * 
    * @ingroup drawables2d
    */
-  class Primitive {
+  class Primitive final : public Drawable2d {
     public:
     Primitive();
     ~Primitive();
@@ -19,24 +20,7 @@ namespace Luna {
     Shape *getShape() const;
     ///@}
 
-    ///@{
-    void setPosition(const Vector2f &position);
-    Vector2f getPosition() const;
-    ///@}
-
-    /**
-     * @name Priority
-     *
-     * Low values (negative) are drawn behind other drawables with higher values.
-     */
-    ///@{
-    void setPriority(float priority);
-    float getPriority() const;
-    ///@}
-
     private:
     Shape *mShape;
-    Vector2f mPosition;
-    float mPriority{0};
   };
 }

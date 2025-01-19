@@ -62,7 +62,7 @@ namespace Luna {
    */
   class Stage {
     public:
-    using Drawable2d = std::variant<Sprite, Primitive, Text, Tilemap>;
+    using Drawable2dVariant = std::variant<Sprite, Primitive, Text, Tilemap>;
     using Drawable3d = Model *;
     Stage();
     ~Stage();
@@ -82,8 +82,8 @@ namespace Luna {
     Model *createModel();
     void destroyModel(Model *model);
 
-    const Pool<Drawable2d, 64> &getDrawables2d() const;
-    const std::forward_list<Drawable2d> getSortedDrawables2d() const;
+    const Pool<Drawable2dVariant, 64> &getDrawables2d() const;
+    const std::forward_list<Drawable2dVariant> getSortedDrawables2d() const;
     const std::list<Drawable3d> &getDrawables3d() const;
 
     void setAmbientLight(const AmbientLight &ambientLight);
@@ -96,7 +96,7 @@ namespace Luna {
     void updateTextureCache();
 
     private:
-    Pool<Drawable2d, 64> mDrawables2d;
+    Pool<Drawable2dVariant, 64> mDrawables2d;
     std::list<Drawable3d> mDrawables3d;
     AmbientLight mAmbientLight;
     std::list<std::shared_ptr<PointLight>> mPointLights;

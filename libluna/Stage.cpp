@@ -142,18 +142,18 @@ void Stage::destroyModel(Model *model) {
   delete model;
 }
 
-const Pool<Stage::Drawable2d, 64> &Stage::getDrawables2d() const {
+const Pool<Stage::Drawable2dVariant, 64> &Stage::getDrawables2d() const {
   return mDrawables2d;
 }
 
-const std::forward_list<Stage::Drawable2d> Stage::getSortedDrawables2d() const {
-  std::forward_list<Drawable2d> sortedDrawables;
+const std::forward_list<Stage::Drawable2dVariant> Stage::getSortedDrawables2d() const {
+  std::forward_list<Drawable2dVariant> sortedDrawables;
 
   for (auto &&drawable : mDrawables2d) {
     sortedDrawables.emplace_front(drawable);
   }
 
-  sortedDrawables.sort([](const Drawable2d &a, const Drawable2d &b) {
+  sortedDrawables.sort([](const Drawable2dVariant &a, const Drawable2dVariant &b) {
     float priorityA = 0;
     float priorityB = 0;
 

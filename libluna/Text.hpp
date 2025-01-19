@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libluna/Drawable2d.hpp>
 #include <libluna/Font.hpp>
 #include <libluna/String.hpp>
 
@@ -12,7 +13,7 @@ namespace Luna {
    *
    * @ingroup drawables2d
    */
-  class Text final {
+  class Text final : public Drawable2d {
     public:
     Text();
     ~Text();
@@ -23,26 +24,8 @@ namespace Luna {
     void setFont(Font *font);
     Font *getFont() const;
 
-    /**
-     * @name Priority
-     *
-     * Low values (negative) are drawn behind other drawables with higher values.
-     */
-    ///@{
-    void setPriority(float priority);
-    float getPriority() const;
-    ///@}
-
-    ///@{
-    void setVisible(bool visible);
-    bool isVisible() const;
-    ///@}
-
     private:
     Font *mFont;
     String mContent;
-
-    float mPriority{0};
-    bool mVisible{true};
   };
 } // namespace Luna
