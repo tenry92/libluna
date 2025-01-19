@@ -101,6 +101,28 @@ unsigned long System::getTotalMemorySize() {
 #endif
 }
 
+unsigned long System::getTotalHeapSize() {
+#ifdef N64
+  heap_stats_t heap_stats;
+  sys_get_heap_stats(&heap_stats);
+
+  return heap_stats.total;
+#else
+  return getTotalMemorySize();
+#endif
+}
+
+unsigned long System::getUsedHeapSize() {
+#ifdef N64
+  heap_stats_t heap_stats;
+  sys_get_heap_stats(&heap_stats);
+
+  return heap_stats.used;
+#else
+  return getPhysicalMemoryUsage();
+#endif
+}
+
 std::list<String> System::getAssetFiles() {
   auto assetsPath =
       Application::getInstance()->getAssetsPath().getRawPath().s_str();
