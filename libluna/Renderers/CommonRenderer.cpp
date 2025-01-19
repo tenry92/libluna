@@ -462,12 +462,16 @@ void CommonRenderer::render2d(
             [&](const Text &text) {
               auto font = text.getFont();
 
-              int x = 0;
-              int y = font->getBaseLine();
+              auto startPosition = text.getPosition();
+
+              int x = static_cast<int>(startPosition.x);
+              int y = static_cast<int>(startPosition.y);
+
+              y += font->getBaseLine();
 
               for (auto &&cp : text.getContent()) {
                 if (cp == '\n') {
-                  x = 0;
+                  x = static_cast<int>(startPosition.x);
                   y += font->getLineHeight();
                   continue;
                 }
