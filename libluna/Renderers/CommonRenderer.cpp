@@ -464,15 +464,15 @@ void CommonRenderer::render2d(
 
               auto startPosition = text.getPosition();
 
-              int x = static_cast<int>(startPosition.x);
-              int y = static_cast<int>(startPosition.y);
+              float x = startPosition.x;
+              float y = startPosition.y;
 
-              y += font->getBaseLine();
+              y += text.getSize() * font->getBaseLine();
 
               for (auto &&cp : text.getContent()) {
                 if (cp == '\n') {
-                  x = static_cast<int>(startPosition.x);
-                  y += font->getLineHeight();
+                  x = startPosition.x;
+                  y += text.getSize() * text.getLineHeight() * font->getLineHeight();
                   continue;
                 }
 
@@ -492,10 +492,16 @@ void CommonRenderer::render2d(
                     auto &texture = std::get<Texture>(textureOrSlices);
 
                     info.textureId = texture.id;
-                    info.position = Vector2i(x, y) + glyph->offset;
+                    info.position = Vector2i(static_cast<int>(x), static_cast<int>(y)) + Vector2i(
+                      static_cast<int>(text.getSize() * glyph->offset.x),
+                      static_cast<int>(text.getSize() * glyph->offset.y)
+                    );
 
                     if (glyph->crop.area() > 0) {
-                      info.size = {glyph->crop.width, glyph->crop.height};
+                      info.size = {
+                        static_cast<int>(text.getSize() * glyph->crop.width),
+                        static_cast<int>(text.getSize() * glyph->crop.height)
+                      };
                       info.crop = glyph->crop;
                     } else {
                       info.size = texture.size;
@@ -505,7 +511,7 @@ void CommonRenderer::render2d(
                   }
                 }
 
-                x += glyph->advance;
+                x += text.getSize() * glyph->advance;
               }
             }},
         drawable

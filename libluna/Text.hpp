@@ -24,8 +24,16 @@ namespace Luna {
     void setFont(Font *font);
     Font *getFont() const;
 
+    void setSize(float size);
+    float getSize() const;
+
+    void setLineHeight(float lineHeight);
+    float getLineHeight() const;
+
     private:
     Font *mFont;
     String mContent;
+    float mSize{1.0f};
+    float mLineHeight{1.0f};
   };
 } // namespace Luna
