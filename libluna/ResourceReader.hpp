@@ -14,7 +14,7 @@ namespace Luna {
    */
   class ResourceReader final : public InputStream {
     public:
-    static ResourceReaderPtr make(const char *name);
+    static ResourceReaderPtr make(const char* name);
     ~ResourceReader();
 
     bool isValid() const override;
@@ -24,12 +24,12 @@ namespace Luna {
     std::size_t seek(std::size_t position) override;
     std::size_t seekRelative(int relativePosition) override;
     std::size_t read(
-      uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
+      uint8_t* buffer, std::size_t objectSize, std::size_t objectCount
     ) override;
     using InputStream::read;
 
     private:
-    ResourceReader(const char *name);
+    ResourceReader(const char* name);
     std::unique_ptr<Filesystem::FileReader> fileReader;
   };
 } // namespace Luna

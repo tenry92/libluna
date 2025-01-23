@@ -18,11 +18,11 @@ namespace Luna {
     Text();
     ~Text();
 
-    void setContent(const String &content);
-    const String &getContent() const;
+    void setContent(const String& content);
+    const String& getContent() const;
 
-    void setFont(Font *font);
-    Font *getFont() const;
+    void setFont(Font* font);
+    Font* getFont() const;
 
     void setSize(float size);
     float getSize() const;
@@ -31,7 +31,7 @@ namespace Luna {
     float getLineHeight() const;
 
     private:
-    Font *mFont;
+    Font* mFont;
     String mContent;
     float mSize{1.0f};
     float mLineHeight{1.0f};

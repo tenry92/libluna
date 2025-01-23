@@ -25,15 +25,15 @@ namespace Luna {
 
     private:
     friend class Canvas;
-    void init(Canvas *canvas);
+    void init(Canvas* canvas);
     void newFrame();
-    void render(ImmediateGui *gui);
+    void render(ImmediateGui* gui);
 #ifdef LUNA_WINDOW_SDL2
-    bool processSdlEvent(const SDL_Event *event);
+    bool processSdlEvent(const SDL_Event* event);
 #endif
-    Canvas *mCanvas{nullptr};
+    Canvas* mCanvas{nullptr};
 #ifdef LUNA_IMGUI
-    ImGuiContext *mImGuiContext{nullptr};
+    ImGuiContext* mImGuiContext{nullptr};
 #endif
   };
 } // namespace Luna

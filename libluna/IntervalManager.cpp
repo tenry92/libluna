@@ -22,7 +22,7 @@ void IntervalManager::addAlways(Callback callback) {
 void IntervalManager::executePendingIntervals() {
   auto now = Clock::now();
 
-  for (auto &&currentInterval : mExecuteAlways) {
+  for (auto&& currentInterval : mExecuteAlways) {
 #ifdef NDS
     float deltaSeconds = 1.0f / 60.0f;
 #elif defined N64

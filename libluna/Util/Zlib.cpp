@@ -72,7 +72,7 @@ std::vector<uint8_t> Zlib::inflate() {
 
       result.resize(result.size() + have);
       std::memcpy(
-        reinterpret_cast<void *>(result.data() + result.size() - have), output,
+        reinterpret_cast<void*>(result.data() + result.size() - have), output,
         have
       );
     } while (mStream.avail_out == 0);

@@ -26,7 +26,7 @@ namespace Luna {
     public:
     enum LogLevel { kDebug, kVerbose, kInfo, kWarn, kError };
 
-    void log(LogLevel pLevel, const String &pMessage);
+    void log(LogLevel pLevel, const String& pMessage);
 
     /**
      * @brief Set identifier for current thread.
@@ -34,81 +34,81 @@ namespace Luna {
      * The thread identifier will be added to all log messages emited from this
      * thread.
      */
-    void setThreadIdentifier(const String &pThreadId);
+    void setThreadIdentifier(const String& pThreadId);
 
-    inline void debug(const String &pMessage) { log(kDebug, pMessage); }
+    inline void debug(const String& pMessage) { log(kDebug, pMessage); }
 
-    inline void verbose(const String &pMessage) { log(kVerbose, pMessage); }
+    inline void verbose(const String& pMessage) { log(kVerbose, pMessage); }
 
-    inline void info(const String &pMessage) { log(kInfo, pMessage); }
+    inline void info(const String& pMessage) { log(kInfo, pMessage); }
 
-    inline void warn(const String &pMessage) { log(kWarn, pMessage); }
+    inline void warn(const String& pMessage) { log(kWarn, pMessage); }
 
-    inline void error(const String &pMessage) { log(kError, pMessage); }
+    inline void error(const String& pMessage) { log(kError, pMessage); }
 
     template <typename... ArgTypes>
-    void log(LogLevel pLevel, const String &pMessage, ArgTypes... pArgs) {
+    void log(LogLevel pLevel, const String& pMessage, ArgTypes... pArgs) {
       log(pLevel, fmt::format(pMessage.c_str(), pArgs...));
     }
 
     template <typename... ArgTypes>
-    void debug(const String &pMessage, ArgTypes... pArgs) {
+    void debug(const String& pMessage, ArgTypes... pArgs) {
       debug(fmt::format(pMessage.c_str(), pArgs...));
     }
 
     template <typename... ArgTypes>
-    void verbose(const String &pMessage, ArgTypes... pArgs) {
+    void verbose(const String& pMessage, ArgTypes... pArgs) {
       verbose(fmt::format(pMessage.c_str(), pArgs...));
     }
 
     template <typename... ArgTypes>
-    void info(const String &pMessage, ArgTypes... pArgs) {
+    void info(const String& pMessage, ArgTypes... pArgs) {
       info(fmt::format(pMessage.c_str(), pArgs...));
     }
 
     template <typename... ArgTypes>
-    void warn(const String &pMessage, ArgTypes... pArgs) {
+    void warn(const String& pMessage, ArgTypes... pArgs) {
       warn(fmt::format(pMessage.c_str(), pArgs...));
     }
 
     template <typename... ArgTypes>
-    void error(const String &pMessage, ArgTypes... pArgs) {
+    void error(const String& pMessage, ArgTypes... pArgs) {
       error(fmt::format(pMessage.c_str(), pArgs...));
     }
 
-    static Logger &getInstance();
+    static Logger& getInstance();
 
     private:
     Logger() = default;
 
-    Logger(const Logger &) = delete;
-    Logger &operator=(const Logger &) = delete;
-    Logger(Logger &&) = delete;
-    Logger &operator=(Logger &&) = delete;
+    Logger(const Logger&) = delete;
+    Logger& operator=(const Logger&) = delete;
+    Logger(Logger&&) = delete;
+    Logger& operator=(Logger&&) = delete;
   };
 
   template <typename... ArgTypes>
-  inline void logDebug(const String &pMessage, ArgTypes... pArgs) {
+  inline void logDebug(const String& pMessage, ArgTypes... pArgs) {
     Logger::getInstance().debug(fmt::format(pMessage.c_str(), pArgs...));
   }
 
   template <typename... ArgTypes>
-  inline void logVerbose(const String &pMessage, ArgTypes... pArgs) {
+  inline void logVerbose(const String& pMessage, ArgTypes... pArgs) {
     Logger::getInstance().verbose(fmt::format(pMessage.c_str(), pArgs...));
   }
 
   template <typename... ArgTypes>
-  inline void logInfo(const String &pMessage, ArgTypes... pArgs) {
+  inline void logInfo(const String& pMessage, ArgTypes... pArgs) {
     Logger::getInstance().info(fmt::format(pMessage.c_str(), pArgs...));
   }
 
   template <typename... ArgTypes>
-  inline void logWarn(const String &pMessage, ArgTypes... pArgs) {
+  inline void logWarn(const String& pMessage, ArgTypes... pArgs) {
     Logger::getInstance().warn(fmt::format(pMessage.c_str(), pArgs...));
   }
 
   template <typename... ArgTypes>
-  inline void logError(const String &pMessage, ArgTypes... pArgs) {
+  inline void logError(const String& pMessage, ArgTypes... pArgs) {
     Logger::getInstance().error(fmt::format(pMessage.c_str(), pArgs...));
   }
 

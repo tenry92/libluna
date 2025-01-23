@@ -8,9 +8,9 @@ using Luna::String;
 
 Path::Path() = default;
 
-Path::Path(const Path &other) { mParts = other.mParts; }
+Path::Path(const Path& other) { mParts = other.mParts; }
 
-Path::Path(const String &path) {
+Path::Path(const String& path) {
   auto uniformPath = path.replaceAll('\\', '/');
   /// @todo Remove multiple consequent slashes?
   uniformPath.split('/', std::back_inserter(mParts));
@@ -18,7 +18,7 @@ Path::Path(const String &path) {
 
 Path::~Path() = default;
 
-Path Path::operator=(const Path &other) {
+Path Path::operator=(const Path& other) {
   mParts = other.mParts;
 
   return *this;
@@ -49,7 +49,7 @@ bool Path::isEmpty() const {
   return mParts.size() == 0 || (mParts.size() == 1 && mParts.front() == "");
 }
 
-Path Path::cd(const Path &other) const {
+Path Path::cd(const Path& other) const {
   Path newPath;
 
   if (other.isAbsolute()) {
@@ -57,7 +57,7 @@ Path Path::cd(const Path &other) const {
   } else {
     newPath.mParts = mParts;
 
-    for (auto &&part : other.mParts) {
+    for (auto&& part : other.mParts) {
       if (part == ".") {
         continue;
       }

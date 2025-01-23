@@ -24,14 +24,14 @@ namespace {
 }
 
 namespace Luna {
-  String::Iterator::Iterator(const String &string, std::size_t index)
+  String::Iterator::Iterator(const String& string, std::size_t index)
       : mString(string), mIndex(index) {}
 
   String::CodePoint String::Iterator::operator*() const {
     return mString[mIndex];
   }
 
-  String::Iterator &String::Iterator::operator++() {
+  String::Iterator& String::Iterator::operator++() {
     ++mIndex;
     return *this;
   }
@@ -42,17 +42,17 @@ namespace Luna {
     return copy;
   }
 
-  bool String::Iterator::operator==(const Iterator &other) const {
+  bool String::Iterator::operator==(const Iterator& other) const {
     return mIndex == other.mIndex;
   }
 
-  bool String::Iterator::operator!=(const Iterator &other) const {
+  bool String::Iterator::operator!=(const Iterator& other) const {
     return mIndex != other.mIndex;
   }
 
   String::String() { clear(); }
 
-  String::String(char *other) : String() {
+  String::String(char* other) : String() {
     if (other == nullptr) {
       return;
     }
@@ -71,7 +71,7 @@ namespace Luna {
     mString = stringData;
   }
 
-  String::String(char *other, std::size_t length) : String() {
+  String::String(char* other, std::size_t length) : String() {
     if (other == nullptr || length == 0) {
       return;
     }
@@ -84,7 +84,7 @@ namespace Luna {
     mString = stringData;
   }
 
-  String::String(const char *other) : String() {
+  String::String(const char* other) : String() {
     if (other == nullptr) {
       return;
     }
@@ -110,7 +110,7 @@ namespace Luna {
     mStringViewByteLength = length;
   }
 
-  String::String(const char *other, std::size_t length) : String() {
+  String::String(const char* other, std::size_t length) : String() {
     if (other == nullptr || length == 0) {
       return;
     }
@@ -130,7 +130,7 @@ namespace Luna {
     mStringViewByteLength = length;
   }
 
-  String::String(const wchar_t *other) : String() {
+  String::String(const wchar_t* other) : String() {
     if (other == nullptr) {
       return;
     }
@@ -150,7 +150,7 @@ namespace Luna {
     for (std::size_t i = 0; i < length; ++i) {
       auto available =
         stringData->size() - 1 - static_cast<std::size_t>(ptr - data());
-      ptr = reinterpret_cast<utf8_int8_t *>(
+      ptr = reinterpret_cast<utf8_int8_t*>(
         utf8catcodepoint(ptr, other[i], available)
       );
     }
@@ -160,7 +160,7 @@ namespace Luna {
     mString = stringData;
   }
 
-  String::String(const std::string &other) : String() {
+  String::String(const std::string& other) : String() {
     if (other.empty()) {
       return;
     }
@@ -173,7 +173,7 @@ namespace Luna {
     mString = stringData;
   }
 
-  String::String(const String &other) = default;
+  String::String(const String& other) = default;
 
   String::String(CodePoint codePoint) : String() {
     if (codePoint == 0) {
@@ -191,7 +191,7 @@ namespace Luna {
     mString = stringData;
   }
 
-  String::String(String &&other) {
+  String::String(String&& other) {
     mString = other.mString;
     mStringViewByteLength = other.mStringViewByteLength;
 
@@ -201,7 +201,7 @@ namespace Luna {
 
   String::~String() = default;
 
-  String &String::operator=(char *other) {
+  String& String::operator=(char* other) {
     clear();
 
     if (other == nullptr) {
@@ -224,7 +224,7 @@ namespace Luna {
     return *this;
   }
 
-  String &String::operator=(const char *other) {
+  String& String::operator=(const char* other) {
     clear();
 
     if (other == nullptr) {
@@ -254,18 +254,18 @@ namespace Luna {
     return *this;
   }
 
-  String &String::operator=(const String &other) {
+  String& String::operator=(const String& other) {
     mString = other.mString;
     mStringViewByteLength = other.mStringViewByteLength;
 
     return *this;
   }
 
-  String &String::operator=(String &&other) {
+  String& String::operator=(String&& other) {
     mString = other.mString;
     mStringViewByteLength = other.mStringViewByteLength;
 
-    if (std::holds_alternative<const char *>(other.mString)) {
+    if (std::holds_alternative<const char*>(other.mString)) {
       other.mString = nullString;
       other.mStringViewByteLength = 0;
     } else {
@@ -275,7 +275,7 @@ namespace Luna {
     return *this;
   }
 
-  bool String::operator==(const String &other) const {
+  bool String::operator==(const String& other) const {
     if (getLength() == 0 && other.getLength() == 0) {
       return true;
     }
@@ -284,12 +284,12 @@ namespace Luna {
       return false;
     }
 
-    if (std::holds_alternative<const char *>(mString)) {
-      auto stringView = std::get<const char *>(mString);
+    if (std::holds_alternative<const char*>(mString)) {
+      auto stringView = std::get<const char*>(mString);
 
-      if (std::holds_alternative<const char *>(other.mString)) {
+      if (std::holds_alternative<const char*>(other.mString)) {
         // we can quit early if the pointers are equal
-        auto otherStringView = std::get<const char *>(other.mString);
+        auto otherStringView = std::get<const char*>(other.mString);
 
         if (stringView == otherStringView) {
           return true;
@@ -313,11 +313,11 @@ namespace Luna {
     return utf8cmp(data(), other.data()) == 0;
   }
 
-  bool String::operator<(const String &other) const {
+  bool String::operator<(const String& other) const {
     return utf8cmp(data(), other.data()) < 0;
   }
 
-  bool String::operator>(const String &other) const {
+  bool String::operator>(const String& other) const {
     return utf8cmp(data(), other.data()) > 0;
   }
 
@@ -346,7 +346,7 @@ namespace Luna {
     return result;
   }
 
-  String String::operator+(const String &other) const {
+  String String::operator+(const String& other) const {
     if (other.getLength() == 0) {
       return *this;
     }
@@ -376,7 +376,7 @@ namespace Luna {
   }
 
   std::size_t String::getByteLength() const {
-    if (std::holds_alternative<const char *>(mString)) {
+    if (std::holds_alternative<const char*>(mString)) {
       return mStringViewByteLength;
     }
 
@@ -389,7 +389,7 @@ namespace Luna {
 
   bool String::isEmpty() const { return getLength() == 0; }
 
-  bool String::startsWith(const String &other) const {
+  bool String::startsWith(const String& other) const {
     if (other.isEmpty()) {
       return true;
     }
@@ -401,7 +401,7 @@ namespace Luna {
     return utf8ncmp(data(), other.data(), other.getByteLength()) == 0;
   }
 
-  bool String::endsWith(const String &other) const {
+  bool String::endsWith(const String& other) const {
     if (other.isEmpty()) {
       return true;
     }
@@ -416,18 +416,18 @@ namespace Luna {
            ) == 0;
   }
 
-  const char *String::c_str() const {
-    if (std::holds_alternative<const char *>(mString)) {
-      return std::get<const char *>(mString);
+  const char* String::c_str() const {
+    if (std::holds_alternative<const char*>(mString)) {
+      return std::get<const char*>(mString);
     }
 
-    return reinterpret_cast<const char *>(
+    return reinterpret_cast<const char*>(
       std::get<std::shared_ptr<StringData>>(mString)->data()
     );
   }
 
-  const utf8_int8_t *String::data() const {
-    return reinterpret_cast<const utf8_int8_t *>(c_str());
+  const utf8_int8_t* String::data() const {
+    return reinterpret_cast<const utf8_int8_t*>(c_str());
   }
 
   String::CodePoint String::operator[](std::size_t index) const {
@@ -447,7 +447,7 @@ namespace Luna {
       return String();
     }
 
-    const utf8_int8_t *ptr = data();
+    const utf8_int8_t* ptr = data();
     CodePoint codePoint = 0;
 
     auto startPtr = ptr;
@@ -458,8 +458,8 @@ namespace Luna {
 
     auto newByteLength = getByteLength() - (startPtr - ptr);
 
-    if (std::holds_alternative<const char *>(mString)) {
-      return String(reinterpret_cast<const char *>(startPtr), newByteLength);
+    if (std::holds_alternative<const char*>(mString)) {
+      return String(reinterpret_cast<const char*>(startPtr), newByteLength);
     }
 
     auto stringData = std::make_shared<StringData>();
@@ -480,7 +480,7 @@ namespace Luna {
       return String();
     }
 
-    const utf8_int8_t *ptr = data();
+    const utf8_int8_t* ptr = data();
     CodePoint codePoint = 0;
 
     auto startPtr = ptr;
@@ -497,8 +497,8 @@ namespace Luna {
 
     auto newByteLength = endPtr - startPtr;
 
-    if (std::holds_alternative<const char *>(mString)) {
-      return String(reinterpret_cast<const char *>(startPtr), newByteLength);
+    if (std::holds_alternative<const char*>(mString)) {
+      return String(reinterpret_cast<const char*>(startPtr), newByteLength);
     }
 
     auto stringData = std::make_shared<StringData>();
@@ -520,7 +520,7 @@ namespace Luna {
       return OptionalIndex();
     }
 
-    const utf8_int8_t *ptr = data();
+    const utf8_int8_t* ptr = data();
     CodePoint currentCodePoint = 0;
 
     for (std::size_t index = 0; index < fromIndex; ++index) {
@@ -537,19 +537,19 @@ namespace Luna {
   }
 
   String::OptionalIndex
-  String::indexOf(const String &string, std::size_t fromIndex) const {
+  String::indexOf(const String& string, std::size_t fromIndex) const {
     if (fromIndex >= getLength()) {
       return OptionalIndex();
     }
 
-    const utf8_int8_t *ptr = data();
+    const utf8_int8_t* ptr = data();
     CodePoint currentCodePoint = 0;
 
     for (std::size_t index = 0; index < fromIndex; ++index) {
       ptr = utf8codepoint(ptr, &currentCodePoint);
     }
 
-    const utf8_int8_t *result = utf8str(ptr, string.data());
+    const utf8_int8_t* result = utf8str(ptr, string.data());
 
     if (result == nullptr) {
       return OptionalIndex();
@@ -559,7 +559,7 @@ namespace Luna {
   }
 
   String
-  String::replace(const String &search, const String &replacement) const {
+  String::replace(const String& search, const String& replacement) const {
     if (search.isEmpty() || replacement.isEmpty()) {
       return *this;
     }
@@ -580,7 +580,7 @@ namespace Luna {
   }
 
   String
-  String::replaceAll(const String &search, const String &replacement) const {
+  String::replaceAll(const String& search, const String& replacement) const {
     if (search.isEmpty() || replacement.isEmpty()) {
       return *this;
     }
@@ -615,7 +615,7 @@ namespace Luna {
     return result;
   }
 
-  std::list<String> String::split(const String &delimiter) const {
+  std::list<String> String::split(const String& delimiter) const {
     std::list<String> result;
     split(delimiter, std::back_inserter(result));
     return result;

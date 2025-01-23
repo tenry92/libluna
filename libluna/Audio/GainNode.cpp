@@ -5,12 +5,12 @@
 using namespace Luna;
 using namespace Luna::Audio;
 
-GainNode::GainNode(AudioManager *manager, float volume)
+GainNode::GainNode(AudioManager* manager, float volume)
     : AudioNode(manager), mVolume(volume) {}
 
 GainNode::~GainNode() = default;
 
-void GainNode::render(float *buffer, int frameCount) {
+void GainNode::render(float* buffer, int frameCount) {
   if (mInputs.size() > 0) {
     auto input = mInputs.front();
     input->render(buffer, frameCount);

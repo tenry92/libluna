@@ -5,8 +5,8 @@
 namespace Luna {
   class ButtonEvent {
     public:
-    ButtonEvent(const String &name, bool down = true);
-    ButtonEvent(const ButtonEvent &other);
+    ButtonEvent(const String& name, bool down = true);
+    ButtonEvent(const ButtonEvent& other);
     ~ButtonEvent();
 
     String getName() const;

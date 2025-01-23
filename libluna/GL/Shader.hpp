@@ -35,7 +35,7 @@ namespace Luna::GL {
   class Shader {
     public:
     inline Shader() {}
-    inline Shader(const char *vertexSource, const char *fragmentSource) {
+    inline Shader(const char* vertexSource, const char* fragmentSource) {
       GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
       glShaderSource(vertexShader, 1, &vertexSource, nullptr);
       glCompileShader(vertexShader);
@@ -57,9 +57,9 @@ namespace Luna::GL {
       glDeleteShader(fragmentShader);
     }
 
-    Shader(const Shader &other) = delete;
+    Shader(const Shader& other) = delete;
 
-    inline Shader &operator=(Shader &&other) {
+    inline Shader& operator=(Shader&& other) {
       mShaderProgram = other.mShaderProgram;
       other.mShaderProgram = 0;
       return *this;
@@ -74,11 +74,11 @@ namespace Luna::GL {
 
     inline void use() const { glUseProgram(mShaderProgram); }
 
-    inline Uniform getUniform(const String &name) {
+    inline Uniform getUniform(const String& name) {
       return Uniform(mShaderProgram, name);
     }
 
-    inline Uniform getUniform(const String &name, int count) {
+    inline Uniform getUniform(const String& name, int count) {
       return Uniform(mShaderProgram, name, count);
     }
 

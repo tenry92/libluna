@@ -12,7 +12,7 @@ namespace Luna::Performance {
    */
   class Ticker {
     public:
-    Ticker(const String &name = "");
+    Ticker(const String& name = "");
     ~Ticker();
 
     /**
@@ -55,7 +55,7 @@ namespace Luna::Performance {
      */
     float getTicksPerSecond() const;
 
-    static Ticker *getTickerByName(const String &name);
+    static Ticker* getTickerByName(const String& name);
 
     private:
     unsigned long mTickCount = 0;

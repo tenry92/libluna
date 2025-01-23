@@ -63,36 +63,36 @@ namespace Luna {
   class Stage {
     public:
     using Drawable2dVariant = std::variant<Sprite, Primitive, Text, Tilemap>;
-    using Drawable3d = Model *;
+    using Drawable3d = Model*;
     Stage();
     ~Stage();
 
-    Sprite *createSprite();
-    void destroySprite(Sprite *sprite);
+    Sprite* createSprite();
+    void destroySprite(Sprite* sprite);
 
-    Primitive *createPrimitive();
-    void destroyPrimitive(Primitive *primitive);
+    Primitive* createPrimitive();
+    void destroyPrimitive(Primitive* primitive);
 
-    Text *createText();
-    void destroyText(Text *text);
+    Text* createText();
+    void destroyText(Text* text);
 
-    Tilemap *createTilemap();
-    void destroyTilemap(Tilemap *tilemap);
+    Tilemap* createTilemap();
+    void destroyTilemap(Tilemap* tilemap);
 
-    Model *createModel();
-    void destroyModel(Model *model);
+    Model* createModel();
+    void destroyModel(Model* model);
 
-    const Pool<Drawable2dVariant, 64> &getDrawables2d() const;
+    const Pool<Drawable2dVariant, 64>& getDrawables2d() const;
     const std::forward_list<Drawable2dVariant> getSortedDrawables2d() const;
-    const std::list<Drawable3d> &getDrawables3d() const;
+    const std::list<Drawable3d>& getDrawables3d() const;
 
-    void setAmbientLight(const AmbientLight &ambientLight);
+    void setAmbientLight(const AmbientLight& ambientLight);
     AmbientLight getAmbientLight() const;
 
     std::shared_ptr<PointLight> makePointLight();
-    const std::list<std::shared_ptr<PointLight>> &getPointLights() const;
+    const std::list<std::shared_ptr<PointLight>>& getPointLights() const;
 
-    TextureCache *getTextureCache();
+    TextureCache* getTextureCache();
     void updateTextureCache();
 
     private:

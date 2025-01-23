@@ -22,8 +22,8 @@ N64Renderer::N64Renderer() {
 N64Renderer::~N64Renderer() = default;
 
 void N64Renderer::startRender() {
-  surface_t *disp = display_get();
-  surface_t *zbuf = display_get_zbuf();
+  surface_t* disp = display_get();
+  surface_t* zbuf = display_get_zbuf();
 
   rdpq_attach(disp, zbuf);
 
@@ -51,7 +51,7 @@ void N64Renderer::clearBackground([[maybe_unused]] ColorRgb color) {
 }
 
 bool N64Renderer::sliceTexture(
-  Image *image, std::vector<Image> &slices, Vector2i &sliceCount
+  Image* image, std::vector<Image>& slices, Vector2i& sliceCount
 ) {
   const int tmemSize = 4096;
 
@@ -95,9 +95,9 @@ void N64Renderer::destroyTexture([[maybe_unused]] int id) {
 }
 
 void N64Renderer::loadTexture(
-  [[maybe_unused]] int id, [[maybe_unused]] Image *image
+  [[maybe_unused]] int id, [[maybe_unused]] Image* image
 ) {
-  auto &texture = mTextureIdMapping.at(id);
+  auto& texture = mTextureIdMapping.at(id);
 
   GLenum inputFormat = GL_RGBA;
   GLenum inputType = GL_UNSIGNED_SHORT_5_5_5_1_EXT;
@@ -145,7 +145,7 @@ void N64Renderer::resizeTexture(
 ) {}
 
 void N64Renderer::renderTexture(
-  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info
+  [[maybe_unused]] Canvas* canvas, [[maybe_unused]] RenderTextureInfo* info
 ) {
   auto texture = mTextureIdMapping.at(info->textureId);
 
@@ -206,13 +206,13 @@ void N64Renderer::destroyShape([[maybe_unused]] int id) {
 }
 
 void N64Renderer::loadShape(
-  [[maybe_unused]] int id, [[maybe_unused]] Shape *shape
+  [[maybe_unused]] int id, [[maybe_unused]] Shape* shape
 ) {
   mShapeIdMapping.emplace(id, shape);
 }
 
 void N64Renderer::renderShape(
-  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderShapeInfo *info
+  [[maybe_unused]] Canvas* canvas, [[maybe_unused]] RenderShapeInfo* info
 ) {
   auto shape = mShapeIdMapping.at(info->shapeId);
 
@@ -234,7 +234,7 @@ void N64Renderer::renderShape(
 
   glBegin(GL_LINE_STRIP);
 
-  for (auto &&vertex : shape->getVertices()) {
+  for (auto&& vertex : shape->getVertices()) {
     float x = info->position.x + vertex.x;
     float y = info->position.y + vertex.y;
 
@@ -265,8 +265,8 @@ void N64Renderer::loadMesh(
   for (std::size_t faceIndex = 0; faceIndex < mesh->getFaces().size();
        ++faceIndex) {
     for (std::size_t index : mesh->getFaces().at(faceIndex)) {
-      auto &vertex = mesh->getVertices().at(index);
-      auto &texCoords = mesh->getTexCoords().at(index);
+      auto& vertex = mesh->getVertices().at(index);
+      auto& texCoords = mesh->getTexCoords().at(index);
 
       glTexCoord2f(texCoords.x, texCoords.y);
       glVertex3f(vertex.x, vertex.y, vertex.z);
@@ -278,7 +278,7 @@ void N64Renderer::loadMesh(
 }
 
 void N64Renderer::renderMesh(
-  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info
+  [[maybe_unused]] Canvas* canvas, [[maybe_unused]] RenderMeshInfo* info
 ) {
   auto listId = mMeshIdMapping.at(info->meshId);
   auto texture = mTextureIdMapping.at(info->diffuseTextureId);
@@ -292,7 +292,7 @@ void N64Renderer::renderMesh(
 
   int lightId = 0;
 
-  for (auto &&pointLight : canvas->getStage()->getPointLights()) {
+  for (auto&& pointLight : canvas->getStage()->getPointLights()) {
     glEnable(GL_LIGHT0 + lightId);
     float pos[4] = {
       pointLight->position.x, pointLight->position.y, pointLight->position.z,

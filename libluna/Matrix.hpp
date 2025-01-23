@@ -15,15 +15,15 @@ namespace Luna {
   class Matrix4x4 {
     public:
     Matrix4x4();
-    Matrix4x4(const Matrix4x4 &other);
-    Matrix4x4(const std::array<std::array<float, 4>, 4> &cols);
+    Matrix4x4(const Matrix4x4& other);
+    Matrix4x4(const std::array<std::array<float, 4>, 4>& cols);
     ~Matrix4x4();
-    bool operator==(const Matrix4x4 &other) const;
-    Matrix4x4 &operator=(const Matrix4x4 &other);
-    Matrix4x4 operator*(const Matrix4x4 &other) const;
-    float &at(int row, int column);
+    bool operator==(const Matrix4x4& other) const;
+    Matrix4x4& operator=(const Matrix4x4& other);
+    Matrix4x4 operator*(const Matrix4x4& other) const;
+    float& at(int row, int column);
     float at(int row, int column) const;
-    const float *getValuePointer() const;
+    const float* getValuePointer() const;
 
     Matrix4x4 translate(Vector3f vector) const;
     Matrix4x4 rotateX(float angle) const;

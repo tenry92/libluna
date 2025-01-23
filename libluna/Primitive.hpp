@@ -16,11 +16,11 @@ namespace Luna {
     ~Primitive();
 
     ///@{
-    void setShape(Shape *shape);
-    Shape *getShape() const;
+    void setShape(Shape* shape);
+    Shape* getShape() const;
     ///@}
 
     private:
-    Shape *mShape;
+    Shape* mShape;
   };
 } // namespace Luna

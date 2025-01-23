@@ -17,7 +17,7 @@ namespace Luna::GL {
     inline Uniform() {}
 
     inline Uniform(
-      [[maybe_unused]] GLuint program, [[maybe_unused]] const String &name
+      [[maybe_unused]] GLuint program, [[maybe_unused]] const String& name
     ) {
       mLocation = glGetUniformLocation(program, name.c_str());
 
@@ -26,7 +26,7 @@ namespace Luna::GL {
       }
     }
 
-    inline Uniform(GLuint program, const String &name, int count) {
+    inline Uniform(GLuint program, const String& name, int count) {
       mArray.reserve(count);
 
       for (int i = 0; i < count; ++i) {
@@ -36,7 +36,7 @@ namespace Luna::GL {
       }
     }
 
-    inline Uniform &operator[](std::size_t index) { return mArray.at(index); }
+    inline Uniform& operator[](std::size_t index) { return mArray.at(index); }
 
     inline int operator=(int value) const {
       glUniform1i(mLocation, value);
@@ -63,7 +63,7 @@ namespace Luna::GL {
       return value;
     }
 
-    inline Luna::Matrix4x4 operator=(const Luna::Matrix4x4 &value) const {
+    inline Luna::Matrix4x4 operator=(const Luna::Matrix4x4& value) const {
       glUniformMatrix4fv(mLocation, 1, GL_FALSE, value.getValuePointer());
       return value;
     }

@@ -18,7 +18,7 @@ class AudioCommand : public Command {
   std::function<void()> mCallback;
 };
 
-AudioNode::AudioNode(AudioManager *manager) { mManager = manager; }
+AudioNode::AudioNode(AudioManager* manager) { mManager = manager; }
 
 AudioNode::~AudioNode() = default;
 

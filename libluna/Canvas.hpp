@@ -61,23 +61,23 @@ namespace Luna {
    */
   class Canvas {
     public:
-    Canvas(const Vector2i &size);
+    Canvas(const Vector2i& size);
     ~Canvas();
 
     void close();
 
-    void setVideoDriver(const String &name);
+    void setVideoDriver(const String& name);
 
     void attachImmediateGui(std::unique_ptr<ImmediateGui> gui);
-    ImmediateGui *getImmediateGui() const;
+    ImmediateGui* getImmediateGui() const;
 
-    void setStage(Stage *stage);
-    Stage *getStage() const;
+    void setStage(Stage* stage);
+    Stage* getStage() const;
 
-    void setCamera2d(const Camera2d &camera);
+    void setCamera2d(const Camera2d& camera);
     Camera2d getCamera2d() const;
 
-    void setCamera3d(const Camera3d &camera);
+    void setCamera3d(const Camera3d& camera);
     Camera3d getCamera3d() const;
 
     void setBackgroundColor(ColorRgb color);
@@ -88,7 +88,7 @@ namespace Luna {
     void render();
     void sync();
 
-    std::queue<ButtonEvent> &getButtonEvents();
+    std::queue<ButtonEvent>& getButtonEvents();
 
     /**
      * @brief Get the current value of an axis input.
@@ -96,23 +96,23 @@ namespace Luna {
      * The axis may be the horizontal or vertical position of a joystick or the
      * value of a trigger button.
      */
-    float getInputAxis(const String &name);
+    float getInputAxis(const String& name);
 
     bool isClosed() const;
 
     void setOriginalSize(Vector2i size);
     Vector2i getOriginalSize() const;
 
-    static const std::list<Canvas *> getCanvasByStage(Stage *stage);
+    static const std::list<Canvas*> getCanvasByStage(Stage* stage);
 
     Internal::GraphicsMetrics getMetrics();
 
 #ifdef LUNA_WINDOW_SDL2
-    bool processSdlEvent(const SDL_Event *event);
-    bool sdlEventTargetsThis(const SDL_Event *event);
-    bool sendSdlEventToImmediateGui(const SDL_Event *event);
+    bool processSdlEvent(const SDL_Event* event);
+    bool sdlEventTargetsThis(const SDL_Event* event);
+    bool sendSdlEventToImmediateGui(const SDL_Event* event);
     struct {
-      SDL_Window *window{nullptr};
+      SDL_Window* window{nullptr};
 #ifdef LUNA_RENDERER_OPENGL
       SDL_GLContext glContext{nullptr};
 #endif
@@ -120,7 +120,7 @@ namespace Luna {
 #endif
 #ifdef LUNA_WINDOW_GLFW
     struct {
-      GLFWwindow *window{nullptr};
+      GLFWwindow* window{nullptr};
     } glfw;
 #endif
 #ifdef LUNA_WINDOW_EGL
@@ -137,7 +137,7 @@ namespace Luna {
 
     Vector2i mSize;
     Vector2i mOriginalSize;
-    Stage *mStage;
+    Stage* mStage;
     std::unique_ptr<AbstractRenderer> mRenderer;
     std::unique_ptr<ImmediateGui> mImmediateGui;
     Camera2d mCamera2d;

@@ -31,14 +31,14 @@ unsigned int System::getProcessorCount() {
 
 unsigned long System::getPhysicalMemoryUsage() {
 #ifdef __linux__
-  FILE *fp = fopen("/proc/self/status", "rt");
+  FILE* fp = fopen("/proc/self/status", "rt");
   unsigned long result = 0;
   char line[128];
 
   while (fgets(line, 128, fp) != nullptr) {
     if (strncmp(line, "VmRSS:", 6) == 0) {
       auto i = strlen(line);
-      const char *p = line;
+      const char* p = line;
       while (*p < '0' || *p > '9') {
         p++;
       }
@@ -53,7 +53,7 @@ unsigned long System::getPhysicalMemoryUsage() {
 #elif defined(_WIN32)
   PROCESS_MEMORY_COUNTERS_EX pmc;
   GetProcessMemoryInfo(
-    GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc)
+    GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc)
   );
   return static_cast<unsigned long>(pmc.WorkingSetSize);
 #else
@@ -63,14 +63,14 @@ unsigned long System::getPhysicalMemoryUsage() {
 
 unsigned long System::getVirtualMemoryUsage() {
 #ifdef __linux__
-  FILE *fp = fopen("/proc/self/status", "rt");
+  FILE* fp = fopen("/proc/self/status", "rt");
   unsigned long result = 0;
   char line[128];
 
   while (fgets(line, 128, fp) != nullptr) {
     if (strncmp(line, "VmSize:", 6) == 0) {
       auto i = strlen(line);
-      const char *p = line;
+      const char* p = line;
       while (*p < '0' || *p > '9') {
         p++;
       }
@@ -85,7 +85,7 @@ unsigned long System::getVirtualMemoryUsage() {
 #elif defined(_WIN32)
   PROCESS_MEMORY_COUNTERS_EX pmc;
   GetProcessMemoryInfo(
-    GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc)
+    GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc)
   );
   return static_cast<unsigned long>(pmc.PrivateUsage);
 #else
@@ -137,7 +137,7 @@ std::list<String> System::getAssetFiles() {
   }
 #else
   if (fs::exists(assetsPath.c_str()) && fs::is_directory(assetsPath.c_str())) {
-    for (const auto &entry :
+    for (const auto& entry :
          fs::recursive_directory_iterator(assetsPath.c_str())) {
       list.emplace_back(entry.path().c_str());
     }

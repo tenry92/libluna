@@ -5,9 +5,9 @@
 namespace Luna::Audio {
   class GainNode : public AudioNode {
     public:
-    GainNode(AudioManager *manager, float volume);
+    GainNode(AudioManager* manager, float volume);
     ~GainNode();
-    void render(float *buffer, int frameCount) override;
+    void render(float* buffer, int frameCount) override;
     void setVolume(float volume);
 
     private:

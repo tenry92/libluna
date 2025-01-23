@@ -31,20 +31,20 @@ namespace Luna {
     void clearBackground(ColorRgb color) override;
     void createTexture(int id) override;
     void destroyTexture(int id) override;
-    void loadTexture(int id, Image *image) override;
+    void loadTexture(int id, Image* image) override;
     void resizeTexture(int id, Vector2i size) override;
-    void renderTexture(Canvas *canvas, RenderTextureInfo *info) override;
+    void renderTexture(Canvas* canvas, RenderTextureInfo* info) override;
 
     void createShape(int id) override;
     void destroyShape(int id) override;
-    void loadShape(int id, Shape *shape) override;
-    void renderShape(Canvas *canvas, RenderShapeInfo *info) override;
+    void loadShape(int id, Shape* shape) override;
+    void renderShape(Canvas* canvas, RenderShapeInfo* info) override;
 
     void createMesh(int id) override;
     void destroyMesh(int id) override;
     void loadMesh(int id, std::shared_ptr<Mesh> mesh) override;
 
-    void renderMesh(Canvas *canvas, RenderMeshInfo *info) override;
+    void renderMesh(Canvas* canvas, RenderMeshInfo* info) override;
 
     void setTextureFilterEnabled(int id, bool enabled) override;
     void setRenderTargetTexture(int id) override;
@@ -56,7 +56,7 @@ namespace Luna {
 
     private:
 #ifdef LUNA_IMGUI
-    ImGuiContext *mImGuiContext{nullptr};
+    ImGuiContext* mImGuiContext{nullptr};
 #endif
 
     GL::Shader mSpriteShader;
@@ -85,7 +85,7 @@ namespace Luna {
     } mUniforms;
 
     std::map<int, GLuint> mTextureIdMapping;
-    std::map<int, Luna::Shape *> mShapeIdMapping;
+    std::map<int, Luna::Shape*> mShapeIdMapping;
     std::map<int, GLuint> mFramebuffers;
     std::map<int, std::shared_ptr<GL::MeshBuffer>> mMeshMapping;
     bool mUsingFramebuffer{false};

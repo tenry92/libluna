@@ -7,7 +7,7 @@
 
 using namespace Luna;
 
-static void printMatrix(const Matrix4x4 &matrix) {
+static void printMatrix(const Matrix4x4& matrix) {
   auto valuePtr = matrix.getValuePointer();
 
   std::cout << "\n----------" << std::endl;
@@ -27,7 +27,7 @@ static void printMatrix(const Matrix4x4 &matrix) {
   std::cout << "----------" << std::endl;
 }
 
-static void compareMatrix(const Matrix4x4 &actual, const Matrix4x4 &expected) {
+static void compareMatrix(const Matrix4x4& actual, const Matrix4x4& expected) {
   auto actualPtr = actual.getValuePointer();
   auto expectedPtr = expected.getValuePointer();
 
@@ -78,7 +78,7 @@ static void compareMatrix(const Matrix4x4 &actual, const Matrix4x4 &expected) {
   std::cout << "----------" << std::endl;
 }
 
-static void ASSERT_EQL(const Matrix4x4 &actual, const Matrix4x4 &expected) {
+static void ASSERT_EQL(const Matrix4x4& actual, const Matrix4x4& expected) {
   for (int row = 0; row < 4; ++row) {
     for (int col = 0; col < 4; ++col) {
       auto delta = abs(actual.at(row, col) - expected.at(row, col));
@@ -93,7 +93,7 @@ static void ASSERT_EQL(const Matrix4x4 &actual, const Matrix4x4 &expected) {
   }
 }
 
-int main(int, char **) {
+int main(int, char**) {
   TEST("identify matrix", []() {
     auto actual = Matrix4x4::identity();
     auto expected = Matrix4x4({{

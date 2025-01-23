@@ -6,13 +6,13 @@ Text::Text() = default;
 
 Text::~Text() = default;
 
-void Text::setContent(const String &content) { mContent = content; }
+void Text::setContent(const String& content) { mContent = content; }
 
-const String &Text::getContent() const { return mContent; }
+const String& Text::getContent() const { return mContent; }
 
-void Text::setFont(Font *font) { mFont = font; }
+void Text::setFont(Font* font) { mFont = font; }
 
-Font *Text::getFont() const { return mFont; }
+Font* Text::getFont() const { return mFont; }
 
 void Text::setSize(float size) { mSize = size; }
 

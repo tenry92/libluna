@@ -42,7 +42,7 @@ namespace Luna::Audio {
      */
     void free();
 
-    static AudioManager *getInstance();
+    static AudioManager* getInstance();
 
     double getTime() const;
 
@@ -58,7 +58,7 @@ namespace Luna::Audio {
       float frequency, OscillatorNode::Type type = OscillatorNode::kSine
     );
 
-    Internal::AudioMetrics &getMetrics();
+    Internal::AudioMetrics& getMetrics();
 
     void advanceTime(double time);
 

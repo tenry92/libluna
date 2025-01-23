@@ -138,17 +138,17 @@ namespace Luna {
      *
      * This is not doing any setup until `run()` is called.
      */
-    Application(int argc, char **argv);
+    Application(int argc, char** argv);
 
     virtual ~Application();
 
-    static Application *getInstance();
+    static Application* getInstance();
 
     int run();
     void addInterval(int ratePerSecond, std::function<void(float)> callback);
     void addVsync(std::function<void(float)> callback);
-    int getOptionIndex(const String &name) const;
-    bool hasOption(const String &name) const;
+    int getOptionIndex(const String& name) const;
+    bool hasOption(const String& name) const;
 
     /**
      * @brief Get command-line option value.
@@ -157,38 +157,38 @@ namespace Luna {
      *
      * @param name Parameter name, excluding preceding dashes.
      */
-    String getOptionValue(const String &name) const;
+    String getOptionValue(const String& name) const;
 
     Filesystem::Path getAssetsPath() const;
 
     void setAssetsPath(Filesystem::Path assetsPath);
 
-    Canvas *makeCanvas(const Vector2i &size);
-    std::list<Canvas *> getOpenCanvases();
+    Canvas* makeCanvas(const Vector2i& size);
+    std::list<Canvas*> getOpenCanvases();
 
-    void raiseCriticalError(const String &message);
+    void raiseCriticalError(const String& message);
 
     String getDefaultVideoDriver() const;
 
     /**
      * @brief Set application name.
      */
-    void setName(const String &name);
+    void setName(const String& name);
 
     /**
      * @brief Get application name.
      */
-    const String &getName() const;
+    const String& getName() const;
 
-    Audio::AudioManager *getAudioManager();
+    Audio::AudioManager* getAudioManager();
 
     Audio::AudioNodePtr getAudioDestinationNode() const;
 
-    void openDebugger(Canvas *canvas);
+    void openDebugger(Canvas* canvas);
 
 #ifdef LUNA_WINDOW_SDL2
-    Canvas *getCanvasBySdlWindowId(Uint32 windowId);
-    void pushSdlEvent(SDL_Event *event);
+    Canvas* getCanvasBySdlWindowId(Uint32 windowId);
+    void pushSdlEvent(SDL_Event* event);
 #endif
 
     protected:

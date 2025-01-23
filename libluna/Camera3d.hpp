@@ -12,7 +12,7 @@ namespace Luna {
     ~Camera3d();
 
     Vector3f getPosition() const;
-    void setPosition(const Vector3f &position);
+    void setPosition(const Vector3f& position);
 
     void rotateY(float angle);
     void resetRotation();

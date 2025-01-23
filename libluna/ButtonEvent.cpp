@@ -2,10 +2,10 @@
 
 using namespace Luna;
 
-ButtonEvent::ButtonEvent(const String &name, bool down)
+ButtonEvent::ButtonEvent(const String& name, bool down)
     : mName{name}, mDown{down} {}
 
-ButtonEvent::ButtonEvent(const ButtonEvent &other)
+ButtonEvent::ButtonEvent(const ButtonEvent& other)
     : mName{other.mName}, mDown{other.mDown} {}
 
 ButtonEvent::~ButtonEvent() = default;

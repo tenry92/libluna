@@ -6,7 +6,7 @@
 using namespace std;
 using namespace Luna;
 
-int main(int, char **) {
+int main(int, char**) {
   TEST("String emptyString is empty", []() {
     String emptyString;
     ASSERT(strcmp(emptyString.c_str(), "") == 0, "strcmp(..., \"\") == 0");
@@ -15,7 +15,7 @@ int main(int, char **) {
   });
 
   TEST("C constructed", []() {
-    const char *cString = "c string";
+    const char* cString = "c string";
     String cStringConstructed(cString);
     string sString(cString);
     ASSERT(
@@ -30,7 +30,7 @@ int main(int, char **) {
   });
 
   TEST("C constructed with NUL", []() {
-    const char *cString = "c\0string";
+    const char* cString = "c\0string";
     String cStringConstructed(cString, 8);
     string sString(cString, 8);
     ASSERT(
@@ -45,7 +45,7 @@ int main(int, char **) {
   });
 
   TEST("wchar_t constructed", []() {
-    const wchar_t *wString = L"wchar_t *ÄÖÜ";
+    const wchar_t* wString = L"wchar_t *ÄÖÜ";
     String wStringConstructed(wString);
     ASSERT(wStringConstructed.getLength() == 12, "getLength() == 12");
   });
@@ -153,7 +153,7 @@ int main(int, char **) {
   TEST("for split", []() {
     std::vector<String> parts;
 
-    for (auto &&part : String("lorem ipsum dolor").split(" ")) {
+    for (auto&& part : String("lorem ipsum dolor").split(" ")) {
       parts.push_back(part);
     }
 

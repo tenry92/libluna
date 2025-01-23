@@ -14,7 +14,7 @@ namespace Luna::Audio {
    */
   class AudioNode : public std::enable_shared_from_this<AudioNode> {
     public:
-    AudioNode(AudioManager *manager);
+    AudioNode(AudioManager* manager);
     virtual ~AudioNode();
 
     /**
@@ -22,7 +22,7 @@ namespace Luna::Audio {
      *
      * In stereo mode (2 channels), a frame represents 2 samples (2 floats).
      */
-    virtual void render(float *buffer, int frameCount) = 0;
+    virtual void render(float* buffer, int frameCount) = 0;
 
     // void addInput(std::shared_ptr<AudioNode> source);
 
@@ -38,7 +38,7 @@ namespace Luna::Audio {
     friend class AudioManager;
     AudioNode();
     std::list<AudioNodePtr> mInputs;
-    AudioManager *mManager;
+    AudioManager* mManager;
     AudioNodePtr mConnectedNode;
 
     private:

@@ -9,9 +9,9 @@ using Luna::String;
 
 static constexpr std::size_t kTicksPerQueue = 10;
 
-static std::map<String, Ticker &> gTickers;
+static std::map<String, Ticker&> gTickers;
 
-Ticker::Ticker(const String &pName) {
+Ticker::Ticker(const String& pName) {
   mName = pName;
 
   if (pName != "") {
@@ -93,7 +93,7 @@ float Ticker::getTicksPerSecond() const {
   return 1.f / averageDuration;
 }
 
-Ticker *Ticker::getTickerByName(const String &name) {
+Ticker* Ticker::getTickerByName(const String& name) {
   auto it = gTickers.find(name);
 
   if (it != gTickers.end()) {

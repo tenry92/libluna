@@ -102,7 +102,7 @@ namespace Luna {
      * @endcode
      */
     virtual std::size_t
-    read(uint8_t *buffer, std::size_t objectSize, std::size_t objectCount) = 0;
+    read(uint8_t* buffer, std::size_t objectSize, std::size_t objectCount) = 0;
 
     /**
      * @brief Read data.
@@ -129,8 +129,8 @@ namespace Luna {
      */
     template <typename BufferType>
     std::size_t
-    read(BufferType *buffer, std::size_t objectSize, std::size_t objectCount) {
-      return read(reinterpret_cast<uint8_t *>(buffer), objectSize, objectCount);
+    read(BufferType* buffer, std::size_t objectSize, std::size_t objectCount) {
+      return read(reinterpret_cast<uint8_t*>(buffer), objectSize, objectCount);
     }
 
     /**
@@ -149,7 +149,7 @@ namespace Luna {
      * myFile.read(moreBytes, 4);
      * @endcode
      */
-    inline std::size_t read(uint8_t *buffer, std::size_t byteCount = 1) {
+    inline std::size_t read(uint8_t* buffer, std::size_t byteCount = 1) {
       return read(buffer, 1, byteCount);
     }
 
@@ -170,13 +170,13 @@ namespace Luna {
      * @endcode
      */
     template <typename BufferType>
-    std::size_t read(BufferType *buffer, std::size_t objectCount = 1) {
+    std::size_t read(BufferType* buffer, std::size_t objectCount = 1) {
       return read(
-        reinterpret_cast<uint8_t *>(buffer), sizeof(BufferType), objectCount
+        reinterpret_cast<uint8_t*>(buffer), sizeof(BufferType), objectCount
       );
     }
 
-    bool readLine(char *buffer, std::size_t bufferSize) {
+    bool readLine(char* buffer, std::size_t bufferSize) {
       if (bufferSize == 0) {
         return false;
       }

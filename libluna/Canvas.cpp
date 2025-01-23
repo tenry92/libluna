@@ -47,7 +47,7 @@ using namespace Luna::Internal;
 using Luna::String;
 
 namespace {
-  std::map<Stage *, std::list<Canvas *>> gCanvasByStage;
+  std::map<Stage*, std::list<Canvas*>> gCanvasByStage;
 
 #ifdef LUNA_RENDERER_OPENGL
   [[maybe_unused]] void setGlAttributes() {
@@ -238,7 +238,7 @@ void Canvas::renderThread() {
 #endif
 
 #ifdef LUNA_WINDOW_SDL2
-bool Canvas::processSdlEvent(const SDL_Event *event) {
+bool Canvas::processSdlEvent(const SDL_Event* event) {
   if (!sdlEventTargetsThis(event)) {
     return false;
   }
@@ -293,7 +293,7 @@ bool Canvas::processSdlEvent(const SDL_Event *event) {
   return false;
 }
 
-bool Canvas::sdlEventTargetsThis(const SDL_Event *event) {
+bool Canvas::sdlEventTargetsThis(const SDL_Event* event) {
   auto myWindowId = SDL_GetWindowID(this->sdl.window);
 
   switch (event->type) {
@@ -316,7 +316,7 @@ bool Canvas::sdlEventTargetsThis(const SDL_Event *event) {
   return true;
 }
 
-bool Canvas::sendSdlEventToImmediateGui(const SDL_Event *event) {
+bool Canvas::sendSdlEventToImmediateGui(const SDL_Event* event) {
   if (mImmediateGui) {
     bool result{false};
     auto command = std::make_shared<CanvasCommand>(([this, &result, event]() {
@@ -338,7 +338,7 @@ bool Canvas::sendSdlEventToImmediateGui(const SDL_Event *event) {
 }
 #endif
 
-Canvas::Canvas(const Vector2i &size) : mSize{size}, mOriginalSize{size} {
+Canvas::Canvas(const Vector2i& size) : mSize{size}, mOriginalSize{size} {
 #ifdef LUNA_THREADED_CANVAS
   mThread = std::thread(&Canvas::renderThread, this);
   this->sync();
@@ -414,7 +414,7 @@ void Canvas::close() {
   mClosed = true;
 }
 
-void Canvas::setVideoDriver(const String &name) {
+void Canvas::setVideoDriver(const String& name) {
   auto command = std::make_shared<CanvasCommand>(([this, name]() {
     createWindow(name == "opengl");
 
@@ -526,9 +526,9 @@ void Canvas::attachImmediateGui(std::unique_ptr<ImmediateGui> gui) {
   processCommandQueue();
 }
 
-ImmediateGui *Canvas::getImmediateGui() const { return mImmediateGui.get(); }
+ImmediateGui* Canvas::getImmediateGui() const { return mImmediateGui.get(); }
 
-void Canvas::setStage(Stage *stage) {
+void Canvas::setStage(Stage* stage) {
   if (stage == mStage) {
     return;
   }
@@ -546,13 +546,13 @@ void Canvas::setStage(Stage *stage) {
   }
 }
 
-Stage *Canvas::getStage() const { return mStage; }
+Stage* Canvas::getStage() const { return mStage; }
 
-void Canvas::setCamera2d(const Camera2d &camera) { mCamera2d = camera; }
+void Canvas::setCamera2d(const Camera2d& camera) { mCamera2d = camera; }
 
 Camera2d Canvas::getCamera2d() const { return mCamera2d; }
 
-void Canvas::setCamera3d(const Camera3d &camera) { mCamera3d = camera; }
+void Canvas::setCamera3d(const Camera3d& camera) { mCamera3d = camera; }
 
 Camera3d Canvas::getCamera3d() const { return mCamera3d; }
 
@@ -562,12 +562,12 @@ ColorRgb Canvas::getBackgroundColor() const { return mBackgroundColor; }
 
 #ifdef LUNA_WINDOW_SDL2
 ImagePtr Canvas::captureScreenshot() {
-  SDL_Surface *surface = SDL_GetWindowSurface(sdl.window);
+  SDL_Surface* surface = SDL_GetWindowSurface(sdl.window);
   // returns nullptr if SDL_FRAMEBUFFER_ACCELERATION=0 env is not set
 
   std::cout << "surface size: " << surface->w << "x" << surface->h << std::endl;
 
-  std::cout << "first pixel: " << ((uint32_t *)surface->pixels)[0] << std::endl;
+  std::cout << "first pixel: " << ((uint32_t*)surface->pixels)[0] << std::endl;
 
   // SDL renderer: SDL_RenderReadPixels(renderer, ...)
 
@@ -637,7 +637,7 @@ void Canvas::sync() {
 #endif
 }
 
-std::queue<ButtonEvent> &Canvas::getButtonEvents() { return mButtonEvents; }
+std::queue<ButtonEvent>& Canvas::getButtonEvents() { return mButtonEvents; }
 
 bool Canvas::isClosed() const { return mClosed; }
 
@@ -645,6 +645,6 @@ void Canvas::setOriginalSize(Vector2i size) { mOriginalSize = size; }
 
 Vector2i Canvas::getOriginalSize() const { return mOriginalSize; }
 
-const std::list<Canvas *> Canvas::getCanvasByStage(Stage *stage) {
+const std::list<Canvas*> Canvas::getCanvasByStage(Stage* stage) {
   return gCanvasByStage[stage];
 }

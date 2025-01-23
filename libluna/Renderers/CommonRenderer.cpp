@@ -88,8 +88,8 @@ void CommonRenderer::clearBackground([[maybe_unused]] ColorRgb color) {
 }
 
 bool CommonRenderer::sliceTexture(
-  [[maybe_unused]] Image *image, [[maybe_unused]] std::vector<Image> &slices,
-  [[maybe_unused]] Vector2i &sliceCount
+  [[maybe_unused]] Image* image, [[maybe_unused]] std::vector<Image>& slices,
+  [[maybe_unused]] Vector2i& sliceCount
 ) {
   return false;
 }
@@ -103,7 +103,7 @@ void CommonRenderer::destroyTexture([[maybe_unused]] int id) {
 }
 
 void CommonRenderer::loadTexture(
-  [[maybe_unused]] int id, [[maybe_unused]] Image *image
+  [[maybe_unused]] int id, [[maybe_unused]] Image* image
 ) {
   // stub
 }
@@ -123,7 +123,7 @@ void CommonRenderer::destroyShape([[maybe_unused]] int id) {
 }
 
 void CommonRenderer::loadShape(
-  [[maybe_unused]] int id, [[maybe_unused]] Shape *shape
+  [[maybe_unused]] int id, [[maybe_unused]] Shape* shape
 ) {
   // stub
 }
@@ -139,19 +139,19 @@ void CommonRenderer::imguiNewFrame() {
 }
 
 void CommonRenderer::renderMesh(
-  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info
+  [[maybe_unused]] Canvas* canvas, [[maybe_unused]] RenderMeshInfo* info
 ) {
   // stub
 }
 
 void CommonRenderer::renderTexture(
-  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info
+  [[maybe_unused]] Canvas* canvas, [[maybe_unused]] RenderTextureInfo* info
 ) {
   // stub
 }
 
 void CommonRenderer::renderShape(
-  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderShapeInfo *info
+  [[maybe_unused]] Canvas* canvas, [[maybe_unused]] RenderShapeInfo* info
 ) {
   // stub
 }
@@ -219,12 +219,12 @@ Vector2i CommonRenderer::getTextureSize(int id) const {
   return mTextureIdMapping.at(id).size;
 }
 
-void CommonRenderer::updateTextureCache([[maybe_unused]] Stage *stage) {
+void CommonRenderer::updateTextureCache([[maybe_unused]] Stage* stage) {
   auto imagesLoaderCache = stage->getTextureCache()->getCache();
 
-  std::unordered_set<ImageLoader *> visitedImageLoaders;
+  std::unordered_set<ImageLoader*> visitedImageLoaders;
 
-  for (auto &&[imageLoader, priority] : imagesLoaderCache) {
+  for (auto&& [imageLoader, priority] : imagesLoaderCache) {
     visitedImageLoaders.emplace(imageLoader);
     if (mKnownImages.count(imageLoader) == 0) {
       auto image = imageLoader->load();
@@ -233,13 +233,13 @@ void CommonRenderer::updateTextureCache([[maybe_unused]] Stage *stage) {
       Vector2i sliceCount;
 
       if (sliceTexture(&image, slices, sliceCount)) {
-        auto &textureOrSlices = mKnownImages[imageLoader];
+        auto& textureOrSlices = mKnownImages[imageLoader];
         textureOrSlices = SlicedTexture{};
-        auto &slicedTexture = std::get<SlicedTexture>(textureOrSlices);
+        auto& slicedTexture = std::get<SlicedTexture>(textureOrSlices);
         slicedTexture.sliceCount = sliceCount;
         slicedTexture.slices.reserve(slices.size());
 
-        for (auto &&slice : slices) {
+        for (auto&& slice : slices) {
           int textureId = mTextureIdAllocator.next();
           mTextureIdMapping.emplace(
             textureId, Texture{textureId, slice.getSize()}
@@ -265,12 +265,12 @@ void CommonRenderer::updateTextureCache([[maybe_unused]] Stage *stage) {
 
   for (auto it = mKnownImages.begin(); it != mKnownImages.end();) {
     if (visitedImageLoaders.find(it->first) == visitedImageLoaders.end()) {
-      auto &textureOrSlices = it->second;
+      auto& textureOrSlices = it->second;
 
       if (std::holds_alternative<SlicedTexture>(textureOrSlices)) {
-        auto &slicedTexture = std::get<SlicedTexture>(textureOrSlices);
+        auto& slicedTexture = std::get<SlicedTexture>(textureOrSlices);
 
-        for (auto &&texture : slicedTexture.slices) {
+        for (auto&& texture : slicedTexture.slices) {
           auto textureId = texture.id;
           logDebug("destroy texture #{}", textureId);
           mTextureIdAllocator.free(static_cast<uint16_t>(textureId));
@@ -278,7 +278,7 @@ void CommonRenderer::updateTextureCache([[maybe_unused]] Stage *stage) {
           mTextureIdMapping.erase(textureId);
         }
       } else {
-        auto &texture = std::get<Texture>(textureOrSlices);
+        auto& texture = std::get<Texture>(textureOrSlices);
 
         auto textureId = texture.id;
         logDebug("destroy texture #{}", textureId);
@@ -293,14 +293,14 @@ void CommonRenderer::updateTextureCache([[maybe_unused]] Stage *stage) {
     }
   }
 
-  std::unordered_set<Shape *> visitedShapes;
+  std::unordered_set<Shape*> visitedShapes;
 
-  for (auto &&drawable : stage->getDrawables2d()) {
+  for (auto&& drawable : stage->getDrawables2d()) {
     if (!std::holds_alternative<Primitive>(drawable)) {
       continue;
     }
 
-    auto &primitive = std::get<Primitive>(drawable);
+    auto& primitive = std::get<Primitive>(drawable);
 
     if (primitive.getShape() == nullptr) {
       continue;
@@ -328,7 +328,7 @@ void CommonRenderer::updateTextureCache([[maybe_unused]] Stage *stage) {
 
   std::unordered_set<std::shared_ptr<Mesh>> visitedMeshes;
 
-  for (auto &&model : stage->getDrawables3d()) {
+  for (auto&& model : stage->getDrawables3d()) {
     visitedMeshes.emplace(model->getMesh());
 
     if (mKnownMeshes.count(model->getMesh()) == 0) {
@@ -340,8 +340,8 @@ void CommonRenderer::updateTextureCache([[maybe_unused]] Stage *stage) {
   }
 }
 
-void CommonRenderer::renderWorld(Canvas *canvas) {
-  for (auto &&model : canvas->getStage()->getDrawables3d()) {
+void CommonRenderer::renderWorld(Canvas* canvas) {
+  for (auto&& model : canvas->getStage()->getDrawables3d()) {
     RenderMeshInfo info;
     info.meshId = mKnownMeshes.at(model->getMesh());
     info.transform = model->getTransform();
@@ -349,7 +349,7 @@ void CommonRenderer::renderWorld(Canvas *canvas) {
     auto material = model->getMaterial();
 
     if (material.getDiffuse()) {
-      auto &diffuseTextureOrSlices = mKnownImages.at(material.getDiffuse());
+      auto& diffuseTextureOrSlices = mKnownImages.at(material.getDiffuse());
 
       if (std::holds_alternative<Texture>(diffuseTextureOrSlices)) {
         info.diffuseTextureId = std::get<Texture>(diffuseTextureOrSlices).id;
@@ -359,7 +359,7 @@ void CommonRenderer::renderWorld(Canvas *canvas) {
     }
 
     if (material.getNormal()) {
-      auto &normalTextureOrSlices = mKnownImages.at(material.getNormal());
+      auto& normalTextureOrSlices = mKnownImages.at(material.getNormal());
 
       if (std::holds_alternative<Texture>(normalTextureOrSlices)) {
         info.normalTextureId = std::get<Texture>(normalTextureOrSlices).id;
@@ -373,13 +373,13 @@ void CommonRenderer::renderWorld(Canvas *canvas) {
 }
 
 void CommonRenderer::render2d(
-  Canvas *canvas, [[maybe_unused]] Vector2i renderSize
+  Canvas* canvas, [[maybe_unused]] Vector2i renderSize
 ) {
-  for (auto &&drawable : canvas->getStage()->getSortedDrawables2d()) {
+  for (auto&& drawable : canvas->getStage()->getSortedDrawables2d()) {
     std::visit(
       overloaded{
         [](auto) {},
-        [&](const Sprite &sprite) {
+        [&](const Sprite& sprite) {
           if (!sprite.isVisible()) {
             return;
           }
@@ -390,10 +390,10 @@ void CommonRenderer::render2d(
 
           RenderTextureInfo info;
 
-          auto &textureOrSlices = mKnownImages.at(sprite.getImageLoader());
+          auto& textureOrSlices = mKnownImages.at(sprite.getImageLoader());
 
           if (std::holds_alternative<Texture>(textureOrSlices)) {
-            auto &texture = std::get<Texture>(textureOrSlices);
+            auto& texture = std::get<Texture>(textureOrSlices);
 
             info.textureId = texture.id;
             info.size = texture.size;
@@ -401,14 +401,14 @@ void CommonRenderer::render2d(
               sprite.getPosition() - canvas->getCamera2d().getPosition();
             renderTexture(canvas, &info);
           } else {
-            auto &slicedTexture = std::get<SlicedTexture>(textureOrSlices);
+            auto& slicedTexture = std::get<SlicedTexture>(textureOrSlices);
 
             info.position =
               sprite.getPosition() - canvas->getCamera2d().getPosition();
 
             for (int y = 0; y < slicedTexture.sliceCount.y; ++y) {
               for (int x = 0; x < slicedTexture.sliceCount.x; ++x) {
-                auto &slice =
+                auto& slice =
                   slicedTexture.slices[y * slicedTexture.sliceCount.x + x];
                 info.textureId = slice.id;
                 info.size = slice.size;
@@ -424,7 +424,7 @@ void CommonRenderer::render2d(
             }
           }
         },
-        [&](const Primitive &primitive) {
+        [&](const Primitive& primitive) {
           if (!primitive.getShape() || !mKnownShapes.count(primitive.getShape())) {
             return;
           }
@@ -434,15 +434,15 @@ void CommonRenderer::render2d(
           info.position = primitive.getPosition();
           renderShape(canvas, &info);
         },
-        [&](const Tilemap &tilemap) {
+        [&](const Tilemap& tilemap) {
           auto tileset = tilemap.getTileset();
-          auto &textureOrSlices = mKnownImages.at(tileset->getImage());
+          auto& textureOrSlices = mKnownImages.at(tileset->getImage());
 
           if (!std::holds_alternative<Texture>(textureOrSlices)) {
             return;
           }
 
-          auto &texture = std::get<Texture>(textureOrSlices);
+          auto& texture = std::get<Texture>(textureOrSlices);
 
           for (int y = 0; y < tilemap.getSize().height; ++y) {
             for (int x = 0; x < tilemap.getSize().width; ++x) {
@@ -465,7 +465,7 @@ void CommonRenderer::render2d(
             }
           }
         },
-        [&](const Text &text) {
+        [&](const Text& text) {
           auto font = text.getFont();
 
           auto startPosition = text.getPosition();
@@ -475,7 +475,7 @@ void CommonRenderer::render2d(
 
           y += text.getSize() * font->getBaseLine();
 
-          for (auto &&cp : text.getContent()) {
+          for (auto&& cp : text.getContent()) {
             if (cp == '\n') {
               x = startPosition.x;
               y +=
@@ -491,12 +491,12 @@ void CommonRenderer::render2d(
             }
 
             if (cp != ' ' && glyph->imageLoader) {
-              auto &textureOrSlices = mKnownImages.at(glyph->imageLoader);
+              auto& textureOrSlices = mKnownImages.at(glyph->imageLoader);
 
               if (std::holds_alternative<Texture>(textureOrSlices)) {
                 RenderTextureInfo info;
 
-                auto &texture = std::get<Texture>(textureOrSlices);
+                auto& texture = std::get<Texture>(textureOrSlices);
 
                 info.textureId = texture.id;
                 info.position =
@@ -527,7 +527,7 @@ void CommonRenderer::render2d(
   }
 }
 
-void CommonRenderer::start2dFramebuffer([[maybe_unused]] Canvas *canvas) {
+void CommonRenderer::start2dFramebuffer([[maybe_unused]] Canvas* canvas) {
   resizeTexture(mRenderTargetId, getInternalSize());
   setRenderTargetTexture(mRenderTargetId);
   setViewport({0, 0}, getInternalSize());
@@ -535,7 +535,7 @@ void CommonRenderer::start2dFramebuffer([[maybe_unused]] Canvas *canvas) {
   clearBackground(ColorRgb{0, 0, 0, 0});
 }
 
-void CommonRenderer::end2dFramebuffer([[maybe_unused]] Canvas *canvas) {
+void CommonRenderer::end2dFramebuffer([[maybe_unused]] Canvas* canvas) {
   unsetRenderTargetTexture();
   setViewport({0, 0}, getCanvasSize());
   mCurrentRenderSize = getCanvasSize();

@@ -75,9 +75,9 @@ void OpenglRenderer::initialize() {
   glGetIntegerv(GL_MAX_RECTANGLE_TEXTURE_SIZE, &mMetrics->maxTextureSize);
   glGetIntegerv(GL_MAJOR_VERSION, &mMetrics->glMajor);
   glGetIntegerv(GL_MINOR_VERSION, &mMetrics->glMinor);
-  mMetrics->vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+  mMetrics->vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
   mMetrics->shadingLangVersion =
-    reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
+    reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION));
 
   GL::ShaderLib shaderLib;
   shaderLib.registerShader(
@@ -120,7 +120,7 @@ void OpenglRenderer::initializeImmediateGui() {
 #ifdef LUNA_IMGUI
   IMGUI_CHECKVERSION();
   mImGuiContext = ImGui::CreateContext();
-  ImGuiIO &io = ImGui::GetIO();
+  ImGuiIO& io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
@@ -209,7 +209,7 @@ void OpenglRenderer::destroyTexture(int id) {
   CHECK_GL(glDeleteTextures(1, &texture));
 }
 
-void OpenglRenderer::loadTexture(int id, Image *image) {
+void OpenglRenderer::loadTexture(int id, Image* image) {
   GLuint texture = mTextureIdMapping.at(id);
 
   GLenum inputFormat = GL_RGBA;
@@ -256,7 +256,7 @@ void OpenglRenderer::resizeTexture(int id, Vector2i size) {
 }
 
 void OpenglRenderer::renderTexture(
-  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info
+  [[maybe_unused]] Canvas* canvas, [[maybe_unused]] RenderTextureInfo* info
 ) {
   mSpriteShader.use();
   glDisable(GL_DEPTH_TEST);
@@ -318,7 +318,7 @@ void OpenglRenderer::loadMesh(
 }
 
 void OpenglRenderer::renderMesh(
-  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info
+  [[maybe_unused]] Canvas* canvas, [[maybe_unused]] RenderMeshInfo* info
 ) {
   mModelShader.use();
   glEnable(GL_DEPTH_TEST);
@@ -337,7 +337,7 @@ void OpenglRenderer::renderMesh(
   mUniforms.pointLightsPosition =
     mModelShader.getUniform("uPointLights[{}].position", 1);
 
-  for (auto &&pointLight : canvas->getStage()->getPointLights()) {
+  for (auto&& pointLight : canvas->getStage()->getPointLights()) {
     mUniforms.pointLightsColor[0] = pointLight->color;
     mUniforms.pointLightsPosition[0] = pointLight->position;
   }
@@ -388,13 +388,13 @@ void OpenglRenderer::destroyShape([[maybe_unused]] int id) {
 }
 
 void OpenglRenderer::loadShape(
-  [[maybe_unused]] int id, [[maybe_unused]] Shape *shape
+  [[maybe_unused]] int id, [[maybe_unused]] Shape* shape
 ) {
   mShapeIdMapping.emplace(id, shape);
 }
 
 void OpenglRenderer::renderShape(
-  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderShapeInfo *info
+  [[maybe_unused]] Canvas* canvas, [[maybe_unused]] RenderShapeInfo* info
 ) {
   auto shape = mShapeIdMapping.at(info->shapeId);
 
@@ -419,15 +419,15 @@ void OpenglRenderer::renderShape(
   CHECK_GL(glBindVertexArray(vertexAttribConf));
   CHECK_GL(glBindBuffer(GL_ARRAY_BUFFER, pointBuffer));
 
-  CHECK_GL(glVertexAttribPointer(
-    0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0
-  ));
+  CHECK_GL(
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0)
+  );
   CHECK_GL(glEnableVertexAttribArray(0));
 
   std::vector<float> vertices;
   vertices.reserve(shape->getVertices().size() * 2);
 
-  for (auto &&vertex : shape->getVertices()) {
+  for (auto&& vertex : shape->getVertices()) {
     vertices.push_back(vertex.x);
     vertices.push_back(vertex.y);
   }

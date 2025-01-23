@@ -20,15 +20,15 @@ namespace Luna {
     Tilemap();
     ~Tilemap();
 
-    void setTileset(Tileset *tileset);
-    Tileset *getTileset() const;
+    void setTileset(Tileset* tileset);
+    Tileset* getTileset() const;
 
     void resize(Vector2i size);
     Vector2i getSize() const;
 
-    TileData *getTileData();
+    TileData* getTileData();
 
-    inline TileData &at(Vector2i position) {
+    inline TileData& at(Vector2i position) {
       return mTileData[position.y * mSize.width + position.x];
     }
 
@@ -37,7 +37,7 @@ namespace Luna {
     }
 
     private:
-    Tileset *mTileset;
+    Tileset* mTileset;
     Vector2i mSize;
     std::vector<TileData> mTileData;
   };

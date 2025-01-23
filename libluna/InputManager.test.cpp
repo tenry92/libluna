@@ -3,7 +3,7 @@
 
 using namespace Luna;
 
-int main(int, char **) {
+int main(int, char**) {
   TEST("isButtonPressed 0s", []() {
     InputManager inputManager;
     std::queue<ButtonEvent> queue;

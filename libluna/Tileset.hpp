@@ -14,8 +14,8 @@ namespace Luna {
     void setTileSize(int tileSize);
     int getTileSize() const;
 
-    void setImage(ImageLoader *image);
-    ImageLoader *getImage() const;
+    void setImage(ImageLoader* image);
+    ImageLoader* getImage() const;
 
     inline int getColumns() const {
       // return mImage->getSize().width / mTileSize;
@@ -24,6 +24,6 @@ namespace Luna {
 
     private:
     int mTileSize;
-    ImageLoader *mImage{nullptr};
+    ImageLoader* mImage{nullptr};
   };
 } // namespace Luna

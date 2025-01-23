@@ -42,18 +42,18 @@ namespace Luna {
   template <typename T> class Vector2 {
     public:
     Vector2();
-    Vector2(const Vector2<T> &other);
-    template <typename U> Vector2(const Vector2<U> &other);
+    Vector2(const Vector2<T>& other);
+    template <typename U> Vector2(const Vector2<U>& other);
     Vector2(T x, T y);
     ~Vector2();
 
-    Vector2<T> &operator=(const Vector2<T> &other);
-    bool operator==(const Vector2<T> &other) const;
-    inline bool operator!=(const Vector2<T> &other) const {
+    Vector2<T>& operator=(const Vector2<T>& other);
+    bool operator==(const Vector2<T>& other) const;
+    inline bool operator!=(const Vector2<T>& other) const {
       return !(*this == other);
     }
-    Vector2<T> operator+(const Vector2<T> &other) const;
-    Vector2<T> operator-(const Vector2<T> &other) const;
+    Vector2<T> operator+(const Vector2<T>& other) const;
+    Vector2<T> operator-(const Vector2<T>& other) const;
     Vector2<T> operator-() const;
     Vector2<T> operator*(T scale) const;
     Vector2<T> operator/(T factor) const;
@@ -62,9 +62,9 @@ namespace Luna {
     Vector2<T> normalized() const;
     Vector2<T> absolute() const;
 
-    Vector2<T> scaleToFit(const Vector2<T> &other) const;
+    Vector2<T> scaleToFit(const Vector2<T>& other) const;
 
-    static T distance(const Vector2<T> &left, const Vector2<T> &right);
+    static T distance(const Vector2<T>& left, const Vector2<T>& right);
 
     static constexpr Vector2<T> one() { return Vector2<T>(1, 1); }
     static constexpr Vector2<T> zero() { return Vector2<T>(0, 0); }
@@ -75,24 +75,24 @@ namespace Luna {
 
     T x{0};
     T y{0};
-    T &width = x;
-    T &height = y;
+    T& width = x;
+    T& height = y;
   };
 
   template <typename T> class Vector3 {
     public:
     Vector3();
-    Vector3(const Vector3<T> &other);
+    Vector3(const Vector3<T>& other);
     Vector3(T x, T y, T z);
     ~Vector3();
 
-    Vector3<T> &operator=(const Vector3<T> &other);
-    bool operator==(const Vector3<T> &other) const;
-    inline bool operator!=(const Vector3<T> &other) const {
+    Vector3<T>& operator=(const Vector3<T>& other);
+    bool operator==(const Vector3<T>& other) const;
+    inline bool operator!=(const Vector3<T>& other) const {
       return !(*this == other);
     }
-    Vector3<T> operator+(const Vector3<T> &other) const;
-    Vector3<T> operator-(const Vector3<T> &other) const;
+    Vector3<T> operator+(const Vector3<T>& other) const;
+    Vector3<T> operator-(const Vector3<T>& other) const;
     Vector3<T> operator-() const;
     Vector3<T> operator*(T scale) const;
     Vector3<T> operator/(T factor) const;
@@ -100,8 +100,8 @@ namespace Luna {
     T magnitude() const;
     Vector3<T> normalized() const;
 
-    static T distance(const Vector3<T> &left, const Vector3<T> &right);
-    static Vector3<T> cross(const Vector3<T> &a, const Vector3<T> &b);
+    static T distance(const Vector3<T>& left, const Vector3<T>& right);
+    static Vector3<T> cross(const Vector3<T>& a, const Vector3<T>& b);
 
     static constexpr Vector3<T> one() { return Vector3<T>(1, 1, 1); }
     static constexpr Vector3<T> zero() { return Vector3<T>(0, 0, 0); }

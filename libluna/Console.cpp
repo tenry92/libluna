@@ -74,7 +74,7 @@ void Console::quit() {
 #endif
 }
 
-void Console::write(const String &message) {
+void Console::write(const String& message) {
 #ifdef N64
   printf("%s", message.c_str());
 #else
@@ -82,7 +82,7 @@ void Console::write(const String &message) {
 #endif
 }
 
-void Console::writeLine(const String &message) {
+void Console::writeLine(const String& message) {
 #ifdef N64
   printf("%s\n", message.c_str());
 #else

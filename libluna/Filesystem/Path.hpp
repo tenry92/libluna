@@ -12,13 +12,13 @@ namespace Luna::Filesystem {
   class Path {
     public:
     Path();
-    Path(const Path &other);
-    Path(const String &path);
+    Path(const Path& other);
+    Path(const String& path);
     ~Path();
 
-    Path operator=(const Path &other);
+    Path operator=(const Path& other);
 
-    inline Path(const char *string) : Path(String(string)) {}
+    inline Path(const char* string) : Path(String(string)) {}
 
     String getRawPath() const;
 
@@ -83,7 +83,7 @@ namespace Luna::Filesystem {
      *
      * \see up()
      */
-    Path cd(const Path &other) const;
+    Path cd(const Path& other) const;
 
     /**
      * \brief Change directory.
@@ -96,7 +96,7 @@ namespace Luna::Filesystem {
      * \endcode
      */
     template <typename... ArgTypes>
-    Path cd(const Path &first, ArgTypes... rest) const {
+    Path cd(const Path& first, ArgTypes... rest) const {
       return cd(first).cd(rest...);
     }
 

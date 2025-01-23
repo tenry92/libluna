@@ -14,14 +14,14 @@ using namespace Luna;
 using namespace Luna::Filesystem;
 
 #ifdef __SWITCH__
-static const char *assetsPath = "romfs:/assets";
+static const char* assetsPath = "romfs:/assets";
 #elif defined(N64)
-static const char *assetsPath = "rom:/assets";
+static const char* assetsPath = "rom:/assets";
 #else
-static const char *assetsPath = "tests/assets";
+static const char* assetsPath = "tests/assets";
 #endif
 
-int main(int, char **) {
+int main(int, char**) {
 #ifdef __SWITCH__
   if (R_FAILED(romfsInit())) {
     consoleInit(NULL);
@@ -48,7 +48,7 @@ int main(int, char **) {
       buffer.data(), sizeof(std::uint8_t), fileReader->getSize()
     );
     std::string contents(
-      reinterpret_cast<const char *>(buffer.data()), buffer.size()
+      reinterpret_cast<const char*>(buffer.data()), buffer.size()
     );
     ASSERT_EQL(
       contents, "This text is read from a text file.\n", "file contents"

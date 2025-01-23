@@ -4,7 +4,7 @@ using namespace Luna;
 
 template <typename T> Rect<T>::Rect() = default;
 
-template <typename T> Rect<T>::Rect(const Rect<T> &other) {
+template <typename T> Rect<T>::Rect(const Rect<T>& other) {
   this->x = other.x;
   this->y = other.y;
   this->width = other.width;
@@ -20,7 +20,7 @@ template <typename T> Rect<T>::Rect(T pX, T pY, T pWidth, T pHeight) {
 
 template <typename T> Rect<T>::~Rect() = default;
 
-template <typename T> Rect<T> &Rect<T>::operator=(const Rect<T> &other) {
+template <typename T> Rect<T>& Rect<T>::operator=(const Rect<T>& other) {
   this->x = other.x;
   this->y = other.y;
   this->width = other.width;
@@ -29,7 +29,7 @@ template <typename T> Rect<T> &Rect<T>::operator=(const Rect<T> &other) {
   return *this;
 }
 
-template <typename T> bool Rect<T>::operator==(const Rect<T> &other) const {
+template <typename T> bool Rect<T>::operator==(const Rect<T>& other) const {
   return this->x == other.x && this->y == other.y &&
          this->width == other.width && this->height == other.height;
 }

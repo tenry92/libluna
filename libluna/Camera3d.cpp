@@ -10,7 +10,7 @@ void Camera3d::resetRotation() { mRotation = Matrix4x4::identity(); }
 
 Vector3f Camera3d::getPosition() const { return mPosition; }
 
-void Camera3d::setPosition(const Vector3f &position) { mPosition = position; }
+void Camera3d::setPosition(const Vector3f& position) { mPosition = position; }
 
 void Camera3d::rotateY(float angle) { mRotation = mRotation.rotateY(angle); }
 

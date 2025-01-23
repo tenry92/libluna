@@ -16,12 +16,12 @@ namespace Luna {
     /**
      * @brief Associate a canvas where to draw to.
      */
-    void setCanvas(Canvas *canvas);
+    void setCanvas(Canvas* canvas);
 
     /**
      * @brief Get associated canvas.
      */
-    Canvas *getCanvas() const;
+    Canvas* getCanvas() const;
 
     /**
      * @brief Called once to initialize the renderer.
@@ -55,6 +55,6 @@ namespace Luna {
     virtual Internal::GraphicsMetrics getMetrics() = 0;
 
     private:
-    Canvas *mCanvas;
+    Canvas* mCanvas;
   };
 } // namespace Luna

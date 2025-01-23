@@ -42,7 +42,7 @@
 using namespace Luna;
 using namespace Luna::Audio;
 
-static Application *gSingletonApp;
+static Application* gSingletonApp;
 
 static void initSystem() {
   Console::init();
@@ -80,7 +80,7 @@ static void initSystem() {
 }
 
 static void printCompiler() {
-  for (auto &&info : Platform::getCompilerInfo()) {
+  for (auto&& info : Platform::getCompilerInfo()) {
     Console::writeLine(info);
   }
 }
@@ -95,15 +95,15 @@ static void printDefines() {
   Console::writeLine("System: {}", Platform::getSystemName());
 }
 
-static void printArguments(const std::vector<String> &args) {
+static void printArguments(const std::vector<String>& args) {
   for (std::size_t i = 0; i < args.size(); ++i) {
     Console::writeLine("Argument {}: {}", i, args[i].c_str());
   }
 }
 
 void Application::executeKeyboardShortcuts() {
-  for (auto &&canvas : mCanvases) {
-    auto &queue = canvas.getButtonEvents();
+  for (auto&& canvas : mCanvases) {
+    auto& queue = canvas.getButtonEvents();
 
     // note: since we are not using input buffer, the time period (0.1f) does
     // not matter
@@ -153,20 +153,20 @@ void Application::mainLoop() {
 
     mDebugMetrics->renderTicker.tick();
     // logDebug("rendering canvases");
-    for (auto &&canvas : mCanvases) {
+    for (auto&& canvas : mCanvases) {
       canvas.render();
     }
     mDebugMetrics->renderTicker.measure();
 
     // logDebug("syncing canvases");
-    for (auto &&canvas : mCanvases) {
+    for (auto&& canvas : mCanvases) {
       canvas.sync();
     }
 
     ++mDebugMetrics->framesElapsed;
   }
 
-  for (auto &&canvas : mCanvases) {
+  for (auto&& canvas : mCanvases) {
     canvas.close();
   }
 
@@ -207,14 +207,14 @@ void Application::processEvents() {
     case SDL_QUIT:
       logInfo("sdl quit event received");
 
-      for (auto &&canvas : mCanvases) {
+      for (auto&& canvas : mCanvases) {
         canvas.close();
       }
 
       return;
     }
 
-    for (auto &&canvas : mCanvases) {
+    for (auto&& canvas : mCanvases) {
       if (canvas.processSdlEvent(&event)) {
         break;
       }
@@ -224,7 +224,7 @@ void Application::processEvents() {
 #ifdef LUNA_WINDOW_GLFW
   glfwPollEvents();
 
-  for (auto &&canvas : mCanvases) {
+  for (auto&& canvas : mCanvases) {
     if (!canvas.glfw.window) {
       continue;
     }
@@ -235,8 +235,8 @@ void Application::processEvents() {
   }
 #endif
 #ifdef N64
-  for (auto &&canvas : mCanvases) {
-    auto &events = canvas.getButtonEvents();
+  for (auto&& canvas : mCanvases) {
+    auto& events = canvas.getButtonEvents();
 
     joypad_poll();
 
@@ -322,7 +322,7 @@ void Application::processEvents() {
 }
 
 void Application::shutDown() {
-  for (auto &&canvas : mCanvases) {
+  for (auto&& canvas : mCanvases) {
     canvas.close();
   }
 
@@ -338,7 +338,7 @@ void Application::shutDown() {
 }
 
 bool Application::hasCanvas() {
-  for (auto &&canvas : mCanvases) {
+  for (auto&& canvas : mCanvases) {
     if (!canvas.isClosed()) {
       return true;
     }
@@ -348,8 +348,8 @@ bool Application::hasCanvas() {
 }
 
 #ifdef LUNA_WINDOW_SDL2
-Canvas *Application::getCanvasBySdlWindowId(Uint32 windowId) {
-  for (auto &&canvas : mCanvases) {
+Canvas* Application::getCanvasBySdlWindowId(Uint32 windowId) {
+  for (auto&& canvas : mCanvases) {
     if (canvas.sdl.window == nullptr) {
       continue;
     }
@@ -364,10 +364,10 @@ Canvas *Application::getCanvasBySdlWindowId(Uint32 windowId) {
   return nullptr;
 }
 
-void Application::pushSdlEvent(SDL_Event *event) { SDL_PushEvent(event); }
+void Application::pushSdlEvent(SDL_Event* event) { SDL_PushEvent(event); }
 #endif
 
-Application::Application(int argc, char **argv) {
+Application::Application(int argc, char** argv) {
   Clock::init();
 
   gSingletonApp = this;
@@ -386,7 +386,7 @@ Application::Application(int argc, char **argv) {
 
 Application::~Application() = default;
 
-Application *Application::getInstance() { return gSingletonApp; }
+Application* Application::getInstance() { return gSingletonApp; }
 
 int Application::run() {
   String assetsPath = Application::getInstance()->getOptionValue("assets");
@@ -426,11 +426,11 @@ void Application::addVsync(std::function<void(float)> callback) {
   mIntervalManager.addAlways(callback);
 }
 
-int Application::getOptionIndex(const String &name) const {
+int Application::getOptionIndex(const String& name) const {
   bool isLong = name.getLength() > 1;
 
   for (int index = 1; index < static_cast<int>(mArgs.size()); ++index) {
-    auto &arg = mArgs[index];
+    auto& arg = mArgs[index];
 
     if (arg[0] != '-') {
       // not an option
@@ -459,11 +459,11 @@ int Application::getOptionIndex(const String &name) const {
   return -1;
 }
 
-bool Application::hasOption(const String &name) const {
+bool Application::hasOption(const String& name) const {
   return this->getOptionIndex(name) != -1;
 }
 
-String Application::getOptionValue(const String &name) const {
+String Application::getOptionValue(const String& name) const {
   int optIndex = this->getOptionIndex(name);
 
   if (optIndex == -1 || optIndex + 1 >= static_cast<int>(mArgs.size())) {
@@ -481,7 +481,7 @@ void Application::setAssetsPath(Filesystem::Path assetsPath) {
   mPathManager.setAssetsPath(assetsPath);
 }
 
-Canvas *Application::makeCanvas(const Vector2i &size) {
+Canvas* Application::makeCanvas(const Vector2i& size) {
   logInfo("creating canvas {}x{}", size.width, size.height);
 
   auto canvas = mCanvases.acquire(size);
@@ -489,17 +489,17 @@ Canvas *Application::makeCanvas(const Vector2i &size) {
   return canvas;
 }
 
-std::list<Canvas *> Application::getOpenCanvases() {
-  std::list<Canvas *> canvases;
+std::list<Canvas*> Application::getOpenCanvases() {
+  std::list<Canvas*> canvases;
 
-  for (auto &&canvas : canvases) {
+  for (auto&& canvas : canvases) {
     canvases.emplace_back(canvas);
   }
 
   return canvases;
 }
 
-void Application::raiseCriticalError(const String &message) {
+void Application::raiseCriticalError(const String& message) {
   if (mRaisedErrorMessage.isEmpty()) {
     mRaisedErrorMessage = message;
   }
@@ -522,17 +522,17 @@ String Application::getDefaultVideoDriver() const {
   return driverName;
 }
 
-void Application::setName(const String &name) { mName = name; }
+void Application::setName(const String& name) { mName = name; }
 
-const String &Application::getName() const { return mName; }
+const String& Application::getName() const { return mName; }
 
-AudioManager *Application::getAudioManager() { return &mAudioManager; }
+AudioManager* Application::getAudioManager() { return &mAudioManager; }
 
 AudioNodePtr Application::getAudioDestinationNode() const {
   return mAudioManager.getDestinationNode();
 }
 
-void Application::openDebugger([[maybe_unused]] Canvas *canvas) {
+void Application::openDebugger([[maybe_unused]] Canvas* canvas) {
 #ifdef LUNA_IMGUI
   if (!canvas->getImmediateGui()) {
     canvas->attachImmediateGui(

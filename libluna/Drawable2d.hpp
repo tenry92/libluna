@@ -9,7 +9,7 @@ namespace Luna {
     ~Drawable2d();
 
     ///@{
-    void setPosition(const Vector2f &position);
+    void setPosition(const Vector2f& position);
     Vector2f getPosition() const;
     ///@}
 

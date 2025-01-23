@@ -17,12 +17,12 @@ namespace Luna {
     Mesh();
     ~Mesh();
 
-    std::vector<Vector3f> &getVertices();
-    std::vector<Face> &getFaces();
-    std::vector<Vector2f> &getTexCoords();
-    std::vector<Vector3f> &getNormals();
-    std::vector<Vector3f> &getTangents();
-    std::vector<Vector3f> &getBitangents();
+    std::vector<Vector3f>& getVertices();
+    std::vector<Face>& getFaces();
+    std::vector<Vector2f>& getTexCoords();
+    std::vector<Vector3f>& getNormals();
+    std::vector<Vector3f>& getTangents();
+    std::vector<Vector3f>& getBitangents();
 
     private:
     std::vector<Vector3f> mVertices;

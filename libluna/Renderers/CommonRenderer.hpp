@@ -113,7 +113,7 @@ namespace Luna {
      * Returns true if the image was sliced, false otherwise.
      */
     virtual bool sliceTexture(
-      Image *image, std::vector<Image> &slices, Vector2i &sliceCount
+      Image* image, std::vector<Image>& slices, Vector2i& sliceCount
     );
 
     /**
@@ -135,7 +135,7 @@ namespace Luna {
      * It is guaranteed that the given texture ID was previously passed to
      * @ref createTexture().
      */
-    virtual void loadTexture(int id, Image *image);
+    virtual void loadTexture(int id, Image* image);
 
     /**
      * @brief Resize the texture for the provided ID.
@@ -145,15 +145,15 @@ namespace Luna {
     /**
      * @brief Draw a texture on the canvas.
      */
-    virtual void renderTexture(Canvas *canvas, RenderTextureInfo *info);
+    virtual void renderTexture(Canvas* canvas, RenderTextureInfo* info);
 
     virtual void createShape(int id);
 
     virtual void destroyShape(int id);
 
-    virtual void loadShape(int id, Shape *shape);
+    virtual void loadShape(int id, Shape* shape);
 
-    virtual void renderShape(Canvas *canvas, RenderShapeInfo *info);
+    virtual void renderShape(Canvas* canvas, RenderShapeInfo* info);
 
     /**
      * @brief Create a new empty mesh for the provided ID.
@@ -179,7 +179,7 @@ namespace Luna {
     /**
      * @brief Draw a 3D mesh on the canvas.
      */
-    virtual void renderMesh(Canvas *canvas, RenderMeshInfo *info);
+    virtual void renderMesh(Canvas* canvas, RenderMeshInfo* info);
 
     virtual void setTextureFilterEnabled(int id, bool enabled);
     virtual void setRenderTargetTexture(int id);
@@ -215,7 +215,7 @@ namespace Luna {
      *
      * This is usually done before anything 2D is rendered.
      */
-    void renderWorld(Canvas *canvas);
+    void renderWorld(Canvas* canvas);
 
     /**
      * @brief Render all 2D drawables on the canvas.
@@ -223,22 +223,22 @@ namespace Luna {
      * For scaling and interpolation reasons, this is usually done onto a render
      * texture and later drawn onto the canvas.
      */
-    void render2d(Canvas *canvas, Vector2i renderSize);
+    void render2d(Canvas* canvas, Vector2i renderSize);
 
-    void updateTextureCache(Stage *stage);
+    void updateTextureCache(Stage* stage);
 
-    void start2dFramebuffer(Canvas *canvas);
+    void start2dFramebuffer(Canvas* canvas);
 
-    void end2dFramebuffer(Canvas *canvas);
+    void end2dFramebuffer(Canvas* canvas);
 
     IdAllocator<uint16_t> mTextureIdAllocator;
     IdAllocator<uint16_t> mShapeIdAllocator;
     IdAllocator<uint16_t> mMeshIdAllocator;
     int mRenderTargetId;
     Vector2i mCurrentRenderSize;
-    std::unordered_map<ImageLoader *, TextureOrSlices> mKnownImages;
+    std::unordered_map<ImageLoader*, TextureOrSlices> mKnownImages;
     std::map<int, Texture> mTextureIdMapping;
-    std::unordered_map<Shape *, int> mKnownShapes;
+    std::unordered_map<Shape*, int> mKnownShapes;
     std::set<FontPtr> mLoadedFonts;
     std::unordered_map<std::shared_ptr<Mesh>, int> mKnownMeshes;
   };

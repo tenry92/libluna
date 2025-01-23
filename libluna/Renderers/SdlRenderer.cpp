@@ -89,7 +89,7 @@ void SdlRenderer::initializeImmediateGui() {
 #ifdef LUNA_IMGUI
   IMGUI_CHECKVERSION();
   mImGuiContext = ImGui::CreateContext();
-  ImGuiIO &io = ImGui::GetIO();
+  ImGuiIO& io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
@@ -153,14 +153,14 @@ void SdlRenderer::createTexture([[maybe_unused]] int id) {
 }
 
 void SdlRenderer::destroyTexture(int id) {
-  SDL_Texture *texture = mTextureIdMapping.at(id);
+  SDL_Texture* texture = mTextureIdMapping.at(id);
   mTextureIdMapping.erase(id);
   SDL_DestroyTexture(texture);
 }
 
-void SdlRenderer::loadTexture(int id, Image *image) {
+void SdlRenderer::loadTexture(int id, Image* image) {
   if (mTextureIdMapping.count(id)) {
-    SDL_Texture *oldTexture = mTextureIdMapping.at(id);
+    SDL_Texture* oldTexture = mTextureIdMapping.at(id);
     SDL_DestroyTexture(oldTexture);
     mTextureIdMapping.erase(id);
   }
@@ -179,8 +179,8 @@ void SdlRenderer::loadTexture(int id, Image *image) {
     break;
   }
 
-  SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(
-    (void *)(image->getData()), image->getSize().width, image->getSize().height,
+  SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormatFrom(
+    (void*)(image->getData()), image->getSize().width, image->getSize().height,
     image->getBitsPerPixel(), image->getBytesPerRow(), surfaceFormat
   );
 
@@ -195,12 +195,12 @@ void SdlRenderer::resizeTexture(
   [[maybe_unused]] int id, [[maybe_unused]] Vector2i size
 ) {
   if (mTextureIdMapping.count(id)) {
-    SDL_Texture *oldTexture = mTextureIdMapping.at(id);
+    SDL_Texture* oldTexture = mTextureIdMapping.at(id);
     mTextureIdMapping.erase(id);
     SDL_DestroyTexture(oldTexture);
   }
 
-  SDL_Texture *texture = SDL_CreateTexture(
+  SDL_Texture* texture = SDL_CreateTexture(
     mRenderer.get(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET,
     size.width, size.height
   );
@@ -209,7 +209,7 @@ void SdlRenderer::resizeTexture(
 }
 
 void SdlRenderer::renderTexture(
-  [[maybe_unused]] Canvas *canvas, RenderTextureInfo *info
+  [[maybe_unused]] Canvas* canvas, RenderTextureInfo* info
 ) {
   auto texture = mTextureIdMapping.at(info->textureId);
 
@@ -233,13 +233,13 @@ void SdlRenderer::destroyShape([[maybe_unused]] int id) {
 }
 
 void SdlRenderer::loadShape(
-  [[maybe_unused]] int id, [[maybe_unused]] Shape *shape
+  [[maybe_unused]] int id, [[maybe_unused]] Shape* shape
 ) {
   mShapeIdMapping.emplace(id, shape);
 }
 
 void SdlRenderer::renderShape(
-  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderShapeInfo *info
+  [[maybe_unused]] Canvas* canvas, [[maybe_unused]] RenderShapeInfo* info
 ) {
   auto shape = mShapeIdMapping.at(info->shapeId);
 
@@ -248,7 +248,7 @@ void SdlRenderer::renderShape(
   std::vector<SDL_FPoint> points;
   points.reserve(shape->getVertices().size());
 
-  for (auto &point : shape->getVertices()) {
+  for (auto& point : shape->getVertices()) {
     points.push_back({info->position.x + point.x, info->position.y + point.y});
   }
 

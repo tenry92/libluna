@@ -29,8 +29,8 @@ namespace Luna {
     ~Sprite();
 
     ///@{
-    void setImageLoader(ImageLoader *loader);
-    ImageLoader *getImageLoader() const;
+    void setImageLoader(ImageLoader* loader);
+    ImageLoader* getImageLoader() const;
     ///@}
 
     ///@{
@@ -39,7 +39,7 @@ namespace Luna {
     ///@}
 
     private:
-    ImageLoader *mImageLoader;
+    ImageLoader* mImageLoader;
     std::shared_ptr<Resource<Palette>> mPalette;
   };
 } // namespace Luna

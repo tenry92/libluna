@@ -14,9 +14,9 @@ using namespace Luna;
 
 Matrix4x4::Matrix4x4() = default;
 
-Matrix4x4::Matrix4x4(const Matrix4x4 &other) : Matrix4x4() { *this = other; }
+Matrix4x4::Matrix4x4(const Matrix4x4& other) : Matrix4x4() { *this = other; }
 
-Matrix4x4::Matrix4x4(const std::array<std::array<float, 4>, 4> &cols)
+Matrix4x4::Matrix4x4(const std::array<std::array<float, 4>, 4>& cols)
     : Matrix4x4() {
   for (int col = 0; col < 4; ++col) {
     for (int row = 0; row < 4; ++row) {
@@ -27,17 +27,17 @@ Matrix4x4::Matrix4x4(const std::array<std::array<float, 4>, 4> &cols)
 
 Matrix4x4::~Matrix4x4() = default;
 
-bool Matrix4x4::operator==(const Matrix4x4 &other) const {
+bool Matrix4x4::operator==(const Matrix4x4& other) const {
   return mMatrix == other.mMatrix;
 }
 
-Matrix4x4 &Matrix4x4::operator=(const Matrix4x4 &other) {
+Matrix4x4& Matrix4x4::operator=(const Matrix4x4& other) {
   mMatrix = other.mMatrix;
 
   return *this;
 }
 
-Matrix4x4 Matrix4x4::operator*(const Matrix4x4 &other) const {
+Matrix4x4 Matrix4x4::operator*(const Matrix4x4& other) const {
   Matrix4x4 result;
 
   result.mMatrix = mMatrix * other.mMatrix;
@@ -45,7 +45,7 @@ Matrix4x4 Matrix4x4::operator*(const Matrix4x4 &other) const {
   return result;
 }
 
-float &Matrix4x4::at(int row, int column) {
+float& Matrix4x4::at(int row, int column) {
   return glm::value_ptr(mMatrix)[row + column * 4];
 }
 
@@ -53,7 +53,7 @@ float Matrix4x4::at(int row, int column) const {
   return glm::value_ptr(mMatrix)[row + column * 4];
 }
 
-const float *Matrix4x4::getValuePointer() const {
+const float* Matrix4x4::getValuePointer() const {
   return glm::value_ptr(mMatrix);
 }
 

@@ -12,7 +12,7 @@ namespace Luna {
 
     static Shape createCircle(float radius, int segments = 32);
 
-    std::vector<Vector2f> &getVertices();
+    std::vector<Vector2f>& getVertices();
 
     private:
     std::vector<Vector2f> mVertices;

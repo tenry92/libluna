@@ -81,7 +81,7 @@ void DebugGui::render() {
     auto canvases = app->getOpenCanvases();
     ImGui::Text("Open canvases: %lu", canvases.size());
 
-    for (auto &&canvas : canvases) {
+    for (auto&& canvas : canvases) {
       if (ImGui::BeginTabBar("CanvasTabBar")) {
         auto metrics = canvas->getMetrics();
 

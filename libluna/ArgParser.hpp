@@ -12,7 +12,7 @@ namespace Luna {
    * @todo Implement ArgParser.
    */
   class ArgParser {
-    bool parse(int argc, char **argv);
+    bool parse(int argc, char** argv);
 
     private:
     class impl;

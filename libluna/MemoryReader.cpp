@@ -7,7 +7,7 @@
 
 using namespace Luna;
 
-MemoryReader::MemoryReader(void *address, std::size_t size)
+MemoryReader::MemoryReader(void* address, std::size_t size)
     : mAddress{address}, mSize{size} {}
 
 MemoryReader::~MemoryReader() = default;
@@ -31,7 +31,7 @@ std::size_t MemoryReader::seekRelative(int relativePosition) {
 }
 
 std::size_t MemoryReader::read(
-  uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
+  uint8_t* buffer, std::size_t objectSize, std::size_t objectCount
 ) {
   auto endPos = mPos + objectSize * objectCount;
 
@@ -41,7 +41,7 @@ std::size_t MemoryReader::read(
     objectCount -= tooMuchObjects;
   }
 
-  auto sourceAddress = reinterpret_cast<char *>(mAddress) + mPos;
+  auto sourceAddress = reinterpret_cast<char*>(mAddress) + mPos;
 
   std::memcpy(buffer, sourceAddress, objectCount * objectSize);
 

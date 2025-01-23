@@ -17,9 +17,9 @@ namespace Luna {
     std::shared_ptr<Mesh> getMesh() const;
 
     void setMaterial(Material material);
-    Material &getMaterial();
+    Material& getMaterial();
 
-    Matrix4x4 &getTransform();
+    Matrix4x4& getTransform();
 
     private:
     std::shared_ptr<Mesh> mMesh;

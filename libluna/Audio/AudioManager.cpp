@@ -24,13 +24,13 @@ using namespace Luna::Audio;
 
 class DestinationAudioNode : public AudioNode {
   public:
-  DestinationAudioNode(AudioManager *manager) : AudioNode(manager) {}
-  void render(float *buffer, int frameCount) override {
+  DestinationAudioNode(AudioManager* manager) : AudioNode(manager) {}
+  void render(float* buffer, int frameCount) override {
     int sampleCount = frameCount * 2;
     std::fill(buffer, buffer + sampleCount, 0.0f);
     std::vector<float> mixBuffer(sampleCount);
 
-    for (auto &&input : mInputs) {
+    for (auto&& input : mInputs) {
       input->render(mixBuffer.data(), frameCount);
 
       std::transform(
@@ -42,14 +42,14 @@ class DestinationAudioNode : public AudioNode {
 };
 
 namespace {
-  AudioManager *gInstance{nullptr};
+  AudioManager* gInstance{nullptr};
 
   [[maybe_unused]] void
-  audioCallback(void *userData, std::uint8_t *stream, int byteCount) {
+  audioCallback(void* userData, std::uint8_t* stream, int byteCount) {
     auto metrics = &AudioManager::getInstance()->getMetrics();
 
     Logger::getInstance().setThreadIdentifier("audio");
-    auto destinationNode = reinterpret_cast<DestinationAudioNode *>(userData);
+    auto destinationNode = reinterpret_cast<DestinationAudioNode*>(userData);
     auto audioManager = AudioManager::getInstance();
 
     auto sampleCount = byteCount / sizeof(float);
@@ -61,7 +61,7 @@ namespace {
     metrics->renderTicker.tick();
 
     destinationNode->render(
-      reinterpret_cast<float *>(stream), static_cast<int>(frameCount)
+      reinterpret_cast<float*>(stream), static_cast<int>(frameCount)
     );
 
     audioManager->advanceTime(static_cast<double>(frameCount) / frameRate);
@@ -146,7 +146,7 @@ void AudioManager::free() {
 #endif
 }
 
-AudioManager *AudioManager::getInstance() { return gInstance; }
+AudioManager* AudioManager::getInstance() { return gInstance; }
 
 double AudioManager::getTime() const { return mTime; }
 
@@ -167,6 +167,6 @@ AudioManager::createOscillator(float frequency, OscillatorNode::Type type) {
   return std::make_shared<OscillatorNode>(this, frequency, type);
 }
 
-Internal::AudioMetrics &AudioManager::getMetrics() { return mMetrics; }
+Internal::AudioMetrics& AudioManager::getMetrics() { return mMetrics; }
 
 void AudioManager::advanceTime(double time) { mTime += time; }

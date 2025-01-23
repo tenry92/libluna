@@ -101,7 +101,7 @@ namespace Luna {
       return future;
     }
 
-    void set_value(const T &value) { *mValue = value; }
+    void set_value(const T& value) { *mValue = value; }
 
     private:
     std::shared_ptr<T> mValue;

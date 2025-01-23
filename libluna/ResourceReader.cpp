@@ -5,11 +5,11 @@
 
 using namespace Luna;
 
-ResourceReaderPtr ResourceReader::make(const char *name) {
+ResourceReaderPtr ResourceReader::make(const char* name) {
   return ResourceReaderPtr(new ResourceReader(name));
 }
 
-ResourceReader::ResourceReader(const char *name) {
+ResourceReader::ResourceReader(const char* name) {
   auto filePath = Application::getInstance()->getAssetsPath().cd(name);
   fileReader = Filesystem::FileReader::make(filePath);
 }
@@ -33,7 +33,7 @@ std::size_t ResourceReader::seekRelative(int relativePosition) {
 }
 
 std::size_t ResourceReader::read(
-  uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
+  uint8_t* buffer, std::size_t objectSize, std::size_t objectCount
 ) {
   return fileReader->read(buffer, objectSize, objectCount);
 }

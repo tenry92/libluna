@@ -13,12 +13,12 @@
 
 namespace Luna {
   struct SdlDeleter {
-    void operator()(SDL_Renderer *renderer) const {
+    void operator()(SDL_Renderer* renderer) const {
       logVerbose("destroying SDL renderer");
       SDL_DestroyRenderer(renderer);
     }
 
-    void operator()(SDL_Texture *texture) const {
+    void operator()(SDL_Texture* texture) const {
       logDebug("destroying SDL texture");
       SDL_DestroyTexture(texture);
     }
@@ -39,14 +39,14 @@ namespace Luna {
     void clearBackground(ColorRgb color) override;
     void createTexture(int id) override;
     void destroyTexture(int id) override;
-    void loadTexture(int id, Image *image) override;
+    void loadTexture(int id, Image* image) override;
     void resizeTexture(int id, Vector2i size) override;
-    void renderTexture(Canvas *canvas, RenderTextureInfo *info) override;
+    void renderTexture(Canvas* canvas, RenderTextureInfo* info) override;
 
     void createShape(int id) override;
     void destroyShape(int id) override;
-    void loadShape(int id, Shape *shape) override;
-    void renderShape(Canvas *canvas, RenderShapeInfo *info) override;
+    void loadShape(int id, Shape* shape) override;
+    void renderShape(Canvas* canvas, RenderShapeInfo* info) override;
 
     void setTextureFilterEnabled(int id, bool enabled) override;
     void setRenderTargetTexture(int id) override;
@@ -58,13 +58,13 @@ namespace Luna {
 
     private:
 #ifdef LUNA_IMGUI
-    ImGuiContext *mImGuiContext{nullptr};
+    ImGuiContext* mImGuiContext{nullptr};
 #endif
 
     std::unique_ptr<SDL_Renderer, SdlDeleter> mRenderer;
     std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
 
-    std::map<int, SDL_Texture *> mTextureIdMapping;
-    std::map<int, Luna::Shape *> mShapeIdMapping;
+    std::map<int, SDL_Texture*> mTextureIdMapping;
+    std::map<int, Luna::Shape*> mShapeIdMapping;
   };
 } // namespace Luna

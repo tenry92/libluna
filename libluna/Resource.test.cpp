@@ -17,14 +17,14 @@ static std::vector<int> logData;
 
 class MyResource {
   public:
-  MyResource(const Luna::String &text) {
+  MyResource(const Luna::String& text) {
     logData.push_back(ConstructingMyResource);
     mText = text;
   }
 
   ~MyResource() { logData.push_back(DeconstructingMyResource); }
 
-  const Luna::String &getText() const { return mText; }
+  const Luna::String& getText() const { return mText; }
 
   private:
   Luna::String mText;
@@ -32,7 +32,7 @@ class MyResource {
 
 class MyResourceLoader {
   public:
-  MyResourceLoader(const Luna::String &name) : mName(name) {}
+  MyResourceLoader(const Luna::String& name) : mName(name) {}
 
   shared_ptr<MyResource> operator()() {
     logData.push_back(LoadingMyResource);
@@ -43,7 +43,7 @@ class MyResourceLoader {
   const Luna::String mName;
 };
 
-int main(int, char **) {
+int main(int, char**) {
   TEST("futures", []() {
     shared_ptr<MyResource> resource1, resource2;
     auto resource = Luna::Resource<MyResource>(MyResourceLoader("test"));

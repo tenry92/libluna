@@ -3,7 +3,7 @@
 
 using namespace Luna;
 
-int main(int, char **) {
+int main(int, char**) {
   TEST("initial empty Vector2i", []() {
     Vector2i myVector;
 

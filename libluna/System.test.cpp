@@ -3,7 +3,7 @@
 
 using namespace Luna;
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   Console::init();
 
   Console::writeLine("Arguments: {}", argc);

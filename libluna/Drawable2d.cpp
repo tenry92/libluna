@@ -4,7 +4,7 @@ namespace Luna {
   Drawable2d::Drawable2d() = default;
   Drawable2d::~Drawable2d() = default;
 
-  void Drawable2d::setPosition(const Vector2f &position) {
+  void Drawable2d::setPosition(const Vector2f& position) {
     mPosition = position;
   }
 

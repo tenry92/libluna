@@ -5,7 +5,7 @@ namespace Luna {
 
   Primitive::~Primitive() = default;
 
-  void Primitive::setShape(Shape *shape) { mShape = shape; }
+  void Primitive::setShape(Shape* shape) { mShape = shape; }
 
-  Shape *Primitive::getShape() const { return mShape; }
+  Shape* Primitive::getShape() const { return mShape; }
 } // namespace Luna

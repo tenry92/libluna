@@ -6,7 +6,7 @@
 using namespace Luna;
 using namespace Luna::Audio;
 
-DelayNode::DelayNode(AudioManager *manager, float delay) : AudioNode(manager) {
+DelayNode::DelayNode(AudioManager* manager, float delay) : AudioNode(manager) {
   mDelay = delay;
   mBuffer.resize(static_cast<int>(getFrameRate() * delay) * getChannelCount());
   mBufferOffset = 0;
@@ -14,7 +14,7 @@ DelayNode::DelayNode(AudioManager *manager, float delay) : AudioNode(manager) {
 
 DelayNode::~DelayNode() = default;
 
-void DelayNode::render(float *buffer, int frameCount) {
+void DelayNode::render(float* buffer, int frameCount) {
   int sampleCount = frameCount * getChannelCount();
   int renderedSampleCount = 0;
 

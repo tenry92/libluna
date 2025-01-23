@@ -12,11 +12,11 @@ int Font::getBaseLine() const { return mBaseLine; }
 
 void Font::setBaseLine(int baseLine) { mBaseLine = baseLine; }
 
-Font::Glyph *Font::getGlyphByCodePoint(String::CodePoint codePoint) {
+Font::Glyph* Font::getGlyphByCodePoint(String::CodePoint codePoint) {
   return &mGlyphs.at(codePoint);
 }
 
-Font::Glyph *Font::makeGlyphForCodePoint(String::CodePoint codePoint) {
+Font::Glyph* Font::makeGlyphForCodePoint(String::CodePoint codePoint) {
   mGlyphs.emplace(codePoint, Font::Glyph{});
   auto glyph = getGlyphByCodePoint(codePoint);
   glyph->codePoint = codePoint;
@@ -24,6 +24,6 @@ Font::Glyph *Font::makeGlyphForCodePoint(String::CodePoint codePoint) {
   return glyph;
 }
 
-const std::map<String::CodePoint, Font::Glyph> &Font::getGlyphs() const {
+const std::map<String::CodePoint, Font::Glyph>& Font::getGlyphs() const {
   return mGlyphs;
 }

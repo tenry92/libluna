@@ -36,18 +36,18 @@ namespace Luna {
 
     class Iterator {
       public:
-      Iterator(const String &string, std::size_t index);
+      Iterator(const String& string, std::size_t index);
 
       CodePoint operator*() const;
 
-      Iterator &operator++();
+      Iterator& operator++();
       Iterator operator++(int);
 
-      bool operator==(const Iterator &other) const;
-      bool operator!=(const Iterator &other) const;
+      bool operator==(const Iterator& other) const;
+      bool operator!=(const Iterator& other) const;
 
       private:
-      const String &mString;
+      const String& mString;
       std::size_t mIndex;
     };
 
@@ -59,17 +59,17 @@ namespace Luna {
     /**
      * @brief Copy string constructor.
      */
-    String(char *other);
+    String(char* other);
 
     /**
      * @brief Copy string constructor with length in bytes.
      */
-    String(char *other, std::size_t length);
+    String(char* other, std::size_t length);
 
     /**
      * @brief Const string view constructor.
      */
-    String(const char *other);
+    String(const char* other);
 
     /**
      * @brief Const string view constructor with length in bytes.
@@ -77,41 +77,41 @@ namespace Luna {
      * If the other string does not terminate with a NULL character at the given
      * length, the data is copied.
      */
-    String(const char *other, std::size_t length);
+    String(const char* other, std::size_t length);
 
     /**
      * @brief Copy wide string constructor.
      */
-    String(const wchar_t *other);
+    String(const wchar_t* other);
 
-    String(const std::string &other);
+    String(const std::string& other);
 
-    String(const String &other);
+    String(const String& other);
 
     String(CodePoint codePoint);
 
-    String(String &&other);
+    String(String&& other);
 
     ~String();
 
-    String &operator=(char *other);
-    String &operator=(const char *other);
-    String &operator=(const String &other);
-    String &operator=(String &&other);
+    String& operator=(char* other);
+    String& operator=(const char* other);
+    String& operator=(const String& other);
+    String& operator=(String&& other);
 
-    bool operator==(const String &other) const;
+    bool operator==(const String& other) const;
 
-    inline bool operator!=(const String &other) const {
+    inline bool operator!=(const String& other) const {
       return !(*this == other);
     }
 
-    bool operator<(const String &other) const;
+    bool operator<(const String& other) const;
 
-    bool operator>(const String &other) const;
+    bool operator>(const String& other) const;
 
     String operator+(CodePoint cp) const;
 
-    String operator+(const String &other) const;
+    String operator+(const String& other) const;
 
     /**
      * @brief Get the length of the string in code points.
@@ -125,13 +125,13 @@ namespace Luna {
 
     bool isEmpty() const;
 
-    bool startsWith(const String &other) const;
+    bool startsWith(const String& other) const;
 
-    bool endsWith(const String &other) const;
+    bool endsWith(const String& other) const;
 
-    const char *c_str() const;
+    const char* c_str() const;
 
-    const utf8_int8_t *data() const;
+    const utf8_int8_t* data() const;
 
     CodePoint operator[](std::size_t index) const;
 
@@ -142,11 +142,11 @@ namespace Luna {
     OptionalIndex indexOf(CodePoint codePoint, std::size_t fromIndex = 0) const;
 
     OptionalIndex
-    indexOf(const String &string, std::size_t fromIndex = 0) const;
+    indexOf(const String& string, std::size_t fromIndex = 0) const;
 
-    String replace(const String &search, const String &replacement) const;
+    String replace(const String& search, const String& replacement) const;
 
-    String replaceAll(const String &search, const String &replacement) const;
+    String replaceAll(const String& search, const String& replacement) const;
 
     void clear();
 
@@ -173,7 +173,7 @@ namespace Luna {
     }
 
     template <typename OutputIt>
-    void split(const String &delimiter, OutputIt output) const {
+    void split(const String& delimiter, OutputIt output) const {
       if (isEmpty()) {
         return;
       }
@@ -196,7 +196,7 @@ namespace Luna {
 
     std::list<String> split(CodePoint delimiter) const;
 
-    std::list<String> split(const String &delimiter) const;
+    std::list<String> split(const String& delimiter) const;
 
     template <typename InputIt>
     static String join(InputIt begin, InputIt end, CodePoint delimiter) {
@@ -216,7 +216,7 @@ namespace Luna {
     }
 
     template <typename InputIt>
-    static String join(InputIt begin, InputIt end, const String &delimiter) {
+    static String join(InputIt begin, InputIt end, const String& delimiter) {
       String result;
 
       if (begin == end) {
@@ -245,7 +245,7 @@ namespace Luna {
      * The data is implicitly shared between instances. When an instance is
      * modified, the data is copied.
      */
-    std::variant<const char *, std::shared_ptr<StringData>> mString;
+    std::variant<const char*, std::shared_ptr<StringData>> mString;
 
     /**
      * @brief Length of the string view in bytes if referencing non-owning

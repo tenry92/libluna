@@ -7,11 +7,11 @@
 
 using namespace Luna::Filesystem;
 
-FileReaderPtr FileReader::make(const Path &filename) {
+FileReaderPtr FileReader::make(const Path& filename) {
   return FileReaderPtr(new FileReader(filename));
 }
 
-FileReader::FileReader(const Path &filename) {
+FileReader::FileReader(const Path& filename) {
   auto rawPath = filename.getRawPath();
   mStream = std::ifstream(rawPath.c_str(), std::ios::binary);
 
@@ -58,7 +58,7 @@ std::size_t FileReader::seekRelative(int position) {
 }
 
 std::size_t FileReader::read(
-  std::uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
+  std::uint8_t* buffer, std::size_t objectSize, std::size_t objectCount
 ) {
   int startPos = static_cast<int>(mStream.tellg());
 
@@ -66,7 +66,7 @@ std::size_t FileReader::read(
     objectCount = (mSize - startPos) / objectSize;
   }
 
-  mStream.read(reinterpret_cast<char *>(buffer), objectSize * objectCount);
+  mStream.read(reinterpret_cast<char*>(buffer), objectSize * objectCount);
   int endPos = static_cast<int>(mStream.tellg());
 
   if (endPos == -1) {

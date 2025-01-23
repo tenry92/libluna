@@ -6,10 +6,10 @@ Material::Material() = default;
 
 Material::~Material() = default;
 
-void Material::setDiffuse(ImageLoader *image) { mDiffuse = image; }
+void Material::setDiffuse(ImageLoader* image) { mDiffuse = image; }
 
-ImageLoader *Material::getDiffuse() const { return mDiffuse; }
+ImageLoader* Material::getDiffuse() const { return mDiffuse; }
 
-void Material::setNormal(ImageLoader *image) { mNormal = image; }
+void Material::setNormal(ImageLoader* image) { mNormal = image; }
 
-ImageLoader *Material::getNormal() const { return mNormal; }
+ImageLoader* Material::getNormal() const { return mNormal; }

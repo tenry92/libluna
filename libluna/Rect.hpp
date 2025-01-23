@@ -4,13 +4,13 @@ namespace Luna {
   template <typename T> class Rect {
     public:
     Rect();
-    Rect(const Rect<T> &other);
+    Rect(const Rect<T>& other);
     Rect(T x, T y, T width, T height);
     ~Rect();
 
-    Rect<T> &operator=(const Rect<T> &other);
-    bool operator==(const Rect<T> &other) const;
-    inline bool operator!=(const Rect<T> &other) const {
+    Rect<T>& operator=(const Rect<T>& other);
+    bool operator==(const Rect<T>& other) const;
+    inline bool operator!=(const Rect<T>& other) const {
       return !(*this == other);
     }
 

@@ -8,9 +8,9 @@ Sprite::Sprite() = default;
 
 Sprite::~Sprite() = default;
 
-void Sprite::setImageLoader(ImageLoader *loader) { mImageLoader = loader; }
+void Sprite::setImageLoader(ImageLoader* loader) { mImageLoader = loader; }
 
-ImageLoader *Sprite::getImageLoader() const { return mImageLoader; }
+ImageLoader* Sprite::getImageLoader() const { return mImageLoader; }
 
 void Sprite::setPalette(ResourcePtr<Palette> palette) { mPalette = palette; }
 

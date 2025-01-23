@@ -14,7 +14,7 @@ static std::mutex gLogMutex;
 thread_local String gThreadIdentifier;
 #endif
 
-void Logger::log(LogLevel pLevel, const String &pMessage) {
+void Logger::log(LogLevel pLevel, const String& pMessage) {
 #if !N64 && !NDS
   std::lock_guard<std::mutex> lock(gLogMutex);
 
@@ -51,14 +51,14 @@ void Logger::log(LogLevel pLevel, const String &pMessage) {
   Console::writeLine(pMessage);
 }
 
-void Logger::setThreadIdentifier([[maybe_unused]] const String &pThreadId) {
+void Logger::setThreadIdentifier([[maybe_unused]] const String& pThreadId) {
 #if !N64 && !NDS
   gThreadIdentifier = pThreadId;
 #endif
 }
 
-Logger &Logger::getInstance() {
-  static Logger *logger = new Logger();
+Logger& Logger::getInstance() {
+  static Logger* logger = new Logger();
 
   return *logger;
 }

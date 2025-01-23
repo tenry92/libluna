@@ -40,7 +40,7 @@ namespace Luna::GL {
       CHECK_GL(glDeleteVertexArrays(1, &mVertexAttribConf));
     }
 
-    SpriteBuffer(const SpriteBuffer &other) = delete;
+    SpriteBuffer(const SpriteBuffer& other) = delete;
 
     void resize(Luna::Vector2i size) {
       mSize = size;
@@ -101,8 +101,8 @@ namespace Luna::GL {
         GL_FLOAT, // vector of floats
         GL_FALSE, // don't normalize input data
         4 * sizeof(float
-            ),    // stride; offset between each vector (2 = xy, 4 = xyvu)
-        (void *)0 // offset; where data begins in the buffer
+            ),   // stride; offset between each vector (2 = xy, 4 = xyvu)
+        (void*)0 // offset; where data begins in the buffer
       ));
       CHECK_GL(glEnableVertexAttribArray(0));
 
@@ -113,7 +113,7 @@ namespace Luna::GL {
         GL_FALSE, // don't normalize input data
         4 * sizeof(float
             ), // stride; offset between each vector (2 = xy, 4 = xyvu)
-        (void *)(2 * sizeof(float)) // offset; where data begins in the buffer
+        (void*)(2 * sizeof(float)) // offset; where data begins in the buffer
       ));
       CHECK_GL(glEnableVertexAttribArray(1));
     }

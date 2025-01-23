@@ -44,7 +44,7 @@ namespace Luna {
       /**
        * @brief Check whether a is to be executed before b.
        */
-      friend bool operator<(const Interval &a, const Interval &b) {
+      friend bool operator<(const Interval& a, const Interval& b) {
         return a.nextExecution > b.nextExecution;
       }
     };

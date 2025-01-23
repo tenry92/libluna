@@ -8,28 +8,28 @@
 using namespace Luna;
 
 namespace {
-  std::forward_list<ImageLoader *> listImagesInUse(Stage *stage) {
-    std::forward_list<ImageLoader *> imageLoaders;
+  std::forward_list<ImageLoader*> listImagesInUse(Stage* stage) {
+    std::forward_list<ImageLoader*> imageLoaders;
 
-    for (auto &&drawable : stage->getDrawables2d()) {
+    for (auto&& drawable : stage->getDrawables2d()) {
       std::visit(
         overloaded{
           [](auto) {},
-          [&](const Sprite &sprite) {
+          [&](const Sprite& sprite) {
             if (sprite.getImageLoader()) {
               imageLoaders.emplace_front(sprite.getImageLoader());
             }
           },
-          [&](const Text &text) {
+          [&](const Text& text) {
             if (text.getFont()) {
-              for (auto &&[codePoint, glyph] : text.getFont()->getGlyphs()) {
+              for (auto&& [codePoint, glyph] : text.getFont()->getGlyphs()) {
                 if (glyph.imageLoader) {
                   imageLoaders.emplace_front(glyph.imageLoader);
                 }
               }
             }
           },
-          [&](const Tilemap &tilemap) {
+          [&](const Tilemap& tilemap) {
             auto tileset = tilemap.getTileset();
             if (tileset->getImage()) {
               imageLoaders.emplace_front(tileset->getImage());
@@ -40,7 +40,7 @@ namespace {
       );
     }
 
-    for (auto &&model : stage->getDrawables3d()) {
+    for (auto&& model : stage->getDrawables3d()) {
       auto diffuse = model->getMaterial().getDiffuse();
       auto normal = model->getMaterial().getNormal();
 
@@ -61,15 +61,15 @@ Stage::Stage() = default;
 
 Stage::~Stage() = default;
 
-Sprite *Stage::createSprite() {
+Sprite* Stage::createSprite() {
   auto drawable2d = mDrawables2d.acquire();
   drawable2d->emplace<Sprite>();
 
   return &std::get<Sprite>(*drawable2d);
 }
 
-void Stage::destroySprite(Sprite *sprite) {
-  for (auto &&drawable : mDrawables2d) {
+void Stage::destroySprite(Sprite* sprite) {
+  for (auto&& drawable : mDrawables2d) {
     if (std::holds_alternative<Sprite>(drawable) && &std::get<Sprite>(drawable) == sprite) {
       mDrawables2d.release(&drawable);
       break;
@@ -77,15 +77,15 @@ void Stage::destroySprite(Sprite *sprite) {
   }
 }
 
-Primitive *Stage::createPrimitive() {
+Primitive* Stage::createPrimitive() {
   auto drawable2d = mDrawables2d.acquire();
   drawable2d->emplace<Primitive>();
 
   return &std::get<Primitive>(*drawable2d);
 }
 
-void Stage::destroyPrimitive(Primitive *primitive) {
-  for (auto &&drawable : mDrawables2d) {
+void Stage::destroyPrimitive(Primitive* primitive) {
+  for (auto&& drawable : mDrawables2d) {
     if (std::holds_alternative<Primitive>(drawable) && &std::get<Primitive>(drawable) == primitive) {
       mDrawables2d.release(&drawable);
       break;
@@ -93,15 +93,15 @@ void Stage::destroyPrimitive(Primitive *primitive) {
   }
 }
 
-Text *Stage::createText() {
+Text* Stage::createText() {
   auto drawable2d = mDrawables2d.acquire();
   drawable2d->emplace<Text>();
 
   return &std::get<Text>(*drawable2d);
 }
 
-void Stage::destroyText(Text *text) {
-  for (auto &&drawable : mDrawables2d) {
+void Stage::destroyText(Text* text) {
+  for (auto&& drawable : mDrawables2d) {
     if (std::holds_alternative<Text>(drawable) && &std::get<Text>(drawable) == text) {
       mDrawables2d.release(&drawable);
       break;
@@ -109,15 +109,15 @@ void Stage::destroyText(Text *text) {
   }
 }
 
-Tilemap *Stage::createTilemap() {
+Tilemap* Stage::createTilemap() {
   auto drawable2d = mDrawables2d.acquire();
   drawable2d->emplace<Tilemap>();
 
   return &std::get<Tilemap>(*drawable2d);
 }
 
-void Stage::destroyTilemap(Tilemap *tilemap) {
-  for (auto &&drawable : mDrawables2d) {
+void Stage::destroyTilemap(Tilemap* tilemap) {
+  for (auto&& drawable : mDrawables2d) {
     if (std::holds_alternative<Tilemap>(drawable) && &std::get<Tilemap>(drawable) == tilemap) {
       mDrawables2d.release(&drawable);
       break;
@@ -125,7 +125,7 @@ void Stage::destroyTilemap(Tilemap *tilemap) {
   }
 }
 
-Model *Stage::createModel() {
+Model* Stage::createModel() {
   // todo: use smart pointers
   auto model = new Model();
   mDrawables3d.emplace_back(model);
@@ -133,12 +133,12 @@ Model *Stage::createModel() {
   return model;
 }
 
-void Stage::destroyModel(Model *model) {
+void Stage::destroyModel(Model* model) {
   mDrawables3d.remove(model);
   delete model;
 }
 
-const Pool<Stage::Drawable2dVariant, 64> &Stage::getDrawables2d() const {
+const Pool<Stage::Drawable2dVariant, 64>& Stage::getDrawables2d() const {
   return mDrawables2d;
 }
 
@@ -146,12 +146,12 @@ const std::forward_list<Stage::Drawable2dVariant>
 Stage::getSortedDrawables2d() const {
   std::forward_list<Drawable2dVariant> sortedDrawables;
 
-  for (auto &&drawable : mDrawables2d) {
+  for (auto&& drawable : mDrawables2d) {
     sortedDrawables.emplace_front(drawable);
   }
 
   sortedDrawables.sort(
-    [](const Drawable2dVariant &a, const Drawable2dVariant &b) {
+    [](const Drawable2dVariant& a, const Drawable2dVariant& b) {
       float priorityA = 0;
       float priorityB = 0;
 
@@ -186,11 +186,11 @@ Stage::getSortedDrawables2d() const {
   return sortedDrawables;
 }
 
-const std::list<Stage::Drawable3d> &Stage::getDrawables3d() const {
+const std::list<Stage::Drawable3d>& Stage::getDrawables3d() const {
   return mDrawables3d;
 }
 
-void Stage::setAmbientLight(const AmbientLight &ambientLight) {
+void Stage::setAmbientLight(const AmbientLight& ambientLight) {
   mAmbientLight = ambientLight;
 }
 
@@ -203,18 +203,18 @@ std::shared_ptr<PointLight> Stage::makePointLight() {
   return light;
 }
 
-const std::list<std::shared_ptr<PointLight>> &Stage::getPointLights() const {
+const std::list<std::shared_ptr<PointLight>>& Stage::getPointLights() const {
   return mPointLights;
 }
 
-TextureCache *Stage::getTextureCache() { return &mTextureCache; }
+TextureCache* Stage::getTextureCache() { return &mTextureCache; }
 
 void Stage::updateTextureCache() {
   auto images = listImagesInUse(this);
 
   mTextureCache.resetPriorities();
 
-  for (auto &&image : images) {
+  for (auto&& image : images) {
     mTextureCache.addImage(image, TextureCache::kForce);
   }
 }

@@ -10,14 +10,14 @@ namespace Luna {
     Material();
     ~Material();
 
-    void setDiffuse(ImageLoader *image);
-    ImageLoader *getDiffuse() const;
+    void setDiffuse(ImageLoader* image);
+    ImageLoader* getDiffuse() const;
 
-    void setNormal(ImageLoader *image);
-    ImageLoader *getNormal() const;
+    void setNormal(ImageLoader* image);
+    ImageLoader* getNormal() const;
 
     private:
-    ImageLoader *mDiffuse{nullptr};
-    ImageLoader *mNormal{nullptr};
+    ImageLoader* mDiffuse{nullptr};
+    ImageLoader* mNormal{nullptr};
   };
 } // namespace Luna

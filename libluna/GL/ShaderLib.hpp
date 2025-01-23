@@ -19,7 +19,7 @@ namespace Luna::GL {
   class ShaderLib {
     public:
     void registerShader(
-      const std::string &filename, std::unique_ptr<Luna::InputStream> source
+      const std::string& filename, std::unique_ptr<Luna::InputStream> source
     ) {
       std::vector<char> contents(source->getSize());
       source->read(contents.data(), source->getSize());
@@ -29,7 +29,7 @@ namespace Luna::GL {
     }
 
     GL::Shader
-    compileShader(const std::string &vertex, const std::string &fragment) {
+    compileShader(const std::string& vertex, const std::string& fragment) {
       auto vertexLines = getShaderLines(vertex);
       auto fragmentLines = getShaderLines(fragment);
 
@@ -44,7 +44,7 @@ namespace Luna::GL {
       return GL::Shader(vertexSource.c_str(), fragmentSource.c_str());
     }
 
-    std::list<Luna::String> getShaderLines(const std::string &filename) {
+    std::list<Luna::String> getShaderLines(const std::string& filename) {
       if (!mRegisteredShaders.count(filename)) {
         logError("unknown shader file {}", filename);
         return {};
@@ -58,7 +58,7 @@ namespace Luna::GL {
       int lineNumber = 1;
 #endif
 
-      for (auto &&line : sourceLines) {
+      for (auto&& line : sourceLines) {
 #ifdef INSERT_GLSL_LINE_STATEMENTS
         ++lineNumber;
 #endif
@@ -69,7 +69,7 @@ namespace Luna::GL {
           auto fileToInclude = line.subString(nameOffsetStart, nameOffsetEnd);
           auto includedLines = getShaderLines(fileToInclude.c_str());
 
-          for (auto &&includedLine : includedLines) {
+          for (auto&& includedLine : includedLines) {
             output.emplace_back(includedLine);
           }
 

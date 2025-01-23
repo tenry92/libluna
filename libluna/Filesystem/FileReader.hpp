@@ -21,7 +21,7 @@ namespace Luna::Filesystem {
     /**
      * @brief Create a new binary file reader for the file at the given path.
      */
-    static FileReaderPtr make(const Path &filename);
+    static FileReaderPtr make(const Path& filename);
     ~FileReader();
 
     bool isValid() const final override;
@@ -31,12 +31,12 @@ namespace Luna::Filesystem {
     std::size_t seek(std::size_t position) final override;
     std::size_t seekRelative(int relativePosition) final override;
     std::size_t read(
-      std::uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
+      std::uint8_t* buffer, std::size_t objectSize, std::size_t objectCount
     ) final override;
     using InputStream::read;
 
     private:
-    explicit FileReader(const Path &filename);
+    explicit FileReader(const Path& filename);
     Path mPath;
     std::ifstream mStream;
     std::size_t mSize;

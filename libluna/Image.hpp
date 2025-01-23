@@ -38,15 +38,15 @@ namespace Luna {
     /**
      * @brief Create an image with given bits per pixel and size.
      */
-    Image(int bitsPerPixel, const Vector2i &size);
+    Image(int bitsPerPixel, const Vector2i& size);
 
-    Image(const Image &other);
+    Image(const Image& other);
 
-    Image(Image &&other);
+    Image(Image&& other);
 
-    Image operator=(const Image &other);
+    Image operator=(const Image& other);
 
-    Image &operator=(Image &&other);
+    Image& operator=(Image&& other);
 
     ~Image();
 
@@ -61,14 +61,14 @@ namespace Luna {
     void setPalette(PalettePtr palette);
     PalettePtr getPalette() const;
 
-    const uint8_t *getData() const;
-    uint8_t *getData();
-    const ColorRgb16 *getRgb16() const;
-    ColorRgb16 *getRgb16();
-    const ColorRgb24 *getRgb24() const;
-    ColorRgb24 *getRgb24();
-    const ColorRgb32 *getRgb32() const;
-    ColorRgb32 *getRgb32();
+    const uint8_t* getData() const;
+    uint8_t* getData();
+    const ColorRgb16* getRgb16() const;
+    ColorRgb16* getRgb16();
+    const ColorRgb24* getRgb24() const;
+    ColorRgb24* getRgb24();
+    const ColorRgb32* getRgb32() const;
+    ColorRgb32* getRgb32();
 
     /**
      * @brief Convert the image to RGB16.
@@ -114,7 +114,7 @@ namespace Luna {
      *
      * The slices are from left to right, then top to bottom.
      */
-    std::vector<Image> slice(Vector2i maxSliceSize, Vector2i &sliceCount);
+    std::vector<Image> slice(Vector2i maxSliceSize, Vector2i& sliceCount);
 
     int getByteCount() const {
       return getSize().width * getSize().height * (getBitsPerPixel() / 4) / 2;
@@ -134,13 +134,13 @@ namespace Luna {
 
     void setNibbleAt(int x, int y, uint8_t value);
 
-    uint8_t &byteAt(int x, int y);
+    uint8_t& byteAt(int x, int y);
 
-    ColorRgb16 &rgb16At(int x, int y);
+    ColorRgb16& rgb16At(int x, int y);
 
-    ColorRgb24 &rgb24At(int x, int y);
+    ColorRgb24& rgb24At(int x, int y);
 
-    ColorRgb32 &rgb32At(int x, int y);
+    ColorRgb32& rgb32At(int x, int y);
 
     void setInterpolation(bool enabled);
 

@@ -5,9 +5,9 @@
 namespace Luna::Audio {
   class DelayNode : public AudioNode {
     public:
-    DelayNode(AudioManager *manager, float delay);
+    DelayNode(AudioManager* manager, float delay);
     ~DelayNode();
-    void render(float *buffer, int frameCount) override;
+    void render(float* buffer, int frameCount) override;
 
     private:
     float mDelay;

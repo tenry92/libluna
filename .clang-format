@@ -11,4 +11,5 @@ IncludeCategories:
 NamespaceIndentation: All
 ReflowComments:  false
 ContinuationIndentWidth: 2
+PointerAlignment: Left
 ...

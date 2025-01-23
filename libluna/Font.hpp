@@ -16,7 +16,7 @@ namespace Luna {
     public:
     struct Glyph {
       String::CodePoint codePoint;
-      ImageLoader *imageLoader;
+      ImageLoader* imageLoader;
       Recti crop;
       Vector2i offset;
       int advance;
@@ -30,11 +30,11 @@ namespace Luna {
 
     void setBaseLine(int baseLine);
 
-    Glyph *getGlyphByCodePoint(String::CodePoint codePoint);
+    Glyph* getGlyphByCodePoint(String::CodePoint codePoint);
 
-    Glyph *makeGlyphForCodePoint(String::CodePoint codePoint);
+    Glyph* makeGlyphForCodePoint(String::CodePoint codePoint);
 
-    const std::map<String::CodePoint, Glyph> &getGlyphs() const;
+    const std::map<String::CodePoint, Glyph>& getGlyphs() const;
 
     private:
     int mLineHeight;

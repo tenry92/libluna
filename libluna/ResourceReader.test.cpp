@@ -13,14 +13,14 @@ using namespace Luna;
 using namespace Luna::Filesystem;
 
 #ifdef __SWITCH__
-static const char *assetsPath = "romfs:/assets";
+static const char* assetsPath = "romfs:/assets";
 #elif defined(N64)
-static const char *assetsPath = "rom:/assets";
+static const char* assetsPath = "rom:/assets";
 #else
-static const char *assetsPath = "tests/assets";
+static const char* assetsPath = "tests/assets";
 #endif
 
-int main(int, char **) {
+int main(int, char**) {
   TEST("read full text file", []() {
     Application app(0, nullptr);
     app.setAssetsPath(assetsPath);
@@ -29,7 +29,7 @@ int main(int, char **) {
     dfs_init(DFS_DEFAULT_LOCATION);
 #endif
 
-    const char *filename = "test.txt";
+    const char* filename = "test.txt";
     auto resourceReader = ResourceReader::make(filename);
 
     ASSERT_EQL(resourceReader->getSize(), 36, "getSize()");
@@ -39,7 +39,7 @@ int main(int, char **) {
       buffer.data(), sizeof(std::uint8_t), resourceReader->getSize()
     );
     std::string contents(
-      reinterpret_cast<const char *>(buffer.data()), buffer.size()
+      reinterpret_cast<const char*>(buffer.data()), buffer.size()
     );
     ASSERT_EQL(
       contents, "This text is read from a text file.\n", "file contents"

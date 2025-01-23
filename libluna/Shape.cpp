@@ -23,5 +23,5 @@ namespace Luna {
     return shape;
   }
 
-  std::vector<Vector2f> &Shape::getVertices() { return mVertices; }
+  std::vector<Vector2f>& Shape::getVertices() { return mVertices; }
 } // namespace Luna

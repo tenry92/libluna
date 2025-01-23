@@ -13,16 +13,16 @@
 
 using namespace Luna;
 
-void ImmediateGui::init(Canvas *canvas) { mCanvas = canvas; }
+void ImmediateGui::init(Canvas* canvas) { mCanvas = canvas; }
 
 void ImmediateGui::newFrame() {
   // stub
 }
 
-void ImmediateGui::render(ImmediateGui *gui) { gui->render(); }
+void ImmediateGui::render(ImmediateGui* gui) { gui->render(); }
 
 #ifdef LUNA_WINDOW_SDL2
-bool ImmediateGui::processSdlEvent([[maybe_unused]] const SDL_Event *event) {
+bool ImmediateGui::processSdlEvent([[maybe_unused]] const SDL_Event* event) {
 #ifdef LUNA_IMGUI
   return ImGui_ImplSDL2_ProcessEvent(event);
 #else

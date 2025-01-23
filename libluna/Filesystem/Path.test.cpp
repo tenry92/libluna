@@ -3,7 +3,7 @@
 
 using namespace Luna::Filesystem;
 
-int main(int, char **) {
+int main(int, char**) {
   TEST("basic raw paths", []() {
     Path usrPath("/usr");
     ASSERT_EQL(usrPath.getRawPath().s_str(), "/usr", "");

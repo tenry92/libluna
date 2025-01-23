@@ -4,7 +4,7 @@
 using namespace std;
 using namespace Luna;
 
-int main(int, char **) {
+int main(int, char**) {
   TEST("empty image", []() {
     auto image = Image();
     ASSERT(image.getSize().width == 0, "getWidth() == 0");

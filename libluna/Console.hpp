@@ -55,20 +55,20 @@ namespace Luna {
     /**
      * @brief Write a string to the standard output.
      */
-    void write(const String &message);
+    void write(const String& message);
 
     /**
      * @brief Write a string with a newline to the standard output.
      */
-    void writeLine(const String &message);
+    void writeLine(const String& message);
 
     template <typename... ArgTypes>
-    void write(const String &message, ArgTypes... args) {
+    void write(const String& message, ArgTypes... args) {
       write(fmt::format(message.c_str(), args...));
     }
 
     template <typename... ArgTypes>
-    void writeLine(const String &message, ArgTypes... args) {
+    void writeLine(const String& message, ArgTypes... args) {
       writeLine(fmt::format(message.c_str(), args...));
     }
 
