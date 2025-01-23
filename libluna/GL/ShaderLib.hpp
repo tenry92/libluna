@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include <fmt/format.h>
+
 #include <libluna/GL/Shader.hpp>
 #include <libluna/InputStream.hpp>
 #include <libluna/Logger.hpp>
@@ -35,9 +37,9 @@ namespace Luna::GL {
       fragmentLines.emplace_front("#version 330 core");
 
       auto vertexSource =
-          Luna::String::join("\n", vertexLines.begin(), vertexLines.end());
+          Luna::String::join(vertexLines.begin(), vertexLines.end(), '\n');
       auto fragmentSource =
-          Luna::String::join("\n", fragmentLines.begin(), fragmentLines.end());
+          Luna::String::join(fragmentLines.begin(), fragmentLines.end(), '\n');
 
       return GL::Shader(vertexSource.c_str(), fragmentSource.c_str());
     }
@@ -52,7 +54,7 @@ namespace Luna::GL {
 
       std::list<Luna::String> output;
 #ifdef INSERT_GLSL_LINE_STATEMENTS
-      output.emplace_back(Luna::String("#line 1 \"{}\"").format(filename));
+      output.emplace_back(fmt::format("#line 1 \"{}\"", filename));
       int lineNumber = 1;
 #endif
 
@@ -65,7 +67,7 @@ namespace Luna::GL {
           auto nameOffsetStart = line.indexOf('"').value() + 1;
           auto nameOffsetEnd = line.indexOf('"', nameOffsetStart).value();
           auto fileToInclude = line.subString(nameOffsetStart, nameOffsetEnd);
-          auto includedLines = getShaderLines(fileToInclude.s_str());
+          auto includedLines = getShaderLines(fileToInclude.c_str());
 
           for (auto &&includedLine : includedLines) {
             output.emplace_back(includedLine);
@@ -73,7 +75,7 @@ namespace Luna::GL {
 
 #ifdef INSERT_GLSL_LINE_STATEMENTS
           output.emplace_back(
-              Luna::String("#line {} \"{}\"").format(lineNumber, filename)
+              fmt::format("#line {} \"{}\"", lineNumber, filename)
           );
 #endif
         } else {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fmt/format.h>
+
 #include <libluna/String.hpp>
 
 namespace Luna {
@@ -62,12 +64,12 @@ namespace Luna {
 
     template <typename... ArgTypes>
     void write(const String &message, ArgTypes... args) {
-      write(message.format(args...));
+      write(fmt::format(message.c_str(), args...));
     }
 
     template <typename... ArgTypes>
     void writeLine(const String &message, ArgTypes... args) {
-      writeLine(message.format(args...));
+      writeLine(fmt::format(message.c_str(), args...));
     }
 
     /**

@@ -107,3 +107,7 @@ if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
 endif()
 
 add_subdirectory(libs/libgfx)
+
+set(FMT_OS OFF)
+add_subdirectory(libs/fmt-11.1.2)
+target_link_libraries(luna PUBLIC fmt::fmt)

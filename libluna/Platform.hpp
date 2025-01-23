@@ -110,7 +110,7 @@ namespace Luna {
 
     static std::vector<String> getCompilerInfo();
 
-    static inline String getSystemName() {
+    static inline const char *getSystemName() {
       if (Platform::isLinux()) {
         return "Linux";
       } else if (Platform::isWindows()) {

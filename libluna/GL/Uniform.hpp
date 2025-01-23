@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <glad/glad.h>
+#include <fmt/format.h>
 
 #include <libluna/Color.hpp>
 #include <libluna/Logger.hpp>
@@ -21,7 +22,7 @@ namespace Luna::GL {
       mLocation = glGetUniformLocation(program, name.c_str());
 
       if (mLocation == -1) {
-        Luna::logWarn("unknown uniform \"{}\"", name);
+        Luna::logWarn("unknown uniform \"{}\"", name.c_str());
       }
     }
 
@@ -29,7 +30,7 @@ namespace Luna::GL {
       mArray.reserve(count);
 
       for (int i = 0; i < count; ++i) {
-        mArray.emplace_back(Uniform(program, name.format(i).c_str()));
+        mArray.emplace_back(Uniform(program, fmt::format(name.c_str(), i).c_str()));
       }
     }
 

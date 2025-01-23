@@ -70,6 +70,7 @@ set(PUBLIC_MODULES
   Camera3d
   Canvas
   Console
+  Drawable2d
   Filesystem/FileReader
   Filesystem/Path
   Font

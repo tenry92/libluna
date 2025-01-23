@@ -125,7 +125,7 @@ unsigned long System::getUsedHeapSize() {
 
 std::list<String> System::getAssetFiles() {
   auto assetsPath =
-      Application::getInstance()->getAssetsPath().getRawPath().s_str();
+      Application::getInstance()->getAssetsPath().getRawPath();
   std::list<String> list;
 
 #ifdef N64
@@ -137,8 +137,8 @@ std::list<String> System::getAssetFiles() {
     result = dir_findnext(assetsPath.c_str(), &dir);
   }
 #else
-  if (fs::exists(assetsPath) && fs::is_directory(assetsPath)) {
-    for (const auto &entry : fs::recursive_directory_iterator(assetsPath)) {
+  if (fs::exists(assetsPath.c_str()) && fs::is_directory(assetsPath.c_str())) {
+    for (const auto &entry : fs::recursive_directory_iterator(assetsPath.c_str())) {
       list.emplace_back(entry.path().c_str());
     }
   }

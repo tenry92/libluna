@@ -78,7 +78,7 @@ void Console::write(const String &message) {
 #ifdef N64
   printf("%s", message.c_str());
 #else
-  std::cout << message.s_str();
+  std::cout << message.c_str();
 #endif
 }
 
@@ -86,7 +86,7 @@ void Console::writeLine(const String &message) {
 #ifdef N64
   printf("%s\n", message.c_str());
 #else
-  std::cout << message.s_str() << std::endl;
+  std::cout << message.c_str() << std::endl;
 #endif
 }
 

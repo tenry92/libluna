@@ -19,506 +19,600 @@
 #pragma GCC diagnostic pop
 #endif
 
-using namespace Luna;
-using Luna::String;
-
-String::Iterator::Iterator(const void *data) : mData(data) {}
-
-String::Iterator &String::Iterator::operator++() {
-  CodePoint codePoint;
-  mData =
-      utf8codepoint(reinterpret_cast<const utf8_int8_t *>(mData), &codePoint);
-
-  return *this;
+namespace {
+  const char nullString[] = "";
 }
 
-String::Iterator String::Iterator::operator++(int) {
-  auto retval = *this;
+namespace Luna {
+  String::Iterator::Iterator(const String &string, std::size_t index)
+    : mString(string), mIndex(index) {}
 
-  CodePoint codePoint;
-  mData =
-      utf8codepoint(reinterpret_cast<const utf8_int8_t *>(mData), &codePoint);
+  String::CodePoint String::Iterator::operator*() const {
+    return mString[mIndex];
+  }
 
-  return retval;
-}
+  String::Iterator &String::Iterator::operator++() {
+    ++mIndex;
+    return *this;
+  }
 
-bool String::Iterator::operator==(Iterator other) const {
-  return mData == other.mData;
-}
+  String::Iterator String::Iterator::operator++(int) {
+    Iterator copy = *this;
+    ++mIndex;
+    return copy;
+  }
 
-bool String::Iterator::operator!=(Iterator other) const {
-  return mData != other.mData;
-}
+  bool String::Iterator::operator==(const Iterator &other) const {
+    return mIndex == other.mIndex;
+  }
 
-String::Iterator::reference String::Iterator::operator*() const {
-  CodePoint codePoint;
-  utf8codepoint(reinterpret_cast<const utf8_int8_t *>(mData), &codePoint);
+  bool String::Iterator::operator!=(const Iterator &other) const {
+    return mIndex != other.mIndex;
+  }
 
-  return codePoint;
-}
+  String::String() {
+    clear();
+  }
 
-String::FormatOptions String::parseFormatOptions(const String &specifier
-) const {
-  FormatOptions options;
-  options.base = 10;
-  options.uppercase = false;
-  options.pad = 0;
-  options.precision = 6;
-
-  auto periodOffset = specifier.indexOf('.');
-
-  if (periodOffset.has_value()) {
-    auto padSpec = specifier.subString(0, periodOffset.value());
-    auto precSpec = specifier.subString(periodOffset.value() + 1);
-
-    if (padSpec.getLength() > 0) {
-      options.pad = std::stoi(padSpec.s_str());
+  String::String(char *other) : String() {
+    if (other == nullptr) {
+      return;
     }
 
-    if (precSpec.getLength() > 0) {
-      options.precision = std::stoi(precSpec.s_str());
+    auto length = std::strlen(other);
+
+    if (length == 0) {
+      return;
     }
+
+    auto stringData = std::make_shared<StringData>();
+    stringData->resize(length + 1);
+    std::memcpy(stringData->data(), other, length);
+    stringData->data()[length] = '\0';
+
+    mString = stringData;
   }
 
-  if (specifier.endsWith("x")) {
-    options.base = 16;
-    options.uppercase = false;
-  } else if (specifier.endsWith("X")) {
-    options.base = 16;
-    options.uppercase = true;
+  String::String(char *other, std::size_t length) : String() {
+    if (other == nullptr || length == 0) {
+      return;
+    }
+
+    auto stringData = std::make_shared<StringData>();
+    stringData->resize(length + 1);
+    std::memcpy(stringData->data(), other, length);
+    stringData->data()[length] = '\0';
+
+    mString = stringData;
   }
 
-  return options;
-}
+  String::String(const char *other) : String() {
+    if (other == nullptr) {
+      return;
+    }
 
-String::String() {
-  mData.resize(1);
-  mData[0] = 0;
-}
+    auto length = std::strlen(other);
 
-String::String(const char *string) {
-  if (string == nullptr) {
-    mData.resize(1);
-    mData[0] = 0;
-    return;
+    if (length == 0) {
+      return;
+    }
+
+    if (other[length] != '\0') {
+      auto stringData = std::make_shared<StringData>();
+      stringData->resize(length + 1);
+      std::memcpy(stringData->data(), other, length);
+      stringData->data()[length] = '\0';
+
+      mString = stringData;
+
+      return;
+    }
+
+    mString = other;
+    mStringViewByteLength = length;
   }
 
-  auto length = strlen(string);
+  String::String(const char *other, std::size_t length) : String() {
+    if (other == nullptr || length == 0) {
+      return;
+    }
 
-  if (length > 0) {
-    mData.resize(length + 1);
-    std::memcpy(mData.data(), string, length + 1);
-  } else {
-    mData.resize(1);
-    mData[0] = 0;
-  }
-}
+    if (other[length] != '\0') {
+      auto stringData = std::make_shared<StringData>();
+      stringData->resize(length + 1);
+      std::memcpy(stringData->data(), other, length);
+      stringData->data()[length] = '\0';
 
-String::String(const char *string, std::size_t size) {
-  if (string == nullptr || size == 0) {
-    return;
-  }
+      mString = stringData;
 
-  auto length = size;
+      return;
+    }
 
-  if (length > 0) {
-    mData.resize(size + 1);
-    std::memcpy(mData.data(), string, length);
-    mData[size] = 0;
-  }
-}
-
-String::String(const wchar_t *string) {
-  if (string == nullptr) {
-    return;
+    mString = other;
+    mStringViewByteLength = length;
   }
 
-  auto length = wcslen(string); // number of characters, not bytes!
+  String::String(const wchar_t *other) : String() {
+    if (other == nullptr) {
+      return;
+    }
 
-  if (length > 0) {
-    mData.resize(length * sizeof(wchar_t) + 1);
-    mData[0] = 0;
-    auto ptr = mData.data();
+    auto length = std::wcslen(other); // number of characters, not bytes!
+
+    if (length == 0) {
+      return;
+    }
+
+    auto stringData = std::make_shared<StringData>();
+    stringData->resize(length * sizeof(wchar_t) + 1);
+    stringData->at(0) = '\0';
+
+    auto ptr = stringData->data();
 
     for (std::size_t i = 0; i < length; ++i) {
-      auto available =
-          getByteLength() - static_cast<std::size_t>(ptr - mData.data());
-      ptr = reinterpret_cast<utf8_int8_t *>(
-          utf8catcodepoint(ptr, string[i], available)
-      );
+      auto available = stringData->size() - 1 - static_cast<std::size_t>(ptr - data());
+      ptr = reinterpret_cast<utf8_int8_t *>(utf8catcodepoint(ptr, other[i], available));
     }
 
-    mData.resize(utf8size(mData.data()));
-  }
-}
+    *ptr = '\0';
 
-String::String(const std::string &string) {
-  if (string.size() > 0) {
-    mData.resize(string.size() + 1);
-    std::memcpy(mData.data(), string.data(), string.size());
-    mData[string.size()] = 0;
-  } else {
-    mData.resize(1);
-    mData[0] = 0;
-  }
-}
-
-String::String(const String &string) : String::String(string.mData.data()) {}
-
-String::String(String &&string) { *this = std::move(string); }
-
-String::~String() {}
-
-String String::operator=(const String &other) {
-  mData = other.mData;
-
-  return *this;
-}
-
-String String::operator=(String &&other) {
-  mData = std::move(other.mData);
-  other.mData.resize(1);
-  other.mData[0] = 0;
-
-  return *this;
-}
-
-String String::operator+(const String &other) const {
-  if (mData.empty()) {
-    return String(other);
-  } else if (other.mData.empty()) {
-    return String(*this);
+    mString = stringData;
   }
 
-  auto length1 = strlen(mData.data());
-  auto length2 = strlen(other.mData.data());
-  std::vector<char> buffer(length1 + length2 + 1);
-  std::memcpy(buffer.data(), mData.data(), length1 + 1);
-  utf8cat(buffer.data(), other.mData.data());
+  String::String(const std::string &other) : String() {
+    if (other.empty()) {
+      return;
+    }
 
-  return String(buffer.data());
-}
+    auto stringData = std::make_shared<StringData>();
+    stringData->resize(other.size() + 1);
+    std::memcpy(stringData->data(), other.data(), other.size());
+    stringData->data()[other.size()] = '\0';
 
-String String::operator+(String::CodePoint cp) const {
-  std::vector<char> buffer(getByteLength() + 4);
-  std::memcpy(buffer.data(), mData.data(), getByteLength());
-  utf8catcodepoint(buffer.data() + getByteLength() - 1, cp, 5);
-  buffer[buffer.size() - 1] = 0;
-
-  return String(buffer.data());
-}
-
-bool String::operator==(const String &other) const {
-  if (getLength() == 0 && other.getLength() == 0) {
-    return true;
+    mString = stringData;
   }
 
-  if (getLength() == 0 || other.getLength() == 0) {
-    return false;
+  String::String(const String &other) = default;
+
+  String::String(CodePoint codePoint) : String() {
+    if (codePoint == 0) {
+      return;
+    }
+
+    auto stringData = std::make_shared<StringData>();
+    stringData->resize(5);
+    stringData->data()[0] = '\0';
+    auto end = utf8catcodepoint(stringData->data(), codePoint, 5);
+    *end = '\0';
+
+    stringData->resize(end - stringData->data() + 1);
+
+    mString = stringData;
   }
 
-  return utf8cmp(mData.data(), other.mData.data()) == 0;
-}
+  String::String(String &&other) {
+    mString = other.mString;
+    mStringViewByteLength = other.mStringViewByteLength;
 
-bool String::operator<(const String &other) const {
-  return utf8cmp(mData.data(), other.mData.data()) < 0;
-}
-
-bool String::operator>(const String &other) const {
-  return utf8cmp(mData.data(), other.mData.data()) > 0;
-}
-
-String::CodePoint String::operator[](std::size_t index) const {
-  if (mData.empty()) {
-    // should not be possible since it shall always contain a null terminator
-    return 0;
+    other.mString = nullString;
+    other.mStringViewByteLength = 0;
   }
 
-  CodePoint codePoint = 0;
-  auto ptr = mData.data();
+  String::~String() = default;
 
-  for (std::size_t offset = 0; offset <= index; ++offset) {
-    ptr = utf8codepoint(ptr, &codePoint);
-  }
+  String &String::operator=(char *other) {
+    clear();
 
-  return codePoint;
-}
+    if (other == nullptr) {
+      return *this;
+    }
 
-std::size_t String::getLength() const {
-  if (mData.empty()) {
-    return 0;
-  }
+    auto length = std::strlen(other);
 
-  return utf8nlen(mData.data(), mData.size());
-}
+    if (length == 0) {
+      return *this;
+    }
 
-std::size_t String::getByteLength() const { return mData.size(); }
+    auto stringData = std::make_shared<StringData>();
+    stringData->resize(length + 1);
+    std::memcpy(stringData->data(), other, length);
+    stringData->data()[length] = '\0';
 
-bool String::isEmpty() const {
-  return mData.empty() || utf8len(mData.data()) == 0;
-}
+    mString = stringData;
 
-String String::subString(std::size_t start) const {
-  auto ptr = mData.data();
-  CodePoint codePoint;
-
-  if (start >= getLength()) {
-    return String();
-  }
-
-  for (std::size_t i = 0; i < start; ++i) {
-    ptr = utf8codepoint(ptr, &codePoint);
-  }
-
-  return String(reinterpret_cast<const char *>(ptr));
-}
-
-String String::subString(std::size_t start, std::size_t end) const {
-  auto ptr = mData.data();
-  CodePoint codePoint;
-
-  if (start > getLength()) {
-    start = getLength();
-  }
-
-  if (end > getLength()) {
-    end = getLength();
-  } else if (end < start) {
-    end = start;
-  }
-
-  std::size_t length = end - start;
-
-  for (std::size_t i = 0; i < start; ++i) {
-    ptr = utf8codepoint(ptr, &codePoint);
-  }
-
-  auto endPtr = ptr;
-
-  for (std::size_t i = 0; i < length; ++i) {
-    endPtr = utf8codepoint(endPtr, &codePoint);
-  }
-
-  std::size_t lengthBytes = static_cast<std::size_t>(
-      reinterpret_cast<const char *>(endPtr) -
-      reinterpret_cast<const char *>(ptr)
-  );
-
-  return String(reinterpret_cast<const char *>(ptr), lengthBytes);
-}
-
-String String::replace(const String &search, const String &replacement) const {
-  auto offset = indexOf(search);
-
-  if (!offset.has_value()) {
     return *this;
   }
 
-  return subString(0, offset.value()) + replacement +
-         subString(offset.value() + search.getLength());
-}
+  String &String::operator=(const char *other) {
+    clear();
 
-String
-String::replaceAll(const String &search, const String &replacement) const {
-  String output;
-  auto offset = indexOf(search);
-  std::size_t lastOffset = 0;
-
-  while (offset.has_value()) {
-    output = output + subString(lastOffset, offset.value()) + replacement;
-    lastOffset = offset.value() + search.getLength();
-    offset = indexOf(search, lastOffset);
-  }
-
-  output = output + subString(lastOffset);
-
-  return output;
-}
-
-std::optional<std::size_t>
-String::indexOf(CodePoint codePoint, std::size_t fromIndex) const {
-  if (mData.empty()) {
-    return std::optional<std::size_t>();
-  }
-
-  if (fromIndex > 0) {
-    auto result = subString(fromIndex).indexOf(codePoint);
-
-    if (result.has_value()) {
-      return result.value() + fromIndex;
+    if (other == nullptr) {
+      return *this;
     }
+
+    auto length = std::strlen(other);
+
+    if (length == 0) {
+      return *this;
+    }
+
+    if (other[length] != '\0') {
+      auto stringData = std::make_shared<StringData>();
+      stringData->resize(length + 1);
+      std::memcpy(stringData->data(), other, length);
+      stringData->data()[length] = '\0';
+
+      mString = stringData;
+
+      return *this;
+    }
+
+    mString = other;
+    mStringViewByteLength = length;
+
+    return *this;
+  }
+
+  String &String::operator=(const String &other) {
+    mString = other.mString;
+    mStringViewByteLength = other.mStringViewByteLength;
+
+    return *this;
+  }
+
+  String &String::operator=(String &&other) {
+    mString = other.mString;
+    mStringViewByteLength = other.mStringViewByteLength;
+
+    if (std::holds_alternative<const char *>(other.mString)) {
+      other.mString = nullString;
+      other.mStringViewByteLength = 0;
+    } else {
+      other.mString = std::shared_ptr<StringData>();
+    }
+
+    return *this;
+  }
+
+  bool String::operator==(const String &other) const {
+    if (getLength() == 0 && other.getLength() == 0) {
+      return true;
+    }
+
+    if (getLength() != other.getLength()) {
+      return false;
+    }
+
+    if (std::holds_alternative<const char *>(mString)) {
+      auto stringView = std::get<const char *>(mString);
+
+      if (std::holds_alternative<const char *>(other.mString)) {
+        // we can quit early if the pointers are equal
+        auto otherStringView = std::get<const char *>(other.mString);
+
+        if (stringView == otherStringView) {
+          return true;
+        }
+      }
+    } else {
+      auto stringData = std::get<std::shared_ptr<StringData>>(mString);
+
+      if (std::holds_alternative<std::shared_ptr<StringData>>(other.mString)) {
+        // wen can quit early if the pointers are equal
+        auto otherStringData = std::get<std::shared_ptr<StringData>>(other.mString);
+
+        if (stringData == otherStringData) {
+          return true;
+        }
+      }
+    }
+
+    // in all other cases, we need to compare the actual data
+    return utf8cmp(data(), other.data()) == 0;
+  }
+
+  bool String::operator<(const String &other) const {
+    return utf8cmp(data(), other.data()) < 0;
+  }
+
+  bool String::operator>(const String &other) const {
+    return utf8cmp(data(), other.data()) > 0;
+  }
+
+  String String::operator+(CodePoint cp) const {
+    if (cp == 0) {
+      return *this;
+    }
+
+    if (getLength() == 0) {
+      return String(cp);
+    }
+
+    String result;
+
+    auto stringData = std::make_shared<StringData>();
+    stringData->resize(getByteLength() + 5);
+    std::memcpy(stringData->data(), data(), getByteLength() + 1);
+
+    auto end = utf8catcodepoint(stringData->data() + getByteLength(), cp, 5);
+    *end = '\0';
+
+    stringData->resize(end - stringData->data() + 1);
+
+    result.mString = stringData;
 
     return result;
   }
 
-  auto ptr = utf8chr(mData.data(), codePoint);
-
-  if (ptr == nullptr) {
-    return std::optional<std::size_t>();
-  }
-
-  size_t index = 0;
-  auto subPtr = mData.data();
-
-  while (subPtr < ptr) {
-    ++subPtr;
-    ++index;
-  }
-
-  return index;
-}
-
-std::optional<std::size_t>
-String::indexOf(const String &string, std::size_t fromIndex) const {
-  if (mData.empty() || string.mData.empty()) {
-    return std::optional<std::size_t>();
-  }
-
-  if (fromIndex > 0) {
-    auto result = subString(fromIndex).indexOf(string);
-
-    if (result.has_value()) {
-      return result.value() + fromIndex;
+  String String::operator+(const String &other) const {
+    if (other.getLength() == 0) {
+      return *this;
     }
+
+    if (getLength() == 0) {
+      return other;
+    }
+
+    String result;
+
+    auto stringData = std::make_shared<StringData>();
+    stringData->resize(getByteLength() + other.getByteLength() + 1);
+    std::memcpy(stringData->data(), data(), getByteLength());
+
+    std::memcpy(stringData->data() + getByteLength(), other.data(), other.getByteLength());
+    stringData->data()[stringData->size() - 1] = '\0';
+
+    result.mString = stringData;
 
     return result;
   }
 
-  auto ptr = utf8str(mData.data(), string.mData.data());
-
-  if (ptr == nullptr) {
-    return std::optional<std::size_t>();
+  std::size_t String::getLength() const {
+    return utf8nlen(data(), getByteLength());
   }
 
-  size_t index = 0;
-  auto subPtr = mData.data();
+  std::size_t String::getByteLength() const {
+    if (std::holds_alternative<const char *>(mString)) {
+      return mStringViewByteLength;
+    }
 
-  while (subPtr < ptr) {
-    ++subPtr;
-    ++index;
+    if (std::holds_alternative<std::shared_ptr<StringData>>(mString)) {
+      return std::get<std::shared_ptr<StringData>>(mString)->size() - 1;
+    }
+
+    return 0;
   }
 
-  return index;
-}
-
-String String::repeat(std::size_t count) const {
-  if (mData.empty() || count == 0) {
-    return String();
+  bool String::isEmpty() const {
+    return getLength() == 0;
   }
 
-  auto rawLength = utf8size(mData.data()) - 1;
-  auto totalLength = rawLength * count;
-  std::vector<char> buffer(totalLength + 1);
+  bool String::startsWith(const String &other) const {
+    if (other.isEmpty()) {
+      return true;
+    }
 
-  for (std::size_t i = 0; i < count; ++i) {
-    auto offset = i * rawLength;
-    std::memcpy(&buffer.data()[offset], mData.data(), rawLength);
+    if (getLength() < other.getLength()) {
+      return false;
+    }
+
+    return utf8ncmp(data(), other.data(), other.getByteLength()) == 0;
   }
 
-  buffer.data()[totalLength] = 0;
+  bool String::endsWith(const String &other) const {
+    if (other.isEmpty()) {
+      return true;
+    }
 
-  return String(buffer.data());
-}
+    if (getLength() < other.getLength()) {
+      return false;
+    }
 
-String String::toLowerCase() const {
-  String output(mData.data());
-  utf8lwr(output.mData.data());
-
-  return output;
-}
-
-String String::toUpperCase() const {
-  String output(mData.data());
-  utf8upr(output.mData.data());
-
-  return output;
-}
-
-String String::padStart(std::size_t targetLength, const String &string) const {
-  auto padLength = targetLength - getLength();
-
-  if (padLength <= 0 || string.isEmpty()) {
-    return *this;
+    return utf8ncmp(data() + getByteLength() - other.getByteLength(), other.data(), other.getByteLength()) == 0;
   }
 
-  /// @todo Can we do this without using floats?
-  auto padRepeat = static_cast<size_t>(std::ceil(
-      static_cast<float>(padLength) / static_cast<float>(string.getLength())
-  ));
+  const char *String::c_str() const {
+    if (std::holds_alternative<const char *>(mString)) {
+      return std::get<const char *>(mString);
+    }
 
-  auto padString = string.repeat(padRepeat);
-
-  return padString.subString(0, padLength) + *this;
-}
-
-String String::padEnd(std::size_t targetLength, const String &string) const {
-  auto padLength = targetLength - getLength();
-
-  if (padLength <= 0 || string.isEmpty()) {
-    return *this;
+    return reinterpret_cast<const char *>(std::get<std::shared_ptr<StringData>>(mString)->data());
   }
 
-  /// @todo Can we do this without using floats?
-  auto padRepeat = static_cast<size_t>(std::ceil(
-      static_cast<float>(padLength) / static_cast<float>(string.getLength())
-  ));
-
-  auto padString = string.repeat(padRepeat);
-
-  return (*this) + padString.subString(0, padLength);
-}
-
-bool String::startsWith(const String &other) const {
-  return subString(0, other.getLength()) == other;
-}
-
-bool String::endsWith(const String &other) const {
-  return subString(getLength() - other.getLength(), getLength()) == other;
-}
-
-const char *String::c_str() const { return mData.data(); }
-
-std::string String::s_str() const {
-  return std::string(c_str(), getByteLength() - 1);
-}
-
-std::wstring String::w_str() const {
-#ifdef _WIN32
-  std::wstring output;
-  int convertResult = MultiByteToWideChar(CP_UTF8, 0, c_str(), -1, nullptr, 0);
-
-  if (convertResult <= 0) {
-    throw new std::runtime_error("unable to convert to wide string");
+  const utf8_int8_t *String::data() const {
+    return reinterpret_cast<const utf8_int8_t *>(c_str());
   }
 
-  output.resize(convertResult + 10);
-  convertResult = MultiByteToWideChar(
-      CP_UTF8, 0, c_str(), -1, &output[0], static_cast<int>(output.size())
-  );
-  return output;
-#else
-  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+  String::CodePoint String::operator[](std::size_t index) const {
+    auto ptr = data();
 
-  return converter.from_bytes(s_str());
-#endif
-}
+    CodePoint codePoint = 0;
 
-String::Iterator String::begin() { return Iterator(mData.data()); }
+    for (std::size_t offset = 0; offset <= index; ++offset) {
+      ptr = utf8codepoint(ptr, &codePoint);
+    }
 
-String::Iterator String::end() {
-  return Iterator(
-      reinterpret_cast<void *>(mData.data() + utf8size(mData.data()) - 1)
-  );
-}
+    return codePoint;
+  }
 
-String::Iterator String::cbegin() const { return Iterator(mData.data()); }
+  String String::subString(std::size_t start) const {
+    if (start >= getLength()) {
+      return String();
+    }
 
-String::Iterator String::cend() const {
-  return Iterator(
-      reinterpret_cast<const void *>(mData.data() + utf8size(mData.data()) - 1)
-  );
-}
+    const utf8_int8_t *ptr = data();
+    CodePoint codePoint = 0;
 
-String Literals::operator"" _s(const char *string, size_t length) {
-  return String(string, length);
-}
+    auto startPtr = ptr;
+
+    for (std::size_t offset = 0; offset < start; ++offset) {
+      startPtr = utf8codepoint(startPtr, &codePoint);
+    }
+
+    auto newByteLength = getByteLength() - (startPtr - ptr);
+
+    if (std::holds_alternative<const char *>(mString)) {
+      return String(reinterpret_cast<const char *>(startPtr), newByteLength);
+    }
+
+    auto stringData = std::make_shared<StringData>();
+
+    String result;
+    stringData = std::make_shared<StringData>();
+    stringData->resize(newByteLength + 1);
+    std::memcpy(stringData->data(), startPtr, newByteLength);
+    stringData->data()[newByteLength] = '\0';
+
+    result.mString = stringData;
+
+    return result;
+  }
+
+  String String::subString(std::size_t start, std::size_t length) const {
+    if (start >= getLength() || length == 0) {
+      return String();
+    }
+
+    const utf8_int8_t *ptr = data();
+    CodePoint codePoint = 0;
+
+    auto startPtr = ptr;
+
+    for (std::size_t offset = 0; offset < start; ++offset) {
+      startPtr = utf8codepoint(startPtr, &codePoint);
+    }
+
+    auto endPtr = startPtr;
+
+    for (std::size_t offset = 0; offset < length; ++offset) {
+      endPtr = utf8codepoint(endPtr, &codePoint);
+    }
+
+    auto newByteLength = endPtr - startPtr;
+
+    if (std::holds_alternative<const char *>(mString)) {
+      return String(reinterpret_cast<const char *>(startPtr), newByteLength);
+    }
+
+    auto stringData = std::make_shared<StringData>();
+
+    String result;
+    stringData = std::make_shared<StringData>();
+    stringData->resize(newByteLength + 1);
+    std::memcpy(stringData->data(), startPtr, newByteLength);
+    stringData->data()[newByteLength] = '\0';
+
+    result.mString = stringData;
+
+    return result;
+  }
+
+  String::OptionalIndex String::indexOf(CodePoint codePoint, std::size_t fromIndex) const {
+    if (fromIndex >= getLength()) {
+      return OptionalIndex();
+    }
+
+    const utf8_int8_t *ptr = data();
+    CodePoint currentCodePoint = 0;
+
+    for (std::size_t index = 0; index < fromIndex; ++index) {
+      ptr = utf8codepoint(ptr, &currentCodePoint);
+    }
+
+    ptr = utf8chr(ptr, codePoint);
+
+    if (ptr == nullptr) {
+      return OptionalIndex();
+    }
+
+    return OptionalIndex(ptr - data());
+  }
+
+  String::OptionalIndex String::indexOf(const String &string, std::size_t fromIndex) const {
+    if (fromIndex >= getLength()) {
+      return OptionalIndex();
+    }
+
+    const utf8_int8_t *ptr = data();
+    CodePoint currentCodePoint = 0;
+
+    for (std::size_t index = 0; index < fromIndex; ++index) {
+      ptr = utf8codepoint(ptr, &currentCodePoint);
+    }
+
+    const utf8_int8_t *result = utf8str(ptr, string.data());
+
+    if (result == nullptr) {
+      return OptionalIndex();
+    }
+
+    return OptionalIndex(result - data());
+  }
+
+  String String::replace(const String &search, const String &replacement) const {
+    if (search.isEmpty() || replacement.isEmpty()) {
+      return *this;
+    }
+
+    String result;
+    std::size_t fromIndex = 0;
+
+    auto optionalIndex = indexOf(search, fromIndex);
+
+    if (optionalIndex.has_value()) {
+      auto searchIndex = optionalIndex.value();
+      result = result + subString(fromIndex, searchIndex - fromIndex) + replacement;
+      fromIndex = searchIndex + search.getByteLength();
+    }
+
+    return result + subString(fromIndex);
+  }
+
+  String String::replaceAll(const String &search, const String &replacement) const {
+    if (search.isEmpty() || replacement.isEmpty()) {
+      return *this;
+    }
+
+    String result;
+    std::size_t fromIndex = 0;
+
+    while (true) {
+      auto optionalIndex = indexOf(search, fromIndex);
+
+      if (!optionalIndex.has_value()) {
+        break;
+      }
+
+      auto searchIndex = optionalIndex.value();
+      result = result + subString(fromIndex, searchIndex - fromIndex) + replacement;
+      fromIndex = searchIndex + search.getByteLength();
+    }
+
+    return result + subString(fromIndex);
+  }
+
+  void String::clear() {
+    mString = nullString;
+    mStringViewByteLength = 0;
+  }
+
+  std::list<String> String::split(CodePoint delimiter) const {
+    std::list<String> result;
+    split(delimiter, std::back_inserter(result));
+    return result;
+  }
+
+  std::list<String> String::split(const String &delimiter) const {
+    std::list<String> result;
+    split(delimiter, std::back_inserter(result));
+    return result;
+  }
+
+  String::Iterator String::begin() const {
+    return Iterator(*this, 0);
+  }
+
+  String::Iterator String::end() const {
+    return Iterator(*this, getLength());
+  }
+} // namespace Luna

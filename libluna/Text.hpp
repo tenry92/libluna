@@ -18,8 +18,8 @@ namespace Luna {
     Text();
     ~Text();
 
-    void setContent(const Luna::String &content);
-    const Luna::String &getContent() const;
+    void setContent(const String &content);
+    const String &getContent() const;
 
     void setFont(Font *font);
     Font *getFont() const;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fmt/format.h>
+
 #include <libluna/String.hpp>
 
 namespace Luna {
@@ -46,32 +48,32 @@ namespace Luna {
 
     template <typename... ArgTypes>
     void log(LogLevel pLevel, const String &pMessage, ArgTypes... pArgs) {
-      log(pLevel, pMessage.format(pArgs...));
+      log(pLevel, fmt::format(pMessage.c_str(), pArgs...));
     }
 
     template <typename... ArgTypes>
     void debug(const String &pMessage, ArgTypes... pArgs) {
-      debug(pMessage.format(pArgs...));
+      debug(fmt::format(pMessage.c_str(), pArgs...));
     }
 
     template <typename... ArgTypes>
     void verbose(const String &pMessage, ArgTypes... pArgs) {
-      verbose(pMessage.format(pArgs...));
+      verbose(fmt::format(pMessage.c_str(), pArgs...));
     }
 
     template <typename... ArgTypes>
     void info(const String &pMessage, ArgTypes... pArgs) {
-      info(pMessage.format(pArgs...));
+      info(fmt::format(pMessage.c_str(), pArgs...));
     }
 
     template <typename... ArgTypes>
     void warn(const String &pMessage, ArgTypes... pArgs) {
-      warn(pMessage.format(pArgs...));
+      warn(fmt::format(pMessage.c_str(), pArgs...));
     }
 
     template <typename... ArgTypes>
     void error(const String &pMessage, ArgTypes... pArgs) {
-      error(pMessage.format(pArgs...));
+      error(fmt::format(pMessage.c_str(), pArgs...));
     }
 
     static Logger &getInstance();
@@ -87,27 +89,27 @@ namespace Luna {
 
   template <typename... ArgTypes>
   inline void logDebug(const String &pMessage, ArgTypes... pArgs) {
-    Logger::getInstance().debug(pMessage.format(pArgs...));
+    Logger::getInstance().debug(fmt::format(pMessage.c_str(), pArgs...));
   }
 
   template <typename... ArgTypes>
   inline void logVerbose(const String &pMessage, ArgTypes... pArgs) {
-    Logger::getInstance().verbose(pMessage.format(pArgs...));
+    Logger::getInstance().verbose(fmt::format(pMessage.c_str(), pArgs...));
   }
 
   template <typename... ArgTypes>
   inline void logInfo(const String &pMessage, ArgTypes... pArgs) {
-    Logger::getInstance().info(pMessage.format(pArgs...));
+    Logger::getInstance().info(fmt::format(pMessage.c_str(), pArgs...));
   }
 
   template <typename... ArgTypes>
   inline void logWarn(const String &pMessage, ArgTypes... pArgs) {
-    Logger::getInstance().warn(pMessage.format(pArgs...));
+    Logger::getInstance().warn(fmt::format(pMessage.c_str(), pArgs...));
   }
 
   template <typename... ArgTypes>
   inline void logError(const String &pMessage, ArgTypes... pArgs) {
-    Logger::getInstance().error(pMessage.format(pArgs...));
+    Logger::getInstance().error(fmt::format(pMessage.c_str(), pArgs...));
   }
 
   /** @} */

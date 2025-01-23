@@ -19,7 +19,7 @@ void Logger::log(LogLevel pLevel, const String &pMessage) {
   std::lock_guard<std::mutex> lock(gLogMutex);
 
   if (!gThreadIdentifier.isEmpty()) {
-    Console::write("[{}] ", gThreadIdentifier);
+    Console::write("[{}] ", gThreadIdentifier.c_str());
   }
 #endif
 

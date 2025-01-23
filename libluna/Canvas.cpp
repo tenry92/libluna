@@ -14,6 +14,8 @@
 
 #include <functional>
 
+#include <fmt/format.h>
+
 #include <libluna/AbstractRenderer.hpp>
 #include <libluna/Application.hpp>
 #include <libluna/Console.hpp>
@@ -112,8 +114,7 @@ void Canvas::createWindow([[maybe_unused]] bool opengl) {
 #endif
 
   this->sdl.window = SDL_CreateWindow(
-      String("{} ({})")
-          .format(Application::getInstance()->getName(), "?")
+      fmt::format("{} ({})", Application::getInstance()->getName().c_str(), "?")
           .c_str(),
 #if SDL_MAJOR_VERSION == 2
       SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -201,8 +202,7 @@ static int gNextThreadId = 0;
 
 void Canvas::renderThread() {
   int threadId = ++gNextThreadId;
-  Logger::getInstance().setThreadIdentifier(String("Render {}").format(threadId)
-  );
+  Logger::getInstance().setThreadIdentifier(fmt::format("Render {}", threadId));
   logDebug("renderThread #{} spawned", threadId);
 
   std::unique_lock lock(mMutex);
@@ -418,7 +418,7 @@ void Canvas::setVideoDriver(const String &name) {
   auto command = std::make_shared<CanvasCommand>(([this, name]() {
     createWindow(name == "opengl");
 
-    logInfo("setting canvas video driver to {}", name);
+    logInfo("setting canvas video driver to {}", name.c_str());
 #ifdef NDS
     mRenderer = std::make_unique<NdsRenderer>();
 #endif

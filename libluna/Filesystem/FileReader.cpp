@@ -3,6 +3,8 @@
 #include <fstream>
 #include <stdexcept>
 
+#include <fmt/format.h>
+
 using namespace Luna::Filesystem;
 
 FileReaderPtr FileReader::make(const Path &filename) {
@@ -10,12 +12,11 @@ FileReaderPtr FileReader::make(const Path &filename) {
 }
 
 FileReader::FileReader(const Path &filename) {
-  mStream = std::ifstream(filename.getRawPath().c_str(), std::ios::binary);
+  auto rawPath = filename.getRawPath();
+  mStream = std::ifstream(rawPath.c_str(), std::ios::binary);
 
   if (!mStream.good()) {
-    throw std::runtime_error(String("unable to open file \"{}\" for reading")
-                                 .format(filename.getRawPath())
-                                 .s_str());
+    throw std::runtime_error(fmt::format("unable to open file \"{}\" for reading", rawPath.c_str()));
   }
 
   mStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);

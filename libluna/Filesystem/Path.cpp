@@ -11,9 +11,9 @@ Path::Path() = default;
 Path::Path(const Path &other) { mParts = other.mParts; }
 
 Path::Path(const String &path) {
-  auto uniformPath = path.replaceAll("\\", "/");
+  auto uniformPath = path.replaceAll('\\', '/');
   /// @todo Remove multiple consequent slashes?
-  uniformPath.split("/", std::back_inserter(mParts));
+  uniformPath.split('/', std::back_inserter(mParts));
 }
 
 Path::~Path() = default;
@@ -25,7 +25,7 @@ Path Path::operator=(const Path &other) {
 }
 
 String Path::getRawPath() const {
-  return String::join("/", mParts.cbegin(), mParts.cend());
+  return String::join(mParts.cbegin(), mParts.cend(), '/');
 }
 
 String Path::basename() const { return mParts.back(); }

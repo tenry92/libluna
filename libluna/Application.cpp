@@ -97,7 +97,7 @@ static void printDefines() {
 
 static void printArguments(const std::vector<String> &args) {
   for (std::size_t i = 0; i < args.size(); ++i) {
-    Console::writeLine("Argument {}: {}", i, args[i]);
+    Console::writeLine("Argument {}: {}", i, args[i].c_str());
   }
 }
 
@@ -173,14 +173,14 @@ void Application::mainLoop() {
   if (!mRaisedErrorMessage.isEmpty()) {
 #ifdef __SWITCH__
     Console::init();
-    logError("{}", mRaisedErrorMessage);
+    logError("{}", mRaisedErrorMessage.c_str());
     while (appletMainLoop()) {
       Console::update();
     }
 #endif
 #ifdef NDS
     Console::init();
-    logError("{}", mRaisedErrorMessage);
+    logError("{}", mRaisedErrorMessage.c_str());
     while (true) {
       Console::update();
       swiWaitForVBlank();
@@ -188,7 +188,7 @@ void Application::mainLoop() {
 #endif
 #ifdef N64
     Console::init();
-    logError("{}", mRaisedErrorMessage);
+    logError("{}", mRaisedErrorMessage.c_str());
     while (true) {
       Console::update();
     }

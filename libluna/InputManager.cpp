@@ -23,7 +23,7 @@ void InputManager::update(std::queue<ButtonEvent> *queue, float deltaTime) {
     auto event = queue->front();
     queue->pop();
 
-    auto buttonName = event.getName().s_str();
+    auto buttonName = event.getName().c_str();
 
     if (mButtonBindings.count(buttonName)) {
       auto actionName = mButtonBindings.at(buttonName);
@@ -46,25 +46,25 @@ void InputManager::update(std::queue<ButtonEvent> *queue, float deltaTime) {
 void InputManager::addButtonBinding(
     const String &actionName, const String &buttonName
 ) {
-  mButtonBindings.emplace(buttonName.s_str(), actionName.s_str());
+  mButtonBindings.emplace(buttonName.c_str(), actionName.c_str());
 }
 
 bool InputManager::isButtonPressed(const String &actionName, float buffer) {
-  if (!mPressedActions.count(actionName.s_str())) {
+  if (!mPressedActions.count(actionName.c_str())) {
     return false;
   }
 
-  float duration = mPressedActions.at(actionName.s_str());
+  float duration = mPressedActions.at(actionName.c_str());
 
   return duration <= buffer;
 }
 
 bool InputManager::isButtonHeld(const String &actionName, float duration) {
-  if (!mPressedActions.count(actionName.s_str())) {
+  if (!mPressedActions.count(actionName.c_str())) {
     return false;
   }
 
-  float presedDuration = mPressedActions.at(actionName.s_str());
+  float presedDuration = mPressedActions.at(actionName.c_str());
 
   return presedDuration >= duration;
 }

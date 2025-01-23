@@ -11,6 +11,8 @@
 #include <unistd.h> // readlink
 #endif
 
+#include <stdexcept>
+
 using namespace Luna;
 using namespace Luna::Filesystem;
 
