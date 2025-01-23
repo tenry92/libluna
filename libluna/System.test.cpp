@@ -16,13 +16,13 @@ int main(int argc, char **argv) {
 
   Console::writeLine("Processors: {}", System::getProcessorCount());
   Console::writeLine(
-      "Physical Mem Usage: {} kB", System::getPhysicalMemoryUsage() / 1024
+    "Physical Mem Usage: {} kB", System::getPhysicalMemoryUsage() / 1024
   );
   Console::writeLine(
-      "Virtual Mem Usage: {} kB", System::getVirtualMemoryUsage() / 1024
+    "Virtual Mem Usage: {} kB", System::getVirtualMemoryUsage() / 1024
   );
   Console::writeLine(
-      "Total Memory: {} MiB", System::getTotalMemorySize() / 1024 / 1024
+    "Total Memory: {} MiB", System::getTotalMemorySize() / 1024 / 1024
   );
 
 #ifdef N64

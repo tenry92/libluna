@@ -33,7 +33,7 @@ std::size_t ResourceReader::seekRelative(int relativePosition) {
 }
 
 std::size_t ResourceReader::read(
-    uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
+  uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
 ) {
   return fileReader->read(buffer, objectSize, objectCount);
 }

@@ -16,7 +16,9 @@ FileReader::FileReader(const Path &filename) {
   mStream = std::ifstream(rawPath.c_str(), std::ios::binary);
 
   if (!mStream.good()) {
-    throw std::runtime_error(fmt::format("unable to open file \"{}\" for reading", rawPath.c_str()));
+    throw std::runtime_error(
+      fmt::format("unable to open file \"{}\" for reading", rawPath.c_str())
+    );
   }
 
   mStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -56,7 +58,7 @@ std::size_t FileReader::seekRelative(int position) {
 }
 
 std::size_t FileReader::read(
-    std::uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
+  std::uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
 ) {
   int startPos = static_cast<int>(mStream.tellg());
 

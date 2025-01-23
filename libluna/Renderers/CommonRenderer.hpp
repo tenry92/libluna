@@ -112,7 +112,9 @@ namespace Luna {
      *
      * Returns true if the image was sliced, false otherwise.
      */
-    virtual bool sliceTexture(Image *image, std::vector<Image> &slices, Vector2i &sliceCount);
+    virtual bool sliceTexture(
+      Image *image, std::vector<Image> &slices, Vector2i &sliceCount
+    );
 
     /**
      * @brief Create a new empty texture for the provided ID.

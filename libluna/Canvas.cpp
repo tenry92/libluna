@@ -114,12 +114,12 @@ void Canvas::createWindow([[maybe_unused]] bool opengl) {
 #endif
 
   this->sdl.window = SDL_CreateWindow(
-      fmt::format("{} ({})", Application::getInstance()->getName().c_str(), "?")
-          .c_str(),
+    fmt::format("{} ({})", Application::getInstance()->getName().c_str(), "?")
+      .c_str(),
 #if SDL_MAJOR_VERSION == 2
-      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+    SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 #endif
-      this->mSize.width, this->mSize.height, windowFlags
+    this->mSize.width, this->mSize.height, windowFlags
   );
 
   if (!this->sdl.window) {
@@ -135,44 +135,44 @@ void Canvas::createWindow([[maybe_unused]] bool opengl) {
   EGLConfig config;
   EGLint numConfigs;
   static const EGLint framebufferAttributeList[] = {
-      EGL_RENDERABLE_TYPE,
-      EGL_OPENGL_BIT,
-      EGL_RED_SIZE,
-      8,
-      EGL_GREEN_SIZE,
-      8,
-      EGL_BLUE_SIZE,
-      8,
-      EGL_ALPHA_SIZE,
-      8,
-      EGL_DEPTH_SIZE,
-      24,
-      EGL_STENCIL_SIZE,
-      8,
-      EGL_NONE};
+    EGL_RENDERABLE_TYPE,
+    EGL_OPENGL_BIT,
+    EGL_RED_SIZE,
+    8,
+    EGL_GREEN_SIZE,
+    8,
+    EGL_BLUE_SIZE,
+    8,
+    EGL_ALPHA_SIZE,
+    8,
+    EGL_DEPTH_SIZE,
+    24,
+    EGL_STENCIL_SIZE,
+    8,
+    EGL_NONE};
   eglChooseConfig(
-      this->egl.display, framebufferAttributeList, &config, 1, &numConfigs
+    this->egl.display, framebufferAttributeList, &config, 1, &numConfigs
   );
 
   this->egl.surface = eglCreateWindowSurface(
-      this->egl.display, config, nwindowGetDefault(), nullptr
+    this->egl.display, config, nwindowGetDefault(), nullptr
   );
 
   static const EGLint contextAttributeList[] = {
-      EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR,
-      EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT_KHR,
-      EGL_CONTEXT_MAJOR_VERSION_KHR,
-      4,
-      EGL_CONTEXT_MINOR_VERSION_KHR,
-      3,
-      EGL_NONE};
+    EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR,
+    EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT_KHR,
+    EGL_CONTEXT_MAJOR_VERSION_KHR,
+    4,
+    EGL_CONTEXT_MINOR_VERSION_KHR,
+    3,
+    EGL_NONE};
 
   this->egl.context = eglCreateContext(
-      this->egl.display, config, EGL_NO_CONTEXT, contextAttributeList
+    this->egl.display, config, EGL_NO_CONTEXT, contextAttributeList
   );
 
   eglMakeCurrent(
-      this->egl.display, this->egl.surface, this->egl.surface, this->egl.context
+    this->egl.display, this->egl.surface, this->egl.surface, this->egl.context
   );
 #endif
 }
@@ -440,7 +440,7 @@ void Canvas::setVideoDriver(const String &name) {
     }
 
     display_init(
-        res, DEPTH_16_BPP, 3, GAMMA_NONE, FILTERS_RESAMPLE_ANTIALIAS_DEDITHER
+      res, DEPTH_16_BPP, 3, GAMMA_NONE, FILTERS_RESAMPLE_ANTIALIAS_DEDITHER
     );
     rdpq_init();
     mRenderer = std::make_unique<N64Renderer>();
@@ -464,11 +464,11 @@ void Canvas::setVideoDriver(const String &name) {
     setGlAttributes();
 
     this->glfw.window = glfwCreateWindow(
-        mSize.width, mSize.height,
-        String("{} ({})")
-            .format(Application::getInstance()->getName(), name)
-            .c_str(),
-        nullptr, nullptr
+      mSize.width, mSize.height,
+      String("{} ({})")
+        .format(Application::getInstance()->getName(), name)
+        .c_str(),
+      nullptr, nullptr
     );
 
     if (!this->glfw.window) {
@@ -628,7 +628,7 @@ void Canvas::sync() {
 
   if (!mCommandQueue.empty()) {
     bool result =
-        mCv.wait_for(lock, 4s, [this]() { return mCommandQueue.empty(); });
+      mCv.wait_for(lock, 4s, [this]() { return mCommandQueue.empty(); });
 
     if (!result) {
       logError("wait timeout expired and predicate still false");
@@ -645,4 +645,6 @@ void Canvas::setOriginalSize(Vector2i size) { mOriginalSize = size; }
 
 Vector2i Canvas::getOriginalSize() const { return mOriginalSize; }
 
-const std::list<Canvas *> Canvas::getCanvasByStage(Stage *stage) { return gCanvasByStage[stage]; }
+const std::list<Canvas *> Canvas::getCanvasByStage(Stage *stage) {
+  return gCanvasByStage[stage];
+}

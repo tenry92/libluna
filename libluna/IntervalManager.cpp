@@ -12,7 +12,7 @@ IntervalManager::~IntervalManager() = default;
 
 void IntervalManager::addInterval(int ratePerSecond, Callback callback) {
   mIntervalQueue.emplace(Interval{
-      ratePerSecond, callback, Clock::now(), Clock::now()});
+    ratePerSecond, callback, Clock::now(), Clock::now()});
 }
 
 void IntervalManager::addAlways(Callback callback) {
@@ -27,7 +27,7 @@ void IntervalManager::executePendingIntervals() {
     float deltaSeconds = 1.0f / 60.0f;
 #elif defined N64
     float deltaSeconds =
-        static_cast<float>(Clock::timeSpan(currentInterval.lastExecution, now));
+      static_cast<float>(Clock::timeSpan(currentInterval.lastExecution, now));
 #else
     auto delta = now - currentInterval.lastExecution;
     auto nanoSeconds = std::chrono::nanoseconds(delta).count();
@@ -53,7 +53,7 @@ void IntervalManager::executePendingIntervals() {
     float deltaSeconds = 1.0f / 60.0f;
 #elif defined N64
     float deltaSeconds =
-        static_cast<float>(Clock::timeSpan(currentInterval.lastExecution, now));
+      static_cast<float>(Clock::timeSpan(currentInterval.lastExecution, now));
 #else
     auto delta = now - currentInterval.lastExecution;
     auto nanoSeconds = std::chrono::nanoseconds(delta).count();
@@ -67,10 +67,10 @@ void IntervalManager::executePendingIntervals() {
     while (currentInterval.nextExecution <= now) {
 #ifdef N64
       currentInterval.nextExecution +=
-          TICKS_PER_SECOND / currentInterval.ratePerSecond;
+        TICKS_PER_SECOND / currentInterval.ratePerSecond;
 #else
       currentInterval.nextExecution += std::chrono::nanoseconds(
-          std::nano::den / currentInterval.ratePerSecond
+        std::nano::den / currentInterval.ratePerSecond
       );
 #endif
     }

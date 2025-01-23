@@ -17,4 +17,4 @@ namespace Luna {
     private:
     std::vector<Vector2f> mVertices;
   };
-}
+} // namespace Luna

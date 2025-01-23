@@ -36,8 +36,8 @@ Image::Image(Image &&other) {
 
 Image Image::operator=(const Image &other) {
   logWarn(
-      "copy image {}x{} {}bpp", other.mSize.width, other.mSize.height,
-      other.mBitsPerPixel
+    "copy image {}x{} {}bpp", other.mSize.width, other.mSize.height,
+    other.mBitsPerPixel
   );
   mBitsPerPixel = other.mBitsPerPixel;
   mSize = other.mSize;
@@ -111,7 +111,7 @@ Image Image::toRgb16() {
 Image Image::crop(Vector2i size, Vector2i offset) {
   auto maxSize = this->getSize() - offset;
   size = Vector2i(
-      std::min(size.width, maxSize.width), std::min(size.height, maxSize.height)
+    std::min(size.width, maxSize.width), std::min(size.height, maxSize.height)
   );
 
   auto croppedImage = Image(mBitsPerPixel, size);
@@ -122,7 +122,7 @@ Image Image::crop(Vector2i size, Vector2i offset) {
 
   for (int y = 0; y < size.height; ++y) {
     auto inputRow =
-        this->getData() + xOffset + bytesPerRowFull * (offset.y + y);
+      this->getData() + xOffset + bytesPerRowFull * (offset.y + y);
     auto outputRow = croppedImage.getData() + bytesPerRowCropped * y;
     std::memcpy(outputRow, inputRow, bytesPerRowCropped);
   }
@@ -134,16 +134,18 @@ std::vector<Image> Image::slice(Vector2i maxSliceSize, Vector2i &sliceCount) {
   std::vector<Image> slices;
 
   // add 1 to round integer calculation up up
-  sliceCount.x = (getSize().width + maxSliceSize.width - 1) / maxSliceSize.width;
-  sliceCount.y = (getSize().height + maxSliceSize.height - 1) / maxSliceSize.height;
+  sliceCount.x =
+    (getSize().width + maxSliceSize.width - 1) / maxSliceSize.width;
+  sliceCount.y =
+    (getSize().height + maxSliceSize.height - 1) / maxSliceSize.height;
 
   slices.reserve(sliceCount.x * sliceCount.y);
 
   for (int y = 0; y < getSize().height; y += maxSliceSize.height) {
     for (int x = 0; x < getSize().width; x += maxSliceSize.width) {
       auto sliceSize = Vector2i(
-          std::min(maxSliceSize.width, getSize().width - x),
-          std::min(maxSliceSize.height, getSize().height - y)
+        std::min(maxSliceSize.width, getSize().width - x),
+        std::min(maxSliceSize.height, getSize().height - y)
       );
       slices.push_back(crop(sliceSize, Vector2i(x, y)));
     }

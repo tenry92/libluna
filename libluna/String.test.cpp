@@ -19,13 +19,13 @@ int main(int, char **) {
     String cStringConstructed(cString);
     string sString(cString);
     ASSERT(
-        strcmp(cStringConstructed.c_str(), cString) == 0,
-        "strcmp(..., cString) == 0"
+      strcmp(cStringConstructed.c_str(), cString) == 0,
+      "strcmp(..., cString) == 0"
     );
     ASSERT(cStringConstructed.s_str() == sString, "== string(cString)");
     ASSERT(
-        cStringConstructed.getLength() == strlen(cString),
-        "getLength() == strlen(cString)"
+      cStringConstructed.getLength() == strlen(cString),
+      "getLength() == strlen(cString)"
     );
   });
 
@@ -34,13 +34,13 @@ int main(int, char **) {
     String cStringConstructed(cString, 8);
     string sString(cString, 8);
     ASSERT(
-        strcmp(cStringConstructed.c_str(), cString) == 0,
-        "strcmp(..., cString) == 0"
+      strcmp(cStringConstructed.c_str(), cString) == 0,
+      "strcmp(..., cString) == 0"
     );
     ASSERT(cStringConstructed.s_str() == sString, "== string(cString)");
     ASSERT(
-        cStringConstructed.getLength() == strlen(cString),
-        "getLength() == strlen(cString)"
+      cStringConstructed.getLength() == strlen(cString),
+      "getLength() == strlen(cString)"
     );
   });
 
@@ -55,8 +55,8 @@ int main(int, char **) {
     String sStringConstructed(sString);
     ASSERT(sStringConstructed.s_str() == sString, "== sString");
     ASSERT(
-        sStringConstructed.getLength() == sString.length(),
-        "getLength() == sString.length()"
+      sStringConstructed.getLength() == sString.length(),
+      "getLength() == sString.length()"
     );
   });
 
@@ -121,23 +121,23 @@ int main(int, char **) {
   TEST("substring", []() {
     String baseString("lorem ipsum dolor");
     ASSERT(
-        baseString.subString(6) == "ipsum dolor",
-        "subString(6) == \"ipsum dolor\""
+      baseString.subString(6) == "ipsum dolor",
+      "subString(6) == \"ipsum dolor\""
     );
     ASSERT(
-        baseString.subString(6, 11) == "ipsum", "subString(6, 11) == \"ipsum\""
+      baseString.subString(6, 11) == "ipsum", "subString(6, 11) == \"ipsum\""
     );
   });
 
   TEST("replace", []() {
     String baseString("lorem ipsum dolor");
     ASSERT(
-        baseString.replace("ipsum", "replaced") == "lorem replaced dolor",
-        "replace 1"
+      baseString.replace("ipsum", "replaced") == "lorem replaced dolor",
+      "replace 1"
     );
     ASSERT(
-        baseString.replaceAll("o", "ö") == "lörem ipsum dölör",
-        "replace all occurrences"
+      baseString.replaceAll("o", "ö") == "lörem ipsum dölör",
+      "replace all occurrences"
     );
   });
 

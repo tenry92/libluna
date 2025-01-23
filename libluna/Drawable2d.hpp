@@ -33,4 +33,4 @@ namespace Luna {
     float mPriority{0};
     bool mVisible{true};
   };
-}
+} // namespace Luna

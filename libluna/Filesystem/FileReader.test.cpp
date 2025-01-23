@@ -45,13 +45,13 @@ int main(int, char **) {
 
     std::vector<std::uint8_t> buffer(fileReader->getSize());
     fileReader->read(
-        buffer.data(), sizeof(std::uint8_t), fileReader->getSize()
+      buffer.data(), sizeof(std::uint8_t), fileReader->getSize()
     );
     std::string contents(
-        reinterpret_cast<const char *>(buffer.data()), buffer.size()
+      reinterpret_cast<const char *>(buffer.data()), buffer.size()
     );
     ASSERT_EQL(
-        contents, "This text is read from a text file.\n", "file contents"
+      contents, "This text is read from a text file.\n", "file contents"
     );
   });
 

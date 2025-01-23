@@ -84,8 +84,8 @@ namespace Luna::GL {
       }
 
       CHECK_GL(glBufferData(
-          GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(),
-          GL_STATIC_DRAW
+        GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(),
+        GL_STATIC_DRAW
       ));
 
       std::vector<unsigned int> indices;
@@ -98,8 +98,8 @@ namespace Luna::GL {
       }
 
       CHECK_GL(glBufferData(
-          GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
-          indices.data(), GL_STATIC_DRAW
+        GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
+        indices.data(), GL_STATIC_DRAW
       ));
 
       mIndexCount = static_cast<unsigned int>(indices.size());
@@ -119,7 +119,7 @@ namespace Luna::GL {
 
     void draw() {
       CHECK_GL(glDrawElements(
-          GL_TRIANGLES, static_cast<GLsizei>(mIndexCount), GL_UNSIGNED_INT, 0
+        GL_TRIANGLES, static_cast<GLsizei>(mIndexCount), GL_UNSIGNED_INT, 0
       ));
     }
 
@@ -129,34 +129,34 @@ namespace Luna::GL {
 
       // aPos
       CHECK_GL(glVertexAttribPointer(
-          0,        // input location = 0
-          3,        // vec3
-          GL_FLOAT, // vector of floats
-          GL_FALSE, // don't normalize input data
-          stride,
-          (void *)0 // offset; where data begins in the buffer
+        0,        // input location = 0
+        3,        // vec3
+        GL_FLOAT, // vector of floats
+        GL_FALSE, // don't normalize input data
+        stride,
+        (void *)0 // offset; where data begins in the buffer
       ));
       CHECK_GL(glEnableVertexAttribArray(0));
 
       // aTexCoord
       CHECK_GL(glVertexAttribPointer(
-          1,        // input location = 1
-          2,        // vec2
-          GL_FLOAT, // vector of floats
-          GL_FALSE, // don't normalize input data
-          stride,
-          (void *)(3 * sizeof(float)) // offset; where data begins in the buffer
+        1,        // input location = 1
+        2,        // vec2
+        GL_FLOAT, // vector of floats
+        GL_FALSE, // don't normalize input data
+        stride,
+        (void *)(3 * sizeof(float)) // offset; where data begins in the buffer
       ));
       CHECK_GL(glEnableVertexAttribArray(1));
 
       // aNormal
       CHECK_GL(glVertexAttribPointer(
-          2,        // input location = 2
-          3,        // vec3
-          GL_FLOAT, // vector of floats
-          GL_TRUE,  // normalize input data
-          stride,
-          (void *)(5 * sizeof(float)) // offset; where data begins in the buffer
+        2,        // input location = 2
+        3,        // vec3
+        GL_FLOAT, // vector of floats
+        GL_TRUE,  // normalize input data
+        stride,
+        (void *)(5 * sizeof(float)) // offset; where data begins in the buffer
       ));
       CHECK_GL(glEnableVertexAttribArray(2));
     }

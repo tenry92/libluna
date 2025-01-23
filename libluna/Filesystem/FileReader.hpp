@@ -31,7 +31,7 @@ namespace Luna::Filesystem {
     std::size_t seek(std::size_t position) final override;
     std::size_t seekRelative(int relativePosition) final override;
     std::size_t read(
-        std::uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
+      std::uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
     ) final override;
     using InputStream::read;
 

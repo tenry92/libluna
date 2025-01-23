@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include <glad/glad.h>
 #include <fmt/format.h>
+#include <glad/glad.h>
 
 #include <libluna/Color.hpp>
 #include <libluna/Logger.hpp>
@@ -17,7 +17,7 @@ namespace Luna::GL {
     inline Uniform() {}
 
     inline Uniform(
-        [[maybe_unused]] GLuint program, [[maybe_unused]] const String &name
+      [[maybe_unused]] GLuint program, [[maybe_unused]] const String &name
     ) {
       mLocation = glGetUniformLocation(program, name.c_str());
 
@@ -30,7 +30,9 @@ namespace Luna::GL {
       mArray.reserve(count);
 
       for (int i = 0; i < count; ++i) {
-        mArray.emplace_back(Uniform(program, fmt::format(name.c_str(), i).c_str()));
+        mArray.emplace_back(
+          Uniform(program, fmt::format(name.c_str(), i).c_str())
+        );
       }
     }
 

@@ -6,8 +6,7 @@ namespace Luna {
   /**
    * A fixed-size pool of objects.
    */
-  template<typename T, size_t N>
-  class Pool {
+  template <typename T, size_t N> class Pool {
     public:
     class Iterator {
       public:
@@ -19,13 +18,9 @@ namespace Luna {
 
       Iterator(Pool *pool, size_t index) : mPool(pool), mIndex(index) {}
 
-      T *operator->() {
-        return &mPool->at(mIndex);
-      }
+      T *operator->() { return &mPool->at(mIndex); }
 
-      T &operator*() {
-        return mPool->at(mIndex);
-      }
+      T &operator*() { return mPool->at(mIndex); }
 
       Iterator &operator++() {
         do {
@@ -41,13 +36,9 @@ namespace Luna {
         return tmp;
       }
 
-      bool operator==(const Iterator &other) {
-        return mIndex == other.mIndex;
-      }
+      bool operator==(const Iterator &other) { return mIndex == other.mIndex; }
 
-      bool operator!=(const Iterator &other) {
-        return mIndex != other.mIndex;
-      }
+      bool operator!=(const Iterator &other) { return mIndex != other.mIndex; }
 
       private:
       Pool *mPool;
@@ -62,15 +53,12 @@ namespace Luna {
       using pointer = const T *;
       using reference = const T &;
 
-      ConstIterator(const Pool *pool, size_t index) : mPool(pool), mIndex(index) {}
+      ConstIterator(const Pool *pool, size_t index)
+          : mPool(pool), mIndex(index) {}
 
-      const T *operator->() {
-        return &mPool->at(mIndex);
-      }
+      const T *operator->() { return &mPool->at(mIndex); }
 
-      const T &operator*() {
-        return mPool->at(mIndex);
-      }
+      const T &operator*() { return mPool->at(mIndex); }
 
       ConstIterator &operator++() {
         do {
@@ -112,8 +100,7 @@ namespace Luna {
      * 
      * @return A pointer to the object, or nullptr if the pool is full.
      */
-    template <typename... ArgTypes>
-    T *acquire(ArgTypes... args) {
+    template <typename... ArgTypes> T *acquire(ArgTypes... args) {
       for (size_t i = 0; i < N; i++) {
         if (!mInUse[i]) {
           mInUse[i] = true;
@@ -145,13 +132,9 @@ namespace Luna {
       return *reinterpret_cast<const T *>(&mData[sizeof(T) * index]);
     }
 
-    T &operator[](size_t index) {
-      return this->at(index);
-    }
+    T &operator[](size_t index) { return this->at(index); }
 
-    const T &operator[](size_t index) const {
-      return this->at(index);
-    }
+    const T &operator[](size_t index) const { return this->at(index); }
 
     Iterator begin() {
       size_t index = 0;
@@ -163,9 +146,7 @@ namespace Luna {
       return Iterator(this, index);
     }
 
-    Iterator end() {
-      return Iterator(this, N);
-    }
+    Iterator end() { return Iterator(this, N); }
 
     ConstIterator begin() const {
       size_t index = 0;
@@ -177,12 +158,10 @@ namespace Luna {
       return ConstIterator(this, index);
     }
 
-    ConstIterator end() const {
-      return ConstIterator(this, N);
-    }
+    ConstIterator end() const { return ConstIterator(this, N); }
 
     private:
     std::array<std::byte, sizeof(T) * N> mData;
     std::array<bool, N> mInUse{false};
   };
-}
+} // namespace Luna

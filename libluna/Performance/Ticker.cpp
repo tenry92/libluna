@@ -60,8 +60,8 @@ float Ticker::getTickDuration() const {
 
   for (auto time : mTickTimes) {
     sum += static_cast<long>(
-        time.count() * unit * std::chrono::steady_clock::period().num /
-        std::chrono::steady_clock::period().den
+      time.count() * unit * std::chrono::steady_clock::period().num /
+      std::chrono::steady_clock::period().den
     );
   }
 
@@ -82,8 +82,8 @@ float Ticker::getTicksPerSecond() const {
   for (std::size_t i = 0; i < mTicks.size() - 1; ++i) {
     auto diff = mTicks[i + 1] - mTicks[i];
     sum += static_cast<long>(
-        diff.count() * unit * std::chrono::steady_clock::period().num /
-        std::chrono::steady_clock::period().den
+      diff.count() * unit * std::chrono::steady_clock::period().num /
+      std::chrono::steady_clock::period().den
     );
   }
 

@@ -10,4 +10,5 @@ IncludeCategories:
     Priority:        2
 NamespaceIndentation: All
 ReflowComments:  false
+ContinuationIndentWidth: 2
 ...

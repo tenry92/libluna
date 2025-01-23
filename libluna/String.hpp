@@ -141,7 +141,8 @@ namespace Luna {
 
     OptionalIndex indexOf(CodePoint codePoint, std::size_t fromIndex = 0) const;
 
-    OptionalIndex indexOf(const String &string, std::size_t fromIndex = 0) const;
+    OptionalIndex
+    indexOf(const String &string, std::size_t fromIndex = 0) const;
 
     String replace(const String &search, const String &replacement) const;
 

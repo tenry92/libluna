@@ -34,8 +34,8 @@ class DestinationAudioNode : public AudioNode {
       input->render(mixBuffer.data(), frameCount);
 
       std::transform(
-          buffer, buffer + sampleCount, mixBuffer.data(), buffer,
-          [](float a, float b) { return a + b; }
+        buffer, buffer + sampleCount, mixBuffer.data(), buffer,
+        [](float a, float b) { return a + b; }
       );
     }
   }
@@ -61,7 +61,7 @@ namespace {
     metrics->renderTicker.tick();
 
     destinationNode->render(
-        reinterpret_cast<float *>(stream), static_cast<int>(frameCount)
+      reinterpret_cast<float *>(stream), static_cast<int>(frameCount)
     );
 
     audioManager->advanceTime(static_cast<double>(frameCount) / frameRate);
@@ -97,17 +97,17 @@ void AudioManager::init() {
   desired.userdata = mDestinationNode.get();
 
   mSdlAudioDeviceId = SDL_OpenAudioDevice(
-      nullptr, /* use suitable device */
-      false,   /* no capture */
-      &desired, &obtained, 0
+    nullptr, /* use suitable device */
+    false,   /* no capture */
+    &desired, &obtained, 0
   );
 
   mFrameRate = static_cast<float>(obtained.freq);
   mChannelCount = obtained.channels;
 
   logDebug(
-      "obtained format: {}Hz, {} channels, {} ({})", obtained.freq,
-      obtained.channels, obtained.format, AUDIO_F32
+    "obtained format: {}Hz, {} channels, {} ({})", obtained.freq,
+    obtained.channels, obtained.format, AUDIO_F32
   );
 
   if (mSdlAudioDeviceId == 0) {

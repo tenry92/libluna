@@ -24,7 +24,7 @@ namespace Luna {
     std::size_t seek(std::size_t position) override;
     std::size_t seekRelative(int relativePosition) override;
     std::size_t read(
-        uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
+      uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
     ) override;
     using InputStream::read;
 

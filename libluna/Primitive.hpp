@@ -23,4 +23,4 @@ namespace Luna {
     private:
     Shape *mShape;
   };
-}
+} // namespace Luna

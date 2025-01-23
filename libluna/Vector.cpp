@@ -83,8 +83,8 @@ Vector2<T> Vector2<T>::scaleToFit(const Vector2<T> &other) const {
   float scaleFactor = std::min(scaleWidth, scaleHeight);
 
   return Vector2<T>(
-      static_cast<T>(static_cast<float>(this->x) * scaleFactor),
-      static_cast<T>(static_cast<float>(this->y) * scaleFactor)
+    static_cast<T>(static_cast<float>(this->x) * scaleFactor),
+    static_cast<T>(static_cast<float>(this->y) * scaleFactor)
   );
 }
 
@@ -151,7 +151,7 @@ template <typename T> Vector3<T> Vector3<T>::operator/(T scale) const {
 
 template <typename T> T Vector3<T>::magnitude() const {
   return static_cast<T>(std::sqrt(
-      std::pow(this->x, 2) + std::pow(this->y, 2) + std::pow(this->z, 2)
+    std::pow(this->x, 2) + std::pow(this->y, 2) + std::pow(this->z, 2)
   ));
 }
 
@@ -169,7 +169,7 @@ T Vector3<T>::distance(const Vector3<T> &left, const Vector3<T> &right) {
 template <typename T>
 Vector3<T> Vector3<T>::cross(const Vector3<T> &a, const Vector3<T> &b) {
   return Vector3<T>(
-      a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x
+    a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x
   );
 }
 

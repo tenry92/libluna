@@ -16,8 +16,8 @@ void GainNode::render(float *buffer, int frameCount) {
     input->render(buffer, frameCount);
 
     std::transform(
-        buffer, buffer + frameCount * getChannelCount(), buffer,
-        [=](float a) { return a *= mVolume; }
+      buffer, buffer + frameCount * getChannelCount(), buffer,
+      [=](float a) { return a *= mVolume; }
     );
   }
 }

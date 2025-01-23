@@ -25,7 +25,7 @@ namespace {
 
 namespace Luna {
   String::Iterator::Iterator(const String &string, std::size_t index)
-    : mString(string), mIndex(index) {}
+      : mString(string), mIndex(index) {}
 
   String::CodePoint String::Iterator::operator*() const {
     return mString[mIndex];
@@ -50,9 +50,7 @@ namespace Luna {
     return mIndex != other.mIndex;
   }
 
-  String::String() {
-    clear();
-  }
+  String::String() { clear(); }
 
   String::String(char *other) : String() {
     if (other == nullptr) {
@@ -150,8 +148,11 @@ namespace Luna {
     auto ptr = stringData->data();
 
     for (std::size_t i = 0; i < length; ++i) {
-      auto available = stringData->size() - 1 - static_cast<std::size_t>(ptr - data());
-      ptr = reinterpret_cast<utf8_int8_t *>(utf8catcodepoint(ptr, other[i], available));
+      auto available =
+        stringData->size() - 1 - static_cast<std::size_t>(ptr - data());
+      ptr = reinterpret_cast<utf8_int8_t *>(
+        utf8catcodepoint(ptr, other[i], available)
+      );
     }
 
     *ptr = '\0';
@@ -299,7 +300,8 @@ namespace Luna {
 
       if (std::holds_alternative<std::shared_ptr<StringData>>(other.mString)) {
         // wen can quit early if the pointers are equal
-        auto otherStringData = std::get<std::shared_ptr<StringData>>(other.mString);
+        auto otherStringData =
+          std::get<std::shared_ptr<StringData>>(other.mString);
 
         if (stringData == otherStringData) {
           return true;
@@ -359,7 +361,9 @@ namespace Luna {
     stringData->resize(getByteLength() + other.getByteLength() + 1);
     std::memcpy(stringData->data(), data(), getByteLength());
 
-    std::memcpy(stringData->data() + getByteLength(), other.data(), other.getByteLength());
+    std::memcpy(
+      stringData->data() + getByteLength(), other.data(), other.getByteLength()
+    );
     stringData->data()[stringData->size() - 1] = '\0';
 
     result.mString = stringData;
@@ -383,9 +387,7 @@ namespace Luna {
     return 0;
   }
 
-  bool String::isEmpty() const {
-    return getLength() == 0;
-  }
+  bool String::isEmpty() const { return getLength() == 0; }
 
   bool String::startsWith(const String &other) const {
     if (other.isEmpty()) {
@@ -408,7 +410,10 @@ namespace Luna {
       return false;
     }
 
-    return utf8ncmp(data() + getByteLength() - other.getByteLength(), other.data(), other.getByteLength()) == 0;
+    return utf8ncmp(
+             data() + getByteLength() - other.getByteLength(), other.data(),
+             other.getByteLength()
+           ) == 0;
   }
 
   const char *String::c_str() const {
@@ -416,7 +421,9 @@ namespace Luna {
       return std::get<const char *>(mString);
     }
 
-    return reinterpret_cast<const char *>(std::get<std::shared_ptr<StringData>>(mString)->data());
+    return reinterpret_cast<const char *>(
+      std::get<std::shared_ptr<StringData>>(mString)->data()
+    );
   }
 
   const utf8_int8_t *String::data() const {
@@ -507,7 +514,8 @@ namespace Luna {
     return result;
   }
 
-  String::OptionalIndex String::indexOf(CodePoint codePoint, std::size_t fromIndex) const {
+  String::OptionalIndex
+  String::indexOf(CodePoint codePoint, std::size_t fromIndex) const {
     if (fromIndex >= getLength()) {
       return OptionalIndex();
     }
@@ -528,7 +536,8 @@ namespace Luna {
     return OptionalIndex(ptr - data());
   }
 
-  String::OptionalIndex String::indexOf(const String &string, std::size_t fromIndex) const {
+  String::OptionalIndex
+  String::indexOf(const String &string, std::size_t fromIndex) const {
     if (fromIndex >= getLength()) {
       return OptionalIndex();
     }
@@ -549,7 +558,8 @@ namespace Luna {
     return OptionalIndex(result - data());
   }
 
-  String String::replace(const String &search, const String &replacement) const {
+  String
+  String::replace(const String &search, const String &replacement) const {
     if (search.isEmpty() || replacement.isEmpty()) {
       return *this;
     }
@@ -561,14 +571,16 @@ namespace Luna {
 
     if (optionalIndex.has_value()) {
       auto searchIndex = optionalIndex.value();
-      result = result + subString(fromIndex, searchIndex - fromIndex) + replacement;
+      result =
+        result + subString(fromIndex, searchIndex - fromIndex) + replacement;
       fromIndex = searchIndex + search.getByteLength();
     }
 
     return result + subString(fromIndex);
   }
 
-  String String::replaceAll(const String &search, const String &replacement) const {
+  String
+  String::replaceAll(const String &search, const String &replacement) const {
     if (search.isEmpty() || replacement.isEmpty()) {
       return *this;
     }
@@ -584,7 +596,8 @@ namespace Luna {
       }
 
       auto searchIndex = optionalIndex.value();
-      result = result + subString(fromIndex, searchIndex - fromIndex) + replacement;
+      result =
+        result + subString(fromIndex, searchIndex - fromIndex) + replacement;
       fromIndex = searchIndex + search.getByteLength();
     }
 
@@ -608,11 +621,7 @@ namespace Luna {
     return result;
   }
 
-  String::Iterator String::begin() const {
-    return Iterator(*this, 0);
-  }
+  String::Iterator String::begin() const { return Iterator(*this, 0); }
 
-  String::Iterator String::end() const {
-    return Iterator(*this, getLength());
-  }
+  String::Iterator String::end() const { return Iterator(*this, getLength()); }
 } // namespace Luna

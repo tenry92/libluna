@@ -13,8 +13,8 @@ InputManager::~InputManager() = default;
 
 void InputManager::update(std::queue<ButtonEvent> *queue, float deltaTime) {
   std::for_each(
-      mPressedActions.begin(), mPressedActions.end(),
-      [deltaTime](auto &pair) { pair.second += deltaTime; }
+    mPressedActions.begin(), mPressedActions.end(),
+    [deltaTime](auto &pair) { pair.second += deltaTime; }
   );
 
   std::queue<ButtonEvent> unusedQueue;
@@ -44,7 +44,7 @@ void InputManager::update(std::queue<ButtonEvent> *queue, float deltaTime) {
 }
 
 void InputManager::addButtonBinding(
-    const String &actionName, const String &buttonName
+  const String &actionName, const String &buttonName
 ) {
   mButtonBindings.emplace(buttonName.c_str(), actionName.c_str());
 }

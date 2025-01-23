@@ -9,4 +9,4 @@ namespace Luna {
 
     virtual Image load() = 0;
   };
-}
+} // namespace Luna

@@ -12,11 +12,15 @@ std::vector<String> Platform::getCompilerInfo() {
 #endif
 
 #ifdef __GNUC__
-  info.emplace_back(fmt::format("compiled with GNU C compatible compiler version {}", __GNUC__));
+  info.emplace_back(
+    fmt::format("compiled with GNU C compatible compiler version {}", __GNUC__)
+  );
 #endif
 
 #ifdef __clang__
-  info.emplace_back(fmt::format("compiled with clang compatible compiler version {}", __clang_version__));
+  info.emplace_back(fmt::format(
+    "compiled with clang compatible compiler version {}", __clang_version__
+  ));
 #endif
 
 #ifdef __MINGW32__
@@ -30,7 +34,7 @@ std::vector<String> Platform::getCompilerInfo() {
 #ifdef __cplusplus
   if constexpr (__cplusplus >= 201103L) {
     info.emplace_back(
-        fmt::format("C++ version: C++{}", __cplusplus / 100 - 2000L)
+      fmt::format("C++ version: C++{}", __cplusplus / 100 - 2000L)
     );
   } else {
     info.emplace_back(fmt::format("C++ version: legacy ({})", __cplusplus));

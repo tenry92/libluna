@@ -50,7 +50,9 @@ void N64Renderer::clearBackground([[maybe_unused]] ColorRgb color) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-bool N64Renderer::sliceTexture(Image *image, std::vector<Image> &slices, Vector2i &sliceCount) {
+bool N64Renderer::sliceTexture(
+  Image *image, std::vector<Image> &slices, Vector2i &sliceCount
+) {
   const int tmemSize = 4096;
 
   if (image->getByteCount() <= tmemSize) {
@@ -61,7 +63,9 @@ bool N64Renderer::sliceTexture(Image *image, std::vector<Image> &slices, Vector2
   sliceSize.width = Math::previousPowerOfTwo(sliceSize.width);
   sliceSize.height = Math::previousPowerOfTwo(sliceSize.height);
 
-  while (sliceSize.width * sliceSize.height * (image->getBitsPerPixel() / 4) / 2 > tmemSize) {
+  while (sliceSize.width * sliceSize.height * (image->getBitsPerPixel() / 4) /
+           2 >
+         tmemSize) {
     if (sliceSize.width > sliceSize.height) {
       sliceSize.width /= 2;
     } else {
@@ -91,7 +95,7 @@ void N64Renderer::destroyTexture([[maybe_unused]] int id) {
 }
 
 void N64Renderer::loadTexture(
-    [[maybe_unused]] int id, [[maybe_unused]] Image *image
+  [[maybe_unused]] int id, [[maybe_unused]] Image *image
 ) {
   auto &texture = mTextureIdMapping.at(id);
 
@@ -120,29 +124,28 @@ void N64Renderer::loadTexture(
   }
 
   glTexImage2D(
-      GL_TEXTURE_2D, 0, /* mipmap level */
-      internalFormat,   /* internal format */
-      image->getWidth(), image->getHeight(),
-      0,           /* format (legacy) */
-      inputFormat, /* input format */
-      inputType, image->getData()
+    GL_TEXTURE_2D, 0,                         /* mipmap level */
+    internalFormat,                           /* internal format */
+    image->getWidth(), image->getHeight(), 0, /* format (legacy) */
+    inputFormat,                              /* input format */
+    inputType, image->getData()
   );
   glTexParameteri(
-      GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-      image->isInterpolated() ? GL_LINEAR : GL_NEAREST
+    GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+    image->isInterpolated() ? GL_LINEAR : GL_NEAREST
   );
   glTexParameteri(
-      GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-      image->isInterpolated() ? GL_LINEAR : GL_NEAREST
+    GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+    image->isInterpolated() ? GL_LINEAR : GL_NEAREST
   );
 }
 
 void N64Renderer::resizeTexture(
-    [[maybe_unused]] int id, [[maybe_unused]] Vector2i size
+  [[maybe_unused]] int id, [[maybe_unused]] Vector2i size
 ) {}
 
 void N64Renderer::renderTexture(
-    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info
+  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info
 ) {
   auto texture = mTextureIdMapping.at(info->textureId);
 
@@ -159,23 +162,17 @@ void N64Renderer::renderTexture(
   if (info->crop.area() > 0) {
     auto textureSize = getTextureSize(info->textureId);
 
-    uvTopLeft.x = static_cast<float>(info->crop.x) /
-                  static_cast<float>(textureSize.width);
+    uvTopLeft.x =
+      static_cast<float>(info->crop.x) / static_cast<float>(textureSize.width);
 
-    uvBottomRight.x =
-        static_cast<float>(
-            info->crop.x + info->crop.width
-        ) /
-        static_cast<float>(textureSize.width);
+    uvBottomRight.x = static_cast<float>(info->crop.x + info->crop.width) /
+                      static_cast<float>(textureSize.width);
 
-    uvTopLeft.y = static_cast<float>(info->crop.y) /
-                  static_cast<float>(textureSize.height);
+    uvTopLeft.y =
+      static_cast<float>(info->crop.y) / static_cast<float>(textureSize.height);
 
-    uvBottomRight.y =
-        static_cast<float>(
-            info->crop.y + info->crop.height
-        ) /
-        static_cast<float>(textureSize.height);
+    uvBottomRight.y = static_cast<float>(info->crop.y + info->crop.height) /
+                      static_cast<float>(textureSize.height);
   }
 
   float left = info->position.x;
@@ -209,13 +206,13 @@ void N64Renderer::destroyShape([[maybe_unused]] int id) {
 }
 
 void N64Renderer::loadShape(
-    [[maybe_unused]] int id, [[maybe_unused]] Shape *shape
+  [[maybe_unused]] int id, [[maybe_unused]] Shape *shape
 ) {
   mShapeIdMapping.emplace(id, shape);
 }
 
 void N64Renderer::renderShape(
-    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderShapeInfo *info
+  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderShapeInfo *info
 ) {
   auto shape = mShapeIdMapping.at(info->shapeId);
 
@@ -259,7 +256,7 @@ void N64Renderer::destroyMesh([[maybe_unused]] int id) {
 }
 
 void N64Renderer::loadMesh(
-    [[maybe_unused]] int id, [[maybe_unused]] std::shared_ptr<Mesh> mesh
+  [[maybe_unused]] int id, [[maybe_unused]] std::shared_ptr<Mesh> mesh
 ) {
   auto listId = mMeshIdMapping.at(id);
   glNewList(listId, GL_COMPILE);
@@ -281,15 +278,15 @@ void N64Renderer::loadMesh(
 }
 
 void N64Renderer::renderMesh(
-    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info
+  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info
 ) {
   auto listId = mMeshIdMapping.at(info->meshId);
   auto texture = mTextureIdMapping.at(info->diffuseTextureId);
 
   auto ambientLight = canvas->getStage()->getAmbientLight();
   float ambient[4] = {
-      ambientLight.color.red, ambientLight.color.green, ambientLight.color.blue,
-      ambientLight.color.alpha};
+    ambientLight.color.red, ambientLight.color.green, ambientLight.color.blue,
+    ambientLight.color.alpha};
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
   glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
 
@@ -298,18 +295,18 @@ void N64Renderer::renderMesh(
   for (auto &&pointLight : canvas->getStage()->getPointLights()) {
     glEnable(GL_LIGHT0 + lightId);
     float pos[4] = {
-        pointLight->position.x, pointLight->position.y, pointLight->position.z,
-        1};
+      pointLight->position.x, pointLight->position.y, pointLight->position.z,
+      1};
     glLightfv(GL_LIGHT0 + lightId, GL_POSITION, pos);
     float color[4] = {
-        pointLight->color.red, pointLight->color.green, pointLight->color.blue,
-        pointLight->color.alpha};
+      pointLight->color.red, pointLight->color.green, pointLight->color.blue,
+      pointLight->color.alpha};
     glLightfv(GL_LIGHT0 + lightId, GL_DIFFUSE, color);
     float lightRadius = 10.0f;
     glLightf(GL_LIGHT0 + lightId, GL_LINEAR_ATTENUATION, 2.0f / lightRadius);
     glLightf(
-        GL_LIGHT0 + lightId, GL_QUADRATIC_ATTENUATION,
-        1.0f / (lightRadius * lightRadius)
+      GL_LIGHT0 + lightId, GL_QUADRATIC_ATTENUATION,
+      1.0f / (lightRadius * lightRadius)
     );
     ++lightId;
   }
@@ -325,7 +322,7 @@ void N64Renderer::renderMesh(
   glMatrixMode(GL_PROJECTION);
   glLoadMatrixf((camera.getProjectionMatrix(4.0f / 3.0f) *
                  camera.getViewMatrix())
-                    .getValuePointer());
+                  .getValuePointer());
 
   glMatrixMode(GL_MODELVIEW);
   glLoadMatrixf(info->transform.getValuePointer());
@@ -334,7 +331,7 @@ void N64Renderer::renderMesh(
 }
 
 void N64Renderer::setTextureFilterEnabled(
-    [[maybe_unused]] int id, [[maybe_unused]] bool enabled
+  [[maybe_unused]] int id, [[maybe_unused]] bool enabled
 ) {}
 
 void N64Renderer::setRenderTargetTexture([[maybe_unused]] int id) {}

@@ -27,7 +27,9 @@ namespace Luna {
     Internal::GraphicsMetrics getMetrics() override;
 
     void clearBackground(ColorRgb color) override;
-    bool sliceTexture(Image *image, std::vector<Image> &slices, Vector2i &sliceCount) override;
+    bool sliceTexture(
+      Image *image, std::vector<Image> &slices, Vector2i &sliceCount
+    ) override;
     void createTexture(int id) override;
     void destroyTexture(int id) override;
     void loadTexture(int id, Image *image) override;

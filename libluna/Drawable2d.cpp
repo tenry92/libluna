@@ -8,23 +8,13 @@ namespace Luna {
     mPosition = position;
   }
 
-  Vector2f Drawable2d::getPosition() const {
-    return mPosition;
-  }
+  Vector2f Drawable2d::getPosition() const { return mPosition; }
 
-  void Drawable2d::setPriority(float priority) {
-    mPriority = priority;
-  }
+  void Drawable2d::setPriority(float priority) { mPriority = priority; }
 
-  float Drawable2d::getPriority() const {
-    return mPriority;
-  }
+  float Drawable2d::getPriority() const { return mPriority; }
 
-  void Drawable2d::setVisible(bool visible) {
-    mVisible = visible;
-  }
+  void Drawable2d::setVisible(bool visible) { mVisible = visible; }
 
-  bool Drawable2d::isVisible() const {
-    return mVisible;
-  }
-}
+  bool Drawable2d::isVisible() const { return mVisible; }
+} // namespace Luna

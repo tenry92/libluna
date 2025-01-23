@@ -97,10 +97,10 @@ int main(int, char **) {
   TEST("identify matrix", []() {
     auto actual = Matrix4x4::identity();
     auto expected = Matrix4x4({{
-        {1, 0, 0, 0},
-        {0, 1, 0, 0},
-        {0, 0, 1, 0},
-        {0, 0, 0, 1},
+      {1, 0, 0, 0},
+      {0, 1, 0, 0},
+      {0, 0, 1, 0},
+      {0, 0, 0, 1},
     }});
 
     ASSERT_EQL(actual, expected);
@@ -109,10 +109,10 @@ int main(int, char **) {
   TEST("translate", []() {
     auto actual = Matrix4x4::identity().translate({10, 20, 30});
     auto expected = Matrix4x4({{
-        {1, 0, 0, 0},
-        {0, 1, 0, 0},
-        {0, 0, 1, 0},
-        {10, 20, 30, 1},
+      {1, 0, 0, 0},
+      {0, 1, 0, 0},
+      {0, 0, 1, 0},
+      {10, 20, 30, 1},
     }});
 
     ASSERT_EQL(actual, expected);
@@ -121,10 +121,10 @@ int main(int, char **) {
   TEST("rotateX", []() {
     auto actual = Matrix4x4::identity().rotateX(42);
     auto expected = Matrix4x4({{
-        {1, 0, 0, 0},
-        {0, -0.4, -0.916, 0},
-        {0, 0.916, -0.4, 0},
-        {0, 0, 0, 1},
+      {1, 0, 0, 0},
+      {0, -0.4, -0.916, 0},
+      {0, 0.916, -0.4, 0},
+      {0, 0, 0, 1},
     }});
 
     ASSERT_EQL(actual, expected);
@@ -133,10 +133,10 @@ int main(int, char **) {
   TEST("rotateY", []() {
     auto actual = Matrix4x4::identity().rotateY(42);
     auto expected = Matrix4x4({{
-        {-0.4, 0, 0.92, 0},
-        {0, 1, 0, 0},
-        {0, 0, -0.4, 0},
-        {-0.92, 0, -0.4, 1},
+      {-0.4, 0, 0.92, 0},
+      {0, 1, 0, 0},
+      {0, 0, -0.4, 0},
+      {-0.92, 0, -0.4, 1},
     }});
 
     ASSERT_EQL(actual, expected);
@@ -145,10 +145,10 @@ int main(int, char **) {
   TEST("rotateZ", []() {
     auto actual = Matrix4x4::identity().rotateZ(42);
     auto expected = Matrix4x4({{
-        {-0.4, -0.92, 0, 0},
-        {0.92, -0.4, 0, 0},
-        {0, 0, 1, 0},
-        {0, 0, 0, 1},
+      {-0.4, -0.92, 0, 0},
+      {0.92, -0.4, 0, 0},
+      {0, 0, 1, 0},
+      {0, 0, 0, 1},
     }});
 
     ASSERT_EQL(actual, expected);
@@ -156,12 +156,12 @@ int main(int, char **) {
 
   TEST("perspective", []() {
     auto actual =
-        Matrix4x4::identity().perspective(45, 16.0f / 9.0f, 0.1f, 100.0f);
+      Matrix4x4::identity().perspective(45, 16.0f / 9.0f, 0.1f, 100.0f);
     auto expected = Matrix4x4({{
-        {1.4, 0, 0, 0},
-        {0, 2.4, 0, 0},
-        {0, 0, -1, -1},
-        {0, 0, -0.2, 0},
+      {1.4, 0, 0, 0},
+      {0, 2.4, 0, 0},
+      {0, 0, -1, -1},
+      {0, 0, -0.2, 0},
     }});
 
     ASSERT_EQL(actual, expected);
@@ -170,15 +170,15 @@ int main(int, char **) {
   TEST("view * transform", []() {
     auto transform = Matrix4x4::identity();
     auto view =
-        Matrix4x4::perspective(45.0f, 1920.0f / 1080.0f, 0.01f, 2000.0f);
+      Matrix4x4::perspective(45.0f, 1920.0f / 1080.0f, 0.01f, 2000.0f);
     view = view.translate({0.0f, -1.0f, 0.0f});
     auto actual = view * transform;
 
     auto expected = Matrix4x4({{
-        {1.4, 0, 0, 0},
-        {0, 2.4, 0, 0},
-        {0, 0, -1, -1},
-        {0, -2.4, -0.02, 0},
+      {1.4, 0, 0, 0},
+      {0, 2.4, 0, 0},
+      {0, 0, -1, -1},
+      {0, -2.4, -0.02, 0},
     }});
 
     ASSERT_EQL(actual, expected);
@@ -187,15 +187,15 @@ int main(int, char **) {
   TEST("project * view * model", []() {
     auto model = Matrix4x4::identity();
     auto projection =
-        Matrix4x4::perspective(45.0f, 1920.0f / 1080.0f, 0.01f, 2000.0f);
+      Matrix4x4::perspective(45.0f, 1920.0f / 1080.0f, 0.01f, 2000.0f);
     auto view = Matrix4x4::identity().translate({0.0f, 0.0f, -3.0f});
 
     auto actual = projection * view * model;
     auto expected = Matrix4x4({{
-        {1.4, 0, 0, 0},
-        {0, 2.4, 0, 0},
-        {0, 0, -1, -1},
-        {0, 0, 3, 3},
+      {1.4, 0, 0, 0},
+      {0, 2.4, 0, 0},
+      {0, 0, -1, -1},
+      {0, 0, 3, 3},
     }});
 
     ASSERT_EQL(actual, expected);

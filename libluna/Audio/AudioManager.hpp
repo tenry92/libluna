@@ -55,7 +55,7 @@ namespace Luna::Audio {
     std::shared_ptr<GainNode> createGain(float volume);
 
     std::shared_ptr<OscillatorNode> createOscillator(
-        float frequency, OscillatorNode::Type type = OscillatorNode::kSine
+      float frequency, OscillatorNode::Type type = OscillatorNode::kSine
     );
 
     Internal::AudioMetrics &getMetrics();

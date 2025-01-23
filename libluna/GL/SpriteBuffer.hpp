@@ -15,7 +15,7 @@ namespace Luna::GL {
      * @param flipVertical If true, the sprite will be flipped vertically.
      */
     SpriteBuffer(
-        Luna::Rectf crop, Luna::Vector2i size, bool flipVertical = false
+      Luna::Rectf crop, Luna::Vector2i size, bool flipVertical = false
     ) {
       mFlipVertical = flipVertical;
       mCrop = crop;
@@ -46,24 +46,23 @@ namespace Luna::GL {
       mSize = size;
 
       float vertices[] = {
-          /* x, y, u, v */
-          // top-left
-          0.f, 0.f, mCrop.x, mFlipVertical ? 1.f - mCrop.y : mCrop.y,
-          // top-right
-          static_cast<float>(mSize.width), 0.f, mCrop.x + mCrop.width,
-          mFlipVertical ? 1.f - mCrop.y : mCrop.y,
-          // bottom-right
-          static_cast<float>(mSize.width), static_cast<float>(mSize.height),
-          mCrop.x + mCrop.width,
-          mFlipVertical ? 1.f - (mCrop.y + mCrop.height)
-                        : mCrop.y + mCrop.height,
-          // bottom-left
-          0.f, static_cast<float>(mSize.height), mCrop.x,
-          mFlipVertical ? 1.f - (mCrop.y + mCrop.height)
-                        : mCrop.y + mCrop.height};
+        /* x, y, u, v */
+        // top-left
+        0.f, 0.f, mCrop.x, mFlipVertical ? 1.f - mCrop.y : mCrop.y,
+        // top-right
+        static_cast<float>(mSize.width), 0.f, mCrop.x + mCrop.width,
+        mFlipVertical ? 1.f - mCrop.y : mCrop.y,
+        // bottom-right
+        static_cast<float>(mSize.width), static_cast<float>(mSize.height),
+        mCrop.x + mCrop.width,
+        mFlipVertical ? 1.f - (mCrop.y + mCrop.height) : mCrop.y + mCrop.height,
+        // bottom-left
+        0.f, static_cast<float>(mSize.height), mCrop.x,
+        mFlipVertical ? 1.f - (mCrop.y + mCrop.height)
+                      : mCrop.y + mCrop.height};
 
       CHECK_GL(glBufferData(
-          GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW
+        GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW
       ));
     }
 
@@ -88,7 +87,7 @@ namespace Luna::GL {
       unsigned int indices[] = {0, 1, 2, 0, 2, 3};
 
       CHECK_GL(glBufferData(
-          GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW
+        GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW
       ));
     }
 
@@ -97,24 +96,24 @@ namespace Luna::GL {
       // [V1  ] [V2  ] [V3  ] [V4  ]
       // [x, y] [x, y] [x, y] [x, y]
       CHECK_GL(glVertexAttribPointer(
-          0,        // input location = 0
-          2,        // vec2
-          GL_FLOAT, // vector of floats
-          GL_FALSE, // don't normalize input data
-          4 * sizeof(float
-              ),    // stride; offset between each vector (2 = xy, 4 = xyvu)
-          (void *)0 // offset; where data begins in the buffer
+        0,        // input location = 0
+        2,        // vec2
+        GL_FLOAT, // vector of floats
+        GL_FALSE, // don't normalize input data
+        4 * sizeof(float
+            ),    // stride; offset between each vector (2 = xy, 4 = xyvu)
+        (void *)0 // offset; where data begins in the buffer
       ));
       CHECK_GL(glEnableVertexAttribArray(0));
 
       CHECK_GL(glVertexAttribPointer(
-          1,        // input location = 1
-          2,        // vec2
-          GL_FLOAT, // vector of floats
-          GL_FALSE, // don't normalize input data
-          4 * sizeof(float
-              ), // stride; offset between each vector (2 = xy, 4 = xyvu)
-          (void *)(2 * sizeof(float)) // offset; where data begins in the buffer
+        1,        // input location = 1
+        2,        // vec2
+        GL_FLOAT, // vector of floats
+        GL_FALSE, // don't normalize input data
+        4 * sizeof(float
+            ), // stride; offset between each vector (2 = xy, 4 = xyvu)
+        (void *)(2 * sizeof(float)) // offset; where data begins in the buffer
       ));
       CHECK_GL(glEnableVertexAttribArray(1));
     }

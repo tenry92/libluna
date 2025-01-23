@@ -87,7 +87,10 @@ void CommonRenderer::clearBackground([[maybe_unused]] ColorRgb color) {
   // stub
 }
 
-bool CommonRenderer::sliceTexture([[maybe_unused]] Image *image, [[maybe_unused]] std::vector<Image> &slices, [[maybe_unused]] Vector2i &sliceCount) {
+bool CommonRenderer::sliceTexture(
+  [[maybe_unused]] Image *image, [[maybe_unused]] std::vector<Image> &slices,
+  [[maybe_unused]] Vector2i &sliceCount
+) {
   return false;
 }
 
@@ -100,13 +103,13 @@ void CommonRenderer::destroyTexture([[maybe_unused]] int id) {
 }
 
 void CommonRenderer::loadTexture(
-    [[maybe_unused]] int id, [[maybe_unused]] Image *image
+  [[maybe_unused]] int id, [[maybe_unused]] Image *image
 ) {
   // stub
 }
 
 void CommonRenderer::resizeTexture(
-    [[maybe_unused]] int id, [[maybe_unused]] Vector2i size
+  [[maybe_unused]] int id, [[maybe_unused]] Vector2i size
 ) {
   // stub
 }
@@ -120,13 +123,13 @@ void CommonRenderer::destroyShape([[maybe_unused]] int id) {
 }
 
 void CommonRenderer::loadShape(
-    [[maybe_unused]] int id, [[maybe_unused]] Shape *shape
+  [[maybe_unused]] int id, [[maybe_unused]] Shape *shape
 ) {
   // stub
 }
 
 void CommonRenderer::setViewport(
-    [[maybe_unused]] Vector2i offset, [[maybe_unused]] Vector2i size
+  [[maybe_unused]] Vector2i offset, [[maybe_unused]] Vector2i size
 ) {
   // stub
 }
@@ -136,19 +139,19 @@ void CommonRenderer::imguiNewFrame() {
 }
 
 void CommonRenderer::renderMesh(
-    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info
+  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info
 ) {
   // stub
 }
 
 void CommonRenderer::renderTexture(
-    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info
+  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info
 ) {
   // stub
 }
 
 void CommonRenderer::renderShape(
-    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderShapeInfo *info
+  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderShapeInfo *info
 ) {
   // stub
 }
@@ -162,13 +165,13 @@ void CommonRenderer::destroyMesh([[maybe_unused]] int id) {
 }
 
 void CommonRenderer::loadMesh(
-    [[maybe_unused]] int id, [[maybe_unused]] std::shared_ptr<Mesh> mesh
+  [[maybe_unused]] int id, [[maybe_unused]] std::shared_ptr<Mesh> mesh
 ) {
   // stub
 }
 
 void CommonRenderer::setTextureFilterEnabled(
-    [[maybe_unused]] int id, [[maybe_unused]] bool enabled
+  [[maybe_unused]] int id, [[maybe_unused]] bool enabled
 ) {
   // stub
 }
@@ -216,9 +219,7 @@ Vector2i CommonRenderer::getTextureSize(int id) const {
   return mTextureIdMapping.at(id).size;
 }
 
-void CommonRenderer::updateTextureCache(
-    [[maybe_unused]] Stage *stage
-) {
+void CommonRenderer::updateTextureCache([[maybe_unused]] Stage *stage) {
   auto imagesLoaderCache = stage->getTextureCache()->getCache();
 
   std::unordered_set<ImageLoader *> visitedImageLoaders;
@@ -241,9 +242,10 @@ void CommonRenderer::updateTextureCache(
         for (auto &&slice : slices) {
           int textureId = mTextureIdAllocator.next();
           mTextureIdMapping.emplace(
-              textureId, Texture{textureId, slice.getSize()}
+            textureId, Texture{textureId, slice.getSize()}
           );
-          slicedTexture.slices.emplace_back(Texture{textureId, slice.getSize()});
+          slicedTexture.slices.emplace_back(Texture{textureId, slice.getSize()}
+          );
           logDebug("create sliced texture #{}", textureId);
           createTexture(textureId);
           loadTexture(textureId, &slice);
@@ -252,7 +254,7 @@ void CommonRenderer::updateTextureCache(
         int textureId = mTextureIdAllocator.next();
         mKnownImages.emplace(imageLoader, Texture{textureId, image.getSize()});
         mTextureIdMapping.emplace(
-            textureId, Texture{textureId, image.getSize()}
+          textureId, Texture{textureId, image.getSize()}
         );
         logDebug("create texture #{}", textureId);
         createTexture(textureId);
@@ -371,150 +373,156 @@ void CommonRenderer::renderWorld(Canvas *canvas) {
 }
 
 void CommonRenderer::render2d(
-    Canvas *canvas, [[maybe_unused]] Vector2i renderSize
+  Canvas *canvas, [[maybe_unused]] Vector2i renderSize
 ) {
   for (auto &&drawable : canvas->getStage()->getSortedDrawables2d()) {
     std::visit(
-        overloaded{
-            [](auto) {},
-            [&](const Sprite &sprite) {
-              if (!sprite.isVisible()) {
-                return;
+      overloaded{
+        [](auto) {},
+        [&](const Sprite &sprite) {
+          if (!sprite.isVisible()) {
+            return;
+          }
+
+          if (!sprite.getImageLoader() || !mKnownImages.count(sprite.getImageLoader())) {
+            return;
+          }
+
+          RenderTextureInfo info;
+
+          auto &textureOrSlices = mKnownImages.at(sprite.getImageLoader());
+
+          if (std::holds_alternative<Texture>(textureOrSlices)) {
+            auto &texture = std::get<Texture>(textureOrSlices);
+
+            info.textureId = texture.id;
+            info.size = texture.size;
+            info.position =
+              sprite.getPosition() - canvas->getCamera2d().getPosition();
+            renderTexture(canvas, &info);
+          } else {
+            auto &slicedTexture = std::get<SlicedTexture>(textureOrSlices);
+
+            info.position =
+              sprite.getPosition() - canvas->getCamera2d().getPosition();
+
+            for (int y = 0; y < slicedTexture.sliceCount.y; ++y) {
+              for (int x = 0; x < slicedTexture.sliceCount.x; ++x) {
+                auto &slice =
+                  slicedTexture.slices[y * slicedTexture.sliceCount.x + x];
+                info.textureId = slice.id;
+                info.size = slice.size;
+                info.crop = {0, 0, info.size.x, info.size.y};
+                renderTexture(canvas, &info);
+
+                info.position.x += static_cast<float>(info.size.x);
               }
 
-              if (!sprite.getImageLoader() || !mKnownImages.count(sprite.getImageLoader())) {
-                return;
+              info.position.x =
+                sprite.getPosition().x - canvas->getCamera2d().getPosition().x;
+              info.position.y += static_cast<float>(info.size.y);
+            }
+          }
+        },
+        [&](const Primitive &primitive) {
+          if (!primitive.getShape() || !mKnownShapes.count(primitive.getShape())) {
+            return;
+          }
+
+          RenderShapeInfo info;
+          info.shapeId = mKnownShapes.at(primitive.getShape());
+          info.position = primitive.getPosition();
+          renderShape(canvas, &info);
+        },
+        [&](const Tilemap &tilemap) {
+          auto tileset = tilemap.getTileset();
+          auto &textureOrSlices = mKnownImages.at(tileset->getImage());
+
+          if (!std::holds_alternative<Texture>(textureOrSlices)) {
+            return;
+          }
+
+          auto &texture = std::get<Texture>(textureOrSlices);
+
+          for (int y = 0; y < tilemap.getSize().height; ++y) {
+            for (int x = 0; x < tilemap.getSize().width; ++x) {
+              auto tile = tilemap.at({x, y});
+              if (tile == 0) {
+                continue;
               }
 
               RenderTextureInfo info;
+              info.textureId = texture.id;
+              info.crop = {
+                tile % tileset->getColumns() * tileset->getTileSize(),
+                tile / tileset->getColumns() * tileset->getTileSize(),
+                tileset->getTileSize(), tileset->getTileSize()};
+              info.size = {tileset->getTileSize(), tileset->getTileSize()};
+              info.position = {
+                static_cast<float>(x * tileset->getTileSize()),
+                static_cast<float>(y * tileset->getTileSize())};
+              renderTexture(canvas, &info);
+            }
+          }
+        },
+        [&](const Text &text) {
+          auto font = text.getFont();
 
-              auto &textureOrSlices = mKnownImages.at(sprite.getImageLoader());
+          auto startPosition = text.getPosition();
+
+          float x = startPosition.x;
+          float y = startPosition.y;
+
+          y += text.getSize() * font->getBaseLine();
+
+          for (auto &&cp : text.getContent()) {
+            if (cp == '\n') {
+              x = startPosition.x;
+              y +=
+                text.getSize() * text.getLineHeight() * font->getLineHeight();
+              continue;
+            }
+
+            auto glyph = font->getGlyphByCodePoint(cp);
+
+            if (!glyph) {
+              // unknown glyph
+              continue;
+            }
+
+            if (cp != ' ' && glyph->imageLoader) {
+              auto &textureOrSlices = mKnownImages.at(glyph->imageLoader);
 
               if (std::holds_alternative<Texture>(textureOrSlices)) {
+                RenderTextureInfo info;
+
                 auto &texture = std::get<Texture>(textureOrSlices);
 
                 info.textureId = texture.id;
-                info.size = texture.size;
-                info.position = sprite.getPosition() - canvas->getCamera2d().getPosition();
+                info.position =
+                  Vector2i(static_cast<int>(x), static_cast<int>(y)) +
+                  Vector2i(
+                    static_cast<int>(text.getSize() * glyph->offset.x),
+                    static_cast<int>(text.getSize() * glyph->offset.y)
+                  );
+
+                if (glyph->crop.area() > 0) {
+                  info.size = {
+                    static_cast<int>(text.getSize() * glyph->crop.width),
+                    static_cast<int>(text.getSize() * glyph->crop.height)};
+                  info.crop = glyph->crop;
+                } else {
+                  info.size = texture.size;
+                }
+
                 renderTexture(canvas, &info);
-              } else {
-                auto &slicedTexture = std::get<SlicedTexture>(textureOrSlices);
-
-                info.position = sprite.getPosition() - canvas->getCamera2d().getPosition();
-
-                for (int y = 0; y < slicedTexture.sliceCount.y; ++y) {
-                  for (int x = 0; x < slicedTexture.sliceCount.x; ++x) {
-                    auto &slice = slicedTexture.slices[y * slicedTexture.sliceCount.x + x];
-                    info.textureId = slice.id;
-                    info.size = slice.size;
-                    info.crop = {0, 0, info.size.x, info.size.y};
-                    renderTexture(canvas, &info);
-
-                    info.position.x += static_cast<float>(info.size.x);
-                  }
-
-                  info.position.x = sprite.getPosition().x - canvas->getCamera2d().getPosition().x;
-                  info.position.y += static_cast<float>(info.size.y);
-                }
               }
-            },
-            [&](const Primitive &primitive) {
-              if (!primitive.getShape() || !mKnownShapes.count(primitive.getShape())) {
-                return;
-              }
+            }
 
-              RenderShapeInfo info;
-              info.shapeId = mKnownShapes.at(primitive.getShape());
-              info.position = primitive.getPosition();
-              renderShape(canvas, &info);
-            },
-            [&](const Tilemap &tilemap) {
-              auto tileset = tilemap.getTileset();
-              auto &textureOrSlices = mKnownImages.at(tileset->getImage());
-
-              if (!std::holds_alternative<Texture>(textureOrSlices)) {
-                return;
-              }
-
-              auto &texture = std::get<Texture>(textureOrSlices);
-
-              for (int y = 0; y < tilemap.getSize().height; ++y) {
-                for (int x = 0; x < tilemap.getSize().width; ++x) {
-                  auto tile = tilemap.at({x, y});
-                  if (tile == 0) {
-                    continue;
-                  }
-
-                  RenderTextureInfo info;
-                  info.textureId = texture.id;
-                  info.crop = {
-                      tile % tileset->getColumns() * tileset->getTileSize(),
-                      tile / tileset->getColumns() * tileset->getTileSize(),
-                      tileset->getTileSize(), tileset->getTileSize()};
-                  info.size = {tileset->getTileSize(), tileset->getTileSize()};
-                  info.position = {
-                      static_cast<float>(x * tileset->getTileSize()),
-                      static_cast<float>(y * tileset->getTileSize())};
-                  renderTexture(canvas, &info);
-                }
-              }
-            },
-            [&](const Text &text) {
-              auto font = text.getFont();
-
-              auto startPosition = text.getPosition();
-
-              float x = startPosition.x;
-              float y = startPosition.y;
-
-              y += text.getSize() * font->getBaseLine();
-
-              for (auto &&cp : text.getContent()) {
-                if (cp == '\n') {
-                  x = startPosition.x;
-                  y += text.getSize() * text.getLineHeight() * font->getLineHeight();
-                  continue;
-                }
-
-                auto glyph = font->getGlyphByCodePoint(cp);
-
-                if (!glyph) {
-                  // unknown glyph
-                  continue;
-                }
-
-                if (cp != ' ' && glyph->imageLoader) {
-                  auto &textureOrSlices = mKnownImages.at(glyph->imageLoader);
-
-                  if (std::holds_alternative<Texture>(textureOrSlices)) {
-                    RenderTextureInfo info;
-
-                    auto &texture = std::get<Texture>(textureOrSlices);
-
-                    info.textureId = texture.id;
-                    info.position = Vector2i(static_cast<int>(x), static_cast<int>(y)) + Vector2i(
-                      static_cast<int>(text.getSize() * glyph->offset.x),
-                      static_cast<int>(text.getSize() * glyph->offset.y)
-                    );
-
-                    if (glyph->crop.area() > 0) {
-                      info.size = {
-                        static_cast<int>(text.getSize() * glyph->crop.width),
-                        static_cast<int>(text.getSize() * glyph->crop.height)
-                      };
-                      info.crop = glyph->crop;
-                    } else {
-                      info.size = texture.size;
-                    }
-
-                    renderTexture(canvas, &info);
-                  }
-                }
-
-                x += text.getSize() * glyph->advance;
-              }
-            }},
-        drawable
+            x += text.getSize() * glyph->advance;
+          }
+        }},
+      drawable
     );
   }
 }

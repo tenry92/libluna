@@ -53,7 +53,7 @@ unsigned long System::getPhysicalMemoryUsage() {
 #elif defined(_WIN32)
   PROCESS_MEMORY_COUNTERS_EX pmc;
   GetProcessMemoryInfo(
-      GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc)
+    GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc)
   );
   return static_cast<unsigned long>(pmc.WorkingSetSize);
 #else
@@ -85,7 +85,7 @@ unsigned long System::getVirtualMemoryUsage() {
 #elif defined(_WIN32)
   PROCESS_MEMORY_COUNTERS_EX pmc;
   GetProcessMemoryInfo(
-      GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc)
+    GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc)
   );
   return static_cast<unsigned long>(pmc.PrivateUsage);
 #else
@@ -124,8 +124,7 @@ unsigned long System::getUsedHeapSize() {
 }
 
 std::list<String> System::getAssetFiles() {
-  auto assetsPath =
-      Application::getInstance()->getAssetsPath().getRawPath();
+  auto assetsPath = Application::getInstance()->getAssetsPath().getRawPath();
   std::list<String> list;
 
 #ifdef N64
@@ -138,7 +137,8 @@ std::list<String> System::getAssetFiles() {
   }
 #else
   if (fs::exists(assetsPath.c_str()) && fs::is_directory(assetsPath.c_str())) {
-    for (const auto &entry : fs::recursive_directory_iterator(assetsPath.c_str())) {
+    for (const auto &entry :
+         fs::recursive_directory_iterator(assetsPath.c_str())) {
       list.emplace_back(entry.path().c_str());
     }
   }

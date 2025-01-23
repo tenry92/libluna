@@ -47,7 +47,7 @@ std::vector<uint8_t> Zlib::inflate() {
   // decompress until deflate stream ends or end of file
   do {
     mStream.avail_in =
-        static_cast<unsigned int>(mReader->read(input, 1, CHUNK_SIZE));
+      static_cast<unsigned int>(mReader->read(input, 1, CHUNK_SIZE));
 
     if (mStream.avail_in == 0) {
       end();
@@ -72,8 +72,8 @@ std::vector<uint8_t> Zlib::inflate() {
 
       result.resize(result.size() + have);
       std::memcpy(
-          reinterpret_cast<void *>(result.data() + result.size() - have),
-          output, have
+        reinterpret_cast<void *>(result.data() + result.size() - have), output,
+        have
       );
     } while (mStream.avail_out == 0);
   } while (ret != Z_STREAM_END);

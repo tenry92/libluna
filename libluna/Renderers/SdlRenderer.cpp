@@ -59,7 +59,7 @@ void SdlRenderer::initialize() {
 
       if (result != 0) {
         logError(
-            "cannot retrieve sdl render driver info #{}: {}", i, SDL_GetError()
+          "cannot retrieve sdl render driver info #{}: {}", i, SDL_GetError()
         );
         continue;
       }
@@ -70,9 +70,9 @@ void SdlRenderer::initialize() {
 
   logInfo("creating SDL renderer");
   std::unique_ptr<SDL_Renderer, SdlDeleter> renderer(SDL_CreateRenderer(
-      getCanvas()->sdl.window,
-      -1, /* -1 = most suitable driver, 0 = first available driver */
-      SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
+    getCanvas()->sdl.window,
+    -1, /* -1 = most suitable driver, 0 = first available driver */
+    SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
   ));
   logDebug("sdl renderer created");
 
@@ -143,7 +143,7 @@ Internal::GraphicsMetrics SdlRenderer::getMetrics() { return *mMetrics; }
 void SdlRenderer::clearBackground(ColorRgb color) {
   auto color32 = makeColorRgb32(color);
   CHECK_SDL(SDL_SetRenderDrawColor(
-      mRenderer.get(), color32.red, color32.green, color32.blue, color32.alpha
+    mRenderer.get(), color32.red, color32.green, color32.blue, color32.alpha
   ));
   CHECK_SDL(SDL_RenderClear(mRenderer.get()));
 }
@@ -180,9 +180,8 @@ void SdlRenderer::loadTexture(int id, Image *image) {
   }
 
   SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(
-      (void *)(image->getData()), image->getSize().width,
-      image->getSize().height, image->getBitsPerPixel(),
-      image->getBytesPerRow(), surfaceFormat
+    (void *)(image->getData()), image->getSize().width, image->getSize().height,
+    image->getBitsPerPixel(), image->getBytesPerRow(), surfaceFormat
   );
 
   auto texture = SDL_CreateTextureFromSurface(mRenderer.get(), surface);
@@ -193,7 +192,7 @@ void SdlRenderer::loadTexture(int id, Image *image) {
 }
 
 void SdlRenderer::resizeTexture(
-    [[maybe_unused]] int id, [[maybe_unused]] Vector2i size
+  [[maybe_unused]] int id, [[maybe_unused]] Vector2i size
 ) {
   if (mTextureIdMapping.count(id)) {
     SDL_Texture *oldTexture = mTextureIdMapping.at(id);
@@ -202,24 +201,24 @@ void SdlRenderer::resizeTexture(
   }
 
   SDL_Texture *texture = SDL_CreateTexture(
-      mRenderer.get(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET,
-      size.width, size.height
+    mRenderer.get(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET,
+    size.width, size.height
   );
   SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
   mTextureIdMapping.emplace(id, texture);
 }
 
 void SdlRenderer::renderTexture(
-    [[maybe_unused]] Canvas *canvas, RenderTextureInfo *info
+  [[maybe_unused]] Canvas *canvas, RenderTextureInfo *info
 ) {
   auto texture = mTextureIdMapping.at(info->textureId);
 
   SDL_Rect srcrect = {
-      info->crop.x, info->crop.y, info->crop.width, info->crop.height};
+    info->crop.x, info->crop.y, info->crop.width, info->crop.height};
 
   SDL_Rect dstrect = {
-      static_cast<int>(info->position.x), static_cast<int>(info->position.y),
-      info->size.width, info->size.height};
+    static_cast<int>(info->position.x), static_cast<int>(info->position.y),
+    info->size.width, info->size.height};
   if (srcrect.w == 0 || srcrect.h == 0) {
     CHECK_SDL(SDL_RenderCopy(mRenderer.get(), texture, nullptr, &dstrect));
   } else {
@@ -233,12 +232,14 @@ void SdlRenderer::destroyShape([[maybe_unused]] int id) {
   mShapeIdMapping.erase(id);
 }
 
-void SdlRenderer::loadShape([[maybe_unused]] int id, [[maybe_unused]] Shape *shape) {
+void SdlRenderer::loadShape(
+  [[maybe_unused]] int id, [[maybe_unused]] Shape *shape
+) {
   mShapeIdMapping.emplace(id, shape);
 }
 
 void SdlRenderer::renderShape(
-    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderShapeInfo *info
+  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderShapeInfo *info
 ) {
   auto shape = mShapeIdMapping.at(info->shapeId);
 
@@ -251,11 +252,13 @@ void SdlRenderer::renderShape(
     points.push_back({info->position.x + point.x, info->position.y + point.y});
   }
 
-  SDL_RenderDrawLinesF(mRenderer.get(), points.data(), static_cast<int>(points.size()));
+  SDL_RenderDrawLinesF(
+    mRenderer.get(), points.data(), static_cast<int>(points.size())
+  );
 }
 
 void SdlRenderer::setTextureFilterEnabled(
-    [[maybe_unused]] int id, [[maybe_unused]] bool enabled
+  [[maybe_unused]] int id, [[maybe_unused]] bool enabled
 ) {}
 
 void SdlRenderer::setRenderTargetTexture(int id) {

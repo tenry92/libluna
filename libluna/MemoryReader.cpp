@@ -31,7 +31,7 @@ std::size_t MemoryReader::seekRelative(int relativePosition) {
 }
 
 std::size_t MemoryReader::read(
-    uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
+  uint8_t *buffer, std::size_t objectSize, std::size_t objectCount
 ) {
   auto endPos = mPos + objectSize * objectCount;
 

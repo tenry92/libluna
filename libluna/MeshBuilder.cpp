@@ -3,7 +3,7 @@
 using namespace Luna;
 
 void MeshBuilder::addQuadFace(
-    std::shared_ptr<Mesh> mesh, std::array<Vector3f, 4> vertices
+  std::shared_ptr<Mesh> mesh, std::array<Vector3f, 4> vertices
 ) {
   auto indexOffset = static_cast<uint32_t>(mesh->getVertices().size());
 
@@ -48,15 +48,15 @@ void MeshBuilder::addQuadFace(
 
   for (int i = 0; i < 4; ++i) {
     mesh->getTangents().push_back(
-        {f * (deltaUv2.y * edge1.x - deltaUv1.y * edge2.x),
-         f * (deltaUv2.y * edge1.y - deltaUv1.y * edge2.y),
-         f * (deltaUv2.y * edge1.z - deltaUv1.y * edge2.z)}
+      {f * (deltaUv2.y * edge1.x - deltaUv1.y * edge2.x),
+       f * (deltaUv2.y * edge1.y - deltaUv1.y * edge2.y),
+       f * (deltaUv2.y * edge1.z - deltaUv1.y * edge2.z)}
     );
 
     mesh->getBitangents().push_back(
-        {f * (-deltaUv2.x * edge1.x + deltaUv1.x * edge2.x),
-         f * (-deltaUv2.x * edge1.y + deltaUv1.x * edge2.y),
-         f * (-deltaUv2.x * edge1.z + deltaUv1.x * edge2.z)}
+      {f * (-deltaUv2.x * edge1.x + deltaUv1.x * edge2.x),
+       f * (-deltaUv2.x * edge1.y + deltaUv1.x * edge2.y),
+       f * (-deltaUv2.x * edge1.z + deltaUv1.x * edge2.z)}
     );
   }
 }

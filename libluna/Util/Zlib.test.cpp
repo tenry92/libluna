@@ -23,7 +23,7 @@ int main(int, char **) {
     auto result = zlib.inflate();
 
     std::string decodedString(
-        reinterpret_cast<const char *>(result.data()), result.size()
+      reinterpret_cast<const char *>(result.data()), result.size()
     );
 
     ASSERT_EQL(decodedString, std::string(expectedResult), "");

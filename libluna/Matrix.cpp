@@ -61,7 +61,7 @@ Matrix4x4 Matrix4x4::translate(Vector3f vector) const {
   Matrix4x4 matrix = *this;
 
   matrix.mMatrix =
-      glm::translate(matrix.mMatrix, glm::vec3(vector.x, vector.y, vector.z));
+    glm::translate(matrix.mMatrix, glm::vec3(vector.x, vector.y, vector.z));
 
   return matrix;
 }
@@ -69,7 +69,7 @@ Matrix4x4 Matrix4x4::translate(Vector3f vector) const {
 Matrix4x4 Matrix4x4::rotateX(float angle) const {
   Matrix4x4 matrix = *this;
   matrix.mMatrix =
-      glm::rotate(matrix.mMatrix, angle, glm::vec3(1.0f, 0.0f, 0.0f));
+    glm::rotate(matrix.mMatrix, angle, glm::vec3(1.0f, 0.0f, 0.0f));
 
   return matrix;
 }
@@ -77,7 +77,7 @@ Matrix4x4 Matrix4x4::rotateX(float angle) const {
 Matrix4x4 Matrix4x4::rotateY(float angle) const {
   Matrix4x4 matrix = *this;
   matrix.mMatrix =
-      glm::rotate(matrix.mMatrix, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::rotate(matrix.mMatrix, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 
   return matrix;
 }
@@ -85,7 +85,7 @@ Matrix4x4 Matrix4x4::rotateY(float angle) const {
 Matrix4x4 Matrix4x4::rotateZ(float angle) const {
   Matrix4x4 matrix = *this;
   matrix.mMatrix =
-      glm::rotate(matrix.mMatrix, angle, glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::rotate(matrix.mMatrix, angle, glm::vec3(0.0f, 0.0f, 1.0f));
 
   return matrix;
 }

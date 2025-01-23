@@ -77,42 +77,42 @@ void OpenglRenderer::initialize() {
   glGetIntegerv(GL_MINOR_VERSION, &mMetrics->glMinor);
   mMetrics->vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
   mMetrics->shadingLangVersion =
-      reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
+    reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
 
   GL::ShaderLib shaderLib;
   shaderLib.registerShader(
-      "sprite_vert.glsl",
-      std::make_unique<MemoryReader>(sprite_vert_glsl, sprite_vert_glsl_len)
+    "sprite_vert.glsl",
+    std::make_unique<MemoryReader>(sprite_vert_glsl, sprite_vert_glsl_len)
   );
   shaderLib.registerShader(
-      "sprite_frag.glsl",
-      std::make_unique<MemoryReader>(sprite_frag_glsl, sprite_frag_glsl_len)
+    "sprite_frag.glsl",
+    std::make_unique<MemoryReader>(sprite_frag_glsl, sprite_frag_glsl_len)
   );
   shaderLib.registerShader(
-      "primitive_vert.glsl",
-      std::make_unique<MemoryReader>(primitive_vert_glsl, primitive_vert_glsl_len)
+    "primitive_vert.glsl",
+    std::make_unique<MemoryReader>(primitive_vert_glsl, primitive_vert_glsl_len)
   );
   shaderLib.registerShader(
-      "primitive_frag.glsl",
-      std::make_unique<MemoryReader>(primitive_frag_glsl, primitive_frag_glsl_len)
+    "primitive_frag.glsl",
+    std::make_unique<MemoryReader>(primitive_frag_glsl, primitive_frag_glsl_len)
   );
   shaderLib.registerShader(
-      "3d_vert.glsl",
-      std::make_unique<MemoryReader>(__3d_vert_glsl, __3d_vert_glsl_len)
+    "3d_vert.glsl",
+    std::make_unique<MemoryReader>(__3d_vert_glsl, __3d_vert_glsl_len)
   );
   shaderLib.registerShader(
-      "3d_frag.glsl",
-      std::make_unique<MemoryReader>(__3d_frag_glsl, __3d_frag_glsl_len)
+    "3d_frag.glsl",
+    std::make_unique<MemoryReader>(__3d_frag_glsl, __3d_frag_glsl_len)
   );
   shaderLib.registerShader(
-      "common3d.glsl",
-      std::make_unique<MemoryReader>(common3d_glsl, common3d_glsl_len)
+    "common3d.glsl",
+    std::make_unique<MemoryReader>(common3d_glsl, common3d_glsl_len)
   );
 
   mSpriteShader =
-      shaderLib.compileShader("sprite_vert.glsl", "sprite_frag.glsl");
+    shaderLib.compileShader("sprite_vert.glsl", "sprite_frag.glsl");
   mPrimitiveShader =
-      shaderLib.compileShader("primitive_vert.glsl", "primitive_frag.glsl");
+    shaderLib.compileShader("primitive_vert.glsl", "primitive_frag.glsl");
   mModelShader = shaderLib.compileShader("3d_vert.glsl", "3d_frag.glsl");
 }
 
@@ -128,7 +128,7 @@ void OpenglRenderer::initializeImmediateGui() {
 
 #ifdef LUNA_WINDOW_SDL2
   ImGui_ImplSDL2_InitForOpenGL(
-      getCanvas()->sdl.window, getCanvas()->sdl.glContext
+    getCanvas()->sdl.window, getCanvas()->sdl.glContext
   );
 #endif
 
@@ -230,19 +230,19 @@ void OpenglRenderer::loadTexture(int id, Image *image) {
 
   CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
   CHECK_GL(glTexImage2D(
-      GL_TEXTURE_2D, 0,                         /* mipmap level */
-      GL_RGBA,                                  /* internal format */
-      image->getWidth(), image->getHeight(), 0, /* format (legacy) */
-      inputFormat,                              /* input format */
-      inputType, image->getData()
+    GL_TEXTURE_2D, 0,                         /* mipmap level */
+    GL_RGBA,                                  /* internal format */
+    image->getWidth(), image->getHeight(), 0, /* format (legacy) */
+    inputFormat,                              /* input format */
+    inputType, image->getData()
   ));
   glTexParameteri(
-      GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-      image->isInterpolated() ? GL_LINEAR : GL_NEAREST
+    GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+    image->isInterpolated() ? GL_LINEAR : GL_NEAREST
   );
   glTexParameteri(
-      GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-      image->isInterpolated() ? GL_LINEAR : GL_NEAREST
+    GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+    image->isInterpolated() ? GL_LINEAR : GL_NEAREST
   );
 }
 
@@ -250,13 +250,13 @@ void OpenglRenderer::resizeTexture(int id, Vector2i size) {
   GLuint texture = mTextureIdMapping.at(id);
   CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
   CHECK_GL(glTexImage2D(
-      GL_TEXTURE_2D, 0, GL_RGBA, size.width, size.height, 0, GL_RGBA,
-      GL_UNSIGNED_BYTE, nullptr
+    GL_TEXTURE_2D, 0, GL_RGBA, size.width, size.height, 0, GL_RGBA,
+    GL_UNSIGNED_BYTE, nullptr
   ));
 }
 
 void OpenglRenderer::renderTexture(
-    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info
+  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderTextureInfo *info
 ) {
   mSpriteShader.use();
   glDisable(GL_DEPTH_TEST);
@@ -268,8 +268,7 @@ void OpenglRenderer::renderTexture(
   auto screenSize = getCurrentRenderSize();
   mUniforms.screenSize = mSpriteShader.getUniform("uScreenSize");
   mUniforms.screenSize = Vector2f(
-      static_cast<float>(screenSize.width),
-      static_cast<float>(screenSize.height)
+    static_cast<float>(screenSize.width), static_cast<float>(screenSize.height)
   );
 
   GLuint texture = mTextureIdMapping.at(info->textureId);
@@ -279,9 +278,9 @@ void OpenglRenderer::renderTexture(
   if (info->crop.area() > 0) {
     auto tetureSize = getTextureSize(info->textureId);
     crop.x =
-        static_cast<float>(info->crop.x) / static_cast<float>(tetureSize.width);
-    crop.y = static_cast<float>(info->crop.y) /
-             static_cast<float>(tetureSize.height);
+      static_cast<float>(info->crop.x) / static_cast<float>(tetureSize.width);
+    crop.y =
+      static_cast<float>(info->crop.y) / static_cast<float>(tetureSize.height);
     crop.width = static_cast<float>(info->crop.width) /
                  static_cast<float>(tetureSize.width);
     crop.height = static_cast<float>(info->crop.height) /
@@ -311,7 +310,7 @@ void OpenglRenderer::destroyMesh([[maybe_unused]] int id) {
 }
 
 void OpenglRenderer::loadMesh(
-    [[maybe_unused]] int id, [[maybe_unused]] std::shared_ptr<Mesh> mesh
+  [[maybe_unused]] int id, [[maybe_unused]] std::shared_ptr<Mesh> mesh
 ) {
   auto meshBuffer = std::make_shared<GL::MeshBuffer>(mesh);
 
@@ -319,7 +318,7 @@ void OpenglRenderer::loadMesh(
 }
 
 void OpenglRenderer::renderMesh(
-    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info
+  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderMeshInfo *info
 ) {
   mModelShader.use();
   glEnable(GL_DEPTH_TEST);
@@ -329,14 +328,14 @@ void OpenglRenderer::renderMesh(
   auto ambientLight = canvas->getStage()->getAmbientLight();
   mUniforms.ambientLightColor = mModelShader.getUniform("uAmbientLight.color");
   mUniforms.ambientLightIntensity =
-      mModelShader.getUniform("uAmbientLight.intensity");
+    mModelShader.getUniform("uAmbientLight.intensity");
   mUniforms.ambientLightColor = ambientLight.color;
   mUniforms.ambientLightIntensity = ambientLight.intensity;
 
   mUniforms.pointLightsColor =
-      mModelShader.getUniform("uPointLights[{}].color", 1);
+    mModelShader.getUniform("uPointLights[{}].color", 1);
   mUniforms.pointLightsPosition =
-      mModelShader.getUniform("uPointLights[{}].position", 1);
+    mModelShader.getUniform("uPointLights[{}].position", 1);
 
   for (auto &&pointLight : canvas->getStage()->getPointLights()) {
     mUniforms.pointLightsColor[0] = pointLight->color;
@@ -349,14 +348,14 @@ void OpenglRenderer::renderMesh(
   GLuint diffuse = mTextureIdMapping.at(info->diffuseTextureId);
 
   mUniforms.materialDiffuseMap =
-      mModelShader.getUniform("uMaterial.diffuseMap");
+    mModelShader.getUniform("uMaterial.diffuseMap");
   mUniforms.materialDiffuseMap = 0;
   CHECK_GL(glBindTexture(GL_TEXTURE_2D, diffuse));
 
   if (info->normalTextureId) {
     GLuint normal = mTextureIdMapping.at(info->normalTextureId);
     mUniforms.materialNormalMap =
-        mModelShader.getUniform("uMaterial.normalMap");
+      mModelShader.getUniform("uMaterial.normalMap");
     mUniforms.materialNormalMap = 1;
 
     glActiveTexture(GL_TEXTURE1);
@@ -373,10 +372,10 @@ void OpenglRenderer::renderMesh(
   mUniforms.transformView = camera.getViewMatrix();
 
   mUniforms.transformProjection =
-      mModelShader.getUniform("uTransform.projection");
+    mModelShader.getUniform("uTransform.projection");
   mUniforms.transformProjection = camera.getProjectionMatrix(
-      static_cast<float>(getCurrentRenderSize().width) /
-      static_cast<float>(getCurrentRenderSize().height)
+    static_cast<float>(getCurrentRenderSize().width) /
+    static_cast<float>(getCurrentRenderSize().height)
   );
 
   mesh->draw();
@@ -389,13 +388,13 @@ void OpenglRenderer::destroyShape([[maybe_unused]] int id) {
 }
 
 void OpenglRenderer::loadShape(
-    [[maybe_unused]] int id, [[maybe_unused]] Shape *shape
+  [[maybe_unused]] int id, [[maybe_unused]] Shape *shape
 ) {
   mShapeIdMapping.emplace(id, shape);
 }
 
 void OpenglRenderer::renderShape(
-    [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderShapeInfo *info
+  [[maybe_unused]] Canvas *canvas, [[maybe_unused]] RenderShapeInfo *info
 ) {
   auto shape = mShapeIdMapping.at(info->shapeId);
 
@@ -409,8 +408,7 @@ void OpenglRenderer::renderShape(
   auto screenSize = getCurrentRenderSize();
   mUniforms.screenSize = mPrimitiveShader.getUniform("uScreenSize");
   mUniforms.screenSize = Vector2f(
-      static_cast<float>(screenSize.width),
-      static_cast<float>(screenSize.height)
+    static_cast<float>(screenSize.width), static_cast<float>(screenSize.height)
   );
 
   unsigned int vertexAttribConf;
@@ -421,7 +419,9 @@ void OpenglRenderer::renderShape(
   CHECK_GL(glBindVertexArray(vertexAttribConf));
   CHECK_GL(glBindBuffer(GL_ARRAY_BUFFER, pointBuffer));
 
-  CHECK_GL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0));
+  CHECK_GL(glVertexAttribPointer(
+    0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0
+  ));
   CHECK_GL(glEnableVertexAttribArray(0));
 
   std::vector<float> vertices;
@@ -432,7 +432,10 @@ void OpenglRenderer::renderShape(
     vertices.push_back(vertex.y);
   }
 
-  CHECK_GL(glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW));
+  CHECK_GL(glBufferData(
+    GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(),
+    GL_STATIC_DRAW
+  ));
 
   mUniforms.primitiveColor = mPrimitiveShader.getUniform("uPrimitiveColor");
   mUniforms.primitiveColor = Luna::ColorRgb{1.0f, 0.f, 0.f, 1.f};
@@ -440,14 +443,16 @@ void OpenglRenderer::renderShape(
   mUniforms.uPrimitivePos = mPrimitiveShader.getUniform("uPrimitivePos");
   mUniforms.uPrimitivePos = info->position;
 
-  CHECK_GL(glDrawArrays(GL_LINE_STRIP, 0, static_cast<int>(shape->getVertices().size())));
+  CHECK_GL(glDrawArrays(
+    GL_LINE_STRIP, 0, static_cast<int>(shape->getVertices().size())
+  ));
 
   CHECK_GL(glDeleteBuffers(1, &pointBuffer));
   CHECK_GL(glDeleteVertexArrays(1, &vertexAttribConf));
 }
 
 void OpenglRenderer::setTextureFilterEnabled(
-    [[maybe_unused]] int id, [[maybe_unused]] bool enabled
+  [[maybe_unused]] int id, [[maybe_unused]] bool enabled
 ) {}
 
 void OpenglRenderer::setRenderTargetTexture(int id) {
@@ -465,7 +470,7 @@ void OpenglRenderer::setRenderTargetTexture(int id) {
   GLuint texture = mTextureIdMapping.at(id);
   CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
   CHECK_GL(glFramebufferTexture2D(
-      GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0
+    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0
   ));
 
   GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);

@@ -27,7 +27,7 @@ void DelayNode::render(float *buffer, int frameCount) {
 
     // copy previous data
     memcpy(
-        buffer, mBuffer.data() + mBufferOffset, sizeof(float) * chunkSampleCount
+      buffer, mBuffer.data() + mBufferOffset, sizeof(float) * chunkSampleCount
     );
     buffer += chunkSampleCount;
 
@@ -35,13 +35,13 @@ void DelayNode::render(float *buffer, int frameCount) {
     if (mInputs.size() > 0) {
       auto input = mInputs.front();
       input->render(
-          mBuffer.data() + mBufferOffset,
-          static_cast<int>(chunkSampleCount / getChannelCount())
+        mBuffer.data() + mBufferOffset,
+        static_cast<int>(chunkSampleCount / getChannelCount())
       );
     }
 
     mBufferOffset =
-        static_cast<int>((mBufferOffset + chunkSampleCount) % mBuffer.size());
+      static_cast<int>((mBufferOffset + chunkSampleCount) % mBuffer.size());
     renderedSampleCount += static_cast<int>(chunkSampleCount);
   }
 }

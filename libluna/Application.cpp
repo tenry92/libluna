@@ -417,7 +417,7 @@ int Application::run() {
 }
 
 void Application::addInterval(
-    int ratePerSecond, std::function<void(float)> callback
+  int ratePerSecond, std::function<void(float)> callback
 ) {
   mIntervalManager.addInterval(ratePerSecond, callback);
 }
@@ -532,12 +532,11 @@ AudioNodePtr Application::getAudioDestinationNode() const {
   return mAudioManager.getDestinationNode();
 }
 
-void Application::openDebugger([[maybe_unused]] Canvas *canvas
-) {
+void Application::openDebugger([[maybe_unused]] Canvas *canvas) {
 #ifdef LUNA_IMGUI
   if (!canvas->getImmediateGui()) {
     canvas->attachImmediateGui(
-        std::make_unique<Internal::DebugGui>(mDebugMetrics)
+      std::make_unique<Internal::DebugGui>(mDebugMetrics)
     );
   }
 #endif

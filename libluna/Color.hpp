@@ -20,9 +20,9 @@ namespace Luna {
    * Uses 5 bits for each color channel and 1 bit for alpha channel.
    */
   struct ColorRgb16 {
-    uint8_t red : 5; ///< Value between 0 and 31.
+    uint8_t red : 5;   ///< Value between 0 and 31.
     uint8_t green : 5; ///< Value between 0 and 31.
-    uint8_t blue : 5; ///< Value between 0 and 31.
+    uint8_t blue : 5;  ///< Value between 0 and 31.
     uint8_t alpha : 1; ///< 0 for transparent, 1 for opaque.
   };
 
@@ -30,18 +30,18 @@ namespace Luna {
    * @brief 24-bit packed "true" color in RGB (888) format.
    */
   struct ColorRgb24 {
-    uint8_t red{0}; ///< Value between 0 and 255.
+    uint8_t red{0};   ///< Value between 0 and 255.
     uint8_t green{0}; ///< Value between 0 and 255.
-    uint8_t blue{0}; ///< Value between 0 and 255.
+    uint8_t blue{0};  ///< Value between 0 and 255.
   };
 
   /**
    * @brief 32-bit packed "true" color in RGBA (8888) format.
    */
   struct ColorRgb32 {
-    uint8_t red{0}; ///< Value between 0 and 255.
-    uint8_t green{0}; ///< Value between 0 and 255.
-    uint8_t blue{0}; ///< Value between 0 and 255.
+    uint8_t red{0};     ///< Value between 0 and 255.
+    uint8_t green{0};   ///< Value between 0 and 255.
+    uint8_t blue{0};    ///< Value between 0 and 255.
     uint8_t alpha{255}; ///< Value between 0 and 255.
   };
 
@@ -49,9 +49,9 @@ namespace Luna {
    * @brief RGBA color using floating point values.
    */
   struct ColorRgb {
-    float red{0}; ///< Value between 0 and 1.
+    float red{0};   ///< Value between 0 and 1.
     float green{0}; ///< Value between 0 and 1.
-    float blue{0}; ///< Value between 0 and 1.
+    float blue{0};  ///< Value between 0 and 1.
     float alpha{1}; ///< Value between 0 and 1.
   };
 
@@ -59,29 +59,29 @@ namespace Luna {
    * @brief HSV color using floating point values.
    */
   struct ColorHsv {
-    float hue; ///< Value between 0 and 360.
+    float hue;        ///< Value between 0 and 360.
     float saturation; ///< Value between 0 and 1.
-    float value; ///< Value between 0 and 1.
-    float alpha{1}; ///< Value between 0 and 1.
+    float value;      ///< Value between 0 and 1.
+    float alpha{1};   ///< Value between 0 and 1.
   };
 
   /**
    * @brief HSL color using floating point values.
    */
   struct ColorHsl {
-    float hue; ///< Value between 0 and 360.
+    float hue;        ///< Value between 0 and 360.
     float saturation; ///< Value between 0 and 1.
-    float lightness; ///< Value between 0 and 1.
-    float alpha{1}; ///< Value between 0 and 1.
+    float lightness;  ///< Value between 0 and 1.
+    float alpha{1};   ///< Value between 0 and 1.
   };
 
   /**
    * @brief YUV color using floating point values.
    */
   struct ColorYuv {
-    float y; ///< Value between 0 and 1.
-    float u; ///< Value between -0.5 and 0.5.
-    float v; ///< Value between -0.5 and 0.5.
+    float y;        ///< Value between 0 and 1.
+    float u;        ///< Value between -0.5 and 0.5.
+    float v;        ///< Value between -0.5 and 0.5.
     float alpha{1}; ///< Value between 0 and 1.
   };
 #pragma pack(pop)

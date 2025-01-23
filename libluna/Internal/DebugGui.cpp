@@ -36,31 +36,31 @@ void DebugGui::render() {
 
     ImGui::Text("Frames elapsed: %d", mMetrics->framesElapsed);
     ImGui::Text(
-        "Average tick duration: %.2fms",
-        mMetrics->frameTicker.getTickDuration() * std::milli::den
+      "Average tick duration: %.2fms",
+      mMetrics->frameTicker.getTickDuration() * std::milli::den
     );
     ImGui::Text(
-        "Ticks per second: %0.1f", mMetrics->frameTicker.getTicksPerSecond()
+      "Ticks per second: %0.1f", mMetrics->frameTicker.getTicksPerSecond()
     );
     ImGui::Text(
-        "Average render duration: %.2fms",
-        mMetrics->renderTicker.getTickDuration() * std::milli::den
+      "Average render duration: %.2fms",
+      mMetrics->renderTicker.getTickDuration() * std::milli::den
     );
     ImGui::Text(
-        "Renders per second: %0.1f", mMetrics->renderTicker.getTicksPerSecond()
+      "Renders per second: %0.1f", mMetrics->renderTicker.getTicksPerSecond()
     );
 
     ImGui::Separator();
 
     float audioLoad =
-        audioMetrics->renderTicker.getTickDuration() / audioMetrics->bufferSize;
+      audioMetrics->renderTicker.getTickDuration() / audioMetrics->bufferSize;
     ImGui::Text(
-        "Audio buffer size: %.2fms", audioMetrics->bufferSize * std::milli::den
+      "Audio buffer size: %.2fms", audioMetrics->bufferSize * std::milli::den
     );
     ImGui::Text(
-        "Audio render duration: %.2fms (%.1f%%)",
-        audioMetrics->renderTicker.getTickDuration() * std::milli::den,
-        audioLoad * 100.0f
+      "Audio render duration: %.2fms (%.1f%%)",
+      audioMetrics->renderTicker.getTickDuration() * std::milli::den,
+      audioLoad * 100.0f
     );
 
     ImGui::Separator();
@@ -68,12 +68,12 @@ void DebugGui::render() {
     auto app = Application::getInstance();
     ImGui::Text("Processor count: %d", System::getProcessorCount());
     ImGui::Text(
-        "Physical memory usage: %.1f MiB",
-        static_cast<float>(System::getPhysicalMemoryUsage() / 1024 / 1024)
+      "Physical memory usage: %.1f MiB",
+      static_cast<float>(System::getPhysicalMemoryUsage() / 1024 / 1024)
     );
     ImGui::Text(
-        "Virtual memory usage: %.1f MiB",
-        static_cast<float>(System::getVirtualMemoryUsage() / 1024 / 1024)
+      "Virtual memory usage: %.1f MiB",
+      static_cast<float>(System::getVirtualMemoryUsage() / 1024 / 1024)
     );
 
     ImGui::Separator();
@@ -87,11 +87,11 @@ void DebugGui::render() {
 
         if (ImGui::BeginTabItem("Graphics")) {
           ImGui::Text(
-              "Max OpenGL version: %d.%d", metrics.glMajor, metrics.glMinor
+            "Max OpenGL version: %d.%d", metrics.glMajor, metrics.glMinor
           );
           ImGui::Text("Vendor: %s", metrics.vendor.c_str());
           ImGui::Text(
-              "Shading lang version: %s", metrics.shadingLangVersion.c_str()
+            "Shading lang version: %s", metrics.shadingLangVersion.c_str()
           );
           ImGui::Text("Max texture size: %d²", metrics.maxTextureSize);
           ImGui::EndTabItem();

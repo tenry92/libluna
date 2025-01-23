@@ -8,7 +8,7 @@ using namespace Luna::Audio;
 constexpr double pi = 3.14159265358979323846;
 
 OscillatorNode::OscillatorNode(
-    AudioManager *manager, float frequency, Type type
+  AudioManager *manager, float frequency, Type type
 )
     : AudioNode(manager) {
   mFrequency = frequency;
@@ -22,7 +22,7 @@ OscillatorNode::~OscillatorNode() = default;
 void OscillatorNode::render(float *buffer, int frameCount) {
   // assuming a frame rate of 48000
   float phaseIncrement =
-      static_cast<float>(pi * 2.0f * mFrequency / getFrameRate());
+    static_cast<float>(pi * 2.0f * mFrequency / getFrameRate());
 
   for (int i = 0; i < frameCount; ++i) {
     float sample;
@@ -52,8 +52,7 @@ void OscillatorNode::render(float *buffer, int frameCount) {
     buffer[i * 2] = buffer[i * 2 + 1] = sample;
 
     mPhase = fmodf(
-        static_cast<float>(mPhase + phaseIncrement),
-        static_cast<float>(pi * 2.0f)
+      static_cast<float>(mPhase + phaseIncrement), static_cast<float>(pi * 2.0f)
     );
   }
 }

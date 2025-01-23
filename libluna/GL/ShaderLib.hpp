@@ -19,12 +19,12 @@ namespace Luna::GL {
   class ShaderLib {
     public:
     void registerShader(
-        const std::string &filename, std::unique_ptr<Luna::InputStream> source
+      const std::string &filename, std::unique_ptr<Luna::InputStream> source
     ) {
       std::vector<char> contents(source->getSize());
       source->read(contents.data(), source->getSize());
       mRegisteredShaders.emplace(
-          filename, Luna::String(contents.data(), source->getSize())
+        filename, Luna::String(contents.data(), source->getSize())
       );
     }
 
@@ -37,9 +37,9 @@ namespace Luna::GL {
       fragmentLines.emplace_front("#version 330 core");
 
       auto vertexSource =
-          Luna::String::join(vertexLines.begin(), vertexLines.end(), '\n');
+        Luna::String::join(vertexLines.begin(), vertexLines.end(), '\n');
       auto fragmentSource =
-          Luna::String::join(fragmentLines.begin(), fragmentLines.end(), '\n');
+        Luna::String::join(fragmentLines.begin(), fragmentLines.end(), '\n');
 
       return GL::Shader(vertexSource.c_str(), fragmentSource.c_str());
     }
@@ -75,7 +75,7 @@ namespace Luna::GL {
 
 #ifdef INSERT_GLSL_LINE_STATEMENTS
           output.emplace_back(
-              fmt::format("#line {} \"{}\"", lineNumber, filename)
+            fmt::format("#line {} \"{}\"", lineNumber, filename)
           );
 #endif
         } else {

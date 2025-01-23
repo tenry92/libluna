@@ -172,7 +172,7 @@ namespace Luna {
     template <typename BufferType>
     std::size_t read(BufferType *buffer, std::size_t objectCount = 1) {
       return read(
-          reinterpret_cast<uint8_t *>(buffer), sizeof(BufferType), objectCount
+        reinterpret_cast<uint8_t *>(buffer), sizeof(BufferType), objectCount
       );
     }
 

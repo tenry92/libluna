@@ -27,8 +27,8 @@ static bool testFailed;
 
 static void TEST(const std::string &description, std::function<void()> test) {
   tests.push_back(Test{
-      description,
-      test,
+    description,
+    test,
   });
 }
 
@@ -41,27 +41,27 @@ static void ASSERT(bool condition, const std::string &message) {
 
 static void ASSERT_EQL(int actual, int expected, const std::string &message) {
   ASSERT(
-      actual == expected, message + ": expected " + std::to_string(actual) +
-                              " (actual) to be " + std::to_string(expected) +
-                              " (expected)"
+    actual == expected, message + ": expected " + std::to_string(actual) +
+                          " (actual) to be " + std::to_string(expected) +
+                          " (expected)"
   );
 }
 
 static void
 ASSERT_EQL(float actual, float expected, const std::string &message) {
   ASSERT(
-      abs(actual - expected) < 0.0001,
-      message + ": expected " + std::to_string(actual) + " (actual) to be " +
-          std::to_string(expected) + " (expected)"
+    abs(actual - expected) < 0.0001,
+    message + ": expected " + std::to_string(actual) + " (actual) to be " +
+      std::to_string(expected) + " (expected)"
   );
 }
 
 static void ASSERT_EQL(
-    std::string actual, std::string expected, const std::string &message
+  std::string actual, std::string expected, const std::string &message
 ) {
   ASSERT(
-      actual == expected, message + ": expected " + actual +
-                              " (actual) to be " + expected + " (expected)"
+    actual == expected, message + ": expected " + actual + " (actual) to be " +
+                          expected + " (expected)"
   );
 }
 

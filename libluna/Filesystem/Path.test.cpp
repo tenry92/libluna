@@ -16,7 +16,7 @@ int main(int, char **) {
 
     Path romfsAssetsPath("romfs:/assets");
     ASSERT_EQL(
-        romfsAssetsPath.getRawPath().s_str(), "romfs:/assets", "romfs:/assets"
+      romfsAssetsPath.getRawPath().s_str(), "romfs:/assets", "romfs:/assets"
     );
   });
 
@@ -27,12 +27,12 @@ int main(int, char **) {
 
     auto usrLocalIncludePath = usrPath.cd("local", "include");
     ASSERT_EQL(
-        usrLocalIncludePath.getRawPath().s_str(), "/usr/local/include", ""
+      usrLocalIncludePath.getRawPath().s_str(), "/usr/local/include", ""
     );
 
     auto usrLocalIncludePath2 = usrPath.cd("local/include");
     ASSERT_EQL(
-        usrLocalIncludePath2.getRawPath().s_str(), "/usr/local/include", ""
+      usrLocalIncludePath2.getRawPath().s_str(), "/usr/local/include", ""
     );
 
     auto rootPath = usrPath.cd("/root");
@@ -40,8 +40,8 @@ int main(int, char **) {
 
     Path romfsRootPath("romfs:");
     ASSERT_EQL(
-        romfsRootPath.cd("assets").getRawPath().s_str(), "romfs:/assets",
-        "romfs:/assets"
+      romfsRootPath.cd("assets").getRawPath().s_str(), "romfs:/assets",
+      "romfs:/assets"
     );
   });
 
