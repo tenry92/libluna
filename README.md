@@ -1,9 +1,10 @@
-**libluna** is a cross-platform game engine written in C++.
+**libluna** is a multimedia framework designed to make video games
+cross-platform for modern and retro platforms.
 It's in a very early stage and not meant for real usage yet.
 The API is currently very unstable.
 
-This engine is currently being implemented for Windows, Linux, the Nintendo
-Switch (using devkitpro) and the Nintendo 64 (using libdragon).
+This engine is currently being implemented for Windows, Linux and the
+Nintendo 64 (using [libdragon](https://github.com/DragonMinded/libdragon)).
 
 ## Getting started
 
@@ -12,38 +13,37 @@ A very basic program based on libluna looks like this:
 ```cpp
 #include <libluna/Application.hpp>
 
-int main(int argc, char **argv) {
-  // Create a new application instance.
-  Luna::Application app(argc, argv);
+class GameApp : public Luna::Application {
+  public:
+  using Application::Application;
 
-  // Prepare variables we will set later.
-  std::shared_ptr<Luna::Canvas> canvas;
-  std::shared_ptr<Luna::Stage> stage;
-
-  // Register callback function when app is ready.
-  app.whenReady([&]() {
+  protected:
+  void init() override final {
     // Create a canvas.
     // On desktop, this simply creates a window with the desired dimensions.
-    canvas = app.makeCanvas({800, 600});
+    mCanvas = this->makeCanvas({800, 600});
 
     // Choose default video driver (can be changed via command line).
-    canvas->setVideoDriver(app.getDefaultVideoDriver());
+    mCanvas->setVideoDriver(this->getDefaultVideoDriver());
 
-    // Create a stage.
-    // This is where all the sprites and models will be.
+    // The stage is where all the sprites and models will be.
     // The same stage can be displayed on different canvases.
-    stage = std::make_shared<Luna::Stage>();
-
     // Tell the canvas to use the given stage for rendering.
-    canvas->setStage(stage);
-  });
+    mCanvas->setStage(&mStage);
+  }
 
-  // Register callback function that will be called 60 times per second.
-  app.addInterval(60, [&](float elapsedTime) {
-    // Perform game logic update at 60 fps.
-  });
+  void update(float deltaTime) override final {
+    // Perform game logic update here
+  }
 
-  // Start the app.
+  private:
+  Luna::Canvas* mCanvas;
+  Luna::Stage mStage;
+};
+
+int main(int argc, char **argv) {
+  GameApp app(argc, argv);
+
   return app.run();
 }
 ```
