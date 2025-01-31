@@ -3,7 +3,12 @@ cross-platform for modern and retro platforms.
 It's in a very early stage and not meant for real usage yet.
 The API is currently very unstable.
 
-This engine is currently being implemented for Windows, Linux and the
+Unlike a real game engine or framework, libluna is designed to only provide
+the basic multimedia functionality such as drawing 2D and 3D stuff, playing
+audio and receiving input. libluna does not provide any functionality for
+loading specific file formats, handling game objects, physics, etc.
+
+This framework is currently being implemented for Windows, Linux and the
 Nintendo 64 (using [libdragon](https://github.com/DragonMinded/libdragon)).
 
 ## Getting started
