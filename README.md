@@ -41,7 +41,7 @@ class GameApp : public Luna::Application {
   Luna::Stage mStage;
 };
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   GameApp app(argc, argv);
 
   return app.run();
