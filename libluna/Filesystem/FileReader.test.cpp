@@ -21,6 +21,19 @@ static const char* assetsPath = "rom:/assets";
 static const char* assetsPath = "tests/assets";
 #endif
 
+/**
+ * This test needs to be executed within an application context because it may
+ * need to initialize the path to the assets directory.
+ */
+class TestApp : public Application {
+  public:
+  using Application::Application;
+
+  protected:
+  void init() override final {}
+  void update(float) override final {}
+};
+
 int main(int, char**) {
 #ifdef __SWITCH__
   if (R_FAILED(romfsInit())) {
@@ -36,7 +49,7 @@ int main(int, char**) {
 #endif
 
   TEST("read full text file", []() {
-    Application app(0, nullptr);
+    TestApp app(0, nullptr);
     app.setAssetsPath(assetsPath);
 
     auto fileReader = FileReader::make(app.getAssetsPath().cd("test.txt"));
@@ -56,7 +69,7 @@ int main(int, char**) {
   });
 
   TEST("seek way off the boundary", []() {
-    Application app(0, nullptr);
+    TestApp app(0, nullptr);
     app.setAssetsPath(assetsPath);
 
     auto fileReader = FileReader::make(app.getAssetsPath().cd("test.txt"));

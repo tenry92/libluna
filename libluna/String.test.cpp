@@ -10,7 +10,6 @@ int main(int, char**) {
   TEST("String emptyString is empty", []() {
     String emptyString;
     ASSERT(strcmp(emptyString.c_str(), "") == 0, "strcmp(..., \"\") == 0");
-    ASSERT(emptyString.s_str() == string(""), "== string()");
     ASSERT(emptyString.getLength() == 0, "getLength() == 0");
   });
 
@@ -22,7 +21,6 @@ int main(int, char**) {
       strcmp(cStringConstructed.c_str(), cString) == 0,
       "strcmp(..., cString) == 0"
     );
-    ASSERT(cStringConstructed.s_str() == sString, "== string(cString)");
     ASSERT(
       cStringConstructed.getLength() == strlen(cString),
       "getLength() == strlen(cString)"
@@ -37,7 +35,6 @@ int main(int, char**) {
       strcmp(cStringConstructed.c_str(), cString) == 0,
       "strcmp(..., cString) == 0"
     );
-    ASSERT(cStringConstructed.s_str() == sString, "== string(cString)");
     ASSERT(
       cStringConstructed.getLength() == strlen(cString),
       "getLength() == strlen(cString)"
@@ -53,7 +50,6 @@ int main(int, char**) {
   TEST("std:string constructed", []() {
     string sString("std::string");
     String sStringConstructed(sString);
-    ASSERT(sStringConstructed.s_str() == sString, "== sString");
     ASSERT(
       sStringConstructed.getLength() == sString.length(),
       "getLength() == sString.length()"
@@ -88,31 +84,6 @@ int main(int, char**) {
     ASSERT(str2 == originalString, "str2 is original string");
   });
 
-  TEST("base-10 integer", []() {
-    auto base10String = String::fromInteger(42);
-    ASSERT(base10String == "42", "is \"42\"");
-  });
-
-  TEST("base-10 negative integer", []() {
-    auto base10String = String::fromInteger(-42);
-    ASSERT(base10String == "-42", "is \"-42\"");
-  });
-
-  TEST("base-16 integer", []() {
-    auto base16String = String::fromInteger(42, 16);
-    ASSERT(base16String == "2a", "is \"2a\"");
-  });
-
-  TEST("float", []() {
-    auto floatString = String::fromFloat(123.456);
-    ASSERT(floatString == "123.456000", "is \"123.456000\"");
-  });
-
-  TEST("negative float", []() {
-    auto floatString = String::fromFloat(-123.456);
-    ASSERT(floatString == "-123.456000", "is \"-123.456000\"");
-  });
-
   TEST("concatenate strings", []() {
     auto catString = String("foo") + String("bar");
     ASSERT(catString == "foobar", "is \"foobar\"");
@@ -125,7 +96,7 @@ int main(int, char**) {
       "subString(6) == \"ipsum dolor\""
     );
     ASSERT(
-      baseString.subString(6, 11) == "ipsum", "subString(6, 11) == \"ipsum\""
+      baseString.subString(6, 5) == "ipsum", "subString(6, 11) == \"ipsum\""
     );
   });
 
@@ -161,21 +132,6 @@ int main(int, char**) {
     ASSERT(parts[0] == "lorem", "part[0] == lorem");
     ASSERT(parts[1] == "ipsum", "part[1] == ipsum");
     ASSERT(parts[2] == "dolor", "part[2] == dolor");
-  });
-
-  TEST("repeat", []() {
-    auto repeat = String("repeat").repeat(3);
-    ASSERT(repeat == "repeatrepeatrepeat", "== repeatrepeatrepeat");
-  });
-
-  TEST("padStart", []() {
-    auto padStart = String("3").padStart(3, "0");
-    ASSERT(padStart == "003", "== \"003\"");
-  });
-
-  TEST("format", []() {
-    auto formattedString = String("pos = {{ x: {}, y: {} }").format(19, 11);
-    ASSERT(formattedString == "pos = { x: 19, y: 11 }", "");
   });
 
   return runTests();

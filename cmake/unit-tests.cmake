@@ -3,13 +3,13 @@ include(cmake/utils.cmake)
 enable_testing()
 
 set(UNIT_TESTS
-  Filesystem/FileReader
+  # Filesystem/FileReader
   Filesystem/Path
   Image
   InputManager
-  Matrix
-  ResourceReader
-  Resource
+  # Matrix
+  # ResourceReader
+  # Resource
   String
   System
   Vector

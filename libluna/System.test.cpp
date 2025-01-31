@@ -26,6 +26,15 @@ int main(int argc, char** argv) {
   );
 
 #ifdef N64
+  Console::writeLine(
+    "Total Heap: {} kB", System::getTotalHeapSize() / 1024
+  );
+  Console::writeLine(
+    "Used Heap: {} kB", System::getUsedHeapSize() / 1024
+  );
+#endif
+
+#ifdef N64
   while (true) {
     Console::update();
   }

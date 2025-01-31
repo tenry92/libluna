@@ -65,11 +65,11 @@ int main(int, char**) {
     Vector2f b(2.0f, 4.0f);
 
     ASSERT_EQL(a.normalized().magnitude(), 1.0f, "");
-    ASSERT_EQL(a.normalized().x, 1.0f, "");
-    ASSERT_EQL(a.normalized().y, 1.0f, "");
+    ASSERT_EQL(a.normalized().x, 0.707107f, "");
+    ASSERT_EQL(a.normalized().y, 0.707107f, "");
 
     ASSERT_EQL(b.normalized().magnitude(), 1.0f, "");
-    ASSERT_EQL(b.normalized().x, 1.0f, "");
+    ASSERT_EQL(b.normalized().x, 0.447214f, "");
     ASSERT_EQL(b.normalized().y, 0.894427f, "");
   });
 
