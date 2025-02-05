@@ -54,7 +54,8 @@ function(n64_create_rom target)
   endif()
 
   add_custom_command(
-    TARGET ${target}
+    OUTPUT ${N64_OUTPUT}
+    DEPENDS ${target}
     COMMAND ${N64_SYM} ${ELF_PATH} ${SYM_PATH}
     COMMAND ${CMAKE_COMMAND} -E copy ${ELF_PATH} ${ELF_STRIPPED_PATH}
     COMMAND ${CMAKE_STRIP} -s ${ELF_STRIPPED_PATH}
@@ -63,5 +64,8 @@ function(n64_create_rom target)
     COMMAND ${N64_TOOL} ${TITLE_ARG} --toc --output ${N64_OUTPUT} --align 256 ${ELF_STRIPPED_COMPRESSED_PATH} --align 8 ${SYM_PATH} ${DFS_ARG}
     COMMAND ${CMAKE_COMMAND} -E remove ${ELF_STRIPPED_PATH} ${ELF_STRIPPED_COMPRESSED_PATH}
     COMMENT "Creating N64 ROM ${N64_OUTPUT}"
+    VERBATIM
   )
+
+  add_custom_target(${target}_n64 ALL DEPENDS ${N64_OUTPUT})
 endfunction()

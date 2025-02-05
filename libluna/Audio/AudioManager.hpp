@@ -2,11 +2,15 @@
 
 #include <libluna/config.h>
 
+#include <list>
+
 #include <libluna/Audio/DelayNode.hpp>
 #include <libluna/Audio/GainNode.hpp>
 #include <libluna/Audio/OscillatorNode.hpp>
 #include <libluna/Command.hpp>
 #include <libluna/Internal/AudioMetrics.hpp>
+#include <libluna/Pool.hpp>
+#include <libluna/Sound.hpp>
 
 namespace Luna::Audio {
   class AudioNode;
@@ -50,6 +54,11 @@ namespace Luna::Audio {
 
     float getFrameRate() const;
 
+    Sound* createSound();
+    void destroySound(Sound* sound);
+
+    void playSound(const char* source);
+
     std::shared_ptr<DelayNode> createDelay(float delay);
 
     std::shared_ptr<GainNode> createGain(float volume);
@@ -76,5 +85,7 @@ namespace Luna::Audio {
 #ifdef LUNA_AUDIO_SDL2
     SDL_AudioDeviceID mSdlAudioDeviceId{0};
 #endif
+    Pool<Sound, 64> mSounds;
+    std::list<Sound*> mPlayingSounds;
   };
 } // namespace Luna::Audio

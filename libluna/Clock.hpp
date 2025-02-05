@@ -9,8 +9,10 @@
 namespace Luna::Clock {
 #ifdef N64
   using TimePoint = long long;
+  using Duration = long long;
 #else
   using TimePoint = std::chrono::steady_clock::time_point;
+  using Duration = std::chrono::steady_clock::duration;
 #endif
   inline TimePoint now() {
 #ifdef N64

@@ -368,6 +368,13 @@ void Application::pushSdlEvent(SDL_Event* event) { SDL_PushEvent(event); }
 #endif
 
 Application::Application(int argc, char** argv) {
+#ifdef N64
+#ifndef NDEBUG
+  debug_init_usblog();
+  debug_init_isviewer();
+#endif
+#endif
+
   Clock::init();
 
   gSingletonApp = this;

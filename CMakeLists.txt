@@ -93,6 +93,7 @@ set(PUBLIC_MODULES
   Rect
   ResourceReader
   Shape
+  Sound
   Sprite
   Stage
   String

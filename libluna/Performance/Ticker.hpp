@@ -6,6 +6,8 @@
 #include <deque>
 #include <map>
 
+#include <libluna/Clock.hpp>
+
 namespace Luna::Performance {
   /**
    * \brief Measure average ticks per second and tick duration.
@@ -59,8 +61,8 @@ namespace Luna::Performance {
 
     private:
     unsigned long mTickCount = 0;
-    std::deque<std::chrono::steady_clock::time_point> mTicks;
-    std::deque<std::chrono::steady_clock::duration> mTickTimes;
+    std::deque<Clock::TimePoint> mTicks;
+    std::deque<Clock::Duration> mTickTimes;
     String mName;
   };
 } // namespace Luna::Performance

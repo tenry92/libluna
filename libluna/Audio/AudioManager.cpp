@@ -22,6 +22,10 @@
 using namespace Luna;
 using namespace Luna::Audio;
 
+#ifdef N64
+constexpr int kInternalBufferCount = 4;
+#endif
+
 class DestinationAudioNode : public AudioNode {
   public:
   DestinationAudioNode(AudioManager* manager) : AudioNode(manager) {}
@@ -118,23 +122,41 @@ void AudioManager::init() {
   }
 #endif
 #ifdef N64
-  int internalBufferCount = 4;
-  audio_init(static_cast<int>(getFrameRate()), internalBufferCount);
+  audio_init(static_cast<int>(getFrameRate()), kInternalBufferCount);
 
-  // int numMixChannels = 16;
-  // mixer_init(numMixChannels);
+  const int numMixChannels = 16;
+  mixer_init(numMixChannels);
+
+  wav64_init_compression(3);
 #endif
 }
 
 void AudioManager::update() {
 #ifdef LUNA_AUDIO_SDL2
   SDL_LockAudioDevice(mSdlAudioDeviceId);
+#endif
   while (!mCommandQueue.empty()) {
     auto command = mCommandQueue.front();
     mCommandQueue.pop();
     command->execute();
   }
+#ifdef LUNA_AUDIO_SDL2
   SDL_UnlockAudioDevice(mSdlAudioDeviceId);
+#endif
+#ifdef N64
+  for (auto it = mPlayingSounds.begin(); it != mPlayingSounds.end();) {
+    auto sound = *it;
+    if (!sound->isPlaying()) {
+      it = mPlayingSounds.erase(it);
+      destroySound(sound);
+    } else {
+      ++it;
+    }
+  }
+
+  for (int i = 0; i < kInternalBufferCount; i++) {
+    mixer_try_play();
+  }
 #endif
 }
 
@@ -143,6 +165,10 @@ void AudioManager::free() {
   if (mSdlAudioDeviceId > 0) {
     SDL_CloseAudioDevice(mSdlAudioDeviceId);
   }
+#endif
+#ifdef N64
+  mixer_close();
+  audio_close();
 #endif
 }
 
@@ -153,6 +179,20 @@ double AudioManager::getTime() const { return mTime; }
 int AudioManager::getChannelCount() const { return mChannelCount; }
 
 float AudioManager::getFrameRate() const { return mFrameRate; }
+
+Sound* AudioManager::createSound() { return mSounds.acquire(); }
+
+void AudioManager::destroySound(Sound* sound) { mSounds.release(sound); }
+
+void AudioManager::playSound(const char* source) {
+  auto sound = createSound();
+  mPlayingSounds.push_front(sound);
+
+#ifdef N64
+  sound->setSource(source);
+  sound->play();
+#endif
+}
 
 std::shared_ptr<DelayNode> AudioManager::createDelay(float delay) {
   return std::make_shared<DelayNode>(this, delay);

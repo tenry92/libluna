@@ -9,7 +9,7 @@ namespace {
   std::string toString(const Path& path) {
     return std::string(path.getRawPath().c_str());
   }
-}
+} // namespace
 
 int main(int, char**) {
   TEST("basic raw paths", []() {
@@ -23,9 +23,7 @@ int main(int, char**) {
     ASSERT_EQL(toString(romfsRootPath), "romfs:", "romfs:");
 
     Path romfsAssetsPath("romfs:/assets");
-    ASSERT_EQL(
-      toString(romfsAssetsPath), "romfs:/assets", "romfs:/assets"
-    );
+    ASSERT_EQL(toString(romfsAssetsPath), "romfs:/assets", "romfs:/assets");
   });
 
   TEST("cd", []() {
@@ -34,22 +32,17 @@ int main(int, char**) {
     ASSERT_EQL(toString(usrLocalPath), "/usr/local", "");
 
     auto usrLocalIncludePath = usrPath.cd("local", "include");
-    ASSERT_EQL(
-      toString(usrLocalIncludePath), "/usr/local/include", ""
-    );
+    ASSERT_EQL(toString(usrLocalIncludePath), "/usr/local/include", "");
 
     auto usrLocalIncludePath2 = usrPath.cd("local/include");
-    ASSERT_EQL(
-      toString(usrLocalIncludePath2), "/usr/local/include", ""
-    );
+    ASSERT_EQL(toString(usrLocalIncludePath2), "/usr/local/include", "");
 
     auto rootPath = usrPath.cd("/root");
     ASSERT_EQL(toString(rootPath), "/root", "");
 
     Path romfsRootPath("romfs:");
     ASSERT_EQL(
-      toString(romfsRootPath.cd("assets")), "romfs:/assets",
-      "romfs:/assets"
+      toString(romfsRootPath.cd("assets")), "romfs:/assets", "romfs:/assets"
     );
   });
 
