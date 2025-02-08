@@ -4,6 +4,13 @@ namespace Luna {
   class SoundSource {
     public:
     virtual ~SoundSource() = default;
-    virtual void generate(float* buffer, unsigned int samples) = 0;
+
+    /**
+     * @brief Write interleaved stereo audio samples to the buffer.
+     *
+     * @return Number of frames actually written.
+     * If 0, the source is assumed to be finished.
+     */
+    virtual int write(float* buffer, int frames) = 0;
   };
 } // namespace Luna

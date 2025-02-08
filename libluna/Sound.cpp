@@ -19,7 +19,11 @@ namespace {
 } // namespace
 
 namespace Luna {
+#ifdef N64
   void Sound::setSource(const char* source) { mSource = source; }
+#else
+  void Sound::setSource(SoundSource* source) { mSource = source; }
+#endif
 
   void Sound::setPitch(float pitch) { mPitch = pitch; }
 
@@ -46,9 +50,17 @@ namespace Luna {
 #endif
   }
 
-  void Sound::stop() { mixer_ch_stop(mChannel); }
+  void Sound::stop() {
+#ifdef N64
+    mixer_ch_stop(mChannel);
+#endif
+  }
 
   bool Sound::isPlaying() {
+#ifdef N64
     return mChannel != -1 && mixer_ch_playing(mChannel);
+#else
+    return false; // not implemented yet
+#endif
   }
 } // namespace Luna

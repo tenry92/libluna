@@ -184,15 +184,23 @@ Sound* AudioManager::createSound() { return mSounds.acquire(); }
 
 void AudioManager::destroySound(Sound* sound) { mSounds.release(sound); }
 
+#ifdef N64
 void AudioManager::playSound(const char* source) {
   auto sound = createSound();
   mPlayingSounds.push_front(sound);
 
-#ifdef N64
   sound->setSource(source);
   sound->play();
-#endif
 }
+#else
+void AudioManager::playSound(SoundBufferSource* source) {
+  auto sound = createSound();
+  mPlayingSounds.push_front(sound);
+
+  sound->setSource(source);
+  sound->play();
+}
+#endif
 
 std::shared_ptr<DelayNode> AudioManager::createDelay(float delay) {
   return std::make_shared<DelayNode>(this, delay);
