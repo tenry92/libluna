@@ -152,16 +152,19 @@ void Application::mainLoop() {
     mDebugMetrics->frameTicker.measure();
 
     mDebugMetrics->renderTicker.tick();
-    // logDebug("rendering canvases");
     for (auto&& canvas : mCanvases) {
       canvas.render();
     }
     mDebugMetrics->renderTicker.measure();
 
-    // logDebug("syncing canvases");
     for (auto&& canvas : mCanvases) {
       canvas.sync();
     }
+
+    // logDebug("==============");
+    // logDebug("frame #{}", mDebugMetrics->framesElapsed);
+    // logDebug("update time: {}ms; updates/second: {}", (mDebugMetrics->frameTicker.getTickDuration() * 1000), mDebugMetrics->frameTicker.getTicksPerSecond());
+    // logDebug("render time: {}ms; renders/second: {}", (mDebugMetrics->renderTicker.getTickDuration() * 1000), mDebugMetrics->renderTicker.getTicksPerSecond());
 
     ++mDebugMetrics->framesElapsed;
   }

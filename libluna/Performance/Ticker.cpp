@@ -58,7 +58,7 @@ float Ticker::getTickDuration() const {
   }
 
 #ifdef N64
-  double sum = 0;
+  long long sum = 0;
 #else
   auto unit = std::nano().den;
   long sum = 0;
@@ -66,7 +66,7 @@ float Ticker::getTickDuration() const {
 
   for (auto time : mTickTimes) {
 #ifdef N64
-    sum += static_cast<double>(time);
+    sum += time;
 #else
     sum += static_cast<long>(
       time.count() * unit * std::chrono::steady_clock::period().num /
@@ -76,7 +76,7 @@ float Ticker::getTickDuration() const {
   }
 
 #ifdef N64
-  return static_cast<float>(sum) / TICKS_PER_SECOND;
+  return static_cast<float>(sum) / TICKS_PER_SECOND / static_cast<float>(mTickTimes.size());
 #else
   return static_cast<float>(sum) / static_cast<float>(unit) /
          static_cast<float>(mTickTimes.size());
@@ -98,7 +98,7 @@ float Ticker::getTicksPerSecond() const {
   }
 
   auto averageDuration =
-    static_cast<float>(sum) / static_cast<float>(mTicks.size() - 1);
+    static_cast<float>(sum) / static_cast<float>(mTicks.size() - 1) / TICKS_PER_SECOND;
 #else
   auto unit = std::nano().den;
   long sum = 0;

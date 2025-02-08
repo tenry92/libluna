@@ -12,6 +12,12 @@
 #define LUNA_THREADED_CANVAS
 #endif
 
+#ifdef N64
+// Technically not defined, since N64 is not Linux or Windows,
+// but code editor is not aware of this.
+#undef LUNA_THREADED_CANVAS
+#endif
+
 #ifdef LUNA_THREADED_CANVAS
 #include <condition_variable>
 #include <mutex>

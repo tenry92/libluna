@@ -28,6 +28,22 @@ void N64Renderer::startRender() {
   rdpq_attach(disp, zbuf);
 
   gl_context_begin();
+
+  if (!mSpriteDisplayList) {
+    mSpriteDisplayList = glGenLists(1);
+    glNewList(mSpriteDisplayList, GL_COMPILE);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(0.0f, 1.0f, 0.0f);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(1.0f, 1.0f, 0.0f);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(1.0f, 0.0f, 0.0f);
+    glEnd();
+    glEndList();
+  }
 }
 
 void N64Renderer::endRender() { gl_context_end(); }
@@ -184,19 +200,12 @@ void N64Renderer::renderTexture(
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, texture);
-  glBegin(GL_TRIANGLE_FAN);
-  glTexCoord2f(uvTopLeft.x, uvBottomRight.y);
-  glVertex3f(left, bottom, 0.0f);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  glTranslatef(left, top, 0.0f);
+  glScalef(right - left, bottom - top, 1.0f);
 
-  glTexCoord2f(uvTopLeft.x, uvTopLeft.y);
-  glVertex3f(left, top, 0.0f);
-
-  glTexCoord2f(uvBottomRight.x, uvTopLeft.y);
-  glVertex3f(right, top, 0.0f);
-
-  glTexCoord2f(uvBottomRight.x, uvBottomRight.y);
-  glVertex3f(right, bottom, 0.0f);
-  glEnd();
+  glCallList(mSpriteDisplayList);
 }
 
 void N64Renderer::createShape([[maybe_unused]] int id) {}
@@ -240,6 +249,7 @@ void N64Renderer::renderShape(
 
     glVertex2f(x, y);
   }
+
   glEnd();
 
   glColor3f(1.0f, 1.0f, 1.0f);

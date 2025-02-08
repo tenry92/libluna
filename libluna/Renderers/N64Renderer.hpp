@@ -61,5 +61,6 @@ namespace Luna {
     std::map<int, GLuint> mTextureIdMapping;
     std::map<int, Luna::Shape*> mShapeIdMapping;
     std::map<int, GLuint> mMeshIdMapping;
+    GLuint mSpriteDisplayList{0};
   };
 } // namespace Luna
