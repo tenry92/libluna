@@ -66,7 +66,7 @@ namespace Luna::GL {
         if (line.startsWith("#include ")) {
           auto nameOffsetStart = line.indexOf('"').value() + 1;
           auto nameOffsetEnd = line.indexOf('"', nameOffsetStart).value();
-          auto fileToInclude = line.subString(nameOffsetStart, nameOffsetEnd);
+          auto fileToInclude = line.subString(nameOffsetStart, nameOffsetEnd - nameOffsetStart);
           auto includedLines = getShaderLines(fileToInclude.c_str());
 
           for (auto&& includedLine : includedLines) {
