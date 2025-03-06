@@ -502,8 +502,8 @@ Canvas* Application::makeCanvas(const Vector2i& size) {
 std::list<Canvas*> Application::getOpenCanvases() {
   std::list<Canvas*> canvases;
 
-  for (auto&& canvas : canvases) {
-    canvases.emplace_back(canvas);
+  for (auto&& canvas : mCanvases) {
+    canvases.emplace_back(&canvas);
   }
 
   return canvases;
