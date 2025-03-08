@@ -140,6 +140,15 @@ namespace Luna {
      */
     Application(int argc, char** argv);
 
+    /**
+     * @brief Create application with a name.
+     *
+     * This is not doing any setup until `run()` is called.
+     *
+     * @param name The user-friendly name of the application.
+     */
+    Application(const String& name, int argc, char** argv);
+
     virtual ~Application();
 
     static Application* getInstance();

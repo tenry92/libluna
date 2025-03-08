@@ -394,11 +394,17 @@ Application::Application(int argc, char** argv) {
   mName = APP_PRODUCT_NAME;
 }
 
+Application::Application(const String& name, int argc, char** argv) : Application(argc, argv) {
+  mName = name;
+}
+
 Application::~Application() = default;
 
 Application* Application::getInstance() { return gSingletonApp; }
 
 int Application::run() {
+  SDL_SetHint(SDL_HINT_APP_NAME, mName.c_str());
+
   String assetsPath = Application::getInstance()->getOptionValue("assets");
 
   if (!assetsPath.isEmpty()) {
