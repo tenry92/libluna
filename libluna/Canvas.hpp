@@ -67,7 +67,14 @@ namespace Luna {
    */
   class Canvas {
     public:
+    /**
+     * @brief Create a canvas with the desired internal resolution.
+     *
+     * The internal framebuffer for 2D rendering does not change by default when
+     * the window is resized.
+     */
     Canvas(const Vector2i& size);
+
     ~Canvas();
 
     void close();
@@ -106,8 +113,8 @@ namespace Luna {
 
     bool isClosed() const;
 
-    void setOriginalSize(Vector2i size);
-    Vector2i getOriginalSize() const;
+    void setInternalResolution(Vector2i size);
+    Vector2i getInternalResolution() const;
 
     static const std::list<Canvas*> getCanvasByStage(Stage* stage);
 
@@ -142,7 +149,7 @@ namespace Luna {
     void processCommandQueue();
 
     Vector2i mSize;
-    Vector2i mOriginalSize;
+    Vector2i mInternalResolution;
     Stage* mStage;
     std::unique_ptr<AbstractRenderer> mRenderer;
     std::unique_ptr<ImmediateGui> mImmediateGui;

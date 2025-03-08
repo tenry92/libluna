@@ -338,7 +338,7 @@ bool Canvas::sendSdlEventToImmediateGui(const SDL_Event* event) {
 }
 #endif
 
-Canvas::Canvas(const Vector2i& size) : mSize{size}, mOriginalSize{size} {
+Canvas::Canvas(const Vector2i& size) : mSize{size}, mInternalResolution{size} {
 #ifdef LUNA_THREADED_CANVAS
   mThread = std::thread(&Canvas::renderThread, this);
   this->sync();
@@ -641,9 +641,9 @@ std::queue<ButtonEvent>& Canvas::getButtonEvents() { return mButtonEvents; }
 
 bool Canvas::isClosed() const { return mClosed; }
 
-void Canvas::setOriginalSize(Vector2i size) { mOriginalSize = size; }
+void Canvas::setInternalResolution(Vector2i size) { mInternalResolution = size; }
 
-Vector2i Canvas::getOriginalSize() const { return mOriginalSize; }
+Vector2i Canvas::getInternalResolution() const { return mInternalResolution; }
 
 const std::list<Canvas*> Canvas::getCanvasByStage(Stage* stage) {
   return gCanvasByStage[stage];

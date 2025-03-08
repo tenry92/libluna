@@ -497,7 +497,7 @@ void Application::setAssetsPath(Filesystem::Path assetsPath) {
   mPathManager.setAssetsPath(assetsPath);
 }
 
-Canvas* Application::makeCanvas(const Vector2i& size) {
+Canvas* Application::createCanvas(const Vector2i& size) {
   logInfo("creating canvas {}x{}", size.width, size.height);
 
   auto canvas = mCanvases.acquire(size);

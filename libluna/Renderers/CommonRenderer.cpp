@@ -208,7 +208,7 @@ Vector2i CommonRenderer::getCanvasSize() const {
 }
 
 Vector2i CommonRenderer::getInternalSize() const {
-  return getCanvas()->getOriginalSize();
+  return getCanvas()->getInternalResolution();
 }
 
 Vector2i CommonRenderer::getCurrentRenderSize() const {
