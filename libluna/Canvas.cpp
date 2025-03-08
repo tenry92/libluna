@@ -114,7 +114,7 @@ void Canvas::createWindow([[maybe_unused]] bool opengl) {
 #endif
 
   this->sdl.window = SDL_CreateWindow(
-    fmt::format("{} ({})", Application::getInstance()->getName().c_str(), "?")
+    fmt::format("{} ({})", Application::getInstance()->getName().c_str(), opengl ? "OpenGL" : "SDL")
       .c_str(),
 #if SDL_MAJOR_VERSION == 2
     SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
