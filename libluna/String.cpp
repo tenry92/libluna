@@ -201,6 +201,14 @@ namespace Luna {
 
   String::~String() = default;
 
+  String String::copyFrom(const char *other) {
+    return String(const_cast<char*>(other));
+  }
+
+  String String::copyFrom(const char* other, std::size_t length) {
+    return String(const_cast<char*>(other), length);
+  }
+
   String& String::operator=(char* other) {
     clear();
 

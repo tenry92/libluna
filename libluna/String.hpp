@@ -94,6 +94,10 @@ namespace Luna {
 
     ~String();
 
+    static String copyFrom(const char* other);
+
+    static String copyFrom(const char* other, std::size_t length);
+
     String& operator=(char* other);
     String& operator=(const char* other);
     String& operator=(const String& other);
