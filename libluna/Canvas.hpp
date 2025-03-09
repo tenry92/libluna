@@ -54,6 +54,12 @@
 namespace Luna {
   class AbstractRenderer;
 
+  struct DisplayMode {
+    Vector2i resolution{0, 0};
+    bool fullscreen{false};
+    String videoDriver;
+  };
+
   /**
    * @brief Abstraction for windows (computer) and fullscreen displays.
    *
@@ -79,7 +85,7 @@ namespace Luna {
 
     void close();
 
-    void setVideoDriver(const String& name);
+    void setDisplayMode(DisplayMode mode);
 
     void attachImmediateGui(std::unique_ptr<ImmediateGui> gui);
     ImmediateGui* getImmediateGui() const;
@@ -145,7 +151,7 @@ namespace Luna {
 #endif
 
     private:
-    void createWindow(bool opengl);
+    void createWindow(const DisplayMode& mode);
     void processCommandQueue();
 
     Vector2i mSize;

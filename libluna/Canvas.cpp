@@ -89,7 +89,7 @@ class CanvasCommand : public Command {
   std::function<void()> mCallback;
 };
 
-void Canvas::createWindow([[maybe_unused]] bool opengl) {
+void Canvas::createWindow(const DisplayMode& displayMode) {
   Console::quit();
 
 #ifdef LUNA_WINDOW_SDL2
@@ -102,24 +102,29 @@ void Canvas::createWindow([[maybe_unused]] bool opengl) {
     this->sdl.window = nullptr;
   }
 
-  logInfo("creating SDL window ({}x{} pixels)", mSize.width, mSize.height);
+  logInfo("creating SDL window ({}x{} pixels)", displayMode.resolution.width, displayMode.resolution.height);
 
   Uint32 windowFlags = SDL_WINDOW_RESIZABLE;
 
+  if (displayMode.fullscreen) {
+    // note: SDL_WINDOW_FULLSCREEN may change the display resolution
+    windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+  }
+
 #ifdef LUNA_RENDERER_OPENGL
-  if (opengl) {
+  if (displayMode.videoDriver == "opengl") {
     setGlAttributes();
     windowFlags |= SDL_WINDOW_OPENGL;
   }
 #endif
 
   this->sdl.window = SDL_CreateWindow(
-    fmt::format("{} ({})", Application::getInstance()->getName().c_str(), opengl ? "OpenGL" : "SDL")
+    fmt::format("{} ({})", Application::getInstance()->getName().c_str(), displayMode.videoDriver.c_str())
       .c_str(),
 #if SDL_MAJOR_VERSION == 2
     SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 #endif
-    this->mSize.width, this->mSize.height, windowFlags
+    displayMode.resolution.width, displayMode.resolution.height, windowFlags
   );
 
   if (!this->sdl.window) {
@@ -414,28 +419,32 @@ void Canvas::close() {
   mClosed = true;
 }
 
-void Canvas::setVideoDriver(const String& name) {
-  auto command = std::make_shared<CanvasCommand>(([this, name]() {
-    createWindow(name == "opengl");
+void Canvas::setDisplayMode(DisplayMode mode) {
+  if (mode.videoDriver.isEmpty()) {
+    mode.videoDriver = Application::getInstance()->getDefaultVideoDriver();
+  }
 
-    logInfo("setting canvas video driver to {}", name.c_str());
+  auto command = std::make_shared<CanvasCommand>(([this, mode]() {
+    createWindow(mode);
+
+    logInfo("setting canvas video driver to {}", mode.videoDriver.c_str());
 #ifdef NDS
     mRenderer = std::make_unique<NdsRenderer>();
 #endif
 #ifdef N64
     resolution_t res = RESOLUTION_320x240;
 
-    if (mSize == Vector2i(256, 240)) {
+    if (mode.resolution == Vector2i(256, 240)) {
       res = RESOLUTION_256x240;
-    } else if (mSize == Vector2i(320, 240)) {
+    } else if (mode.resolution == Vector2i(320, 240)) {
       res = RESOLUTION_320x240;
-    } else if (mSize == Vector2i(512, 240)) {
+    } else if (mode.resolution == Vector2i(512, 240)) {
       res = RESOLUTION_512x240;
-    } else if (mSize == Vector2i(640, 240)) {
+    } else if (mode.resolution == Vector2i(640, 240)) {
       res = RESOLUTION_640x240;
-    } else if (mSize == Vector2i(512, 480)) {
+    } else if (mode.resolution == Vector2i(512, 480)) {
       res = RESOLUTION_512x480;
-    } else if (mSize == Vector2i(640, 480)) {
+    } else if (mode.resolution == Vector2i(640, 480)) {
       res = RESOLUTION_640x480;
     }
 
@@ -448,7 +457,7 @@ void Canvas::setVideoDriver(const String& name) {
 
 #ifdef LUNA_WINDOW_SDL2
 #ifdef LUNA_RENDERER_OPENGL
-    if (name == "opengl") {
+    if (mode.videoDriver == "opengl") {
       this->sdl.glContext = SDL_GL_CreateContext(this->sdl.window);
       SDL_GL_MakeCurrent(this->sdl.window, this->sdl.glContext);
       SDL_GL_SetSwapInterval(1); // enable vsync
@@ -456,7 +465,7 @@ void Canvas::setVideoDriver(const String& name) {
     }
 #endif
 
-    if (name == "sdl") {
+    if (mode.videoDriver == "sdl") {
       mRenderer = std::make_unique<SdlRenderer>();
     }
 #endif
@@ -464,9 +473,9 @@ void Canvas::setVideoDriver(const String& name) {
     setGlAttributes();
 
     this->glfw.window = glfwCreateWindow(
-      mSize.width, mSize.height,
+      mode.resolution.width, mode.resolution.height,
       String("{} ({})")
-        .format(Application::getInstance()->getName(), name)
+        .format(Application::getInstance()->getName(), mode.videoDriver)
         .c_str(),
       nullptr, nullptr
     );
@@ -475,7 +484,7 @@ void Canvas::setVideoDriver(const String& name) {
       logError("error creating glfw window");
     }
 
-    if (name == "opengl") {
+    if (mode.videoDriver == "opengl") {
       glfwMakeContextCurrent(this->glfw.window);
       glfwSwapInterval(1);
       mRenderer = std::make_unique<OpenglGraphicsDriver>();
