@@ -47,6 +47,30 @@ using namespace Luna::Internal;
 using Luna::String;
 
 namespace {
+  static void printDisplays() {
+    static bool didPrint = false;
+
+    if (didPrint) {
+      return;
+    }
+
+    didPrint = true;
+
+#ifdef LUNA_WINDOW_SDL2
+    int displayCount = SDL_GetNumVideoDisplays();
+
+    for (int i = 0; i < displayCount; ++i) {
+      SDL_DisplayMode mode;
+
+      if (SDL_GetCurrentDisplayMode(i, &mode) == 0) {
+        Console::writeLine(
+          "Display {} ({}): {}x{} @ {}Hz", i, SDL_GetDisplayName(i), mode.w, mode.h, mode.refresh_rate
+        );
+      }
+    }
+#endif
+  }
+
   std::map<Stage*, std::list<Canvas*>> gCanvasByStage;
 
 #ifdef LUNA_RENDERER_OPENGL
@@ -95,6 +119,7 @@ void Canvas::createWindow(const DisplayMode& displayMode) {
 #ifdef LUNA_WINDOW_SDL2
   if (!SDL_WasInit(SDL_INIT_VIDEO)) {
     SDL_InitSubSystem(SDL_INIT_VIDEO);
+    printDisplays();
   }
 
   if (this->sdl.window) {
