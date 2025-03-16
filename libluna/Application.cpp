@@ -121,7 +121,12 @@ void Application::mainLoop() {
   logInfo("entering main loop");
 
   mIntervalManager.addAlways([this](float deltaTime) {
-    this->update(deltaTime);
+    if (mTimeScale > 0.f) {
+      this->update(deltaTime * mTimeScale);
+    } else if (mDoStep) {
+      this->update(deltaTime);
+      mDoStep = false;
+    }
   });
 
   while (hasCanvas() && mRaisedErrorMessage.isEmpty()) {
@@ -630,3 +635,11 @@ bool Application::isDebuggerOpen([[maybe_unused]] Canvas* canvas) {
 
   return false;
 }
+
+float Application::getTimeScale() const { return mTimeScale; }
+
+void Application::setTimeScale(float timeScale) {
+  mTimeScale = timeScale;
+}
+
+void Application::step() { mDoStep = true; }

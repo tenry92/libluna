@@ -21,6 +21,7 @@ void DebugGui::render() {
   if (ImGui::BeginMainMenuBar()) {
     if (ImGui::BeginMenu("Tools")) {
       ImGui::MenuItem("Luna Debugger", nullptr, &mShowLunaDebugger);
+      ImGui::MenuItem("Execution Debugger", nullptr, &mShowExecutionDebugger);
       ImGui::Separator();
       ImGui::MenuItem("ImGui Demo", nullptr, &mShowDemoWindow);
       ImGui::EndMenu();
@@ -126,6 +127,33 @@ void DebugGui::render() {
       }
       // event queue, axis values
       // renderer, textures, resources
+    }
+    ImGui::End();
+  }
+
+  if (mShowExecutionDebugger) {
+    if (ImGui::Begin("Execution Debugger", &mShowExecutionDebugger, 0)) {
+      float currentTimeScale = Application::getInstance()->getTimeScale();
+      ImGui::SliderFloat("Time scale", &currentTimeScale, 0.0f, 2.0f);
+      Application::getInstance()->setTimeScale(currentTimeScale);
+
+      bool paused = currentTimeScale == 0.0f;
+
+      if (paused) {
+        if (ImGui::Button("Resume")) {
+          Application::getInstance()->setTimeScale(1.0f);
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Step")) {
+          Application::getInstance()->step();
+        }
+      } else {
+        if (ImGui::Button("Pause")) {
+          Application::getInstance()->setTimeScale(0.0f);
+        }
+      }
     }
     ImGui::End();
   }

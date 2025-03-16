@@ -208,6 +208,19 @@ namespace Luna {
 
     bool isDebuggerOpen(Canvas* canvas);
 
+    float getTimeScale() const;
+
+    /**
+     * @brief Set the time scale.
+     *
+     * This affects the delta time passed to the update function.
+     * A lower value will slow down the game.
+     * A value of 0 will pause the game.
+     */
+    void setTimeScale(float timeScale);
+
+    void step();
+
 #ifdef LUNA_WINDOW_SDL2
     Canvas* getCanvasBySdlWindowId(Uint32 windowId);
     void pushSdlEvent(SDL_Event* event);
@@ -237,5 +250,7 @@ namespace Luna {
     String mName;
     std::shared_ptr<Internal::DebugMetrics> mDebugMetrics;
     InputManager mHotkeysManager;
+    float mTimeScale{1.0f};
+    bool mDoStep{false}; ///< Step one frame if paused
   };
 } // namespace Luna
