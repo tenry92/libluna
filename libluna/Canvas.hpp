@@ -88,7 +88,8 @@ namespace Luna {
     void setDisplayMode(DisplayMode mode);
 
     void attachImmediateGui(std::unique_ptr<ImmediateGui> gui);
-    ImmediateGui* getImmediateGui() const;
+    void detachImmediateGui(ImmediateGui* gui);
+    std::list<ImmediateGui*> getImmediateGuis() const;
 
     void setStage(Stage* stage);
     Stage* getStage() const;
@@ -106,8 +107,6 @@ namespace Luna {
 
     void render();
     void sync();
-
-    std::queue<ButtonEvent>& getButtonEvents();
 
     /**
      * @brief Get the current value of an axis input.
@@ -127,7 +126,6 @@ namespace Luna {
     Internal::GraphicsMetrics getMetrics();
 
 #ifdef LUNA_WINDOW_SDL2
-    bool processSdlEvent(const SDL_Event* event);
     bool sdlEventTargetsThis(const SDL_Event* event);
     bool sendSdlEventToImmediateGui(const SDL_Event* event);
     struct {
@@ -158,11 +156,10 @@ namespace Luna {
     Vector2i mInternalResolution;
     Stage* mStage;
     std::unique_ptr<AbstractRenderer> mRenderer;
-    std::unique_ptr<ImmediateGui> mImmediateGui;
+    std::list<std::unique_ptr<ImmediateGui>> mImmediateGuis;
     Camera2d mCamera2d;
     Camera3d mCamera3d;
     ColorRgb mBackgroundColor;
-    std::queue<ButtonEvent> mButtonEvents;
     std::map<std::string, float> mAxisValues;
     bool mClosed{false};
 

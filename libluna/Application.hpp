@@ -202,6 +202,12 @@ namespace Luna {
 
     void openDebugger(Canvas* canvas);
 
+    void closeDebugger(Canvas* canvas);
+
+    void toggleDebugger(Canvas* canvas);
+
+    bool isDebuggerOpen(Canvas* canvas);
+
 #ifdef LUNA_WINDOW_SDL2
     Canvas* getCanvasBySdlWindowId(Uint32 windowId);
     void pushSdlEvent(SDL_Event* event);
@@ -211,6 +217,8 @@ namespace Luna {
     virtual void init() = 0;
 
     virtual void update(float deltaTime) = 0;
+
+    virtual void handleButtonEvent(const ButtonEvent& event);
 
     private:
     void executeKeyboardShortcuts();

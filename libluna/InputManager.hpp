@@ -72,7 +72,8 @@ namespace Luna {
     public:
     InputManager();
     ~InputManager();
-    void update(std::queue<ButtonEvent>* queue, float deltaTime);
+    void handleButtonEvent(const ButtonEvent& event);
+    void update(float deltaTime);
 
     void addButtonBinding(const String& actionName, const String& buttonName);
 
@@ -87,11 +88,8 @@ namespace Luna {
      */
     bool isButtonHeld(const String& actionName, float duration = 0.0f);
 
-    void setReturnUnused(bool returnUnused = true);
-
     private:
     std::map<std::string, float> mPressedActions;
     std::map<std::string, std::string> mButtonBindings;
-    bool mReturnUnusedEvents{false};
   };
 } // namespace Luna

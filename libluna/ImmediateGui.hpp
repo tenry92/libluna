@@ -29,7 +29,7 @@ namespace Luna {
     void newFrame();
     void render(ImmediateGui* gui);
 #ifdef LUNA_WINDOW_SDL2
-    bool processSdlEvent(const SDL_Event* event);
+    static bool processSdlEvent(const SDL_Event* event);
 #endif
     Canvas* mCanvas{nullptr};
 #ifdef LUNA_IMGUI

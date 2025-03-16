@@ -1,6 +1,7 @@
 #include <libluna/config.h>
 
 #include <libluna/Application.hpp>
+#include <libluna/Internal/Keyboard.hpp>
 
 #ifdef __SWITCH__
 #include <switch.h>
@@ -41,6 +42,7 @@
 
 using namespace Luna;
 using namespace Luna::Audio;
+using namespace Luna::Internal;
 
 static Application* gSingletonApp;
 
@@ -101,22 +103,18 @@ static void printArguments(const std::vector<String>& args) {
   }
 }
 
+void Application::handleButtonEvent(const ButtonEvent& event) {
+  mHotkeysManager.handleButtonEvent(event);
+}
+
 void Application::executeKeyboardShortcuts() {
   for (auto&& canvas : mCanvases) {
-    auto& queue = canvas.getButtonEvents();
-
-    // note: since we are not using input buffer, the time period (0.1f) does
-    // not matter
-    mHotkeysManager.update(&queue, 0.1f);
-
     if (mHotkeysManager.isButtonPressed("Toggle Debugger")) {
-      if (canvas.getImmediateGui()) {
-        canvas.attachImmediateGui(nullptr);
-      } else {
-        Application::getInstance()->openDebugger(&canvas);
-      }
+      Application::getInstance()->toggleDebugger(&canvas);
     }
   }
+
+  mHotkeysManager.update(0.1f);
 }
 
 void Application::mainLoop() {
@@ -207,7 +205,7 @@ void Application::processEvents() {
 
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
-    case SDL_QUIT:
+      case SDL_QUIT:
       logInfo("sdl quit event received");
 
       for (auto&& canvas : mCanvases) {
@@ -217,8 +215,53 @@ void Application::processEvents() {
       return;
     }
 
+    bool eventHandledByImmediateGui = false;
+
     for (auto&& canvas : mCanvases) {
-      if (canvas.processSdlEvent(&event)) {
+      if (canvas.sdlEventTargetsThis(&event)) {
+        eventHandledByImmediateGui = canvas.sendSdlEventToImmediateGui(&event);
+
+        if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE) {
+          canvas.close();
+        }
+
+        break;
+      }
+    }
+
+    if (eventHandledByImmediateGui) {
+      continue;
+    }
+
+    switch (event.type) {
+      case SDL_KEYDOWN: {
+        auto keycodeName = Keyboard::sdlKeycodeToName(event.key.keysym.sym);
+
+        if (!keycodeName.isEmpty()) {
+          handleButtonEvent(ButtonEvent(keycodeName, true));
+        }
+
+        auto scancodeName = Keyboard::sdlScancodeToName(event.key.keysym.scancode);
+
+        if (!scancodeName.isEmpty()) {
+          handleButtonEvent(ButtonEvent(scancodeName, true));
+        }
+
+        break;
+      }
+      case SDL_KEYUP: {
+        auto keycodeName = Keyboard::sdlKeycodeToName(event.key.keysym.sym);
+
+        if (!keycodeName.isEmpty()) {
+          handleButtonEvent(ButtonEvent(keycodeName, false));
+        }
+
+        auto scancodeName = Keyboard::sdlScancodeToName(event.key.keysym.scancode);
+
+        if (!scancodeName.isEmpty()) {
+          handleButtonEvent(ButtonEvent(scancodeName, false));
+        }
+
         break;
       }
     }
@@ -382,7 +425,6 @@ Application::Application(int argc, char** argv) {
 
   gSingletonApp = this;
 
-  mHotkeysManager.setReturnUnused(true);
   mHotkeysManager.addButtonBinding("Toggle Debugger", "Keyboard/Scancode/F1");
 
   mArgs.reserve(static_cast<std::size_t>(argc));
@@ -550,10 +592,41 @@ AudioNodePtr Application::getAudioDestinationNode() const {
 
 void Application::openDebugger([[maybe_unused]] Canvas* canvas) {
 #ifdef LUNA_IMGUI
-  if (!canvas->getImmediateGui()) {
+  if (!isDebuggerOpen(canvas)) {
     canvas->attachImmediateGui(
       std::make_unique<Internal::DebugGui>(mDebugMetrics)
     );
   }
 #endif
+}
+
+void Application::closeDebugger(Canvas* canvas) {
+#ifdef LUNA_IMGUI
+  for (auto&& gui : canvas->getImmediateGuis()) {
+    if (dynamic_cast<Internal::DebugGui*>(gui)) {
+      canvas->detachImmediateGui(gui);
+      break;
+    }
+  }
+#endif
+}
+
+void Application::toggleDebugger(Canvas* canvas) {
+  if (isDebuggerOpen(canvas)) {
+    closeDebugger(canvas);
+  } else {
+    openDebugger(canvas);
+  }
+}
+
+bool Application::isDebuggerOpen([[maybe_unused]] Canvas* canvas) {
+#ifdef LUNA_IMGUI
+  for (auto&& gui : canvas->getImmediateGuis()) {
+    if (dynamic_cast<Internal::DebugGui*>(gui)) {
+      return true;
+    }
+  }
+#endif
+
+  return false;
 }

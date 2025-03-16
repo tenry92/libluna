@@ -13,5 +13,7 @@ namespace Luna::Internal {
 
     private:
     std::shared_ptr<DebugMetrics> mMetrics;
+    bool mShowDemoWindow{false};
+    bool mShowLunaDebugger{false};
   };
 } // namespace Luna::Internal

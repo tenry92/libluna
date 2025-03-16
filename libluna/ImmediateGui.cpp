@@ -1,6 +1,7 @@
 #include <libluna/config.h>
 
 #include <libluna/ImmediateGui.hpp>
+#include <libluna/Logger.hpp>
 
 #ifdef LUNA_IMGUI
 #include <imgui/imgui.h>
@@ -24,7 +25,8 @@ void ImmediateGui::render(ImmediateGui* gui) { gui->render(); }
 #ifdef LUNA_WINDOW_SDL2
 bool ImmediateGui::processSdlEvent([[maybe_unused]] const SDL_Event* event) {
 #ifdef LUNA_IMGUI
-  return ImGui_ImplSDL2_ProcessEvent(event);
+  ImGui_ImplSDL2_ProcessEvent(event);
+  return ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow);
 #else
   return false;
 #endif

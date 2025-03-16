@@ -118,6 +118,10 @@ void OpenglRenderer::initialize() {
 
 void OpenglRenderer::initializeImmediateGui() {
 #ifdef LUNA_IMGUI
+  if (mImGuiContext != nullptr) {
+    return;
+  }
+
   IMGUI_CHECKVERSION();
   mImGuiContext = ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO();

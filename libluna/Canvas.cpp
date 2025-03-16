@@ -19,7 +19,6 @@
 #include <libluna/AbstractRenderer.hpp>
 #include <libluna/Application.hpp>
 #include <libluna/Console.hpp>
-#include <libluna/Internal/Keyboard.hpp>
 #include <libluna/Logger.hpp>
 
 #ifdef LUNA_WINDOW_SDL2
@@ -268,61 +267,6 @@ void Canvas::renderThread() {
 #endif
 
 #ifdef LUNA_WINDOW_SDL2
-bool Canvas::processSdlEvent(const SDL_Event* event) {
-  if (!sdlEventTargetsThis(event)) {
-    return false;
-  }
-
-  if (sendSdlEventToImmediateGui(event)) {
-    return true;
-  }
-
-  switch (event->type) {
-  case SDL_WINDOWEVENT: {
-    switch (event->window.event) {
-    case SDL_WINDOWEVENT_CLOSE: {
-      close();
-      return true;
-    }
-    }
-
-    return true;
-  }
-  case SDL_KEYDOWN: {
-    auto keycodeName = Keyboard::sdlKeycodeToName(event->key.keysym.sym);
-
-    if (!keycodeName.isEmpty()) {
-      mButtonEvents.push(ButtonEvent(keycodeName, true));
-    }
-
-    auto scancodeName = Keyboard::sdlScancodeToName(event->key.keysym.scancode);
-
-    if (!scancodeName.isEmpty()) {
-      mButtonEvents.push(ButtonEvent(scancodeName, true));
-    }
-
-    return true;
-  }
-  case SDL_KEYUP: {
-    auto keycodeName = Keyboard::sdlKeycodeToName(event->key.keysym.sym);
-
-    if (!keycodeName.isEmpty()) {
-      mButtonEvents.push(ButtonEvent(keycodeName, false));
-    }
-
-    auto scancodeName = Keyboard::sdlScancodeToName(event->key.keysym.scancode);
-
-    if (!scancodeName.isEmpty()) {
-      mButtonEvents.push(ButtonEvent(scancodeName, false));
-    }
-
-    return true;
-  }
-  }
-
-  return false;
-}
-
 bool Canvas::sdlEventTargetsThis(const SDL_Event* event) {
   auto myWindowId = SDL_GetWindowID(this->sdl.window);
 
@@ -347,21 +291,19 @@ bool Canvas::sdlEventTargetsThis(const SDL_Event* event) {
 }
 
 bool Canvas::sendSdlEventToImmediateGui(const SDL_Event* event) {
-  if (mImmediateGui) {
+  if (mImmediateGuis.size() > 0) {
     bool result{false};
     auto command = std::make_shared<CanvasCommand>(([this, &result, event]() {
-      result = mImmediateGui->processSdlEvent(event);
+      result = ImmediateGui::processSdlEvent(event);
     }));
 
     mCommandQueue.emplace(command);
     processCommandQueue();
     sync();
 
-    // note: ImGui always returns true if it can handle the event, even if there
-    // is no focus
-    // if (result) {
-    //   return true;
-    // }
+    if (result) {
+      return true;
+    }
   }
 
   return false;
@@ -380,9 +322,7 @@ Canvas::~Canvas() { this->close(); }
 void Canvas::close() {
   setStage(nullptr);
 
-  if (mImmediateGui) {
-    mImmediateGui.reset();
-  }
+  mImmediateGuis.clear();
 
 #ifdef LUNA_THREADED_CANVAS
   if (mThread.joinable()) {
@@ -534,25 +474,11 @@ void Canvas::setDisplayMode(DisplayMode mode) {
 }
 
 void Canvas::attachImmediateGui(std::unique_ptr<ImmediateGui> gui) {
-  if (mImmediateGui) {
-    auto command = std::make_shared<CanvasCommand>(([this]() {
-      mImmediateGui->init(this);
-      mRenderer->quitImmediateGui();
-    }));
+  auto guiPtr = gui.get();
+  mImmediateGuis.emplace_back(std::move(gui));
 
-    mCommandQueue.emplace(command);
-    processCommandQueue();
-    this->sync();
-  }
-
-  mImmediateGui = std::move(gui);
-
-  if (!mImmediateGui) {
-    return;
-  }
-
-  auto command = std::make_shared<CanvasCommand>(([this]() {
-    mImmediateGui->init(this);
+  auto command = std::make_shared<CanvasCommand>(([this, guiPtr]() {
+    guiPtr->init(this);
     mRenderer->initializeImmediateGui();
   }));
 
@@ -560,7 +486,29 @@ void Canvas::attachImmediateGui(std::unique_ptr<ImmediateGui> gui) {
   processCommandQueue();
 }
 
-ImmediateGui* Canvas::getImmediateGui() const { return mImmediateGui.get(); }
+void Canvas::detachImmediateGui(ImmediateGui* gui) {
+  mImmediateGuis.remove_if([gui](auto& item) { return item.get() == gui; });
+
+  if (mImmediateGuis.size() == 0) {
+    auto command = std::make_shared<CanvasCommand>(([this]() {
+      mRenderer->quitImmediateGui();
+    }));
+
+    mCommandQueue.emplace(command);
+    processCommandQueue();
+    this->sync();
+  }
+}
+
+std::list<ImmediateGui*> Canvas::getImmediateGuis() const {
+  std::list<ImmediateGui*> result;
+
+  for (auto& gui : mImmediateGuis) {
+    result.push_back(gui.get());
+  }
+
+  return result;
+}
 
 void Canvas::setStage(Stage* stage) {
   if (stage == mStage) {
@@ -627,8 +575,8 @@ void Canvas::render() {
 
     mRenderer->render();
 
-    if (mImmediateGui) {
-      mImmediateGui->render(mImmediateGui.get());
+    for (auto& gui : mImmediateGuis) {
+      gui->render(gui.get());
     }
 
     mRenderer->present();
@@ -670,8 +618,6 @@ void Canvas::sync() {
   }
 #endif
 }
-
-std::queue<ButtonEvent>& Canvas::getButtonEvents() { return mButtonEvents; }
 
 bool Canvas::isClosed() const { return mClosed; }
 
