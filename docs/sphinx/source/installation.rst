@@ -239,18 +239,32 @@ After installation, you can use libluna in your CMake projects:
 Generating Documentation
 ------------------------
 
-libluna uses Sphinx for guide documentation and Doxygen for API reference.
+libluna uses `Sphinx <https://www.sphinx-doc.org/en/master/>`_ for guide
+documentation and `Doxygen <https://www.doxygen.nl/>`_ for API reference.
 
-**Building Documentation**
+**Building Sphinx Documentation**
+
+Make sure Python is installed. If the ``python`` and ``pip`` commands point to
+Python 2, use ``python3`` and ``pip3`` respectively.
+
+Navigate to the ``docs/sphinx`` directory in your terminal.
+
+It's recommended to use a virtual environment to keep dependencies isolated:
+
+.. code-block:: bash
+
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
 
 To build the documentation, run the following command in the root of your libluna
 directory:
 
 .. code-block:: bash
 
-   sphinx-build -b html docs/source docs/build
+   sphinx-build -M html source build
 
-This will generate the HTML documentation in the `docs/build/html` directory.
+This will generate the HTML documentation in the `build/html` directory.
 
 Troubleshooting
 ---------------
