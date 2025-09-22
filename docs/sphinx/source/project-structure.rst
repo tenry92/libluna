@@ -1,7 +1,7 @@
 Project structure
 =================
 
-The Luna Game Engine (libluna) project is composed of the following parts:
+The Luna framework (libluna) project is composed of the following parts:
 
 .. code-block::
 

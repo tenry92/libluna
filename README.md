@@ -60,10 +60,6 @@ installed on your machine:
 
 - a C++ compiler (e.g. g++, clang, MSVC)
 - CMake
-- zlib
-- libpng
-- libopus
-- libopusfile
 - libglm
 - libsdl2
 

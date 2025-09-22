@@ -11,6 +11,9 @@ C++ source files.
 If a file contains a single class or namespace, the file name should match the
 class or namespace name, for example ``MyClass.hpp`` and ``MyClass.cpp``.
 
+Exception to this rule are special C header files, such as ``config.h`` or
+``utf8.h``.
+
 Order of includes
 -----------------
 
@@ -105,7 +108,7 @@ The maximum width of a line of source code is 80 characters.
 Curly braces
 ------------
 
-Curly braces are placed on the same line as the statement they belong to.
+Opening curly braces are placed on the same line as the statement they belong to.
 
 Statements
 ----------

@@ -1,68 +1,40 @@
-Luna Game Engine
-================
+Luna Framework
+==============
 
 .. toctree::
    :maxdepth: 1
 
+   installation
    project-structure
    build-layout
    coding-guidelines
 
-Getting started
----------------
+**libluna** is a C++ framework designed to make video games cross-platform for
+modern and retro platforms.
 
-In order to build libluna, make sure you have CMake any any C++ compiler
-installed. On Linux, it's suggested to have g++ or clang installed. On Windows,
-it's suggested to have MSVC installed.
+Unlike a real game engine, libluna is a low-level framework that provides
+access to graphics, audio, input and filesystem APIs.
 
-In addition, make sure these libraries are also installed on your system:
+Target platforms
+----------------
 
-- zlib
-- libpng
-- libopus
-- libopusfile
-- libglm
-- libsdl2
+**libluna** can be used for the following target platforms:
 
-You may run ``scripts/install-dependencies.sh`` (Linux) or
-``scripts/install-dependencies.ps1`` (Windows) to automatically install the
-dependencies.
+- Windows (SDL2, OpenGL)
+- Linux (SDL2, OpenGL)
+- Nintendo DS (`devkitPro <https://github.com/devkitpro>`_)
+- Nintendo 64 (`libdragon <https://github.com/DragonMinded/libdragon>`_)
 
-On Windows, the script will install Chocolatey, Git and vcpkg and install the
-libraries via vcpkg.
+Requirements
+------------
 
-On Linux, you may also use the provided Dockerfile for an isolated environment
-ready for building the project:
+In order to build **libluna**, you need the following on your system:
 
-.. code-block:: bash
-   :caption: libluna
+- C++ compiler (g++, clang, MSVC)
+- CMake
+- Development libraries for SDL2, glm and fmt
 
-   docker build -t cpp-cmake-env .
-   docker run -it --rm cpp-cmake-env
+When compiling for a video game console, you only need the respective toolchain
+(devkitPro or libdragon) and CMake.
 
-Now you can configure the build environment. Create a new folder, for example
-``build`` and run cmake:
-
-.. code-block:: bash
-   :caption: libluna
-
-   mkdir build
-   cd build
-   cmake -DCMAKE_BUILD_TYPE=Release ..
-
-On Windows, when using vcpkg, you should configure ``CMAKE_TOOLCHAIN_FILE``:
-
-.. code-block:: bash
-   :caption: libluna/build
-
-   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake ..
-
-If you want to create a debug build, change ``Release`` to ``Debug`` or omit it.
-
-The configuration will check if all dependencies are available for building the
-project. When it succeeded, the library and internal dependencies can be built:
-
-.. code-block:: bash
-   :caption: libluna/build
-
-   cmake --build . --config Release
+See the `installation guide <installation.html>`_ for more information.

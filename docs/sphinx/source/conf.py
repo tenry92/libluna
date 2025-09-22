@@ -6,8 +6,8 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Luna Game Engine'
-copyright = '2024, Tenry'
+project = 'Luna Framework'
+copyright = '2025, Tenry'
 author = 'Tenry'
 
 # -- General configuration ---------------------------------------------------
