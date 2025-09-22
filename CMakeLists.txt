@@ -8,8 +8,8 @@ project(libluna
 
 include(ExternalProject)
 
-set(CMAKE_MODULE_PATH "/opt/cmake/module")
-set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX_PATH}")
+# set(CMAKE_MODULE_PATH "/opt/cmake/module")
+# set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX_PATH}")
 
 ################################################################################
 # VARIABLES
@@ -44,9 +44,11 @@ add_library(luna STATIC)
 add_dependencies(luna shaders)
 target_compile_features(luna PUBLIC cxx_std_17)
 target_include_directories(luna PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/libs # for imgui
-  ${CMAKE_CURRENT_BINARY_DIR} # for generated files like config.h
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libs> # for imgui
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}> # for generated files like config.h
+
+  $<INSTALL_INTERFACE:include>
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "NintendoDS")
@@ -102,7 +104,6 @@ set(PUBLIC_MODULES
   TextureCache
   Tilemap
   Tileset
-  Util/Zlib
   Vector
 )
 
@@ -153,6 +154,8 @@ list(APPEND PUBLIC_HEADERS
   libluna/Palette.hpp
   libluna/Pool.hpp
   libluna/Resource.hpp
+  libluna/utf8.h
+  ${CMAKE_CURRENT_BINARY_DIR}/libluna/config.h
   libs/imgui/imgui.h
   libs/imgui/imconfig.h
 )
@@ -215,10 +218,37 @@ add_dependencies(shaders xxd-native)
 # INSTALL
 
 install(TARGETS luna
-  ARCHIVE
+  EXPORT lunaTargets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+  PUBLIC_HEADER DESTINATION include/libluna
 )
 
 install(FILES ${PUBLIC_HEADERS} DESTINATION include/libluna)
+
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(cmake/lunaConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/lunaConfig.cmake
+  INSTALL_DESTINATION lib/cmake/luna
+)
+
+install(EXPORT lunaTargets
+  FILE LunaTargets.cmake
+  NAMESPACE luna::
+  DESTINATION lib/cmake/luna
+)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lunaConfig.cmake
+  DESTINATION lib/cmake/luna
+)
+
+# configure_file(luna.pc.in luna.pc @ONLY)
+
+# install(FILES ${CMAKE_CURRENT_BINARY_DIR}/luna.pc
+#   DESTINATION lib/pkgconfig
+# )
 
 ################################################################################
 # UNIT TESTS
@@ -230,6 +260,6 @@ endif()
 ################################################################################
 # EXAMPLES
 
-if(LUNA_BUILD_EXAMPLES)
-  add_subdirectory(examples)
-endif()
+# if(LUNA_BUILD_EXAMPLES)
+#   add_subdirectory(examples)
+# endif()

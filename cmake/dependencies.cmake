@@ -6,19 +6,10 @@ if(LUNA_USE_STD_THREAD)
 endif()
 
 if(NOT (CMAKE_SYSTEM_NAME STREQUAL "Nintendo64" OR CMAKE_SYSTEM_NAME STREQUAL "NintendoDS"))
-  find_package(ZLIB REQUIRED)
-  target_link_libraries(luna PUBLIC ZLIB::ZLIB)
-
-  find_path(OPUSFILE_INCLUDE_DIR NAMES opusfile.h REQUIRED PATH_SUFFIXES opus)
-  find_library(OGG_LIB NAMES ogg)
-  find_library(OPUS_LIB NAMES opus)
-  find_library(OPUSFILE_LIB NAMES opusfile)
-  target_include_directories(luna PRIVATE ${OPUSFILE_INCLUDE_DIR})
-  target_link_libraries(luna PRIVATE ${OPUSFILE_LIB} ${OPUS_LIB} ${OGG_LIB})
-
-  find_path(UTF8_INCLUDE_DIR NAMES utf8.h REQUIRED HINTS ${PROJECT_SOURCE_DIR}/libs PATH_SUFFIXES utf8)
-  find_path(GLM_INCLUDE_DIR NAMES glm/glm.hpp REQUIRED PATH_SUFFIXES utf8)
-  target_include_directories(luna PUBLIC ${UTF8_INCLUDE_DIR} ${GLM_INCLUDE_DIR})
+  find_path(GLM_INCLUDE_DIR NAMES glm/glm.hpp REQUIRED)
+  target_include_directories(luna PUBLIC
+    ${GLM_INCLUDE_DIR}
+  )
 endif()
 
 if(LUNA_WINDOW_SDL2)
@@ -38,51 +29,48 @@ if(LUNA_RENDERER_OPENGL)
 endif()
 
 if(LUNA_IMGUI)
-  add_library(imgui_base STATIC
+  add_library(imgui_base OBJECT
     libs/imgui/imgui_demo.cpp
     libs/imgui/imgui_draw.cpp
     libs/imgui/imgui_tables.cpp
     libs/imgui/imgui_widgets.cpp
     libs/imgui/imgui.cpp
   )
-  target_include_directories(imgui_base PUBLIC libs/imgui)
-  target_link_libraries(luna PRIVATE imgui_base)
+  target_include_directories(imgui_base PRIVATE libs/imgui)
+  target_sources(luna PRIVATE $<TARGET_OBJECTS:imgui_base>)
+  target_include_directories(luna PRIVATE libs/imgui)
 
   if(LUNA_RENDERER_OPENGL)
-    add_library(imgui_opengl STATIC
+    add_library(imgui_opengl OBJECT
       libs/imgui/backends/imgui_impl_opengl3.cpp
     )
-    target_include_directories(imgui_opengl PUBLIC libs/imgui)
-    target_link_libraries(luna PRIVATE imgui_opengl)
+    target_include_directories(imgui_opengl PRIVATE libs/imgui)
+    target_sources(luna PRIVATE $<TARGET_OBJECTS:imgui_opengl>)
   endif()
 
   if(LUNA_WINDOW_SDL2)
-    add_library(imgui_sdl2 STATIC
+    add_library(imgui_sdl2 OBJECT
       libs/imgui/backends/imgui_impl_sdl2.cpp
       libs/imgui/backends/imgui_impl_sdlrenderer2.cpp
     )
-    target_include_directories(imgui_sdl2 PUBLIC libs/imgui)
-    target_link_libraries(imgui_sdl2 PUBLIC SDL2::SDL2)
-    target_link_libraries(luna PRIVATE imgui_sdl2)
+    target_include_directories(imgui_sdl2 PRIVATE libs/imgui)
+    target_link_libraries(imgui_sdl2 PRIVATE SDL2::SDL2)
+    target_sources(luna PRIVATE $<TARGET_OBJECTS:imgui_sdl2>)
   endif()
 
   if(LUNA_WINDOW_GLFW)
-    add_library(imgui_glfw STATIC
+    add_library(imgui_glfw OBJECT
       libs/imgui/backends/imgui_impl_glfw.cpp
     )
-    target_include_directories(imgui_glfw PUBLIC libs/imgui)
-    target_link_libraries(imgui_glfw PUBLIC glfw)
-    target_link_libraries(luna PRIVATE imgui_glfw)
+    target_include_directories(imgui_glfw PRIVATE libs/imgui)
+    target_link_libraries(imgui_glfw PRIVATE glfw)
+    target_sources(luna PRIVATE $<TARGET_OBJECTS:imgui_glfw>)
   endif()
 endif()
 
-target_include_directories(luna PUBLIC
-  /usr/include/opus
-)
-
-if(NOT (CMAKE_SYSTEM_NAME STREQUAL "Nintendo64" OR CMAKE_SYSTEM_NAME STREQUAL "NintendoDS"))
-  target_link_libraries(luna PRIVATE glad)
-endif()
+# target_include_directories(luna PUBLIC
+#   /usr/include/opus
+# )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
   target_link_libraries(luna PRIVATE EGL glapi drm_nouveau)
@@ -93,21 +81,19 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
   # target_link_libraries(luna PRIVATE ${LIBDRAGON_LIB})
 endif()
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64" OR CMAKE_SYSTEM_NAME STREQUAL "NintendoDS")
-  target_include_directories(luna PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/utf8)
-  # target_link_libraries(luna PRIVATE ${LIBDRAGON_LIB})
-endif()
-
 target_include_directories(luna PUBLIC
   /usr/local/include
 )
 
 if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
   add_subdirectory(libs/glad-4.3)
+  target_sources(luna PRIVATE
+    $<TARGET_OBJECTS:glad>
+  )
+  target_include_directories(luna PRIVATE libs/glad-4.3/include)
 endif()
 
-add_subdirectory(libs/libgfx)
-
 set(FMT_OS OFF)
-add_subdirectory(libs/fmt-11.1.2)
+# add_subdirectory(libs/fmt-11.1.2)
+find_package(fmt REQUIRED)
 target_link_libraries(luna PUBLIC fmt::fmt)

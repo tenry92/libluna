@@ -473,13 +473,13 @@ void CommonRenderer::render2d(
           float x = startPosition.x;
           float y = startPosition.y;
 
-          y += text.getSize() * font->getBaseLine();
+          y += text.getSize() * static_cast<float>(font->getBaseLine());
 
           for (auto&& cp : text.getContent()) {
             if (cp == '\n') {
               x = startPosition.x;
               y +=
-                text.getSize() * text.getLineHeight() * font->getLineHeight();
+                text.getSize() * text.getLineHeight() * static_cast<float>(font->getLineHeight());
               continue;
             }
 
@@ -502,14 +502,15 @@ void CommonRenderer::render2d(
                 info.position =
                   Vector2i(static_cast<int>(x), static_cast<int>(y)) +
                   Vector2i(
-                    static_cast<int>(text.getSize() * glyph->offset.x),
-                    static_cast<int>(text.getSize() * glyph->offset.y)
+                    static_cast<int>(text.getSize() * static_cast<float>(glyph->offset.x)),
+                    static_cast<int>(text.getSize() * static_cast<float>(glyph->offset.y))
                   );
 
                 if (glyph->crop.area() > 0) {
                   info.size = {
-                    static_cast<int>(text.getSize() * glyph->crop.width),
-                    static_cast<int>(text.getSize() * glyph->crop.height)};
+                    static_cast<int>(text.getSize() * static_cast<float>(glyph->crop.width)),
+                    static_cast<int>(text.getSize() * static_cast<float>(glyph->crop.height))
+                  };
                   info.crop = glyph->crop;
                 } else {
                   info.size = texture.size;
@@ -519,7 +520,7 @@ void CommonRenderer::render2d(
               }
             }
 
-            x += text.getSize() * glyph->advance;
+            x += text.getSize() * static_cast<float>(glyph->advance);
           }
         }},
       drawable

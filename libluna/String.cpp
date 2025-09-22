@@ -14,7 +14,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
 #endif
-#include <utf8.h>
+#include <libluna/utf8.h>
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif

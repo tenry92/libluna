@@ -15,12 +15,6 @@ set(UNIT_TESTS
   Vector
 )
 
-if(NOT (CMAKE_SYSTEM_NAME STREQUAL "Nintendo64" OR CMAKE_SYSTEM_NAME STREQUAL "NintendoDS"))
-  list(APPEND UNIT_TESTS
-    Util/Zlib
-  )
-endif()
-
 foreach(test_name ${UNIT_TESTS})
   string(REPLACE "/" "_" TEST_TARGET_NAME "${test_name}.test")
   add_executable(${TEST_TARGET_NAME} libluna/${test_name}.test.cpp)

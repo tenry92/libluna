@@ -36,13 +36,9 @@ if (-not (Test-Path -Path "C:\vcpkg\vcpkg.exe")) {
 
 # Define the libraries to install
 $libraries = @(
-  "zlib",
-  "libpng",
-  "opus",
-  "opusfile",
   "glm",
-  "utfcpp",
-  "sdl2"
+  "sdl2",
+  "fmt"
 )
 
 # Install the libraries using vcpkg

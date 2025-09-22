@@ -1,0 +1,15 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+if(@LUNA_WINDOW_SDL2@)
+  find_dependency(SDL2 REQUIRED)
+endif()
+
+if(@LUNA_WINDOW_GLFW@)
+  find_dependency(glfw3 REQUIRED)
+endif()
+
+find_dependency(fmt REQUIRED)
+
+include("${CMAKE_CURRENT_LIST_DIR}/LunaTargets.cmake")
