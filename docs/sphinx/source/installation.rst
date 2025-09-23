@@ -159,6 +159,17 @@ dependencies:
 .. tip::
    Replace ``C:/vcpkg`` with the actual path where you installed vcpkg.
 
+**Configuration for Cross-Compiling to Nintendo 64**
+
+To cross-compile libluna for the Nintendo 64, you need to set up the toolchain
+file and specify the target architecture:
+
+.. code-block:: bash
+
+   mkdir build
+   cd build
+   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../cmake/Nintendo64.cmake ..
+
 **Advanced Configuration Options**
 
 libluna supports several CMake options to customize the build:
@@ -175,7 +186,7 @@ libluna supports several CMake options to customize the build:
 
 - ``LUNA_BUILD_TESTS``: Build unit tests (default: OFF)
 - ``LUNA_BUILD_EXAMPLES``: Build example applications (default: OFF)
-- ``CMAKE_INSTALL_PREFIX``: Installation directory (default: ``/usr/local`` on Linux, ``C:\Program Files`` on Windows)
+- ``CMAKE_INSTALL_PREFIX``: Installation directory (default: ``/usr/local`` on Linux, ``C:\Program Files\libluna`` on Windows)
 
 Building and Installing
 -----------------------
@@ -222,6 +233,9 @@ To install libluna to your system:
 
 - **Linux:** ``/usr/local/lib`` (libraries), ``/usr/local/include`` (headers)
 - **Windows:** ``C:\Program Files\libluna`` (or ``C:\Program Files (x86)\libluna`` for 32-bit)
+
+For Nintendo 64, defaults to ``/usr/local``. It's recommended to set a custom
+prefix, such as ``/opt/libdragon/mips64-elf``.
 
 **Using libluna in Your Project**
 

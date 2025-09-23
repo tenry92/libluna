@@ -2,7 +2,18 @@ if(NOT CMAKE_SYSTEM_NAME)
   set(CMAKE_SYSTEM_NAME Nintendo64)
 endif()
 
+set(NINTENDO_64 TRUE)
+
+set(CMAKE_SYSTEM_PROCESSOR mips64)
+
 set(LIBDRAGON_ROOT /opt/libdragon)
+set(CMAKE_SYSROOT "${LIBDRAGON_ROOT}/mips64-elf")
+set(CMAKE_FIND_ROOT_PATH "${CMAKE_SYSROOT}")
+set(CMAKE_INSTALL_PREFIX "${CMAKE_SYSROOT}")
+
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set_property(CACHE CMAKE_INSTALL_PREFIX PROPERTY VALUE "${CMAKE_SYSROOT}")
+endif()
 
 find_program(CMAKE_ASM_COMPILER NAMES mips64-elf-gcc HINTS "${LIBDRAGON_ROOT}/bin")
 find_program(CMAKE_C_COMPILER NAMES mips64-elf-gcc HINTS "${LIBDRAGON_ROOT}/bin")
@@ -16,6 +27,12 @@ find_program(CMAKE_OBJCOPY NAMES mips64-elf-objcopy HINTS "${LIBDRAGON_ROOT}/bin
 find_program(N64_ELFCOMPRESS NAMES n64elfcompress HINTS "${LIBDRAGON_ROOT}/bin")
 find_program(N64_MKDFS NAMES mkdfs HINTS "${LIBDRAGON_ROOT}/bin")
 find_program(N64_SYM NAMES n64sym HINTS "${LIBDRAGON_ROOT}/bin")
+
+set(CMAKE_C_COMPILER_FORCED TRUE)
+set(CMAKE_CXX_COMPILER_FORCED TRUE)
+
+set(CMAKE_C_COMPILE_FEATURES c_std_90 c_std_99 c_std_11 c_std_17 c_std_23)
+set(CMAKE_CXX_COMPILE_FEATURES cxx_std_11 cxx_std_14 cxx_std_17 cxx_std_20 cxx_std_23)
 
 find_path(LIBDRAGON_INCLUDE_DIR NAMES libdragon.h HINTS "${LIBDRAGON_ROOT}/mips64-elf/include")
 set(LIBDRAGON_LIB "${LIBDRAGON_ROOT}/mips64-elf/lib/libdragon.a")

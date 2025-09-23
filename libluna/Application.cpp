@@ -286,88 +286,82 @@ void Application::processEvents() {
   }
 #endif
 #ifdef N64
-  for (auto&& canvas : mCanvases) {
-    auto& events = canvas.getButtonEvents();
+  joypad_poll();
 
-    joypad_poll();
+  auto pressed = joypad_get_buttons_pressed(JOYPAD_PORT_1);
 
-    auto pressed = joypad_get_buttons_pressed(JOYPAD_PORT_1);
+  if (pressed.z) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/Z", true));
+  }
 
-    if (pressed.z) {
-      events.push(ButtonEvent("Gamepad/N64/Z", true));
-    }
+  if (pressed.d_up) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/DPadUp", true));
+  }
 
-    if (pressed.d_up) {
-      events.push(ButtonEvent("Gamepad/N64/DPadUp", true));
-    }
+  if (pressed.d_down) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/DPadDown", true));
+  }
 
-    if (pressed.d_down) {
-      events.push(ButtonEvent("Gamepad/N64/DPadDown", true));
-    }
+  if (pressed.d_left) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/DPadLeft", true));
+  }
 
-    if (pressed.d_left) {
-      events.push(ButtonEvent("Gamepad/N64/DPadLeft", true));
-    }
+  if (pressed.d_right) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/DPadRight", true));
+  }
 
-    if (pressed.d_right) {
-      events.push(ButtonEvent("Gamepad/N64/DPadRight", true));
-    }
+  if (pressed.c_up) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/CUp", true));
+  }
 
-    if (pressed.c_up) {
-      events.push(ButtonEvent("Gamepad/N64/CUp", true));
-    }
+  if (pressed.c_down) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/CDown", true));
+  }
 
-    if (pressed.c_down) {
-      events.push(ButtonEvent("Gamepad/N64/CDown", true));
-    }
+  if (pressed.c_left) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/CLeft", true));
+  }
 
-    if (pressed.c_left) {
-      events.push(ButtonEvent("Gamepad/N64/CLeft", true));
-    }
+  if (pressed.c_right) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/CRight", true));
+  }
 
-    if (pressed.c_right) {
-      events.push(ButtonEvent("Gamepad/N64/CRight", true));
-    }
+  auto released = joypad_get_buttons_released(JOYPAD_PORT_1);
 
-    auto released = joypad_get_buttons_released(JOYPAD_PORT_1);
+  if (released.z) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/Z", false));
+  }
 
-    if (released.z) {
-      events.push(ButtonEvent("Gamepad/N64/Z", false));
-    }
+  if (released.d_up) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/DPadUp", false));
+  }
 
-    if (released.d_up) {
-      events.push(ButtonEvent("Gamepad/N64/DPadUp", false));
-    }
+  if (released.d_down) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/DPadDown", false));
+  }
 
-    if (released.d_down) {
-      events.push(ButtonEvent("Gamepad/N64/DPadDown", false));
-    }
+  if (released.d_left) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/DPadLeft", false));
+  }
 
-    if (released.d_left) {
-      events.push(ButtonEvent("Gamepad/N64/DPadLeft", false));
-    }
+  if (released.d_right) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/DPadRight", false));
+  }
 
-    if (released.d_right) {
-      events.push(ButtonEvent("Gamepad/N64/DPadRight", false));
-    }
+  if (released.c_up) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/CUp", false));
+  }
 
-    if (released.c_up) {
-      events.push(ButtonEvent("Gamepad/N64/CUp", false));
-    }
+  if (released.c_down) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/CDown", false));
+  }
 
-    if (released.c_down) {
-      events.push(ButtonEvent("Gamepad/N64/CDown", false));
-    }
+  if (released.c_left) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/CLeft", false));
+  }
 
-    if (released.c_left) {
-      events.push(ButtonEvent("Gamepad/N64/CLeft", false));
-    }
-
-    if (released.c_right) {
-      events.push(ButtonEvent("Gamepad/N64/CRight", false));
-    }
-
-    return;
+  if (released.c_right) {
+    handleButtonEvent(ButtonEvent("Gamepad/N64/CRight", false));
   }
 #endif
 }
@@ -450,7 +444,9 @@ Application::~Application() = default;
 Application* Application::getInstance() { return gSingletonApp; }
 
 int Application::run() {
+#ifdef LUNA_WINDOW_SDL2
   SDL_SetHint(SDL_HINT_APP_NAME, mName.c_str());
+#endif
 
   String assetsPath = Application::getInstance()->getOptionValue("assets");
 
@@ -605,7 +601,7 @@ void Application::openDebugger([[maybe_unused]] Canvas* canvas) {
 #endif
 }
 
-void Application::closeDebugger(Canvas* canvas) {
+void Application::closeDebugger([[maybe_unused]] Canvas* canvas) {
 #ifdef LUNA_IMGUI
   for (auto&& gui : canvas->getImmediateGuis()) {
     if (dynamic_cast<Internal::DebugGui*>(gui)) {

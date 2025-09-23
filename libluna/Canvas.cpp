@@ -46,7 +46,7 @@ using namespace Luna::Internal;
 using Luna::String;
 
 namespace {
-  static void printDisplays() {
+  [[maybe_unused]] static void printDisplays() {
     static bool didPrint = false;
 
     if (didPrint) {
@@ -112,7 +112,7 @@ class CanvasCommand : public Command {
   std::function<void()> mCallback;
 };
 
-void Canvas::createWindow(const DisplayMode& displayMode) {
+void Canvas::createWindow([[maybe_unused]] const DisplayMode& displayMode) {
   Console::quit();
 
 #ifdef LUNA_WINDOW_SDL2

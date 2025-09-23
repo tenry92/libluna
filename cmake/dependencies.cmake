@@ -94,6 +94,18 @@ if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
 endif()
 
 set(FMT_OS OFF)
-# add_subdirectory(libs/fmt-11.1.2)
-find_package(fmt REQUIRED)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
+  include(FetchContent)
+  FetchContent_Declare(
+    fmt
+    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+    GIT_TAG 12.0.0
+  )
+  set(FMT_INSTALL ON)
+  FetchContent_MakeAvailable(fmt)
+else()
+  find_package(fmt REQUIRED)
+endif()
+
 target_link_libraries(luna PUBLIC fmt::fmt)
