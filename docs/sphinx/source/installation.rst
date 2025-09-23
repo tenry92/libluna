@@ -237,6 +237,9 @@ To install libluna to your system:
 For Nintendo 64, defaults to ``/usr/local``. It's recommended to set a custom
 prefix, such as ``/opt/libdragon/mips64-elf``.
 
+For devkitPro targets, it defaults to the respective sub-directory in the
+devkitPro installation, such as ``/opt/devkitpro/portlibs/nds``.
+
 **Using libluna in Your Project**
 
 After installation, you can use libluna in your CMake projects:

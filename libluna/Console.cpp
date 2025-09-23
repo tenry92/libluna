@@ -6,9 +6,11 @@
 #define UNIX_COLORS
 #endif
 
-#ifdef UNIX_COLORS
+#ifndef _WIN32
 #include <iostream>
-#elif _WIN32
+#endif
+
+#ifdef _WIN32
 #include <windows.h>
 #define BG(NAME) BACKGROUND_##NAME
 #define FG(NAME) BACKGROUND_##NAME

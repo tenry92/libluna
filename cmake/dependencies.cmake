@@ -95,7 +95,9 @@ endif()
 
 set(FMT_OS OFF)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
+if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
+  find_package(fmt REQUIRED)
+else()
   include(FetchContent)
   FetchContent_Declare(
     fmt
@@ -104,8 +106,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
   )
   set(FMT_INSTALL ON)
   FetchContent_MakeAvailable(fmt)
-else()
-  find_package(fmt REQUIRED)
 endif()
 
 target_link_libraries(luna PUBLIC fmt::fmt)

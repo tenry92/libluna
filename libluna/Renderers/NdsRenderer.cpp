@@ -2,6 +2,8 @@
 
 #include <nds.h>
 
+#include <libluna/Canvas.hpp>
+
 using namespace Luna;
 
 class NdsRenderer::impl {
