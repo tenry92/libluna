@@ -8,7 +8,6 @@
 
 namespace Luna {
   class Mesh;
-  using MeshPtr = std::shared_ptr<Mesh>;
 
   class Mesh final {
     public:

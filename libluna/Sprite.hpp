@@ -11,7 +11,6 @@
 
 namespace Luna {
   class Sprite;
-  using SpritePtr = std::shared_ptr<Sprite>;
 
   /**
    * @defgroup drawables2d 2D Drawables

@@ -10,7 +10,6 @@
 namespace Luna {
   class Image;
   using ImagePtr = std::shared_ptr<Image>;
-  using ImageResPtr = ResourcePtr<Image>;
 
   /**
    * @brief Store a 2D pixel bitmap on the memory.
