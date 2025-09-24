@@ -217,6 +217,14 @@ To speed up compilation on multi-core systems:
    # Or specify the number of cores explicitly
    cmake --build . --config Release --parallel 4
 
+**Running Tests**
+
+If you enabled tests during configuration, you can run them with:
+
+.. code-block:: bash
+
+   ctest
+
 **Installing the Library**
 
 To install libluna to your system:
