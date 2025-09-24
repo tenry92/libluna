@@ -82,10 +82,10 @@ static int runTests() {
     } catch (std::exception& error) {
       assertMessage = error.what();
       testFailed = true;
-      result = 1;
     }
 
     if (testFailed) {
+      result = 1;
       Luna::Console::setColor(Luna::Console::brightRed);
       Luna::Console::write(" FAILED");
       Luna::Console::resetColor();
