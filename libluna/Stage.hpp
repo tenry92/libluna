@@ -83,7 +83,7 @@ namespace Luna {
     void destroyModel(Model* model);
 
     const Pool<Drawable2dVariant, 64>& getDrawables2d() const;
-    const std::forward_list<Drawable2dVariant> getSortedDrawables2d() const;
+    const std::forward_list<const Drawable2dVariant*> getSortedDrawables2d() const;
     const std::list<Drawable3d>& getDrawables3d() const;
 
     void setAmbientLight(const AmbientLight& ambientLight);

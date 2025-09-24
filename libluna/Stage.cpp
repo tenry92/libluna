@@ -63,6 +63,11 @@ Stage::~Stage() = default;
 
 Sprite* Stage::createSprite() {
   auto drawable2d = mDrawables2d.acquire();
+
+  if (!drawable2d) {
+    return nullptr;
+  }
+
   drawable2d->emplace<Sprite>();
 
   return &std::get<Sprite>(*drawable2d);
@@ -79,6 +84,11 @@ void Stage::destroySprite(Sprite* sprite) {
 
 Primitive* Stage::createPrimitive() {
   auto drawable2d = mDrawables2d.acquire();
+
+  if (!drawable2d) {
+    return nullptr;
+  }
+
   drawable2d->emplace<Primitive>();
 
   return &std::get<Primitive>(*drawable2d);
@@ -95,6 +105,11 @@ void Stage::destroyPrimitive(Primitive* primitive) {
 
 Text* Stage::createText() {
   auto drawable2d = mDrawables2d.acquire();
+
+  if (!drawable2d) {
+    return nullptr;
+  }
+
   drawable2d->emplace<Text>();
 
   return &std::get<Text>(*drawable2d);
@@ -111,6 +126,11 @@ void Stage::destroyText(Text* text) {
 
 Tilemap* Stage::createTilemap() {
   auto drawable2d = mDrawables2d.acquire();
+
+  if (!drawable2d) {
+    return nullptr;
+  }
+
   drawable2d->emplace<Tilemap>();
 
   return &std::get<Tilemap>(*drawable2d);
@@ -142,41 +162,45 @@ const Pool<Stage::Drawable2dVariant, 64>& Stage::getDrawables2d() const {
   return mDrawables2d;
 }
 
-const std::forward_list<Stage::Drawable2dVariant>
+const std::forward_list<const Stage::Drawable2dVariant*>
 Stage::getSortedDrawables2d() const {
-  std::forward_list<Drawable2dVariant> sortedDrawables;
+  std::forward_list<const Drawable2dVariant*> sortedDrawables;
 
   for (auto&& drawable : mDrawables2d) {
-    sortedDrawables.emplace_front(drawable);
+    sortedDrawables.emplace_front(&drawable);
   }
 
+  // forward_list.tcc:498:29: null pointer dereference
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference"
   sortedDrawables.sort(
-    [](const Drawable2dVariant& a, const Drawable2dVariant& b) {
+    [](const Drawable2dVariant* a, const Drawable2dVariant* b) {
+#pragma GCC diagnostic pop
       float priorityA = 0;
       float priorityB = 0;
 
-      if (std::holds_alternative<Sprite>(a)) {
-        priorityA = std::get<Sprite>(a).getPriority();
+      if (std::holds_alternative<Sprite>(*a)) {
+        priorityA = std::get<Sprite>(*a).getPriority();
       }
 
-      if (std::holds_alternative<Primitive>(a)) {
-        priorityA = std::get<Primitive>(a).getPriority();
+      if (std::holds_alternative<Primitive>(*a)) {
+        priorityA = std::get<Primitive>(*a).getPriority();
       }
 
-      if (std::holds_alternative<Text>(a)) {
-        priorityA = std::get<Text>(a).getPriority();
+      if (std::holds_alternative<Text>(*a)) {
+        priorityA = std::get<Text>(*a).getPriority();
       }
 
-      if (std::holds_alternative<Sprite>(b)) {
-        priorityB = std::get<Sprite>(b).getPriority();
+      if (std::holds_alternative<Sprite>(*b)) {
+        priorityB = std::get<Sprite>(*b).getPriority();
       }
 
-      if (std::holds_alternative<Primitive>(b)) {
-        priorityB = std::get<Primitive>(b).getPriority();
+      if (std::holds_alternative<Primitive>(*b)) {
+        priorityB = std::get<Primitive>(*b).getPriority();
       }
 
-      if (std::holds_alternative<Text>(b)) {
-        priorityB = std::get<Text>(b).getPriority();
+      if (std::holds_alternative<Text>(*b)) {
+        priorityB = std::get<Text>(*b).getPriority();
       }
 
       return priorityA < priorityB;

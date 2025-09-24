@@ -523,7 +523,7 @@ void CommonRenderer::render2d(
             x += text.getSize() * static_cast<float>(glyph->advance);
           }
         }},
-      drawable
+      *drawable
     );
   }
 }
