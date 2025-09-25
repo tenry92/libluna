@@ -171,11 +171,15 @@ Stage::getSortedDrawables2d() const {
   }
 
   // forward_list.tcc:498:29: null pointer dereference
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnull-dereference"
+#endif
   sortedDrawables.sort(
     [](const Drawable2dVariant* a, const Drawable2dVariant* b) {
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif
       float priorityA = 0;
       float priorityB = 0;
 

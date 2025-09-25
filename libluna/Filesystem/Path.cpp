@@ -1,6 +1,7 @@
 #include <libluna/Filesystem/Path.hpp>
 
 #include <algorithm>
+#include <iterator> // std::back_inserter
 #include <stdexcept>
 
 using namespace Luna::Filesystem;

@@ -1,9 +1,5 @@
 # these are always built for the host platform
 
-if(MSVC)
-  set(EXT_PROJ_TOOLCHAIN CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake)
-endif()
-
 ExternalProject_Add(
   xxd-native
   PREFIX "${LUNA_BUILD_NATIVE_DIR}"

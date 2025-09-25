@@ -1,6 +1,7 @@
 #include <libluna/Console.hpp>
 
 #include <list>
+#include <iostream>
 
 #if defined(__linux__)
 #define UNIX_COLORS
