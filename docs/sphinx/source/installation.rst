@@ -60,61 +60,29 @@ Prerequisites for Windows
 -------------------------
 
 When building libluna on Windows for Windows targets, you'll need to set up a
-development environment with the following components:
+development environment. You can use the Visual Studio installer to install the
+following required components:
 
-**System Requirements**
-
-- Windows 10 or later
-- Visual Studio with C++ development tools
+- MSVC (C++ x64/x86 build tools)
+- C++ CMake tools for Windows
+- Windows 10/11 SDK
 - Git for Windows
+- MSBuild
+- Optional: C++ Clang Compiler for Windows, MSBuild support for LLVM (clang-cl) toolset
 
-**Step-by-Step Setup**
+Most of these components are installed via the workload "Desktop development with C++".
 
-1. **Install Visual Studio**
+It's recommended to use the **Developer PowerShell** provided by the Visual Studio
+installation for running commands.
 
-   Download and install `Visual Studio Community <https://visualstudio.microsoft.com/vs/community/>`_ (free) or a paid edition. During installation, make sure to select:
+**Install Required Libraries**
 
-   - **Workloads:** "Desktop development with C++"
-   - **Individual components:** CMake tools for C++
+Use vcpkg to install the required dependencies:
 
-2. **Install vcpkg (Package Manager)**
+.. code-block:: powershell
 
-   vcpkg is Microsoft's package manager for C++ libraries. You can either:
-
-   **Option A: Use the automated script**
-
-   libluna provides an automated PowerShell script that installs all prerequisites:
-
-   .. code-block:: powershell
-
-      # Run from an elevated PowerShell prompt
-      .\scripts\install-dependencies.ps1
-
-   **Option B: Manual installation**
-
-   .. code-block:: powershell
-
-      # Install Chocolatey (if not already installed)
-      Set-ExecutionPolicy Bypass -Scope Process -Force
-      [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-      iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-
-      # Install Git via Chocolatey
-      choco install -y git
-
-      # Clone and setup vcpkg
-      git clone https://github.com/Microsoft/vcpkg.git C:\vcpkg
-      cd C:\vcpkg
-      .\bootstrap-vcpkg.bat
-
-3. **Install Required Libraries**
-
-   Use vcpkg to install the required dependencies:
-
-   .. code-block:: powershell
-
-      # From the vcpkg directory
-      .\vcpkg install glm sdl2 fmt
+   # From the vcpkg directory
+   .\vcpkg install glm sdl2 fmt
 
 Configuring the Build
 ---------------------
