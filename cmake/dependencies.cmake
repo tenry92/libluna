@@ -6,10 +6,8 @@ if(LUNA_USE_STD_THREAD)
 endif()
 
 if(NOT (CMAKE_SYSTEM_NAME STREQUAL "Nintendo64" OR CMAKE_SYSTEM_NAME STREQUAL "NintendoDS"))
-  find_path(GLM_INCLUDE_DIR NAMES glm/glm.hpp REQUIRED)
-  target_include_directories(luna PUBLIC
-    ${GLM_INCLUDE_DIR}
-  )
+  find_package(glm REQUIRED)
+  target_link_libraries(luna PUBLIC glm::glm)
 endif()
 
 if(LUNA_WINDOW_SDL2)
