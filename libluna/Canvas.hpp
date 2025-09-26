@@ -154,7 +154,7 @@ namespace Luna {
 
     Vector2i mSize;
     Vector2i mInternalResolution;
-    Stage* mStage;
+    Stage* mStage{nullptr};
     std::unique_ptr<AbstractRenderer> mRenderer;
     std::list<std::unique_ptr<ImmediateGui>> mImmediateGuis;
     Camera2d mCamera2d;
