@@ -106,4 +106,4 @@ else()
   FetchContent_MakeAvailable(fmt)
 endif()
 
-target_link_libraries(luna PUBLIC fmt::fmt)
+target_link_libraries(luna PUBLIC fmt::fmt-header-only)
