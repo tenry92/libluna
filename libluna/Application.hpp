@@ -95,15 +95,19 @@
  * ```cpp
  * #include <libluna/Application.hpp>
  *
- * int main(int argc, char **argv) {
- *   Luna::Application app(argc, argv);
+ * class GameApp : public Luna::Application {
+ *   public:
+ *   using Application::Application;
  *
- *   std::shared_ptr<Canvas> canvas;
- *
- *   app.whenReady([&]() {
+ *   protected:
+ *   void init() override {
  *     // create a canvas (window) for rendering
- *     canvas = app.makeCanvas(800, 600);
- *     canvas->setVideoDriver(app.getDefaultVideoDriver());
+ *     mCanvas = app.makeCanvas(800, 600);
+ *     mCanvas->setDisplayMode({
+ *       {800, 600},                 // resolution
+ *       false,                      // fullscreen
+ *       app.getDefaultVideoDriver() // video driver
+ *     });
  *
  *     // define a sprite
  *     auto sprite = Luna::Sprite::make();
@@ -114,11 +118,18 @@
  *     auto stage = std::make_shared<Luna::Stage>();
  *     stage->add(sprite);
  *     canvas->setStage(stage);
- *   });
+ *   }
  *
- *   app.addInterval(60, [&](float elapsedTime) {
+ *   void update(float deltaTime) override {
  *     // update logic
- *   })
+ *   }
+ *
+ *   private:
+ *   Canvas* mCanvas;
+ * }
+ *
+ * int main(int argc, char **argv) {
+ *   GameApp app(argc, argv);
  *
  *   return app.run();
  * }
