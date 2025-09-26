@@ -413,6 +413,7 @@ void Canvas::setDisplayMode(DisplayMode mode) {
       res = RESOLUTION_640x480;
     }
 
+    display_close();
     display_init(
       res, DEPTH_16_BPP, 3, GAMMA_NONE, FILTERS_RESAMPLE_ANTIALIAS_DEDITHER
     );
