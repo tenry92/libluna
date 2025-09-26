@@ -2,6 +2,7 @@
 
 #include <libluna/Application.hpp>
 #include <libluna/Color.hpp>
+#include <libluna/Math.hpp>
 
 #ifdef __SWITCH__
 #define CANVAS_WIDTH 1920
@@ -14,24 +15,26 @@
 using namespace std;
 using namespace Luna;
 
-constexpr double pi = 3.14159265358979323846;
+class ExampleApp : public Application {
+  public:
+  using Application::Application;
 
-int main(int argc, char **argv) {
-  Application app(argc, argv);
+  protected:
+  void init() override {
+    mCanvas = createCanvas({CANVAS_WIDTH, CANVAS_HEIGHT});
+    mCanvas->setDisplayMode({
+      Vector2i{CANVAS_WIDTH, CANVAS_HEIGHT}, // resolution
+      false,                                 // fullscreen
+      getDefaultVideoDriver()
+    });
+    mCanvas->setBackgroundColor(ColorRgb{0.f, 0.f, 0.f});
+  }
 
-  shared_ptr<Canvas> canvas;
-  double t = 0.f;
-
-  app.whenReady([&]() {
-    canvas = app.makeCanvas({CANVAS_WIDTH, CANVAS_HEIGHT});
-    canvas->setVideoDriver(app.getDefaultVideoDriver());
-  });
-
-  app.addInterval(60, [&](float elapsedTime) {
-    t += elapsedTime * 0.4f;
+  void update(float deltaTime) override {
+    mTime += deltaTime * 0.4f;
     ColorRgb baseColor;
 
-    switch (static_cast<int>(t) % 6) {
+    switch (static_cast<int>(mTime) % 6) {
       case 0:
         baseColor = ColorRgb{1.0f, 0.f, 0.f};
         break;
@@ -52,13 +55,23 @@ int main(int argc, char **argv) {
         break;
     }
 
-    float lightness = std::sin(pi * std::fmod(t, 1.0f));
+    float lightness = std::sin(Math::kPi * std::fmod(mTime, 1.0f));
 
     baseColor.red *= lightness;
     baseColor.green *= lightness;
     baseColor.blue *= lightness;
-    canvas->setBackgroundColor(baseColor);
-  });
+    mCanvas->setBackgroundColor(baseColor);
+  }
+
+  void handleButtonEvent(const ButtonEvent& event) override {}
+
+  private:
+  Canvas* mCanvas{nullptr};
+  double mTime{0.f};
+};
+
+int main(int argc, char **argv) {
+  ExampleApp app(argc, argv);
 
   return app.run();
 }

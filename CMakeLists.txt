@@ -260,6 +260,6 @@ endif()
 ################################################################################
 # EXAMPLES
 
-# if(LUNA_BUILD_EXAMPLES)
-#   add_subdirectory(examples)
-# endif()
+if(LUNA_BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()
