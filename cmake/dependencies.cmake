@@ -93,9 +93,8 @@ endif()
 
 set(FMT_OS OFF)
 
-if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
-  find_package(fmt REQUIRED)
-else()
+find_package(fmt QUIET)
+if(NOT fmt_FOUND)
   include(FetchContent)
   FetchContent_Declare(
     fmt
