@@ -240,13 +240,16 @@ void Application::processEvents() {
 
     switch (event.type) {
       case SDL_KEYDOWN: {
-        auto keycodeName = Keyboard::sdlKeycodeToName(event.key.keysym.sym);
+        mKeyboardState.setDown(static_cast<char>(event.key.keysym.sym), true);
+        mKeyboardState.setDown(Input::Keyboard::fromSdlScancode(event.key.keysym.scancode), true);
+
+        auto keycodeName = Internal::Keyboard::sdlKeycodeToName(event.key.keysym.sym);
 
         if (!keycodeName.isEmpty()) {
           handleButtonEvent(ButtonEvent(keycodeName, true));
         }
 
-        auto scancodeName = Keyboard::sdlScancodeToName(event.key.keysym.scancode);
+        auto scancodeName = Internal::Keyboard::sdlScancodeToName(event.key.keysym.scancode);
 
         if (!scancodeName.isEmpty()) {
           handleButtonEvent(ButtonEvent(scancodeName, true));
@@ -255,13 +258,16 @@ void Application::processEvents() {
         break;
       }
       case SDL_KEYUP: {
-        auto keycodeName = Keyboard::sdlKeycodeToName(event.key.keysym.sym);
+        mKeyboardState.setDown(static_cast<char>(event.key.keysym.sym), false);
+        mKeyboardState.setDown(Input::Keyboard::fromSdlScancode(event.key.keysym.scancode), false);
+
+        auto keycodeName = Internal::Keyboard::sdlKeycodeToName(event.key.keysym.sym);
 
         if (!keycodeName.isEmpty()) {
           handleButtonEvent(ButtonEvent(keycodeName, false));
         }
 
-        auto scancodeName = Keyboard::sdlScancodeToName(event.key.keysym.scancode);
+        auto scancodeName = Internal::Keyboard::sdlScancodeToName(event.key.keysym.scancode);
 
         if (!scancodeName.isEmpty()) {
           handleButtonEvent(ButtonEvent(scancodeName, false));
@@ -287,6 +293,29 @@ void Application::processEvents() {
 #endif
 #ifdef N64
   joypad_poll();
+
+  const joypad_port_t ports[] = { JOYPAD_PORT_1, JOYPAD_PORT_2, JOYPAD_PORT_3, JOYPAD_PORT_4 };
+
+  for (int i = 0; i < 4; ++i) {
+    auto inputs = joypad_get_inputs(ports[i]);
+
+    mGamepadStates[i].setDown(N64Gamepad::kA, inputs.btn.a);
+    mGamepadStates[i].setDown(N64Gamepad::kB, inputs.btn.b);
+    mGamepadStates[i].setDown(N64Gamepad::kZ, inputs.btn.z);
+    mGamepadStates[i].setDown(N64Gamepad::kStart, inputs.btn.start);
+    mGamepadStates[i].setDown(N64Gamepad::kDpadUp, inputs.btn.d_up);
+    mGamepadStates[i].setDown(N64Gamepad::kDpadDown, inputs.btn.d_down);
+    mGamepadStates[i].setDown(N64Gamepad::kDpadLeft, inputs.btn.d_left);
+    mGamepadStates[i].setDown(N64Gamepad::kDpadRight, inputs.btn.d_right);
+    mGamepadStates[i].setDown(N64Gamepad::kL, inputs.btn.l);
+    mGamepadStates[i].setDown(N64Gamepad::kR, inputs.btn.r);
+    mGamepadStates[i].setDown(N64Gamepad::kCUp, inputs.btn.c_up);
+    mGamepadStates[i].setDown(N64Gamepad::kCDown, inputs.btn.c_down);
+    mGamepadStates[i].setDown(N64Gamepad::kCLeft, inputs.btn.c_left);
+    mGamepadStates[i].setDown(N64Gamepad::kCRight, inputs.btn.c_right);
+    mGamepadStates[i].setAxis(N64Gamepad::kStickX, static_cast<float>(inputs.stick_x) / 127.0f);
+    mGamepadStates[i].setAxis(N64Gamepad::kStickY, static_cast<float>(inputs.stick_y) / 127.0f);
+  }
 
   auto pressed = joypad_get_buttons_pressed(JOYPAD_PORT_1);
 
@@ -461,6 +490,25 @@ int Application::run() {
   printArguments(mArgs);
 
   mDebugMetrics = std::make_shared<Internal::DebugMetrics>();
+
+#ifdef N64
+  mGamepadDevices = {
+    InputDevice(N64GamepadDevice(&mGamepadStates[0]), 0),
+    InputDevice(N64GamepadDevice(&mGamepadStates[1]), 1),
+    InputDevice(N64GamepadDevice(&mGamepadStates[2]), 2),
+    InputDevice(N64GamepadDevice(&mGamepadStates[3]), 3),
+  };
+#elif defined(__3DS__)
+  mGamepadDevices = {
+    InputDevice(N3dsGamepadDevice(&mGamepadStates[0])),
+  };
+#elif defined(NDS)
+  mGamepadDevices = {
+    InputDevice(NdsGamepadDevice(&mGamepadStates[0])),
+  };
+#else
+  mKeyboardDevice = InputDevice(KeyboardDevice(&mKeyboardState));
+#endif
 
   this->init();
 
@@ -639,3 +687,19 @@ void Application::setTimeScale(float timeScale) {
 }
 
 void Application::step() { mDoStep = true; }
+
+std::optional<InputDevice> Application::getKeyboardDevice() {
+#ifdef LUNA_FLEXIBLE_INPUT
+  return mKeyboardDevice;
+#else
+  return std::nullopt;
+#endif
+}
+
+std::optional<InputDevice> Application::getGamepadDevice(int index) {
+  if (index < 0 || index >= static_cast<int>(mGamepadDevices.size())) {
+    return std::nullopt;
+  }
+
+  return mGamepadDevices[static_cast<std::size_t>(index)];
+}

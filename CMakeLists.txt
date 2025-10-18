@@ -78,6 +78,16 @@ set(PUBLIC_MODULES
   Font
   Image
   ImmediateGui
+  Input/GenericGamepadDevice
+  Input/KeyboardDevice
+  Input/N3dsGamepadDevice
+  Input/N64GamepadDevice
+  Input/NdsGamepadDevice
+  Input/Ps5GamepadDevice
+  Input/SwitchProGamepadDevice
+  Input/Xbox360GamepadDevice
+  Input/XboxOneGamepadDevice
+  InputDevice
   InputManager
   IntervalManager
   Logger
