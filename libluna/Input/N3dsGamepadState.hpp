@@ -6,8 +6,8 @@
 
 namespace Luna::Input {
   struct N3dsGamepadState {
-    std::array<bool, static_cast<std::size_t>(N3dsGamepad::Button::kPower) + 1> buttonStates;
-    std::array<float, static_cast<std::size_t>(N3dsGamepad::Axis::kStickY) + 1> axisStates;
+    std::array<bool, static_cast<std::size_t>(N3dsGamepad::Button::kPower) + 1> buttonStates{};
+    std::array<float, static_cast<std::size_t>(N3dsGamepad::Axis::kStickY) + 1> axisStates{};
 
     inline bool isDown(N3dsGamepad::Button button) const {
       return buttonStates[static_cast<std::size_t>(button)];

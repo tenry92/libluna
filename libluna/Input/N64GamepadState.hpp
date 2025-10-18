@@ -6,8 +6,8 @@
 
 namespace Luna::Input {
   struct N64GamepadState {
-    std::array<bool, static_cast<std::size_t>(N64Gamepad::Button::kCRight) + 1> buttonStates;
-    std::array<float, static_cast<std::size_t>(N64Gamepad::Axis::kStickY) + 1> axisStates;
+    std::array<bool, static_cast<std::size_t>(N64Gamepad::Button::kCRight) + 1> buttonStates{};
+    std::array<float, static_cast<std::size_t>(N64Gamepad::Axis::kStickY) + 1> axisStates{};
 
     inline bool isDown(N64Gamepad::Button button) const {
       return buttonStates[static_cast<std::size_t>(button)];

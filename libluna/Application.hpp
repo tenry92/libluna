@@ -282,10 +282,10 @@ namespace Luna {
     std::array<NdsGamepadState, 1> mGamepadStates;
 #else
     using GamepadStateVariant = std::variant<
-      Ps5GamepadState,
-      Xbox360GamepadState,
-      SwitchProGamepadState,
-      XboxOneGamepadState
+      Input::Ps5GamepadState,
+      Input::Xbox360GamepadState,
+      Input::SwitchProGamepadState,
+      Input::XboxOneGamepadState
     >;
 
     std::optional<InputDevice> mKeyboardDevice;

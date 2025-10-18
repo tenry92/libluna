@@ -6,8 +6,8 @@
 
 namespace Luna::Input {
   struct SwitchProGamepadState {
-    std::array<bool, static_cast<std::size_t>(SwitchProGamepad::Button::kCapture) + 1> buttonStates;
-    std::array<float, static_cast<std::size_t>(SwitchProGamepad::Axis::kRightStickY) + 1> axisStates;
+    std::array<bool, static_cast<std::size_t>(SwitchProGamepad::Button::kCapture) + 1> buttonStates{};
+    std::array<float, static_cast<std::size_t>(SwitchProGamepad::Axis::kRightStickY) + 1> axisStates{};
 
     inline bool isDown(SwitchProGamepad::Button button) const {
       return buttonStates[static_cast<std::size_t>(button)];

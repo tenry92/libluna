@@ -507,7 +507,7 @@ int Application::run() {
     InputDevice(NdsGamepadDevice(&mGamepadStates[0])),
   };
 #else
-  mKeyboardDevice = InputDevice(KeyboardDevice(&mKeyboardState));
+  mKeyboardDevice = InputDevice(Input::KeyboardDevice(&mKeyboardState));
 #endif
 
   this->init();

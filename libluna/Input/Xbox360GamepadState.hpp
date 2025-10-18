@@ -6,8 +6,8 @@
 
 namespace Luna::Input {
   struct Xbox360GamepadState {
-    std::array<bool, static_cast<std::size_t>(Xbox360Gamepad::Button::kDpadRight) + 1> buttonStates;
-    std::array<float, static_cast<std::size_t>(Xbox360Gamepad::Axis::kRightTriggerAxis) + 1> axisStates;
+    std::array<bool, static_cast<std::size_t>(Xbox360Gamepad::Button::kDpadRight) + 1> buttonStates{};
+    std::array<float, static_cast<std::size_t>(Xbox360Gamepad::Axis::kRightTriggerAxis) + 1> axisStates{};
 
     inline bool isDown(Xbox360Gamepad::Button button) const {
       return buttonStates[static_cast<std::size_t>(button)];

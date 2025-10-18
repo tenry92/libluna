@@ -6,8 +6,8 @@
 
 namespace Luna::Input {
   struct Ps5GamepadState {
-    std::array<bool, static_cast<std::size_t>(Ps5Gamepad::Button::kMute) + 1> buttonStates;
-    std::array<float, static_cast<std::size_t>(Ps5Gamepad::Axis::kR2Axis) + 1> axisStates;
+    std::array<bool, static_cast<std::size_t>(Ps5Gamepad::Button::kMute) + 1> buttonStates{};
+    std::array<float, static_cast<std::size_t>(Ps5Gamepad::Axis::kR2Axis) + 1> axisStates{};
 
     inline bool isDown(Ps5Gamepad::Button button) const {
       return buttonStates[static_cast<std::size_t>(button)];

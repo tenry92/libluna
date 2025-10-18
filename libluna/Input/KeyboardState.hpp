@@ -11,8 +11,8 @@ namespace {
 
 namespace Luna::Input {
   struct KeyboardState {
-    std::array<bool, static_cast<std::size_t>(Keyboard::Scancode::kUnknown)> keyStates;
-    std::array<bool, kLastKeycode - kFirstKeycode + 1> keycodeStates;
+    std::array<bool, static_cast<std::size_t>(Keyboard::Scancode::kUnknown) + 1> keyStates{};
+    std::array<bool, kLastKeycode - kFirstKeycode + 1> keycodeStates{};
 
     inline bool isDown(Keyboard::Scancode scancode) const {
       return keyStates[static_cast<std::size_t>(scancode)];

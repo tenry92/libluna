@@ -22,8 +22,6 @@
 #endif
 
 namespace Luna {
-  using namespace Input;
-
   class InputDevice {
     public:
 #ifdef N64
@@ -34,11 +32,11 @@ namespace Luna {
     using InputDeviceVariant = std::variant<NdsGamepadDevice>;
 #else
     using InputDeviceVariant = std::variant<
-      KeyboardDevice,
-      Ps5GamepadDevice,
-      Xbox360GamepadDevice,
-      SwitchProGamepadDevice,
-      XboxOneGamepadDevice
+      Input::KeyboardDevice,
+      Input::Ps5GamepadDevice,
+      Input::Xbox360GamepadDevice,
+      Input::SwitchProGamepadDevice,
+      Input::XboxOneGamepadDevice
     >;
 #endif
 
@@ -63,22 +61,22 @@ namespace Luna {
     NdsGamepadDevice getNdsGamepad();
 #else
     bool isKeyboard() const;
-    KeyboardDevice getKeyboard();
+    Input::KeyboardDevice getKeyboard() const;
 
     bool isPs5Gamepad() const;
-    Ps5GamepadDevice getPs5Gamepad();
+    Input::Ps5GamepadDevice getPs5Gamepad() const;
 
     bool isXbox360Gamepad() const;
-    Xbox360GamepadDevice getXbox360Gamepad();
+    Input::Xbox360GamepadDevice getXbox360Gamepad() const;
 
     bool isSwitchProGamepad() const;
-    SwitchProGamepadDevice getSwitchProGamepad();
+    Input::SwitchProGamepadDevice getSwitchProGamepad() const;
 
     bool isXboxOneGamepad() const;
-    XboxOneGamepadDevice getXboxOneGamepad();
+    Input::XboxOneGamepadDevice getXboxOneGamepad() const;
 
-    bool isGamepad();
-    GenericGamepadDevice getGenericGamepad();
+    bool isGamepad() const;
+    Input::GenericGamepadDevice getGenericGamepad() const;
 #endif
 
     private:
