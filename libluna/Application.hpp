@@ -2,8 +2,10 @@
 
 #include <libluna/config.h>
 
+#include <array>
 #include <functional>
 #include <list>
+#include <optional>
 #include <queue>
 #include <vector>
 
@@ -15,6 +17,7 @@
 #include <libluna/Audio/AudioNode.hpp>
 #include <libluna/Canvas.hpp>
 #include <libluna/Filesystem/Path.hpp>
+#include <libluna/InputDevice.hpp>
 #include <libluna/InputManager.hpp>
 #include <libluna/Internal/DebugMetrics.hpp>
 #include <libluna/IntervalManager.hpp>
@@ -232,6 +235,10 @@ namespace Luna {
 
     void step();
 
+    std::optional<InputDevice> getKeyboardDevice();
+
+    std::optional<InputDevice> getGamepadDevice(int index);
+
 #ifdef LUNA_WINDOW_SDL2
     Canvas* getCanvasBySdlWindowId(Uint32 windowId);
     void pushSdlEvent(SDL_Event* event);
@@ -263,5 +270,29 @@ namespace Luna {
     InputManager mHotkeysManager;
     float mTimeScale{1.0f};
     bool mDoStep{false}; ///< Step one frame if paused
+
+#ifdef N64
+    std::array<std::optional<InputDevice>, 4> mGamepadDevices;
+    std::array<N64GamepadState, 4> mGamepadStates;
+#elif defined(__3DS__)
+    std::array<std::optional<InputDevice>, 1> mGamepadDevices;
+    std::array<N3dsGamepadState, 1> mGamepadStates;
+#elif defined(NDS)
+    std::array<std::optional<InputDevice>, 1> mGamepadDevices;
+    std::array<NdsGamepadState, 1> mGamepadStates;
+#else
+    using GamepadStateVariant = std::variant<
+      Input::Ps5GamepadState,
+      Input::Xbox360GamepadState,
+      Input::SwitchProGamepadState,
+      Input::XboxOneGamepadState
+    >;
+
+    std::optional<InputDevice> mKeyboardDevice;
+    Input::KeyboardState mKeyboardState;
+
+    std::vector<std::optional<InputDevice>> mGamepadDevices;
+    std::vector<GamepadStateVariant> mGamepadStates;
+#endif
   };
 } // namespace Luna

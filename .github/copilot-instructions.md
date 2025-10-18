@@ -55,7 +55,7 @@ SDL2, GLFW and EGL are mutually exclusive.
 
 - Header files use `.hpp` extension, implementation files use `.cpp` extension
 - Header files must start with `#pragma once` as include guard
-- Always include `<libluna/config.h>` first in headers when configuration macros
+- Always include `<libluna/config.h>` first in headers when configuration macros (`VERSION_*`, `APP_NAME_*` and `LUNA_*` macros)
   are needed
 - Group includes in this order: config header, related header, standard library
   headers, third-party headers, libluna headers

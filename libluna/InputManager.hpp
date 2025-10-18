@@ -49,7 +49,7 @@
  *
  * In addition, the following additional buttons and axes are defined:
  *
- * - `Gamepad/Generic/Back`, `Gamepad/Generic/Back`
+ * - `Gamepad/Generic/Select`, `Gamepad/Generic/Back`
  * - `Gamepad/Generic/Start`
  * - `Gamepad/Generic/LeftThumb` (when left stick is pressed)
  * - `Gamepad/Generic/RightThumb` (when right stick is pressed)
