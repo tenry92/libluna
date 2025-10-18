@@ -1,7 +1,6 @@
 #include <libluna/config.h>
 
 #include <libluna/Application.hpp>
-#include <libluna/Internal/Keyboard.hpp>
 
 #ifdef __SWITCH__
 #include <switch.h>
@@ -34,6 +33,7 @@
 #include <libluna/ImmediateGui.hpp>
 #include <libluna/InputManager.hpp>
 #include <libluna/Internal/DebugMetrics.hpp>
+#include <libluna/Internal/Keyboard.hpp>
 #include <libluna/IntervalManager.hpp>
 #include <libluna/Logger.hpp>
 #include <libluna/PathManager.hpp>

@@ -57,9 +57,55 @@ SDL2, GLFW and EGL are mutually exclusive.
 - Header files must start with `#pragma once` as include guard
 - Always include `<libluna/config.h>` first in headers when configuration macros (`VERSION_*`, `APP_NAME_*` and `LUNA_*` macros)
   are needed
+
+### Include Order and Style
+
 - Group includes in this order: config header, related header, standard library
-  headers, third-party headers, libluna headers
+  headers, platform-specific headers, third-party headers, libluna headers
 - Sort includes alphabetically within each group
+- Configuration- and platform-dependent includes may go in separate groups
+
+The config header is `<libluna/config.h>`.
+
+Standard library headers are headers from the C++ standard library (e.g.
+`<vector>`, `<string>`, `<memory>`, etc.) and C standard library (e.g.
+`<stdint.h>`, `<stdlib.h>`, etc.).
+
+Platform-specific headers should be wrapped in appropriate `#ifdef` guards.
+
+Examples for platform-specific includes are:
+
+- `<windows.h>` (`_WIN32`)
+- `<nds.h>` (`NDS`)
+- `<3ds.h>` (`__3DS__`)
+- `<libdragon.h>` (`N64`)
+- `<switch.h>` (`__SWITCH__`)
+
+Example for include order (for `Application.cpp`):
+
+```cpp
+#include <libluna/config.h>
+
+#include <libluna/Application.hpp>
+
+#include <stdint.h>
+#include <vector>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+#ifdef LUNA_WINDOW_SDL2
+#include <SDL2/SDL.h>
+#endif
+
+#include <glad/glad.h>
+#include <utf8.h>
+
+#include <libluna/Console.hpp>
+#include <libluna/Logger.hpp>
+#include <libluna/String.hpp>
+```
 
 ### Naming Conventions
 
@@ -84,7 +130,7 @@ SDL2, GLFW and EGL are mutually exclusive.
 - **Private member variables** use `m` prefix with PascalCase: `mCanvases`,
   `mTimeScale`, `mImageLoader`
 - **Static/global variables** use `g` prefix with PascalCase: `gSingletonApp`
-- **Constants** use `k` prefix with PascalCase: `kPi`
+- **Constants** and **enum values** use `k` prefix with PascalCase: `kPi`
 
 #### Namespaces
 
