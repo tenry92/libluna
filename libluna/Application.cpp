@@ -299,22 +299,22 @@ void Application::processEvents() {
   for (int i = 0; i < 4; ++i) {
     auto inputs = joypad_get_inputs(ports[i]);
 
-    mGamepadStates[i].setDown(N64Gamepad::kA, inputs.btn.a);
-    mGamepadStates[i].setDown(N64Gamepad::kB, inputs.btn.b);
-    mGamepadStates[i].setDown(N64Gamepad::kZ, inputs.btn.z);
-    mGamepadStates[i].setDown(N64Gamepad::kStart, inputs.btn.start);
-    mGamepadStates[i].setDown(N64Gamepad::kDpadUp, inputs.btn.d_up);
-    mGamepadStates[i].setDown(N64Gamepad::kDpadDown, inputs.btn.d_down);
-    mGamepadStates[i].setDown(N64Gamepad::kDpadLeft, inputs.btn.d_left);
-    mGamepadStates[i].setDown(N64Gamepad::kDpadRight, inputs.btn.d_right);
-    mGamepadStates[i].setDown(N64Gamepad::kL, inputs.btn.l);
-    mGamepadStates[i].setDown(N64Gamepad::kR, inputs.btn.r);
-    mGamepadStates[i].setDown(N64Gamepad::kCUp, inputs.btn.c_up);
-    mGamepadStates[i].setDown(N64Gamepad::kCDown, inputs.btn.c_down);
-    mGamepadStates[i].setDown(N64Gamepad::kCLeft, inputs.btn.c_left);
-    mGamepadStates[i].setDown(N64Gamepad::kCRight, inputs.btn.c_right);
-    mGamepadStates[i].setAxis(N64Gamepad::kStickX, static_cast<float>(inputs.stick_x) / 127.0f);
-    mGamepadStates[i].setAxis(N64Gamepad::kStickY, static_cast<float>(inputs.stick_y) / 127.0f);
+    mGamepadStates[i].setDown(Input::N64Gamepad::kA, inputs.btn.a);
+    mGamepadStates[i].setDown(Input::N64Gamepad::kB, inputs.btn.b);
+    mGamepadStates[i].setDown(Input::N64Gamepad::kZ, inputs.btn.z);
+    mGamepadStates[i].setDown(Input::N64Gamepad::kStart, inputs.btn.start);
+    mGamepadStates[i].setDown(Input::N64Gamepad::kDpadUp, inputs.btn.d_up);
+    mGamepadStates[i].setDown(Input::N64Gamepad::kDpadDown, inputs.btn.d_down);
+    mGamepadStates[i].setDown(Input::N64Gamepad::kDpadLeft, inputs.btn.d_left);
+    mGamepadStates[i].setDown(Input::N64Gamepad::kDpadRight, inputs.btn.d_right);
+    mGamepadStates[i].setDown(Input::N64Gamepad::kL, inputs.btn.l);
+    mGamepadStates[i].setDown(Input::N64Gamepad::kR, inputs.btn.r);
+    mGamepadStates[i].setDown(Input::N64Gamepad::kCUp, inputs.btn.c_up);
+    mGamepadStates[i].setDown(Input::N64Gamepad::kCDown, inputs.btn.c_down);
+    mGamepadStates[i].setDown(Input::N64Gamepad::kCLeft, inputs.btn.c_left);
+    mGamepadStates[i].setDown(Input::N64Gamepad::kCRight, inputs.btn.c_right);
+    mGamepadStates[i].setAxis(Input::N64Gamepad::kStickX, static_cast<float>(inputs.stick_x) / 127.0f);
+    mGamepadStates[i].setAxis(Input::N64Gamepad::kStickY, static_cast<float>(inputs.stick_y) / 127.0f);
   }
 
   auto pressed = joypad_get_buttons_pressed(JOYPAD_PORT_1);
@@ -493,10 +493,10 @@ int Application::run() {
 
 #ifdef N64
   mGamepadDevices = {
-    InputDevice(N64GamepadDevice(&mGamepadStates[0]), 0),
-    InputDevice(N64GamepadDevice(&mGamepadStates[1]), 1),
-    InputDevice(N64GamepadDevice(&mGamepadStates[2]), 2),
-    InputDevice(N64GamepadDevice(&mGamepadStates[3]), 3),
+    InputDevice(Input::N64GamepadDevice(&mGamepadStates[0]), 0),
+    InputDevice(Input::N64GamepadDevice(&mGamepadStates[1]), 1),
+    InputDevice(Input::N64GamepadDevice(&mGamepadStates[2]), 2),
+    InputDevice(Input::N64GamepadDevice(&mGamepadStates[3]), 3),
   };
 #elif defined(__3DS__)
   mGamepadDevices = {

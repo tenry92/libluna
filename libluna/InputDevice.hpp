@@ -25,11 +25,11 @@ namespace Luna {
   class InputDevice {
     public:
 #ifdef N64
-    using InputDeviceVariant = std::variant<N64GamepadDevice>;
+    using InputDeviceVariant = std::variant<Input::N64GamepadDevice>;
 #elif defined(__3DS__)
-    using InputDeviceVariant = std::variant<N3dsGamepadDevice>;
+    using InputDeviceVariant = std::variant<Input::N3dsGamepadDevice>;
 #elif defined(NDS)
-    using InputDeviceVariant = std::variant<NdsGamepadDevice>;
+    using InputDeviceVariant = std::variant<Input::NdsGamepadDevice>;
 #else
     using InputDeviceVariant = std::variant<
       Input::KeyboardDevice,
@@ -54,11 +54,11 @@ namespace Luna {
     int getIndex() const;
 
 #ifdef N64
-    N64GamepadDevice getN64Gamepad();
+    Input::N64GamepadDevice getN64Gamepad();
 #elif defined(__3DS__)
-    N3dsGamepadDevice getN3dsGamepad();
+    Input::N3dsGamepadDevice getN3dsGamepad();
 #elif defined(NDS)
-    NdsGamepadDevice getNdsGamepad();
+    Input::NdsGamepadDevice getNdsGamepad();
 #else
     bool isKeyboard() const;
     Input::KeyboardDevice getKeyboard() const;

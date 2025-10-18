@@ -273,13 +273,13 @@ namespace Luna {
 
 #ifdef N64
     std::array<std::optional<InputDevice>, 4> mGamepadDevices;
-    std::array<N64GamepadState, 4> mGamepadStates;
+    std::array<Input::N64GamepadState, 4> mGamepadStates;
 #elif defined(__3DS__)
     std::array<std::optional<InputDevice>, 1> mGamepadDevices;
-    std::array<N3dsGamepadState, 1> mGamepadStates;
+    std::array<Input::N3dsGamepadState, 1> mGamepadStates;
 #elif defined(NDS)
     std::array<std::optional<InputDevice>, 1> mGamepadDevices;
-    std::array<NdsGamepadState, 1> mGamepadStates;
+    std::array<Input::NdsGamepadState, 1> mGamepadStates;
 #else
     using GamepadStateVariant = std::variant<
       Input::Ps5GamepadState,
