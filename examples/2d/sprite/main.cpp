@@ -46,21 +46,15 @@ class ExampleApp : public Application {
 
       Sprite* sprite1 = mStage.allocSprite();
       sprite1->setTexture(0);
-      sprite1->setPosition({
-        64.f, 64.f
-      });
+      sprite1->setPosition({64.f, 64.f});
 
       Sprite* sprite2 = mStage.allocSprite();
       sprite2->setTexture(1);
-      sprite2->setPosition({
-        128.f, 64.f
-      });
+      sprite2->setPosition({128.f, 64.f});
 
       Sprite* sprite3 = mStage.allocSprite();
       sprite3->setTexture(2);
-      sprite3->setPosition({
-        192.f, 64.f
-      });
+      sprite3->setPosition({192.f, 64.f});
     }
 
     ColorRgb baseColor;

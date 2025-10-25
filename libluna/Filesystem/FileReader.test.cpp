@@ -18,7 +18,7 @@ static const char* assetsPath = "romfs:/assets";
 #elif defined(N64)
 static const char* assetsPath = "rom:/assets";
 #else
-static const char* assetsPath = "tests/assets";
+static const char* assetsPath = "data/assets";
 #endif
 
 /**
