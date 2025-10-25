@@ -12,7 +12,10 @@
       "description": "Default build for native system",
       "generator": "Unix Makefiles",
       "hidden": false,
-      "binaryDir": "${sourceDir}/build/default"
+      "binaryDir": "${sourceDir}/build/default",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
     },
     {
       "name": "mingw",
@@ -21,7 +24,10 @@
       "generator": "Unix Makefiles",
       "hidden": false,
       "binaryDir": "${sourceDir}/build/mingw",
-      "toolchainFile": "${sourceDir}/cmake/MinGW.cmake"
+      "toolchainFile": "${sourceDir}/cmake/MinGW.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
     },
     {
       "name": "switch",
@@ -33,6 +39,9 @@
       "toolchainFile": "$env{DEVKITPRO}/cmake/Switch.cmake",
       "environment": {
         "DEVKITPRO": "/opt/devkitpro"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
@@ -45,6 +54,9 @@
       "toolchainFile": "$env{DEVKITPRO}/cmake/NDS.cmake",
       "environment": {
         "DEVKITPRO": "/opt/devkitpro"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
@@ -57,6 +69,9 @@
       "toolchainFile": "$env{DEVKITPRO}/cmake/3DS.cmake",
       "environment": {
         "DEVKITPRO": "/opt/devkitpro"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
@@ -66,7 +81,10 @@
       "generator": "Unix Makefiles",
       "hidden": false,
       "binaryDir": "${sourceDir}/build/n64",
-      "toolchainFile": "${sourceDir}/cmake/Nintendo64.cmake"
+      "toolchainFile": "${sourceDir}/cmake/Nintendo64.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
     }
   ]
 }
