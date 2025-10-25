@@ -94,7 +94,7 @@ void DebugGui::render() {
       ImGui::Separator();
 
       auto canvases = app->getOpenCanvases();
-      ImGui::Text("Open canvases: %lu", canvases.size());
+      ImGui::Text("Open canvases: %zu", canvases.size());
 
       for (auto&& canvas : canvases) {
         if (ImGui::BeginTabBar("CanvasTabBar")) {

@@ -10,6 +10,11 @@ void Tileset::setTileSize(int tileSize) { mTileSize = tileSize; }
 
 int Tileset::getTileSize() const { return mTileSize; }
 
-void Tileset::setImage(ImageLoader* image) { mImage = image; }
+void Tileset::setTextureId(int textureId) { mTextureId = textureId; }
 
-ImageLoader* Tileset::getImage() const { return mImage; }
+int Tileset::getTextureId() const { return mTextureId; }
+
+void Tileset::setTextureSize(Vector2i size) { mTextureSize = size; }
+
+Vector2i Tileset::getTextureSize() const { return mTextureSize; }
+

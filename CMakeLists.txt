@@ -76,7 +76,7 @@ set(PUBLIC_MODULES
   Filesystem/FileReader
   Filesystem/Path
   Font
-  Image
+  Texture
   ImmediateGui
   Input/GenericGamepadDevice
   Input/KeyboardDevice

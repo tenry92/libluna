@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include <libluna/ImageLoader.hpp>
 #include <libluna/Sprite.hpp>
+#include <libluna/Vector.hpp>
 
 namespace Luna {
   class Tileset final {
@@ -14,16 +14,22 @@ namespace Luna {
     void setTileSize(int tileSize);
     int getTileSize() const;
 
-    void setImage(ImageLoader* image);
-    ImageLoader* getImage() const;
+    void setTextureId(int textureId);
+    int getTextureId() const;
+
+    void setTextureSize(Vector2i size);
+    Vector2i getTextureSize() const;
 
     inline int getColumns() const {
-      // return mImage->getSize().width / mTileSize;
-      return 1;
+      if (mTileSize == 0) {
+        return 0;
+      }
+      return mTextureSize.x / mTileSize;
     }
 
     private:
-    int mTileSize;
-    ImageLoader* mImage{nullptr};
+    int mTileSize{0};
+    int mTextureId{0};
+    Vector2i mTextureSize{0, 0};
   };
 } // namespace Luna

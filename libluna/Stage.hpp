@@ -10,7 +10,6 @@
 #include <libluna/Primitive.hpp>
 #include <libluna/Sprite.hpp>
 #include <libluna/Text.hpp>
-#include <libluna/TextureCache.hpp>
 #include <libluna/Tilemap.hpp>
 
 namespace Luna {
@@ -34,7 +33,7 @@ namespace Luna {
    *     mCanvas->setStage(&mStage);
    *
    *     // and create stuff to draw
-   *     Luna::Sprite *sprite = mStage.createSprite();
+   *     Luna::Sprite* sprite = mStage.createSprite();
    *     sprite->setImageLoader(YourImageLoader("player.png"));
    *     sprite->setPosition({400, 300});
    *
@@ -44,7 +43,7 @@ namespace Luna {
    *   void update(float deltaTime) override final {}
    *
    *   private:
-   *   Luna::Canvas *mCanvas;
+   *   Luna::Canvas* mCanvas;
    *   Luna::Stage mStage;
    * };
    * ```
@@ -67,20 +66,20 @@ namespace Luna {
     Stage();
     ~Stage();
 
-    Sprite* createSprite();
-    void destroySprite(Sprite* sprite);
+    Sprite* allocSprite();
+    void freeSprite(Sprite* sprite);
 
-    Primitive* createPrimitive();
-    void destroyPrimitive(Primitive* primitive);
+    Primitive* allocPrimitive();
+    void freePrimitive(Primitive* primitive);
 
-    Text* createText();
-    void destroyText(Text* text);
+    Text* allocText();
+    void freeText(Text* text);
 
-    Tilemap* createTilemap();
-    void destroyTilemap(Tilemap* tilemap);
+    Tilemap* allocTilemap();
+    void freeTilemap(Tilemap* tilemap);
 
-    Model* createModel();
-    void destroyModel(Model* model);
+    Model* allocModel();
+    void freeModel(Model* model);
 
     const Pool<Drawable2dVariant, 64>& getDrawables2d() const;
     const std::forward_list<const Drawable2dVariant*> getSortedDrawables2d() const;
@@ -92,14 +91,10 @@ namespace Luna {
     std::shared_ptr<PointLight> makePointLight();
     const std::list<std::shared_ptr<PointLight>>& getPointLights() const;
 
-    TextureCache* getTextureCache();
-    void updateTextureCache();
-
     private:
     Pool<Drawable2dVariant, 64> mDrawables2d;
     std::list<Drawable3d> mDrawables3d;
     AmbientLight mAmbientLight;
     std::list<std::shared_ptr<PointLight>> mPointLights;
-    TextureCache mTextureCache;
   };
 } // namespace Luna

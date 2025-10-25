@@ -197,29 +197,109 @@ void OpenglRenderer::clearBackground(ColorRgb color) {
   CHECK_GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
-void OpenglRenderer::createTexture(int id) {
+void OpenglRenderer::createFramebufferTexture(uint16_t id, Vector2i size) {
+  GLuint framebuffer;
+  CHECK_GL(glGenFramebuffers(1, &framebuffer));
+  mFramebuffers.emplace(id, framebuffer);
+
   GLuint texture;
   CHECK_GL(glGenTextures(1, &texture));
   mTextureIdMapping.emplace(id, texture);
 
   CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
-  CHECK_GL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-  CHECK_GL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+  CHECK_GL(glTexImage2D(
+    GL_TEXTURE_2D, 0,                         /* mipmap level */
+    GL_RGBA,                                  /* internal format */
+    size.width, size.height, 0,               /* format (legacy) */
+    GL_RGBA,                                 /* input format */
+    GL_UNSIGNED_BYTE, nullptr
+  ));
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+  CHECK_GL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
+  CHECK_GL(glFramebufferTexture2D(
+    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0
+  ));
+
+  GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  if (status != GL_FRAMEBUFFER_COMPLETE) {
+    logError("Failed to create framebuffer texture: {}", status);
+  }
+
+  CHECK_GL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
-void OpenglRenderer::destroyTexture(int id) {
-  GLuint texture = mTextureIdMapping.at(id);
-  mTextureIdMapping.erase(id);
+void OpenglRenderer::resizeFramebufferTexture(uint16_t id, Vector2i size) {
+  auto framebufferIt = mFramebuffers.find(id);
+  auto textureIt = mTextureIdMapping.find(id);
+
+  if (framebufferIt == mFramebuffers.end() ||
+      textureIt == mTextureIdMapping.end()) {
+    logError("Framebuffer texture ID {} not found", id);
+    return;
+  }
+
+  GLuint texture = textureIt->second;
+
+  CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
+  CHECK_GL(glTexImage2D(
+    GL_TEXTURE_2D, 0,                         /* mipmap level */
+    GL_RGBA,                                  /* internal format */
+    size.width, size.height, 0,               /* format (legacy) */
+    GL_RGBA,                                 /* input format */
+    GL_UNSIGNED_BYTE, nullptr
+  ));
+}
+
+void OpenglRenderer::destroyFramebufferTexture(uint16_t id) {
+  auto framebufferIt = mFramebuffers.find(id);
+  auto textureIt = mTextureIdMapping.find(id);
+
+  if (framebufferIt != mFramebuffers.end()) {
+    GLuint framebuffer = framebufferIt->second;
+    CHECK_GL(glDeleteFramebuffers(1, &framebuffer));
+    mFramebuffers.erase(framebufferIt);
+  }
+
+  if (textureIt != mTextureIdMapping.end()) {
+    GLuint texture = textureIt->second;
+    CHECK_GL(glDeleteTextures(1, &texture));
+    mTextureIdMapping.erase(textureIt);
+  }
+}
+
+void OpenglRenderer::freeTexture(int slot) {
+  auto gpuTexture = getGpuTexture(slot);
+
+  if (!gpuTexture) {
+    return;
+  }
+
+  GLuint texture = mTextureIdMapping.at(gpuTexture->id);
+  mTextureIdMapping.erase(gpuTexture->id);
   CHECK_GL(glDeleteTextures(1, &texture));
+
+  freeGpuTexture(slot);
 }
 
-void OpenglRenderer::loadTexture(int id, Image* image) {
-  GLuint texture = mTextureIdMapping.at(id);
+void OpenglRenderer::uploadTexture(int slot, const Texture* texture) {
+  freeTexture(slot);
+
+  GpuTexture gpuTexture;
+  gpuTexture.size = texture->getSize();
+
+  declareGpuTexture(slot, gpuTexture);
+
+  GLuint glTexture;
+
+  CHECK_GL(glGenTextures(1, &glTexture));
+  mTextureIdMapping.emplace(gpuTexture.id, glTexture);
 
   GLenum inputFormat = GL_RGBA;
   GLenum inputType = GL_UNSIGNED_BYTE;
 
-  switch (image->getBitsPerPixel()) {
+  switch (texture->getBitsPerPixel()) {
   case 16:
     inputFormat = GL_RGBA;
     inputType = GL_UNSIGNED_SHORT_1_5_5_5_REV;
@@ -232,31 +312,22 @@ void OpenglRenderer::loadTexture(int id, Image* image) {
     break;
   }
 
-  CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
+  CHECK_GL(glBindTexture(GL_TEXTURE_2D, glTexture));
   CHECK_GL(glTexImage2D(
     GL_TEXTURE_2D, 0,                         /* mipmap level */
     GL_RGBA,                                  /* internal format */
-    image->getWidth(), image->getHeight(), 0, /* format (legacy) */
+    texture->getWidth(), texture->getHeight(), 0, /* format (legacy) */
     inputFormat,                              /* input format */
-    inputType, image->getData()
+    inputType, texture->getData()
   ));
   glTexParameteri(
     GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-    image->isInterpolated() ? GL_LINEAR : GL_NEAREST
+    texture->isInterpolated() ? GL_LINEAR : GL_NEAREST
   );
   glTexParameteri(
     GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-    image->isInterpolated() ? GL_LINEAR : GL_NEAREST
+    texture->isInterpolated() ? GL_LINEAR : GL_NEAREST
   );
-}
-
-void OpenglRenderer::resizeTexture(int id, Vector2i size) {
-  GLuint texture = mTextureIdMapping.at(id);
-  CHECK_GL(glBindTexture(GL_TEXTURE_2D, texture));
-  CHECK_GL(glTexImage2D(
-    GL_TEXTURE_2D, 0, GL_RGBA, size.width, size.height, 0, GL_RGBA,
-    GL_UNSIGNED_BYTE, nullptr
-  ));
 }
 
 void OpenglRenderer::renderTexture(
@@ -329,7 +400,7 @@ void OpenglRenderer::renderMesh(
   glEnable(GL_CULL_FACE);
   glEnable(GL_MULTISAMPLE);
 
-  auto ambientLight = canvas->getStage()->getAmbientLight();
+  auto ambientLight = canvas->getCamera3d().getStage()->getAmbientLight();
   mUniforms.ambientLightColor = mModelShader.getUniform("uAmbientLight.color");
   mUniforms.ambientLightIntensity =
     mModelShader.getUniform("uAmbientLight.intensity");
@@ -341,7 +412,7 @@ void OpenglRenderer::renderMesh(
   mUniforms.pointLightsPosition =
     mModelShader.getUniform("uPointLights[{}].position", 1);
 
-  for (auto&& pointLight : canvas->getStage()->getPointLights()) {
+  for (auto&& pointLight : canvas->getCamera3d().getStage()->getPointLights()) {
     mUniforms.pointLightsColor[0] = pointLight->color;
     mUniforms.pointLightsPosition[0] = pointLight->position;
   }
@@ -456,10 +527,10 @@ void OpenglRenderer::renderShape(
 }
 
 void OpenglRenderer::setTextureFilterEnabled(
-  [[maybe_unused]] int id, [[maybe_unused]] bool enabled
+  [[maybe_unused]] uint16_t id, [[maybe_unused]] bool enabled
 ) {}
 
-void OpenglRenderer::setRenderTargetTexture(int id) {
+void OpenglRenderer::setRenderTargetTexture(uint16_t id) {
   GLuint framebuffer;
 
   if (mFramebuffers.count(id) == 0) {

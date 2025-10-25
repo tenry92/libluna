@@ -187,12 +187,11 @@ namespace Luna {
     void setAssetsPath(Filesystem::Path assetsPath);
 
     /**
-     * @brief Create a canvas with the desired internal resolution.
+     * @brief Allocate a canvas.
      *
-     * The internal framebuffer for 2D rendering does not change by default when
-     * the window is resized.
+     * Use setDisplayMode() on the returned canvas to configure the window.
      */
-    Canvas* createCanvas(const Vector2i& size);
+    Canvas* allocCanvas();
 
     std::list<Canvas*> getOpenCanvases();
 

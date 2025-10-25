@@ -1,6 +1,8 @@
 #pragma once
 
 #include <libluna/Internal/GraphicsMetrics.hpp>
+#include <libluna/Texture.hpp>
+#include <libluna/Vector.hpp>
 
 namespace Luna {
   class Canvas;
@@ -53,6 +55,13 @@ namespace Luna {
     virtual void present() = 0;
 
     virtual Internal::GraphicsMetrics getMetrics() = 0;
+
+    /**
+     * @brief Upload texture data to the GPU for the given ID.
+     */
+    virtual void uploadTexture(int slot, const Texture* texture) = 0;
+
+    virtual void freeTexture(int slot) = 0;
 
     private:
     Canvas* mCanvas;

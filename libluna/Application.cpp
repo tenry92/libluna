@@ -500,11 +500,11 @@ int Application::run() {
   };
 #elif defined(__3DS__)
   mGamepadDevices = {
-    InputDevice(N3dsGamepadDevice(&mGamepadStates[0])),
+    InputDevice(Input::N3dsGamepadDevice(&mGamepadStates[0])),
   };
 #elif defined(NDS)
   mGamepadDevices = {
-    InputDevice(NdsGamepadDevice(&mGamepadStates[0])),
+    InputDevice(Input::NdsGamepadDevice(&mGamepadStates[0])),
   };
 #else
   mKeyboardDevice = InputDevice(Input::KeyboardDevice(&mKeyboardState));
@@ -588,10 +588,10 @@ void Application::setAssetsPath(Filesystem::Path assetsPath) {
   mPathManager.setAssetsPath(assetsPath);
 }
 
-Canvas* Application::createCanvas(const Vector2i& size) {
-  logInfo("creating canvas {}x{}", size.width, size.height);
+Canvas* Application::allocCanvas() {
+  logInfo("allocating canvas");
 
-  auto canvas = mCanvases.acquire(size);
+  auto canvas = mCanvases.acquire();
 
   return canvas;
 }

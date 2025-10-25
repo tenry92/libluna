@@ -2,8 +2,6 @@
 
 #include <map>
 
-#include <libluna/Image.hpp>
-#include <libluna/ImageLoader.hpp>
 #include <libluna/Rect.hpp>
 #include <libluna/String.hpp>
 #include <libluna/Vector.hpp>
@@ -16,7 +14,7 @@ namespace Luna {
     public:
     struct Glyph {
       String::CodePoint codePoint;
-      ImageLoader* imageLoader;
+      int textureId;
       Recti crop;
       Vector2i offset;
       int advance;

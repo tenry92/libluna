@@ -1,6 +1,5 @@
 #pragma once
 
-#include <libluna/ImageLoader.hpp>
 #include <libluna/Resource.hpp>
 #include <libluna/Sprite.hpp>
 
@@ -10,14 +9,14 @@ namespace Luna {
     Material();
     ~Material();
 
-    void setDiffuse(ImageLoader* image);
-    ImageLoader* getDiffuse() const;
+    void setDiffuseTexture(int slot);
+    int getDiffuseTexture() const;
 
-    void setNormal(ImageLoader* image);
-    ImageLoader* getNormal() const;
+    void setNormalTexture(int slot);
+    int getNormalTexture() const;
 
     private:
-    ImageLoader* mDiffuse{nullptr};
-    ImageLoader* mNormal{nullptr};
+    int mDiffuseTexture{0};
+    int mNormalTexture{0};
   };
 } // namespace Luna

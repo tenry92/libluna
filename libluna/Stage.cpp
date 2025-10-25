@@ -7,61 +7,11 @@
 
 using namespace Luna;
 
-namespace {
-  std::forward_list<ImageLoader*> listImagesInUse(Stage* stage) {
-    std::forward_list<ImageLoader*> imageLoaders;
-
-    for (auto&& drawable : stage->getDrawables2d()) {
-      std::visit(
-        overloaded{
-          [](auto) {},
-          [&](const Sprite& sprite) {
-            if (sprite.getImageLoader()) {
-              imageLoaders.emplace_front(sprite.getImageLoader());
-            }
-          },
-          [&](const Text& text) {
-            if (text.getFont()) {
-              for (auto&& [codePoint, glyph] : text.getFont()->getGlyphs()) {
-                if (glyph.imageLoader) {
-                  imageLoaders.emplace_front(glyph.imageLoader);
-                }
-              }
-            }
-          },
-          [&](const Tilemap& tilemap) {
-            auto tileset = tilemap.getTileset();
-            if (tileset->getImage()) {
-              imageLoaders.emplace_front(tileset->getImage());
-            }
-          },
-        },
-        drawable
-      );
-    }
-
-    for (auto&& model : stage->getDrawables3d()) {
-      auto diffuse = model->getMaterial().getDiffuse();
-      auto normal = model->getMaterial().getNormal();
-
-      if (diffuse) {
-        imageLoaders.emplace_front(diffuse);
-      }
-
-      if (normal) {
-        imageLoaders.emplace_front(normal);
-      }
-    }
-
-    return imageLoaders;
-  }
-} // namespace
-
 Stage::Stage() = default;
 
 Stage::~Stage() = default;
 
-Sprite* Stage::createSprite() {
+Sprite* Stage::allocSprite() {
   auto drawable2d = mDrawables2d.acquire();
 
   if (!drawable2d) {
@@ -73,7 +23,7 @@ Sprite* Stage::createSprite() {
   return &std::get<Sprite>(*drawable2d);
 }
 
-void Stage::destroySprite(Sprite* sprite) {
+void Stage::freeSprite(Sprite* sprite) {
   for (auto&& drawable : mDrawables2d) {
     if (std::holds_alternative<Sprite>(drawable) && &std::get<Sprite>(drawable) == sprite) {
       mDrawables2d.release(&drawable);
@@ -82,7 +32,7 @@ void Stage::destroySprite(Sprite* sprite) {
   }
 }
 
-Primitive* Stage::createPrimitive() {
+Primitive* Stage::allocPrimitive() {
   auto drawable2d = mDrawables2d.acquire();
 
   if (!drawable2d) {
@@ -94,7 +44,7 @@ Primitive* Stage::createPrimitive() {
   return &std::get<Primitive>(*drawable2d);
 }
 
-void Stage::destroyPrimitive(Primitive* primitive) {
+void Stage::freePrimitive(Primitive* primitive) {
   for (auto&& drawable : mDrawables2d) {
     if (std::holds_alternative<Primitive>(drawable) && &std::get<Primitive>(drawable) == primitive) {
       mDrawables2d.release(&drawable);
@@ -103,7 +53,7 @@ void Stage::destroyPrimitive(Primitive* primitive) {
   }
 }
 
-Text* Stage::createText() {
+Text* Stage::allocText() {
   auto drawable2d = mDrawables2d.acquire();
 
   if (!drawable2d) {
@@ -115,7 +65,7 @@ Text* Stage::createText() {
   return &std::get<Text>(*drawable2d);
 }
 
-void Stage::destroyText(Text* text) {
+void Stage::freeText(Text* text) {
   for (auto&& drawable : mDrawables2d) {
     if (std::holds_alternative<Text>(drawable) && &std::get<Text>(drawable) == text) {
       mDrawables2d.release(&drawable);
@@ -124,7 +74,7 @@ void Stage::destroyText(Text* text) {
   }
 }
 
-Tilemap* Stage::createTilemap() {
+Tilemap* Stage::allocTilemap() {
   auto drawable2d = mDrawables2d.acquire();
 
   if (!drawable2d) {
@@ -136,7 +86,7 @@ Tilemap* Stage::createTilemap() {
   return &std::get<Tilemap>(*drawable2d);
 }
 
-void Stage::destroyTilemap(Tilemap* tilemap) {
+void Stage::freeTilemap(Tilemap* tilemap) {
   for (auto&& drawable : mDrawables2d) {
     if (std::holds_alternative<Tilemap>(drawable) && &std::get<Tilemap>(drawable) == tilemap) {
       mDrawables2d.release(&drawable);
@@ -145,7 +95,7 @@ void Stage::destroyTilemap(Tilemap* tilemap) {
   }
 }
 
-Model* Stage::createModel() {
+Model* Stage::allocModel() {
   // todo: use smart pointers
   auto model = new Model();
   mDrawables3d.emplace_back(model);
@@ -153,7 +103,7 @@ Model* Stage::createModel() {
   return model;
 }
 
-void Stage::destroyModel(Model* model) {
+void Stage::freeModel(Model* model) {
   mDrawables3d.remove(model);
   delete model;
 }
@@ -233,16 +183,4 @@ std::shared_ptr<PointLight> Stage::makePointLight() {
 
 const std::list<std::shared_ptr<PointLight>>& Stage::getPointLights() const {
   return mPointLights;
-}
-
-TextureCache* Stage::getTextureCache() { return &mTextureCache; }
-
-void Stage::updateTextureCache() {
-  auto images = listImagesInUse(this);
-
-  mTextureCache.resetPriorities();
-
-  for (auto&& image : images) {
-    mTextureCache.addImage(image, TextureCache::kForce);
-  }
 }

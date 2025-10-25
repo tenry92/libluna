@@ -14,6 +14,8 @@ namespace Luna {
     void close() override;
     void render() override;
     void present() override;
+    void uploadTexture(int slot, const Texture* texture) override;
+    void freeTexture(int slot) override;
 
     Internal::GraphicsMetrics getMetrics() override;
 

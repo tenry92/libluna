@@ -29,7 +29,7 @@ void NdsRenderer::render() {
 
   setBackdropColor(makeColorUint16(bgColor));
 
-  if (!canvas->getStage()) {
+  if (!canvas->getCamera2d().getStage()) {
     return;
   }
 }
@@ -37,3 +37,11 @@ void NdsRenderer::render() {
 void NdsRenderer::present() { swiWaitForVBlank(); }
 
 Internal::GraphicsMetrics NdsRenderer::getMetrics() { return *mImpl->mMetrics; }
+
+void NdsRenderer::uploadTexture([[maybe_unused]] int slot, [[maybe_unused]] const Texture* texture) {
+  // stub
+}
+
+void NdsRenderer::freeTexture([[maybe_unused]] int slot) {
+  // stub
+}

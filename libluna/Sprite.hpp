@@ -2,8 +2,7 @@
 
 #include <libluna/Color.hpp>
 #include <libluna/Drawable2d.hpp>
-#include <libluna/Image.hpp>
-#include <libluna/ImageLoader.hpp>
+#include <libluna/Texture.hpp>
 #include <libluna/Palette.hpp>
 #include <libluna/Resource.hpp>
 #include <libluna/String.hpp>
@@ -28,8 +27,8 @@ namespace Luna {
     ~Sprite();
 
     ///@{
-    void setImageLoader(ImageLoader* loader);
-    ImageLoader* getImageLoader() const;
+    void setTexture(int id);
+    int getTexture() const;
     ///@}
 
     ///@{
@@ -38,7 +37,7 @@ namespace Luna {
     ///@}
 
     private:
-    ImageLoader* mImageLoader;
+    int mTextureId{0};
     std::shared_ptr<Resource<Palette>> mPalette;
   };
 } // namespace Luna

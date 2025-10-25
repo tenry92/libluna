@@ -67,19 +67,19 @@ void N64Renderer::clearBackground([[maybe_unused]] ColorRgb color) {
 }
 
 bool N64Renderer::sliceTexture(
-  Image* image, std::vector<Image>& slices, Vector2i& sliceCount
+  Texture* texture, std::vector<Texture>& slices, Vector2i& sliceCount
 ) {
   const int tmemSize = 4096;
 
-  if (image->getByteCount() <= tmemSize) {
+  if (texture->getByteCount() <= tmemSize) {
     return false;
   }
 
-  Vector2i sliceSize = image->getSize();
+  Vector2i sliceSize = texture->getSize();
   sliceSize.width = Math::previousPowerOfTwo(sliceSize.width);
   sliceSize.height = Math::previousPowerOfTwo(sliceSize.height);
 
-  while (sliceSize.width * sliceSize.height * (image->getBitsPerPixel() / 4) /
+  while (sliceSize.width * sliceSize.height * (texture->getBitsPerPixel() / 4) /
            2 >
          tmemSize) {
     if (sliceSize.width > sliceSize.height) {
@@ -89,76 +89,98 @@ bool N64Renderer::sliceTexture(
     }
   }
 
-  slices = image->slice(sliceSize, sliceCount);
+  slices = texture->slice(sliceSize, sliceCount);
 
   return true;
 }
 
-void N64Renderer::createTexture([[maybe_unused]] int id) {
-  GLuint texture;
-  glGenTextures(1, &texture);
-  mTextureIdMapping.emplace(id, texture);
+void N64Renderer::createFramebufferTexture([[maybe_unused]] uint16_t id, [[maybe_unused]] Vector2i size) {}
 
-  glBindTexture(GL_TEXTURE_2D, texture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+void N64Renderer::resizeFramebufferTexture([[maybe_unused]] uint16_t id, [[maybe_unused]] Vector2i size) {}
+
+void N64Renderer::destroyFramebufferTexture([[maybe_unused]] uint16_t id) {}
+
+void N64Renderer::freeTexture(int slot) {
+  auto gpuTexture = getGpuTexture(slot);
+
+  if (gpuTexture) {
+    if (gpuTexture->id != 0) {
+      auto textureIt = mTextureIdMapping.find(gpuTexture->id);
+      if (textureIt != mTextureIdMapping.end()) {
+        GLuint texture = textureIt->second;
+        mTextureIdMapping.erase(textureIt);
+        glDeleteTextures(1, &texture);
+      }
+    }
+
+    for (auto& subTexture : gpuTexture->subTextures) {
+      auto textureIt = mTextureIdMapping.find(subTexture.id);
+      if (textureIt != mTextureIdMapping.end()) {
+        GLuint texture = textureIt->second;
+        mTextureIdMapping.erase(textureIt);
+        glDeleteTextures(1, &texture);
+      }
+    }
+  }
+
+  freeGpuTexture(slot);
 }
 
-void N64Renderer::destroyTexture([[maybe_unused]] int id) {
-  GLuint texture = mTextureIdMapping.at(id);
-  mTextureIdMapping.erase(id);
-  glDeleteTextures(1, &texture);
-}
+void N64Renderer::uploadTexture(int slot, const Texture* texture) {
+  freeTexture(slot);
 
-void N64Renderer::loadTexture(
-  [[maybe_unused]] int id, [[maybe_unused]] Image* image
-) {
-  auto& texture = mTextureIdMapping.at(id);
+  GpuTexture gpuTexture;
+  gpuTexture.size = texture->getSize();
+
+  // todo: slice texture if it is too large for TMEM
+
+  declareGpuTexture(slot, gpuTexture);
+
+  GLuint glTexture;
+
+  glGenTextures(1, &glTexture);
+  mTextureIdMapping.emplace(gpuTexture.id, glTexture);
 
   GLenum inputFormat = GL_RGBA;
   GLenum inputType = GL_UNSIGNED_SHORT_5_5_5_1_EXT;
   GLenum internalFormat = GL_RGB5_A1;
 
-  if (image->getBitsPerPixel() == 24) {
+  if (texture->getBitsPerPixel() == 24) {
     inputFormat = GL_RGB;
-    inputType = GL_BYTE;
-  } else if (image->getBitsPerPixel() == 32) {
+    inputType = GL_UNSIGNED_BYTE;
+  } else if (texture->getBitsPerPixel() == 32) {
     inputType = GL_UNSIGNED_INT_8_8_8_8_EXT;
     internalFormat = GL_RGBA;
   }
 
-  auto imageSize = image->getSize();
+  auto textureSize = texture->getSize();
 
-  glBindTexture(GL_TEXTURE_2D, texture);
+  glBindTexture(GL_TEXTURE_2D, glTexture);
   // note: on N64, a texture size that's not a power of 2, must be clamped
-  if (!Math::isPowerOfTwo(imageSize.width)) {
+  if (!Math::isPowerOfTwo(textureSize.width)) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   }
 
-  if (!Math::isPowerOfTwo(imageSize.height)) {
+  if (!Math::isPowerOfTwo(textureSize.height)) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   }
 
   glTexImage2D(
     GL_TEXTURE_2D, 0,                         /* mipmap level */
     internalFormat,                           /* internal format */
-    image->getWidth(), image->getHeight(), 0, /* format (legacy) */
+    texture->getWidth(), texture->getHeight(), 0, /* format (legacy) */
     inputFormat,                              /* input format */
-    inputType, image->getData()
+    inputType, texture->getData()
   );
   glTexParameteri(
     GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-    image->isInterpolated() ? GL_LINEAR : GL_NEAREST
+    texture->isInterpolated() ? GL_LINEAR : GL_NEAREST
   );
   glTexParameteri(
     GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-    image->isInterpolated() ? GL_LINEAR : GL_NEAREST
+    texture->isInterpolated() ? GL_LINEAR : GL_NEAREST
   );
 }
-
-void N64Renderer::resizeTexture(
-  [[maybe_unused]] int id, [[maybe_unused]] Vector2i size
-) {}
 
 void N64Renderer::renderTexture(
   [[maybe_unused]] Canvas* canvas, [[maybe_unused]] RenderTextureInfo* info
@@ -293,7 +315,7 @@ void N64Renderer::renderMesh(
   auto listId = mMeshIdMapping.at(info->meshId);
   auto texture = mTextureIdMapping.at(info->diffuseTextureId);
 
-  auto ambientLight = canvas->getStage()->getAmbientLight();
+  auto ambientLight = canvas->getCamera3d().getStage()->getAmbientLight();
   float ambient[4] = {
     ambientLight.color.red, ambientLight.color.green, ambientLight.color.blue,
     ambientLight.color.alpha};
@@ -302,7 +324,7 @@ void N64Renderer::renderMesh(
 
   int lightId = 0;
 
-  for (auto&& pointLight : canvas->getStage()->getPointLights()) {
+  for (auto&& pointLight : canvas->getCamera3d().getStage()->getPointLights()) {
     glEnable(GL_LIGHT0 + lightId);
     float pos[4] = {
       pointLight->position.x, pointLight->position.y, pointLight->position.z,
@@ -341,10 +363,10 @@ void N64Renderer::renderMesh(
 }
 
 void N64Renderer::setTextureFilterEnabled(
-  [[maybe_unused]] int id, [[maybe_unused]] bool enabled
+  [[maybe_unused]] uint16_t id, [[maybe_unused]] bool enabled
 ) {}
 
-void N64Renderer::setRenderTargetTexture([[maybe_unused]] int id) {}
+void N64Renderer::setRenderTargetTexture([[maybe_unused]] uint16_t id) {}
 
 void N64Renderer::unsetRenderTargetTexture() {}
 

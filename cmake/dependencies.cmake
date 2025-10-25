@@ -5,14 +5,19 @@ if(LUNA_USE_STD_THREAD)
   target_link_libraries(luna PUBLIC Threads::Threads)
 endif()
 
-if(NOT (CMAKE_SYSTEM_NAME STREQUAL "Nintendo64" OR CMAKE_SYSTEM_NAME STREQUAL "NintendoDS"))
+if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
   find_package(glm REQUIRED)
   target_link_libraries(luna PUBLIC glm::glm)
 endif()
 
+if(CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
+  # portlibs
+  target_include_directories(luna PUBLIC /opt/devkitpro/portlibs/switch/include)
+endif()
+
 if(LUNA_WINDOW_SDL2)
   find_package(SDL2 REQUIRED)
-  target_link_libraries(luna PUBLIC SDL2::SDL2)
+  target_link_libraries(luna PUBLIC SDL2::SDL2main SDL2::SDL2)
 endif()
 
 if(LUNA_WINDOW_GLFW)
@@ -89,6 +94,10 @@ if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
     $<TARGET_OBJECTS:glad>
   )
   target_include_directories(luna PRIVATE libs/glad-4.3/include)
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
+  target_link_libraries(luna PRIVATE glad)
 endif()
 
 set(FMT_OS OFF)

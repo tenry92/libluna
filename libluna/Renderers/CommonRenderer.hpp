@@ -1,18 +1,19 @@
 #pragma once
 
 #include <forward_list>
+#include <set>
 #include <variant>
 #include <vector>
 
 #include <libluna/AbstractRenderer.hpp>
 #include <libluna/Font.hpp>
 #include <libluna/IdAllocator.hpp>
-#include <libluna/ImageLoader.hpp>
 #include <libluna/Matrix.hpp>
 #include <libluna/Mesh.hpp>
 #include <libluna/Rect.hpp>
 #include <libluna/Shape.hpp>
 #include <libluna/Stage.hpp>
+#include <libluna/Texture.hpp>
 
 namespace Luna {
   /**
@@ -28,26 +29,25 @@ namespace Luna {
    */
   class CommonRenderer : public AbstractRenderer {
     public:
-    struct Texture {
-      int id;
-      Vector2i size;
+    struct GpuSubTexture {
+      uint16_t id; ///< The internal texture ID.
+      Recti crop;
     };
 
-    struct SlicedTexture {
-      Vector2i sliceCount;
-      std::vector<Texture> slices;
+    struct GpuTexture {
+      uint16_t id; ///< The internal texture ID. 0 if it uses sub textures.
+      Vector2i size; ///< The size of the texture in pixels.
+      std::vector<GpuSubTexture> subTextures;
     };
-
-    using TextureOrSlices = std::variant<Texture, SlicedTexture>;
 
     /**
      * @brief This holds information about how to render a 2D texture.
      */
     struct RenderTextureInfo {
       /**
-       * @brief The texture ID to render.
+       * @brief The internal texture ID to render.
        */
-      int textureId;
+      uint16_t textureId;
 
       /**
        * @brief The crop rectangle in pixels. If empty, the whole texture is used.
@@ -83,12 +83,12 @@ namespace Luna {
       /**
        * @brief The diffuse texture ID to apply or 0 if none.
        */
-      int diffuseTextureId{0};
+      uint16_t diffuseTextureId{0};
 
       /**
        * @brief The normal texture ID to apply or 0 if none.
        */
-      int normalTextureId{0};
+      uint16_t normalTextureId{0};
 
       /**
        * @brief The local transform to apply to the mesh.
@@ -101,46 +101,41 @@ namespace Luna {
 
     void render() override;
 
+    /**
+     * @brief Declare a texture in the GPU texture mapping.
+     *
+     * @p gpuTexture must be prepared with the texture and sub texture sizes.
+     * Their IDs will be set in this method.
+     *
+     * @param slot The texture slot.
+     * @param gpuTexture The GPU texture information.
+     */
+    void declareGpuTexture(int slot, GpuTexture& gpuTexture);
+
+    GpuTexture* getGpuTexture(int slot);
+
+    void freeGpuTexture(int slot);
+
     virtual void startRender();
 
     virtual void endRender();
 
     virtual void clearBackground(ColorRgb color);
 
+    virtual void createFramebufferTexture(uint16_t id, Vector2i size) = 0;
+
+    virtual void resizeFramebufferTexture(uint16_t id, Vector2i size) = 0;
+
+    virtual void destroyFramebufferTexture(uint16_t id) = 0;
+
     /**
-     * @brief Slice an image before loading as textures.
+     * @brief Slice a texture before loading to GPU.
      *
-     * Returns true if the image was sliced, false otherwise.
+     * Returns true if the texture was sliced, false otherwise.
      */
     virtual bool sliceTexture(
-      Image* image, std::vector<Image>& slices, Vector2i& sliceCount
+      Texture* texture, std::vector<Texture>& slices, Vector2i& sliceCount
     );
-
-    /**
-     * @brief Create a new empty texture for the provided ID.
-     *
-     * This may do nothing and the actual creation can be done later in
-     * @ref loadTexture().
-     */
-    virtual void createTexture(int id);
-
-    /**
-     * @brief Destroy a texture for the provided ID.
-     */
-    virtual void destroyTexture(int id);
-
-    /**
-     * @brief Load data to the given texture ID.
-     *
-     * It is guaranteed that the given texture ID was previously passed to
-     * @ref createTexture().
-     */
-    virtual void loadTexture(int id, Image* image);
-
-    /**
-     * @brief Resize the texture for the provided ID.
-     */
-    virtual void resizeTexture(int id, Vector2i size);
 
     /**
      * @brief Draw a texture on the canvas.
@@ -181,8 +176,8 @@ namespace Luna {
      */
     virtual void renderMesh(Canvas* canvas, RenderMeshInfo* info);
 
-    virtual void setTextureFilterEnabled(int id, bool enabled);
-    virtual void setRenderTargetTexture(int id);
+    virtual void setTextureFilterEnabled(uint16_t id, bool enabled);
+    virtual void setRenderTargetTexture(uint16_t id);
     virtual void unsetRenderTargetTexture();
 
     virtual void setViewport(Vector2i offset, Vector2i size);
@@ -207,7 +202,7 @@ namespace Luna {
 
     Vector2i getCurrentRenderSize() const;
 
-    Vector2i getTextureSize(int id) const;
+    Vector2i getTextureSize(int slot) const;
 
     private:
     /**
@@ -225,19 +220,14 @@ namespace Luna {
      */
     void render2d(Canvas* canvas, Vector2i renderSize);
 
-    void updateTextureCache(Stage* stage);
-
     void start2dFramebuffer(Canvas* canvas);
 
     void end2dFramebuffer(Canvas* canvas);
 
     IdAllocator<uint16_t> mTextureIdAllocator;
-    IdAllocator<uint16_t> mShapeIdAllocator;
-    IdAllocator<uint16_t> mMeshIdAllocator;
-    int mRenderTargetId;
+    uint16_t mRenderTargetId;
     Vector2i mCurrentRenderSize;
-    std::unordered_map<ImageLoader*, TextureOrSlices> mKnownImages;
-    std::map<int, Texture> mTextureIdMapping;
+    std::map<int, GpuTexture> mGpuTextureSlotMapping;
     std::unordered_map<Shape*, int> mKnownShapes;
     std::set<FontPtr> mLoadedFonts;
     std::unordered_map<std::shared_ptr<Mesh>, int> mKnownMeshes;

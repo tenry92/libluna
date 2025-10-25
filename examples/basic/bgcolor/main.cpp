@@ -21,7 +21,7 @@ class ExampleApp : public Application {
 
   protected:
   void init() override {
-    mCanvas = createCanvas({CANVAS_WIDTH, CANVAS_HEIGHT});
+    mCanvas = allocCanvas();
     mCanvas->setDisplayMode({
       Vector2i{CANVAS_WIDTH, CANVAS_HEIGHT}, // resolution
       false,                                 // fullscreen
@@ -70,7 +70,7 @@ class ExampleApp : public Application {
   double mTime{0.f};
 };
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   ExampleApp app(argc, argv);
 
   return app.run();

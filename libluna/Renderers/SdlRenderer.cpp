@@ -24,6 +24,8 @@
 
 #include <libluna/Canvas.hpp>
 
+using namespace Luna;
+
 #define CHECK_SDL(x)                                                           \
   {                                                                            \
     if (x) {                                                                   \
@@ -32,7 +34,15 @@
     }                                                                          \
   }
 
-using namespace Luna;
+template<typename T>
+inline T* assertSdl(T* ptr) {
+  if (ptr == nullptr) {
+    logError("sdl error: {}", SDL_GetError());
+    Application::getInstance()->raiseCriticalError("SDL Error");
+  }
+
+  return ptr;
+}
 
 static bool gDidPrintRenderDrivers{false};
 
@@ -69,11 +79,11 @@ void SdlRenderer::initialize() {
   }
 
   logInfo("creating SDL renderer");
-  std::unique_ptr<SDL_Renderer, SdlDeleter> renderer(SDL_CreateRenderer(
+  std::unique_ptr<SDL_Renderer, SdlDeleter> renderer(assertSdl(SDL_CreateRenderer(
     getCanvas()->sdl.window,
     -1, /* -1 = most suitable driver, 0 = first available driver */
     SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
-  ));
+  )));
   logDebug("sdl renderer created");
 
   if (!renderer) {
@@ -152,26 +162,71 @@ void SdlRenderer::clearBackground(ColorRgb color) {
   CHECK_SDL(SDL_RenderClear(mRenderer.get()));
 }
 
-void SdlRenderer::createTexture([[maybe_unused]] int id) {
-  // stub
+void SdlRenderer::createFramebufferTexture(uint16_t id, Vector2i size) {
+  SDL_Texture* texture = assertSdl(SDL_CreateTexture(
+    mRenderer.get(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET,
+    size.width, size.height
+  ));
+  SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+  mTextureIdMapping.emplace(id, texture);
 }
 
-void SdlRenderer::destroyTexture(int id) {
+void SdlRenderer::resizeFramebufferTexture(uint16_t id, Vector2i size) {
+  if (mTextureIdMapping.count(id)) {
+    SDL_Texture* oldTexture = mTextureIdMapping.at(id);
+    mTextureIdMapping.erase(id);
+    SDL_DestroyTexture(oldTexture);
+  }
+
+  SDL_Texture* texture = assertSdl(SDL_CreateTexture(
+    mRenderer.get(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET,
+    size.width, size.height
+  ));
+  SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+  mTextureIdMapping.emplace(id, texture);
+}
+
+void SdlRenderer::destroyFramebufferTexture(uint16_t id) {
   SDL_Texture* texture = mTextureIdMapping.at(id);
   mTextureIdMapping.erase(id);
   SDL_DestroyTexture(texture);
 }
 
-void SdlRenderer::loadTexture(int id, Image* image) {
-  if (mTextureIdMapping.count(id)) {
-    SDL_Texture* oldTexture = mTextureIdMapping.at(id);
-    SDL_DestroyTexture(oldTexture);
-    mTextureIdMapping.erase(id);
+void SdlRenderer::freeTexture(int slot) {
+  auto gpuTexture = getGpuTexture(slot);
+
+  if (gpuTexture) {
+    if (gpuTexture->id != 0) {
+      auto textureIt = mTextureIdMapping.find(gpuTexture->id);
+      if (textureIt != mTextureIdMapping.end()) {
+        SDL_DestroyTexture(textureIt->second);
+        mTextureIdMapping.erase(textureIt);
+      }
+    }
+
+    for (auto& subTexture : gpuTexture->subTextures) {
+      auto textureIt = mTextureIdMapping.find(subTexture.id);
+      if (textureIt != mTextureIdMapping.end()) {
+        SDL_DestroyTexture(textureIt->second);
+        mTextureIdMapping.erase(textureIt);
+      }
+    }
   }
+
+  freeGpuTexture(slot);
+}
+
+void SdlRenderer::uploadTexture(int slot, const Texture* texture) {
+  freeTexture(slot);
+
+  GpuTexture gpuTexture;
+  gpuTexture.size = texture->getSize();
+
+  declareGpuTexture(slot, gpuTexture);
 
   uint32_t surfaceFormat = SDL_PIXELFORMAT_RGBA32;
 
-  switch (image->getBitsPerPixel()) {
+  switch (texture->getBitsPerPixel()) {
   case 16:
     surfaceFormat = SDL_PIXELFORMAT_ABGR1555;
     break;
@@ -183,33 +238,16 @@ void SdlRenderer::loadTexture(int id, Image* image) {
     break;
   }
 
-  SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormatFrom(
-    (void*)(image->getData()), image->getSize().width, image->getSize().height,
-    image->getBitsPerPixel(), image->getBytesPerRow(), surfaceFormat
-  );
+  SDL_Surface* surface = assertSdl(SDL_CreateRGBSurfaceWithFormatFrom(
+    (void*)(texture->getData()), texture->getSize().width, texture->getSize().height,
+    texture->getBitsPerPixel(), texture->getBytesPerRow(), surfaceFormat
+  ));
 
-  auto texture = SDL_CreateTextureFromSurface(mRenderer.get(), surface);
+  auto sdlTexture = assertSdl(SDL_CreateTextureFromSurface(mRenderer.get(), surface));
 
   SDL_FreeSurface(surface);
 
-  mTextureIdMapping.emplace(id, texture);
-}
-
-void SdlRenderer::resizeTexture(
-  [[maybe_unused]] int id, [[maybe_unused]] Vector2i size
-) {
-  if (mTextureIdMapping.count(id)) {
-    SDL_Texture* oldTexture = mTextureIdMapping.at(id);
-    mTextureIdMapping.erase(id);
-    SDL_DestroyTexture(oldTexture);
-  }
-
-  SDL_Texture* texture = SDL_CreateTexture(
-    mRenderer.get(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET,
-    size.width, size.height
-  );
-  SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-  mTextureIdMapping.emplace(id, texture);
+  mTextureIdMapping.emplace(gpuTexture.id, sdlTexture);
 }
 
 void SdlRenderer::renderTexture(
@@ -262,10 +300,10 @@ void SdlRenderer::renderShape(
 }
 
 void SdlRenderer::setTextureFilterEnabled(
-  [[maybe_unused]] int id, [[maybe_unused]] bool enabled
+  [[maybe_unused]] uint16_t id, [[maybe_unused]] bool enabled
 ) {}
 
-void SdlRenderer::setRenderTargetTexture(int id) {
+void SdlRenderer::setRenderTargetTexture(uint16_t id) {
   auto texture = mTextureIdMapping.at(id);
   SDL_SetRenderTarget(mRenderer.get(), texture);
 }

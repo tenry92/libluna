@@ -49,19 +49,13 @@ void CommonRenderer::render() {
   auto bgColor = canvas->getBackgroundColor();
   clearBackground(bgColor);
 
-  if (!canvas->getStage()) {
-    return;
-  }
-
-  updateTextureCache(canvas->getStage());
-
   renderWorld(canvas);
 
 #ifndef N64
   if (!mRenderTargetId) {
     mRenderTargetId = mTextureIdAllocator.next();
     logDebug("create texture #{} (render target)", mRenderTargetId);
-    createTexture(mRenderTargetId);
+    createFramebufferTexture(mRenderTargetId, getInternalSize());
   }
 
   // render sprites to internal texture
@@ -73,6 +67,58 @@ void CommonRenderer::render() {
   end2dFramebuffer(canvas);
 #endif
   endRender();
+}
+
+void CommonRenderer::declareGpuTexture(
+  int slot, GpuTexture& texture
+) {
+  if (texture.subTextures.empty()) {
+    texture.id = mTextureIdAllocator.next();
+    logDebug("declare texture #{} in slot {} (size: {}x{})",
+      texture.id, slot, texture.size.width, texture.size.height
+    );
+  } else {
+    texture.id = 0; // Uses sub textures
+
+    for (auto& subTexture : texture.subTextures) {
+      subTexture.id = mTextureIdAllocator.next();
+      logDebug("declare sub texture #{} in slot {} (crop: {}x{}+{}+{})",
+        subTexture.id, slot,
+        subTexture.crop.width, subTexture.crop.height,
+        subTexture.crop.x, subTexture.crop.y
+      );
+    }
+  }
+
+  mGpuTextureSlotMapping[slot] = texture;
+}
+
+CommonRenderer::GpuTexture* CommonRenderer::getGpuTexture(int slot) {
+  if (mGpuTextureSlotMapping.find(slot) == mGpuTextureSlotMapping.end()) {
+    return nullptr;
+  }
+
+  return &mGpuTextureSlotMapping.at(slot);
+}
+
+void CommonRenderer::freeGpuTexture(int slot) {
+  if (mGpuTextureSlotMapping.find(slot) == mGpuTextureSlotMapping.end()) {
+    return;
+  }
+
+  auto gpuTexture = mGpuTextureSlotMapping.at(slot);
+
+  if (gpuTexture.id != 0) {
+    logDebug("free texture #{} from slot {}", gpuTexture.id, slot);
+    mTextureIdAllocator.free(gpuTexture.id);
+  } else {
+    for (auto& subTexture : gpuTexture.subTextures) {
+      logDebug("free sub texture #{} from slot {}", subTexture.id, slot);
+      mTextureIdAllocator.free(subTexture.id);
+    }
+  }
+
+  mGpuTextureSlotMapping.erase(slot);
 }
 
 void CommonRenderer::startRender() {
@@ -88,30 +134,10 @@ void CommonRenderer::clearBackground([[maybe_unused]] ColorRgb color) {
 }
 
 bool CommonRenderer::sliceTexture(
-  [[maybe_unused]] Image* image, [[maybe_unused]] std::vector<Image>& slices,
+  [[maybe_unused]] Texture* texture, [[maybe_unused]] std::vector<Texture>& slices,
   [[maybe_unused]] Vector2i& sliceCount
 ) {
   return false;
-}
-
-void CommonRenderer::createTexture([[maybe_unused]] int id) {
-  // stub
-}
-
-void CommonRenderer::destroyTexture([[maybe_unused]] int id) {
-  // stub
-}
-
-void CommonRenderer::loadTexture(
-  [[maybe_unused]] int id, [[maybe_unused]] Image* image
-) {
-  // stub
-}
-
-void CommonRenderer::resizeTexture(
-  [[maybe_unused]] int id, [[maybe_unused]] Vector2i size
-) {
-  // stub
 }
 
 void CommonRenderer::createShape([[maybe_unused]] int id) {
@@ -171,12 +197,12 @@ void CommonRenderer::loadMesh(
 }
 
 void CommonRenderer::setTextureFilterEnabled(
-  [[maybe_unused]] int id, [[maybe_unused]] bool enabled
+  [[maybe_unused]] uint16_t id, [[maybe_unused]] bool enabled
 ) {
   // stub
 }
 
-void CommonRenderer::setRenderTargetTexture([[maybe_unused]] int id) {
+void CommonRenderer::setRenderTargetTexture([[maybe_unused]] uint16_t id) {
   // stub
 }
 
@@ -215,157 +241,34 @@ Vector2i CommonRenderer::getCurrentRenderSize() const {
   return mCurrentRenderSize;
 }
 
-Vector2i CommonRenderer::getTextureSize(int id) const {
-  return mTextureIdMapping.at(id).size;
-}
-
-void CommonRenderer::updateTextureCache([[maybe_unused]] Stage* stage) {
-  auto imagesLoaderCache = stage->getTextureCache()->getCache();
-
-  std::unordered_set<ImageLoader*> visitedImageLoaders;
-
-  for (auto&& [imageLoader, priority] : imagesLoaderCache) {
-    visitedImageLoaders.emplace(imageLoader);
-    if (mKnownImages.count(imageLoader) == 0) {
-      auto image = imageLoader->load();
-
-      std::vector<Image> slices;
-      Vector2i sliceCount;
-
-      if (sliceTexture(&image, slices, sliceCount)) {
-        auto& textureOrSlices = mKnownImages[imageLoader];
-        textureOrSlices = SlicedTexture{};
-        auto& slicedTexture = std::get<SlicedTexture>(textureOrSlices);
-        slicedTexture.sliceCount = sliceCount;
-        slicedTexture.slices.reserve(slices.size());
-
-        for (auto&& slice : slices) {
-          int textureId = mTextureIdAllocator.next();
-          mTextureIdMapping.emplace(
-            textureId, Texture{textureId, slice.getSize()}
-          );
-          slicedTexture.slices.emplace_back(Texture{textureId, slice.getSize()}
-          );
-          logDebug("create sliced texture #{}", textureId);
-          createTexture(textureId);
-          loadTexture(textureId, &slice);
-        }
-      } else {
-        int textureId = mTextureIdAllocator.next();
-        mKnownImages.emplace(imageLoader, Texture{textureId, image.getSize()});
-        mTextureIdMapping.emplace(
-          textureId, Texture{textureId, image.getSize()}
-        );
-        logDebug("create texture #{}", textureId);
-        createTexture(textureId);
-        loadTexture(textureId, &image);
-      }
-    }
-  }
-
-  for (auto it = mKnownImages.begin(); it != mKnownImages.end();) {
-    if (visitedImageLoaders.find(it->first) == visitedImageLoaders.end()) {
-      auto& textureOrSlices = it->second;
-
-      if (std::holds_alternative<SlicedTexture>(textureOrSlices)) {
-        auto& slicedTexture = std::get<SlicedTexture>(textureOrSlices);
-
-        for (auto&& texture : slicedTexture.slices) {
-          auto textureId = texture.id;
-          logDebug("destroy texture #{}", textureId);
-          mTextureIdAllocator.free(static_cast<uint16_t>(textureId));
-          destroyTexture(textureId);
-          mTextureIdMapping.erase(textureId);
-        }
-      } else {
-        auto& texture = std::get<Texture>(textureOrSlices);
-
-        auto textureId = texture.id;
-        logDebug("destroy texture #{}", textureId);
-        mTextureIdAllocator.free(static_cast<uint16_t>(textureId));
-        destroyTexture(textureId);
-        mTextureIdMapping.erase(textureId);
-      }
-
-      it = mKnownImages.erase(it);
-    } else {
-      ++it;
-    }
-  }
-
-  std::unordered_set<Shape*> visitedShapes;
-
-  for (auto&& drawable : stage->getDrawables2d()) {
-    if (!std::holds_alternative<Primitive>(drawable)) {
-      continue;
-    }
-
-    auto& primitive = std::get<Primitive>(drawable);
-
-    if (primitive.getShape() == nullptr) {
-      continue;
-    }
-
-    visitedShapes.emplace(primitive.getShape());
-
-    if (mKnownShapes.count(primitive.getShape()) == 0) {
-      int shapeId = mShapeIdAllocator.next();
-      mKnownShapes.emplace(primitive.getShape(), shapeId);
-      createShape(shapeId);
-      loadShape(shapeId, primitive.getShape());
-    }
-  }
-
-  for (auto it = mKnownShapes.begin(); it != mKnownShapes.end();) {
-    if (visitedShapes.find(it->first) == visitedShapes.end()) {
-      mShapeIdAllocator.free(static_cast<uint16_t>(it->second));
-      destroyShape(it->second);
-      it = mKnownShapes.erase(it);
-    } else {
-      ++it;
-    }
-  }
-
-  std::unordered_set<std::shared_ptr<Mesh>> visitedMeshes;
-
-  for (auto&& model : stage->getDrawables3d()) {
-    visitedMeshes.emplace(model->getMesh());
-
-    if (mKnownMeshes.count(model->getMesh()) == 0) {
-      int meshId = mMeshIdAllocator.next();
-      mKnownMeshes.emplace(model->getMesh(), meshId);
-      createMesh(meshId);
-      loadMesh(meshId, model->getMesh());
-    }
-  }
+Vector2i CommonRenderer::getTextureSize(int slot) const {
+  return mGpuTextureSlotMapping.at(slot).size;
 }
 
 void CommonRenderer::renderWorld(Canvas* canvas) {
-  for (auto&& model : canvas->getStage()->getDrawables3d()) {
+  auto stage = canvas->getCamera3d().getStage();
+
+  if (!stage) {
+    return;
+  }
+
+  for (auto&& model : stage->getDrawables3d()) {
     RenderMeshInfo info;
     info.meshId = mKnownMeshes.at(model->getMesh());
     info.transform = model->getTransform();
 
     auto material = model->getMaterial();
 
-    if (material.getDiffuse()) {
-      auto& diffuseTextureOrSlices = mKnownImages.at(material.getDiffuse());
-
-      if (std::holds_alternative<Texture>(diffuseTextureOrSlices)) {
-        info.diffuseTextureId = std::get<Texture>(diffuseTextureOrSlices).id;
-      }
-
-      // note: sliced textures are not supported for 3D models
+    int diffuseTextureSlot = material.getDiffuseTexture();
+    if (diffuseTextureSlot != 0 && mGpuTextureSlotMapping.find(diffuseTextureSlot) != mGpuTextureSlotMapping.end()) {
+      auto& gpuTexture = mGpuTextureSlotMapping.at(diffuseTextureSlot);
+      info.diffuseTextureId = gpuTexture.id;
     }
 
-    if (material.getNormal()) {
-      auto& normalTextureOrSlices = mKnownImages.at(material.getNormal());
-
-      if (std::holds_alternative<Texture>(normalTextureOrSlices)) {
-        info.normalTextureId = std::get<Texture>(normalTextureOrSlices).id;
-      }
-
-      // note: sliced textures are not supported for 3D models
+    int normalTextureSlot = material.getNormalTexture();
+    if (normalTextureSlot != 0 && mGpuTextureSlotMapping.find(normalTextureSlot) != mGpuTextureSlotMapping.end()) {
+      auto& gpuTexture = mGpuTextureSlotMapping.at(normalTextureSlot);
+      info.normalTextureId = gpuTexture.id;
     }
 
     renderMesh(canvas, &info);
@@ -375,7 +278,13 @@ void CommonRenderer::renderWorld(Canvas* canvas) {
 void CommonRenderer::render2d(
   Canvas* canvas, [[maybe_unused]] Vector2i renderSize
 ) {
-  for (auto&& drawable : canvas->getStage()->getSortedDrawables2d()) {
+  auto stage = canvas->getCamera2d().getStage();
+
+  if (!stage) {
+    return;
+  }
+
+  for (auto&& drawable : stage->getSortedDrawables2d()) {
     std::visit(
       overloaded{
         [](auto) {},
@@ -384,45 +293,20 @@ void CommonRenderer::render2d(
             return;
           }
 
-          if (!sprite.getImageLoader() || !mKnownImages.count(sprite.getImageLoader())) {
+          int textureSlot = sprite.getTexture();
+
+          if (mGpuTextureSlotMapping.find(textureSlot) == mGpuTextureSlotMapping.end()) {
             return;
           }
 
           RenderTextureInfo info;
+          auto& gpuTexture = mGpuTextureSlotMapping.at(textureSlot);
 
-          auto& textureOrSlices = mKnownImages.at(sprite.getImageLoader());
-
-          if (std::holds_alternative<Texture>(textureOrSlices)) {
-            auto& texture = std::get<Texture>(textureOrSlices);
-
-            info.textureId = texture.id;
-            info.size = texture.size;
-            info.position =
-              sprite.getPosition() - canvas->getCamera2d().getPosition();
-            renderTexture(canvas, &info);
-          } else {
-            auto& slicedTexture = std::get<SlicedTexture>(textureOrSlices);
-
-            info.position =
-              sprite.getPosition() - canvas->getCamera2d().getPosition();
-
-            for (int y = 0; y < slicedTexture.sliceCount.y; ++y) {
-              for (int x = 0; x < slicedTexture.sliceCount.x; ++x) {
-                auto& slice =
-                  slicedTexture.slices[y * slicedTexture.sliceCount.x + x];
-                info.textureId = slice.id;
-                info.size = slice.size;
-                info.crop = {0, 0, info.size.x, info.size.y};
-                renderTexture(canvas, &info);
-
-                info.position.x += static_cast<float>(info.size.x);
-              }
-
-              info.position.x =
-                sprite.getPosition().x - canvas->getCamera2d().getPosition().x;
-              info.position.y += static_cast<float>(info.size.y);
-            }
-          }
+          info.textureId = gpuTexture.id;
+          info.size = gpuTexture.size;
+          info.position =
+            sprite.getPosition() - canvas->getCamera2d().getPosition();
+          renderTexture(canvas, &info);
         },
         [&](const Primitive& primitive) {
           if (!primitive.getShape() || !mKnownShapes.count(primitive.getShape())) {
@@ -436,13 +320,14 @@ void CommonRenderer::render2d(
         },
         [&](const Tilemap& tilemap) {
           auto tileset = tilemap.getTileset();
-          auto& textureOrSlices = mKnownImages.at(tileset->getImage());
+          int textureSlot = tileset->getTextureId();
 
-          if (!std::holds_alternative<Texture>(textureOrSlices)) {
+          if (textureSlot == 0 || mGpuTextureSlotMapping.find(textureSlot) == mGpuTextureSlotMapping.end()) {
+            // Texture not uploaded
             return;
           }
 
-          auto& texture = std::get<Texture>(textureOrSlices);
+          auto& gpuTexture = mGpuTextureSlotMapping.at(textureSlot);
 
           for (int y = 0; y < tilemap.getSize().height; ++y) {
             for (int x = 0; x < tilemap.getSize().width; ++x) {
@@ -452,7 +337,7 @@ void CommonRenderer::render2d(
               }
 
               RenderTextureInfo info;
-              info.textureId = texture.id;
+              info.textureId = gpuTexture.id;
               info.crop = {
                 tile % tileset->getColumns() * tileset->getTileSize(),
                 tile / tileset->getColumns() * tileset->getTileSize(),
@@ -490,34 +375,31 @@ void CommonRenderer::render2d(
               continue;
             }
 
-            if (cp != ' ' && glyph->imageLoader) {
-              auto& textureOrSlices = mKnownImages.at(glyph->imageLoader);
+            if (cp != ' ' && glyph->textureId != 0 && 
+                mGpuTextureSlotMapping.find(glyph->textureId) != mGpuTextureSlotMapping.end()) {
+              RenderTextureInfo info;
 
-              if (std::holds_alternative<Texture>(textureOrSlices)) {
-                RenderTextureInfo info;
+              auto& gpuTexture = mGpuTextureSlotMapping.at(glyph->textureId);
 
-                auto& texture = std::get<Texture>(textureOrSlices);
+              info.textureId = gpuTexture.id;
+              info.position =
+                Vector2i(static_cast<int>(x), static_cast<int>(y)) +
+                Vector2i(
+                  static_cast<int>(text.getSize() * static_cast<float>(glyph->offset.x)),
+                  static_cast<int>(text.getSize() * static_cast<float>(glyph->offset.y))
+                );
 
-                info.textureId = texture.id;
-                info.position =
-                  Vector2i(static_cast<int>(x), static_cast<int>(y)) +
-                  Vector2i(
-                    static_cast<int>(text.getSize() * static_cast<float>(glyph->offset.x)),
-                    static_cast<int>(text.getSize() * static_cast<float>(glyph->offset.y))
-                  );
-
-                if (glyph->crop.area() > 0) {
-                  info.size = {
-                    static_cast<int>(text.getSize() * static_cast<float>(glyph->crop.width)),
-                    static_cast<int>(text.getSize() * static_cast<float>(glyph->crop.height))
-                  };
-                  info.crop = glyph->crop;
-                } else {
-                  info.size = texture.size;
-                }
-
-                renderTexture(canvas, &info);
+              if (glyph->crop.area() > 0) {
+                info.size = {
+                  static_cast<int>(text.getSize() * static_cast<float>(glyph->crop.width)),
+                  static_cast<int>(text.getSize() * static_cast<float>(glyph->crop.height))
+                };
+                info.crop = glyph->crop;
+              } else {
+                info.size = gpuTexture.size;
               }
+
+              renderTexture(canvas, &info);
             }
 
             x += text.getSize() * static_cast<float>(glyph->advance);
@@ -529,7 +411,7 @@ void CommonRenderer::render2d(
 }
 
 void CommonRenderer::start2dFramebuffer([[maybe_unused]] Canvas* canvas) {
-  resizeTexture(mRenderTargetId, getInternalSize());
+  resizeFramebufferTexture(mRenderTargetId, getInternalSize());
   setRenderTargetTexture(mRenderTargetId);
   setViewport({0, 0}, getInternalSize());
   mCurrentRenderSize = getInternalSize();

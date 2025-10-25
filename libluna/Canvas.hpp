@@ -44,7 +44,7 @@
 #include <libluna/Canvas.hpp>
 #include <libluna/Color.hpp>
 #include <libluna/Command.hpp>
-#include <libluna/Image.hpp>
+#include <libluna/Texture.hpp>
 #include <libluna/ImmediateGui.hpp>
 #include <libluna/Internal/GraphicsMetrics.hpp>
 #include <libluna/Stage.hpp>
@@ -74,12 +74,11 @@ namespace Luna {
   class Canvas {
     public:
     /**
-     * @brief Create a canvas with the desired internal resolution.
+     * @brief Create a canvas.
      *
-     * The internal framebuffer for 2D rendering does not change by default when
-     * the window is resized.
+     * Use setDisplayMode() to configure the window size and video driver.
      */
-    Canvas(const Vector2i& size);
+    Canvas();
 
     ~Canvas();
 
@@ -91,9 +90,6 @@ namespace Luna {
     void detachImmediateGui(ImmediateGui* gui);
     std::list<ImmediateGui*> getImmediateGuis() const;
 
-    void setStage(Stage* stage);
-    Stage* getStage() const;
-
     void setCamera2d(const Camera2d& camera);
     Camera2d getCamera2d() const;
 
@@ -103,7 +99,12 @@ namespace Luna {
     void setBackgroundColor(ColorRgb color);
     ColorRgb getBackgroundColor() const;
 
-    ImagePtr captureScreenshot();
+    void uploadTexture(int slot, const Texture* texture);
+    void uploadTextures(int firstSlot, int lastSlot, const Texture** textures);
+    void freeTexture(int slot);
+    void freeTextures(int firstSlot, int lastSlot);
+
+    TexturePtr captureScreenshot();
 
     void render();
     void sync();
@@ -120,8 +121,6 @@ namespace Luna {
 
     void setInternalResolution(Vector2i size);
     Vector2i getInternalResolution() const;
-
-    static const std::list<Canvas*> getCanvasByStage(Stage* stage);
 
     Internal::GraphicsMetrics getMetrics();
 
@@ -154,7 +153,6 @@ namespace Luna {
 
     Vector2i mSize;
     Vector2i mInternalResolution;
-    Stage* mStage{nullptr};
     std::unique_ptr<AbstractRenderer> mRenderer;
     std::list<std::unique_ptr<ImmediateGui>> mImmediateGuis;
     Camera2d mCamera2d;

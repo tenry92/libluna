@@ -34,3 +34,7 @@ Matrix4x4 Camera3d::getProjectionMatrix(float aspectRatio) const {
 Matrix4x4 Camera3d::getViewMatrix() const {
   return mRotation * Matrix4x4::identity().translate(-mPosition);
 }
+
+void Camera3d::setStage(Stage* stage) { mStage = stage; }
+
+Stage* Camera3d::getStage() const { return mStage; }

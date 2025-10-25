@@ -37,10 +37,13 @@ namespace Luna {
     Internal::GraphicsMetrics getMetrics() override;
 
     void clearBackground(ColorRgb color) override;
-    void createTexture(int id) override;
-    void destroyTexture(int id) override;
-    void loadTexture(int id, Image* image) override;
-    void resizeTexture(int id, Vector2i size) override;
+
+    void createFramebufferTexture(uint16_t id, Vector2i size) override;
+    void resizeFramebufferTexture(uint16_t id, Vector2i size) override;
+    void destroyFramebufferTexture(uint16_t id) override;
+
+    void freeTexture(int slot) override;
+    void uploadTexture(int slot, const Texture* texture) override;
     void renderTexture(Canvas* canvas, RenderTextureInfo* info) override;
 
     void createShape(int id) override;
@@ -48,8 +51,8 @@ namespace Luna {
     void loadShape(int id, Shape* shape) override;
     void renderShape(Canvas* canvas, RenderShapeInfo* info) override;
 
-    void setTextureFilterEnabled(int id, bool enabled) override;
-    void setRenderTargetTexture(int id) override;
+    void setTextureFilterEnabled(uint16_t id, bool enabled) override;
+    void setRenderTargetTexture(uint16_t id) override;
     void unsetRenderTargetTexture() override;
 
     void setViewport(Vector2i offset, Vector2i size) override;
@@ -64,7 +67,7 @@ namespace Luna {
     std::unique_ptr<SDL_Renderer, SdlDeleter> mRenderer;
     std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
 
-    std::map<int, SDL_Texture*> mTextureIdMapping;
+    std::map<uint16_t, SDL_Texture*> mTextureIdMapping;
     std::map<int, Luna::Shape*> mShapeIdMapping;
   };
 } // namespace Luna

@@ -70,8 +70,6 @@ namespace {
 #endif
   }
 
-  std::map<Stage*, std::list<Canvas*>> gCanvasByStage;
-
 #ifdef LUNA_RENDERER_OPENGL
   [[maybe_unused]] void setGlAttributes() {
 #ifdef LUNA_WINDOW_SDL2
@@ -310,7 +308,7 @@ bool Canvas::sendSdlEventToImmediateGui(const SDL_Event* event) {
 }
 #endif
 
-Canvas::Canvas(const Vector2i& size) : mSize{size}, mInternalResolution{size} {
+Canvas::Canvas() {
 #ifdef LUNA_THREADED_CANVAS
   mThread = std::thread(&Canvas::renderThread, this);
   this->sync();
@@ -320,8 +318,6 @@ Canvas::Canvas(const Vector2i& size) : mSize{size}, mInternalResolution{size} {
 Canvas::~Canvas() { this->close(); }
 
 void Canvas::close() {
-  setStage(nullptr);
-
   mImmediateGuis.clear();
 
 #ifdef LUNA_THREADED_CANVAS
@@ -385,6 +381,9 @@ void Canvas::close() {
 }
 
 void Canvas::setDisplayMode(DisplayMode mode) {
+  mSize = mode.resolution;
+  mInternalResolution = mode.resolution;
+
   if (mode.videoDriver.isEmpty()) {
     mode.videoDriver = Application::getInstance()->getDefaultVideoDriver();
   }
@@ -511,26 +510,6 @@ std::list<ImmediateGui*> Canvas::getImmediateGuis() const {
   return result;
 }
 
-void Canvas::setStage(Stage* stage) {
-  if (stage == mStage) {
-    return;
-  }
-
-  mStage = stage;
-
-  if (stage) {
-    gCanvasByStage[stage].push_back(this);
-  } else {
-    gCanvasByStage[stage].remove(this);
-
-    if (gCanvasByStage[stage].empty()) {
-      gCanvasByStage.erase(stage);
-    }
-  }
-}
-
-Stage* Canvas::getStage() const { return mStage; }
-
 void Canvas::setCamera2d(const Camera2d& camera) { mCamera2d = camera; }
 
 Camera2d Canvas::getCamera2d() const { return mCamera2d; }
@@ -543,8 +522,57 @@ void Canvas::setBackgroundColor(ColorRgb color) { mBackgroundColor = color; }
 
 ColorRgb Canvas::getBackgroundColor() const { return mBackgroundColor; }
 
+void Canvas::uploadTexture(int slot, const Texture* texture) {
+  auto command = std::make_shared<CanvasCommand>([this, slot, texture]() {
+    if (mRenderer) {
+      mRenderer->uploadTexture(slot, texture);
+    }
+  });
+
+  mCommandQueue.emplace(command);
+  processCommandQueue();
+}
+
+void Canvas::uploadTextures(int firstSlot, int lastSlot, const Texture** textures) {
+  auto command = std::make_shared<CanvasCommand>([this, firstSlot, lastSlot, textures]() {
+    if (mRenderer) {
+      for (int slot = firstSlot; slot <= lastSlot; ++slot) {
+        int index = slot - firstSlot;
+        mRenderer->uploadTexture(slot, textures[index]);
+      }
+    }
+  });
+
+  mCommandQueue.emplace(command);
+  processCommandQueue();
+}
+
+void Canvas::freeTexture(int slot) {
+  auto command = std::make_shared<CanvasCommand>([this, slot]() {
+    if (mRenderer) {
+      mRenderer->freeTexture(slot);
+    }
+  });
+
+  mCommandQueue.emplace(command);
+  processCommandQueue();
+}
+
+void Canvas::freeTextures(int firstSlot, int lastSlot) {
+  auto command = std::make_shared<CanvasCommand>([this, firstSlot, lastSlot]() {
+    if (mRenderer) {
+      for (int slot = firstSlot; slot <= lastSlot; ++slot) {
+        mRenderer->freeTexture(slot);
+      }
+    }
+  });
+
+  mCommandQueue.emplace(command);
+  processCommandQueue();
+}
+
 #ifdef LUNA_WINDOW_SDL2
-ImagePtr Canvas::captureScreenshot() {
+TexturePtr Canvas::captureScreenshot() {
   SDL_Surface* surface = SDL_GetWindowSurface(sdl.window);
   // returns nullptr if SDL_FRAMEBUFFER_ACCELERATION=0 env is not set
 
@@ -561,10 +589,6 @@ ImagePtr Canvas::captureScreenshot() {
 void Canvas::render() {
   if (!mRenderer) {
     return;
-  }
-
-  if (mStage) {
-    mStage->updateTextureCache();
   }
 
   auto command = std::make_shared<CanvasCommand>(([this]() {
@@ -625,7 +649,3 @@ bool Canvas::isClosed() const { return mClosed; }
 void Canvas::setInternalResolution(Vector2i size) { mInternalResolution = size; }
 
 Vector2i Canvas::getInternalResolution() const { return mInternalResolution; }
-
-const std::list<Canvas*> Canvas::getCanvasByStage(Stage* stage) {
-  return gCanvasByStage[stage];
-}

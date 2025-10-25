@@ -6,10 +6,10 @@ Material::Material() = default;
 
 Material::~Material() = default;
 
-void Material::setDiffuse(ImageLoader* image) { mDiffuse = image; }
+void Material::setDiffuseTexture(int slot) { mDiffuseTexture = slot; }
 
-ImageLoader* Material::getDiffuse() const { return mDiffuse; }
+int Material::getDiffuseTexture() const { return mDiffuseTexture; }
 
-void Material::setNormal(ImageLoader* image) { mNormal = image; }
+void Material::setNormalTexture(int slot) { mNormalTexture = slot; }
 
-ImageLoader* Material::getNormal() const { return mNormal; }
+int Material::getNormalTexture() const { return mNormalTexture; }

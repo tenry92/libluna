@@ -5,7 +5,7 @@ enable_testing()
 set(UNIT_TESTS
   # Filesystem/FileReader
   Filesystem/Path
-  Image
+  Texture
   InputManager
   # Matrix
   # ResourceReader
