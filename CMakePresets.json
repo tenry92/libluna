@@ -1,8 +1,8 @@
 {
-  "version": 1,
+  "version": 8,
   "cmakeMinimumRequired": {
     "major": 3,
-    "minor": 19,
+    "minor": 12,
     "patch": 0
   },
   "configurePresets": [
@@ -12,7 +12,16 @@
       "description": "Default build for native system",
       "generator": "Unix Makefiles",
       "hidden": false,
-      "binaryDir": "${sourceDir}/build"
+      "binaryDir": "${sourceDir}/build/default"
+    },
+    {
+      "name": "mingw",
+      "displayName": "MinGW-W64 Config",
+      "description": "Build for Windows using MinGW-W64",
+      "generator": "Unix Makefiles",
+      "hidden": false,
+      "binaryDir": "${sourceDir}/build/mingw",
+      "toolchainFile": "${sourceDir}/cmake/MinGW.cmake"
     },
     {
       "name": "switch",
@@ -20,13 +29,44 @@
       "description": "Build for Nintendo Switch",
       "generator": "Unix Makefiles",
       "hidden": false,
-      "binaryDir": "${sourceDir}/build-switch",
-      "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "$env{DEVKITPRO}/cmake/Switch.cmake"
-      },
+      "binaryDir": "${sourceDir}/build/switch",
+      "toolchainFile": "$env{DEVKITPRO}/cmake/Switch.cmake",
       "environment": {
         "DEVKITPRO": "/opt/devkitpro"
       }
+    },
+    {
+      "name": "nds",
+      "displayName": "Config for Nintendo DS",
+      "description": "Build for Nintendo DS",
+      "generator": "Unix Makefiles",
+      "hidden": false,
+      "binaryDir": "${sourceDir}/build/nds",
+      "toolchainFile": "$env{DEVKITPRO}/cmake/NDS.cmake",
+      "environment": {
+        "DEVKITPRO": "/opt/devkitpro"
+      }
+    },
+    {
+      "name": "3ds",
+      "displayName": "Config for Nintendo 3DS",
+      "description": "Build for Nintendo 3DS",
+      "generator": "Unix Makefiles",
+      "hidden": false,
+      "binaryDir": "${sourceDir}/build/3ds",
+      "toolchainFile": "$env{DEVKITPRO}/cmake/3DS.cmake",
+      "environment": {
+        "DEVKITPRO": "/opt/devkitpro"
+      }
+    },
+    {
+      "name": "n64",
+      "displayName": "Config for Nintendo 64",
+      "description": "Build for Nintendo 64",
+      "generator": "Unix Makefiles",
+      "hidden": false,
+      "binaryDir": "${sourceDir}/build/n64",
+      "toolchainFile": "${sourceDir}/cmake/Nintendo64.cmake"
     }
   ]
 }
