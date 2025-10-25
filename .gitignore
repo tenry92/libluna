@@ -2,5 +2,4 @@
 .vscode
 build
 build-*
-docs/doxygen
-docs/sphinx/build
+docs/generated
