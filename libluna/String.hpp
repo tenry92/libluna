@@ -8,15 +8,6 @@
 
 #include <stdint.h>
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
-#include <libluna/utf8.h>
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
-
 #include <list>
 #include <memory>
 #include <optional>
@@ -135,7 +126,7 @@ namespace Luna {
 
     const char* c_str() const;
 
-    const utf8_int8_t* data() const;
+    const char* data() const;
 
     CodePoint operator[](std::size_t index) const;
 
@@ -240,7 +231,7 @@ namespace Luna {
     Iterator end() const;
 
     private:
-    using StringData = std::vector<utf8_int8_t>;
+    using StringData = std::vector<char>;
 
     /**
      * @brief Pointer to non-owning C-string or shared pointer to UTF-8 encoded
