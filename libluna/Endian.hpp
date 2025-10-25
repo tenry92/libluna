@@ -3,7 +3,7 @@
 #include <cstdint>
 
 namespace Luna::Endian {
-  enum class Endian { Little, Big };
+  enum Endian { Little, Big };
 
   // constexpr Endian getEndian() {
   //   constexpr uint32_t value = 0x01020304;

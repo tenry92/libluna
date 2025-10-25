@@ -4,6 +4,7 @@
 #include <fstream>
 #include <memory>
 
+#include <libluna/Endian.hpp>
 #include <libluna/Filesystem/Path.hpp>
 #include <libluna/InputStream.hpp>
 
@@ -21,7 +22,7 @@ namespace Luna::Filesystem {
     /**
      * @brief Create a new binary file reader for the file at the given path.
      */
-    static FileReaderPtr make(const Path& filename);
+    static FileReaderPtr make(const Path& filename, Endian::Endian endian = Endian::Little);
     ~FileReader();
 
     bool isValid() const final override;
@@ -36,8 +37,9 @@ namespace Luna::Filesystem {
     using InputStream::read;
 
     private:
-    explicit FileReader(const Path& filename);
+    explicit FileReader(const Path& filename, Endian::Endian endian);
     Path mPath;
+    Endian::Endian mEndian;
     std::ifstream mStream;
     std::size_t mSize;
   };

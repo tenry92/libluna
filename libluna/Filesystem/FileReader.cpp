@@ -7,11 +7,11 @@
 
 using namespace Luna::Filesystem;
 
-FileReaderPtr FileReader::make(const Path& filename) {
-  return FileReaderPtr(new FileReader(filename));
+FileReaderPtr FileReader::make(const Path& filename, Endian::Endian endian) {
+  return FileReaderPtr(new FileReader(filename, endian));
 }
 
-FileReader::FileReader(const Path& filename) {
+FileReader::FileReader(const Path& filename, Endian::Endian endian) : mEndian(endian) {
   auto rawPath = filename.getRawPath();
   mStream = std::ifstream(rawPath.c_str(), std::ios::binary);
 
@@ -72,6 +72,31 @@ std::size_t FileReader::read(
   if (endPos == -1) {
     // error
     return 0;
+  }
+
+  if (mEndian != Endian::getEndian()) {
+    for (std::size_t i = 0; i < objectCount; i++) {
+      switch (objectSize) {
+      case 2: {
+        auto* val = reinterpret_cast<uint16_t*>(buffer + i * objectSize);
+        *val = Endian::swapEndian(*val);
+        break;
+      }
+      case 4: {
+        auto* val = reinterpret_cast<uint32_t*>(buffer + i * objectSize);
+        *val = Endian::swapEndian(*val);
+        break;
+      }
+      case 8: {
+        auto* val = reinterpret_cast<uint64_t*>(buffer + i * objectSize);
+        *val = Endian::swapEndian(*val);
+        break;
+      }
+      default:
+        // do nothing for unsupported sizes
+        break;
+      }
+    }
   }
 
   return (endPos - startPos) / objectSize;
