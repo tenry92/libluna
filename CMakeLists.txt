@@ -111,7 +111,6 @@ set(PUBLIC_MODULES
   String
   System
   Text
-  TextureCache
   Tilemap
   Tileset
   Vector

@@ -65,7 +65,6 @@ namespace Luna {
     GL::Shader mSpriteShader;
     GL::Shader mPrimitiveShader;
     GL::Shader mModelShader;
-    // std::unique_ptr<TextureCacheType> mTextureCache;
     std::shared_ptr<Internal::GraphicsMetrics> mMetrics;
 
     struct {
