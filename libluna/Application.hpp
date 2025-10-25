@@ -43,7 +43,7 @@
  * ## Resources
  *
  * - @ref Luna::Resource "Resource" - Resource loading abstraction.
- * - @ref Luna::Image "Image" - Container for storing 2D image data.
+ * - @ref Luna::Texture "Texture" - Container for storing 2D image data in RAM.
  * - @ref Luna::Font "Font"
  * - @ref Luna::Mesh "Mesh" - 3D mesh containing vertices and faces and more.
  * - @ref Luna::Material "Material" - Material for 3D objects.
@@ -58,7 +58,7 @@
  *   - @ref Luna::Camera2d "Camera2d" - Manipulating the 2D view.
  *   - @ref Luna::Camera3d "Camera3d" - Manipulating the 3D view.
  *
- * ## Images and colors
+ * ## Textures and colors
  *
  * - General color representation:
  *   - @ref Luna::ColorRgb "ColorRgb" - General RGBA color, using floats for each component.
