@@ -1,4 +1,5 @@
 .devcontainer
+.vscode
 build
 build-*
 docs/doxygen
