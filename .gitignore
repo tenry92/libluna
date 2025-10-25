@@ -1,3 +1,4 @@
+.devcontainer
 build
 build-*
 docs/doxygen
