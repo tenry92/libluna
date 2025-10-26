@@ -18,36 +18,45 @@ A very basic program based on libluna looks like this:
 ```cpp
 #include <libluna/Application.hpp>
 
-class GameApp : public Luna::Application {
+class ExampleApp : public Luna::Application {
   public:
   using Application::Application;
 
   protected:
-  void init() override final {
-    // Create a canvas.
-    // On desktop, this simply creates a window with the desired dimensions.
-    mCanvas = this->makeCanvas({800, 600});
+  void init() override {
+    // Allocate a canvas and set the display mode.
+    // On desktop, this creates a window with the desired dimensions.
+    mCanvas = allocCanvas();
+    mCanvas->setDisplayMode({
+      Luna::Vector2i{800, 600}, // resolution
+      false,                    // fullscreen
+      getDefaultVideoDriver()
+    });
 
-    // Choose default video driver (can be changed via command line).
-    mCanvas->setVideoDriver(this->getDefaultVideoDriver());
+    // Set a background color for the canvas to light blue.
+    mCanvas->setBackgroundColor(Luna::ColorRgb{0.f, 0.5f, 1.f});
 
-    // The stage is where all the sprites and models will be.
-    // The same stage can be displayed on different canvases.
-    // Tell the canvas to use the given stage for rendering.
-    mCanvas->setStage(&mStage);
+    // Assign the stage this camera shall capture.
+    // The stage is where you will add all the 2D and 3D objects.
+    // The same stage can be captured by different cameras.
+    mCamera.setStage(&mStage);
+
+    // Assign the 2D camera this canvas shall use for rendering.
+    mCanvas->setCamera2d(mCamera);
   }
 
-  void update(float deltaTime) override final {
+  void update(float deltaTime) override {
     // Perform game logic update here
   }
 
   private:
-  Luna::Canvas* mCanvas;
+  Luna::Canvas* mCanvas{nullptr};
+  Luna::Camera2d mCamera;
   Luna::Stage mStage;
 };
 
 int main(int argc, char** argv) {
-  GameApp app(argc, argv);
+  ExampleApp app(argc, argv);
 
   return app.run();
 }

@@ -105,20 +105,18 @@
  *     // create a canvas (window) for rendering
  *     mCanvas = app.makeCanvas(800, 600);
  *     mCanvas->setDisplayMode({
- *       {800, 600},                 // resolution
- *       false,                      // fullscreen
- *       app.getDefaultVideoDriver() // video driver
+ *       {800, 600},             // resolution
+ *       false,                  // fullscreen
+ *       getDefaultVideoDriver() // video driver
  *     });
  *
- *     // define a sprite
- *     auto sprite = Luna::Sprite::make();
- *     sprite->setPosition({16, 32});
- *     sprite->setImage(...)
+ *     mCamera.setStage(&mStage);
+ *     mCanvas->setCamera2d(mCamera);
  *
- *     // create a stage, add the sprite to it and assign it to the canvas
- *     auto stage = std::make_shared<Luna::Stage>();
- *     stage->add(sprite);
- *     canvas->setStage(stage);
+ *     // define a sprite
+ *     Luna::Sprite* sprite = mStage.allocSprite();
+ *     sprite->setPosition({16, 32});
+ *     sprite->setTexture(0);
  *   }
  *
  *   void update(float deltaTime) override {
@@ -127,9 +125,11 @@
  *
  *   private:
  *   Canvas* mCanvas;
+ *   Camera2d mCamera;
+ *   Stage mStage;
  * }
  *
- * int main(int argc, char **argv) {
+ * int main(int argc, char** argv) {
  *   GameApp app(argc, argv);
  *
  *   return app.run();
