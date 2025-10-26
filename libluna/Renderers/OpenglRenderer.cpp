@@ -351,15 +351,15 @@ void OpenglRenderer::renderTexture(
   Rectf crop = {0.f, 0.f, 1.f, 1.f};
 
   if (info->crop.area() > 0) {
-    auto tetureSize = getTextureSize(info->textureId);
+    auto textureSize = info->gpuTexture->size;
     crop.x =
-      static_cast<float>(info->crop.x) / static_cast<float>(tetureSize.width);
+      static_cast<float>(info->crop.x) / static_cast<float>(textureSize.width);
     crop.y =
-      static_cast<float>(info->crop.y) / static_cast<float>(tetureSize.height);
+      static_cast<float>(info->crop.y) / static_cast<float>(textureSize.height);
     crop.width = static_cast<float>(info->crop.width) /
-                 static_cast<float>(tetureSize.width);
+                 static_cast<float>(textureSize.width);
     crop.height = static_cast<float>(info->crop.height) /
-                  static_cast<float>(tetureSize.height);
+                  static_cast<float>(textureSize.height);
   }
 
   GL::SpriteBuffer spriteBuffer(crop, info->size, !mUsingFramebuffer);

@@ -302,6 +302,7 @@ void CommonRenderer::render2d(
           RenderTextureInfo info;
           auto& gpuTexture = mGpuTextureSlotMapping.at(textureSlot);
 
+          info.gpuTexture = &gpuTexture;
           info.textureId = gpuTexture.id;
           info.size = gpuTexture.size;
           info.position =
@@ -337,6 +338,7 @@ void CommonRenderer::render2d(
               }
 
               RenderTextureInfo info;
+              info.gpuTexture = &gpuTexture;
               info.textureId = gpuTexture.id;
               info.crop = {
                 tile % tileset->getColumns() * tileset->getTileSize(),
@@ -375,12 +377,13 @@ void CommonRenderer::render2d(
               continue;
             }
 
-            if (cp != ' ' && glyph->textureId != 0 && 
-                mGpuTextureSlotMapping.find(glyph->textureId) != mGpuTextureSlotMapping.end()) {
+            if (cp != ' ' &&
+                mGpuTextureSlotMapping.find(glyph->textureSlot) != mGpuTextureSlotMapping.end()) {
               RenderTextureInfo info;
 
-              auto& gpuTexture = mGpuTextureSlotMapping.at(glyph->textureId);
+              auto& gpuTexture = mGpuTextureSlotMapping.at(glyph->textureSlot);
 
+              info.gpuTexture = &gpuTexture;
               info.textureId = gpuTexture.id;
               info.position =
                 Vector2i(static_cast<int>(x), static_cast<int>(y)) +

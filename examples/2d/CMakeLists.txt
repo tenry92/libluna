@@ -1,5 +1,3 @@
 add_subdirectory(sprite)
 add_subdirectory(anim_sprite_32bpp)
-# add_subdirectory(sprite_16bpp)
-# add_subdirectory(sprite_32bpp)
-# add_subdirectory(var_text)
+add_subdirectory(var_text)

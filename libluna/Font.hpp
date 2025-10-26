@@ -14,7 +14,7 @@ namespace Luna {
     public:
     struct Glyph {
       String::CodePoint codePoint;
-      int textureId;
+      int textureSlot;
       Recti crop;
       Vector2i offset;
       int advance;

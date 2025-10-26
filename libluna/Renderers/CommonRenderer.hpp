@@ -44,6 +44,10 @@ namespace Luna {
      * @brief This holds information about how to render a 2D texture.
      */
     struct RenderTextureInfo {
+      const GpuTexture* gpuTexture;
+
+      const GpuSubTexture* gpuSubTexture;
+
       /**
        * @brief The internal texture ID to render.
        */

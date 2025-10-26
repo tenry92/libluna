@@ -1,10 +1,18 @@
 #include <cstring>
 
-#include <libgfx/libgfx.h>
-
 #include <libluna/Application.hpp>
 #include <libluna/Color.hpp>
+#include <libluna/Filesystem/FileReader.hpp>
+#include <libluna/Logger.hpp>
 #include <libluna/ResourceReader.hpp>
+#include <libluna/Texture.hpp>
+#include <libluna/Vector.hpp>
+
+#include "../../common.hpp"
+
+extern "C" {
+#include "bmfont.h"
+}
 
 #ifdef __SWITCH__
 #define CANVAS_WIDTH 1920
@@ -17,67 +25,106 @@
 #define CANVAS_HEIGHT 600
 #endif
 
+#define NUM_FRAMES 23
+#define TEX_BASE_SLOT_32BPP 0
+#define TEX_BASE_SLOT_24BPP (TEX_BASE_SLOT_32BPP + NUM_FRAMES)
+#define TEX_BASE_SLOT_16BPP (TEX_BASE_SLOT_24BPP + NUM_FRAMES)
+
 using namespace std;
 using namespace Luna;
+using namespace Luna::Filesystem;
 
-static int readFromResource(void *dest, size_t size, void *userData) {
-  auto *reader = reinterpret_cast<ResourceReader *>(userData);
+#ifdef __SWITCH__
+static const char* assetsPath = "romfs:/assets";
+#elif defined(N64)
+static const char* assetsPath = "rom:/assets";
+#else
+static const char* assetsPath = "data/assets";
+#endif
 
-  return reader->read(reinterpret_cast<uint8_t *>(dest), 1, size);
-}
-
-class GfxFontLoader {
+class ExampleApp : public Application {
   public:
-  GfxFontLoader(const String &assetName) : mAssetName(assetName) {}
+  using Application::Application;
 
-  FontPtr operator()() {
-    auto reader = ResourceReader::make(mAssetName.c_str());
-    auto gfx = libgfx_loadImageFromCallback(readFromResource, reader.get());
+  protected:
+  void init() override {
+    mCanvas = allocCanvas();
+    mCanvas->setDisplayMode({
+      Vector2i{CANVAS_WIDTH, CANVAS_HEIGHT}, // resolution
+      false,                                 // fullscreen
+      getDefaultVideoDriver()
+    });
+    mCanvas->setBackgroundColor(ColorRgb{0.f, 0.5f, 1.f});
 
-    auto font = Font::make();
-    font->setBaseLine(gfx->font.baseLine);
-    font->setLineHeight(gfx->font.lineHeight);
-
-    for (int i = 0; i < gfx->numCharacters; ++i) {
-      auto gfxCh = &gfx->characters[i];
-      auto frameset = &gfx->framesets[gfxCh->frameIndex];
-
-      auto ch = font->makeCharForCodePoint(gfxCh->codePoint);
-
-      if (frameset->width > 0 && frameset->height > 0) {
-        ch->image = Image(32, {frameset->width, frameset->height});
-        memcpy(ch->image.getData(), frameset->data, ch->image.getByteCount());
-      }
-
-      ch->offset = Vector2i(gfxCh->xOffset, gfxCh->yOffset);
-      ch->advance = gfxCh->advance;
-    }
-
-    libgfx_freeGfx(gfx);
-
-    return font;
+    mCamera.setStage(&mStage);
+    mCanvas->setCamera2d(mCamera);
   }
 
+  void update(float deltaTime) override {
+    mTime += deltaTime;
+
+    if (!mTexturesLoaded) {
+      loadTextures();
+
+      Text* mText = mStage.allocText();
+      mText->setFont(&mFont);
+      mText->setPosition(Vector2i{24, 24});
+      mText->setContent("Welcome text!\nThis is a demonstration\nfor rendering text!");
+
+      mTexturesLoaded = true;
+    }
+  }
+
+  void handleButtonEvent(const ButtonEvent& event) override {}
+
   private:
-  String mAssetName;
+  void loadTextures() {
+    auto fileReader = FileReader::make(getAssetsPath().cd("font.fnt"));
+    std::vector<char> fntText(fileReader->getSize() + 1);
+    fileReader->read(fntText.data(), fileReader->getSize());
+    fntText[fileReader->getSize()] = '\0';
+
+    BMFont* bmFont = parseBMFont(fntText.data());
+
+    mFont.setLineHeight(bmFont->common.lineHeight);
+    mFont.setBaseLine(bmFont->common.base);
+
+    mFontTextures.resize(bmFont->common.pages);
+
+    for (int i = 0; i < bmFont->common.pages; ++i) {
+      String pageFile = String(bmFont->pages[i].file);
+      loadTexture(getAssetsPath().cd(pageFile), mFontTextures[i]);
+      mCanvas->uploadTexture(i, &mFontTextures[i]);
+    }
+
+    for (int i = 0; i < bmFont->charCount; ++i) {
+      BMFontChar& bmChar = bmFont->chars[i];
+
+      Font::Glyph* glyph = mFont.makeGlyphForCodePoint(static_cast<String::CodePoint>(bmChar.id));
+      glyph->textureSlot = bmChar.page;
+      glyph->crop = Recti{
+        bmChar.x,
+        bmChar.y,
+        bmChar.width,
+        bmChar.height
+      };
+      glyph->offset = Vector2i{bmChar.xoffset, bmChar.yoffset};
+      glyph->advance = bmChar.xadvance;
+    }
+  }
+
+  bool mTexturesLoaded{false};
+  Canvas* mCanvas{nullptr};
+  Stage mStage;
+  Camera2d mCamera;
+  Font mFont;
+  std::vector<Texture> mFontTextures;
+  double mTime{0.f};
 };
 
-int main(int argc, char **argv) {
-  Application app(argc, argv);
-
-  shared_ptr<Canvas> canvas;
-
-  app.whenReady([&]() {
-    canvas = app.makeCanvas({CANVAS_WIDTH, CANVAS_HEIGHT});
-    canvas->setVideoDriver(app.getDefaultVideoDriver());
-    canvas->setBackgroundColor({0.0f, 0.9f, 0.6f, 1.0f});
-
-    auto stage = make_shared<Stage>();
-    auto text = stage->createText();
-    text->setFont(make_shared<Resource<Font>>(GfxFontLoader("font.gfx")));
-    text->setContent("Welcome text!\nThis is a demonstration\nfor rendering text!");
-    canvas->setStage(stage);
-  });
+int main(int argc, char** argv) {
+  ExampleApp app(argc, argv);
+  app.setAssetsPath(assetsPath);
 
   return app.run();
 }

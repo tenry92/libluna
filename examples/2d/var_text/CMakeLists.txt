@@ -1,15 +1,22 @@
 include(${PROJECT_SOURCE_DIR}/cmake/utils.cmake)
 
-set(ASSETS_INPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/assets")
-set(DATA_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/data")
-set(ASSETS_OUTPUT_PATH "${DATA_OUTPUT_PATH}/assets")
-
-luna_build_assets(
-  "font.txt" "font"
+add_custom_target(copy_assets_var_text ALL
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/data/assets
+  COMMAND ${CMAKE_COMMAND} -E copy
+    ${CMAKE_SOURCE_DIR}/assets/font.bmp
+    ${CMAKE_CURRENT_BINARY_DIR}/data/assets/font.bmp
+  COMMAND ${CMAKE_COMMAND} -E copy
+    ${CMAKE_SOURCE_DIR}/assets/font.fnt
+    ${CMAKE_CURRENT_BINARY_DIR}/data/assets/font.fnt
+  COMMENT "Copying asset files to build directory"
 )
 
-add_executable(var_text main.cpp)
-add_dependencies(var_text luna gfx)
-target_link_libraries(var_text PRIVATE luna gfx)
+add_executable(var_text main.cpp bmfont.h bmfont.c)
+
+add_dependencies(var_text luna)
+target_link_libraries(var_text PRIVATE luna)
+
+add_dependencies(var_text copy_assets_var_text)
 set_property(TARGET var_text PROPERTY ROMFS "${DATA_OUTPUT_PATH}")
+
 luna_make_rom(var_text)
