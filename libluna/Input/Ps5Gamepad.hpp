@@ -1,6 +1,11 @@
 #pragma once
 
 namespace Luna::Input {
+  /**
+   * @brief Provides enum definitions for PlayStation 5 gamepad buttons and axes.
+   *
+   * @ingroup input
+   */
   class Ps5Gamepad {
     public:
     enum Button {

@@ -4,7 +4,6 @@
 
 #include <libluna/Color.hpp>
 #include <libluna/Palette.hpp>
-#include <libluna/Resource.hpp>
 #include <libluna/Vector.hpp>
 
 namespace Luna {

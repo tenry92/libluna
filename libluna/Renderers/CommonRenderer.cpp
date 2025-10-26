@@ -133,13 +133,6 @@ void CommonRenderer::clearBackground([[maybe_unused]] ColorRgb color) {
   // stub
 }
 
-bool CommonRenderer::sliceTexture(
-  [[maybe_unused]] Texture* texture, [[maybe_unused]] std::vector<Texture>& slices,
-  [[maybe_unused]] Vector2i& sliceCount
-) {
-  return false;
-}
-
 void CommonRenderer::createShape([[maybe_unused]] int id) {
   // stub
 }

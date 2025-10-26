@@ -5,6 +5,11 @@
 #include <libluna/Vector.hpp>
 
 namespace Luna::Input {
+  /**
+   * @brief Represents a Nintendo Switch Pro gamepad input device.
+   *
+   * @ingroup input input_devices
+   */
   class SwitchProGamepadDevice {
     public:
     SwitchProGamepadDevice(const SwitchProGamepadState* state);

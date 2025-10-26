@@ -11,7 +11,7 @@ namespace Luna {
   /**
    * @brief A 2D text.
    *
-   * @ingroup drawables2d
+   * @ingroup drawables2d canvas
    */
   class Text final : public Drawable2d {
     public:

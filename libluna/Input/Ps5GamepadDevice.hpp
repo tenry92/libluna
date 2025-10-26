@@ -5,6 +5,11 @@
 #include <libluna/Vector.hpp>
 
 namespace Luna::Input {
+  /**
+   * @brief Represents a PlayStation 5 gamepad input device.
+   *
+   * @ingroup input input_devices
+   */
   class Ps5GamepadDevice {
     public:
     Ps5GamepadDevice(const Ps5GamepadState* state);

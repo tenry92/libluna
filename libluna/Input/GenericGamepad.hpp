@@ -1,6 +1,13 @@
 #pragma once
 
 namespace Luna::Input {
+  /**
+   * @brief Provides enum definitions for a generic gamepad layout.
+   *
+   * This device acts as an adapter to specific gamepad implementations.
+   *
+   * @ingroup input
+   */
   class GenericGamepad {
     public:
     enum Button {

@@ -103,10 +103,6 @@ static void printArguments(const std::vector<String>& args) {
   }
 }
 
-void Application::handleButtonEvent(const ButtonEvent& event) {
-  mHotkeysManager.handleButtonEvent(event);
-}
-
 void Application::executeKeyboardShortcuts() {
   for (auto&& canvas : mCanvases) {
     if (mHotkeysManager.isButtonPressed("Toggle Debugger")) {
@@ -246,13 +242,13 @@ void Application::processEvents() {
         auto keycodeName = Internal::Keyboard::sdlKeycodeToName(event.key.keysym.sym);
 
         if (!keycodeName.isEmpty()) {
-          handleButtonEvent(ButtonEvent(keycodeName, true));
+          mHotkeysManager.handleButtonEvent(ButtonEvent(keycodeName, true));
         }
 
         auto scancodeName = Internal::Keyboard::sdlScancodeToName(event.key.keysym.scancode);
 
         if (!scancodeName.isEmpty()) {
-          handleButtonEvent(ButtonEvent(scancodeName, true));
+          mHotkeysManager.handleButtonEvent(ButtonEvent(scancodeName, true));
         }
 
         break;
@@ -264,13 +260,13 @@ void Application::processEvents() {
         auto keycodeName = Internal::Keyboard::sdlKeycodeToName(event.key.keysym.sym);
 
         if (!keycodeName.isEmpty()) {
-          handleButtonEvent(ButtonEvent(keycodeName, false));
+          mHotkeysManager.handleButtonEvent(ButtonEvent(keycodeName, false));
         }
 
         auto scancodeName = Internal::Keyboard::sdlScancodeToName(event.key.keysym.scancode);
 
         if (!scancodeName.isEmpty()) {
-          handleButtonEvent(ButtonEvent(scancodeName, false));
+          mHotkeysManager.handleButtonEvent(ButtonEvent(scancodeName, false));
         }
 
         break;
@@ -320,77 +316,77 @@ void Application::processEvents() {
   auto pressed = joypad_get_buttons_pressed(JOYPAD_PORT_1);
 
   if (pressed.z) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/Z", true));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/Z", true));
   }
 
   if (pressed.d_up) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/DPadUp", true));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/DPadUp", true));
   }
 
   if (pressed.d_down) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/DPadDown", true));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/DPadDown", true));
   }
 
   if (pressed.d_left) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/DPadLeft", true));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/DPadLeft", true));
   }
 
   if (pressed.d_right) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/DPadRight", true));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/DPadRight", true));
   }
 
   if (pressed.c_up) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/CUp", true));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/CUp", true));
   }
 
   if (pressed.c_down) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/CDown", true));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/CDown", true));
   }
 
   if (pressed.c_left) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/CLeft", true));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/CLeft", true));
   }
 
   if (pressed.c_right) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/CRight", true));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/CRight", true));
   }
 
   auto released = joypad_get_buttons_released(JOYPAD_PORT_1);
 
   if (released.z) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/Z", false));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/Z", false));
   }
 
   if (released.d_up) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/DPadUp", false));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/DPadUp", false));
   }
 
   if (released.d_down) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/DPadDown", false));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/DPadDown", false));
   }
 
   if (released.d_left) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/DPadLeft", false));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/DPadLeft", false));
   }
 
   if (released.d_right) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/DPadRight", false));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/DPadRight", false));
   }
 
   if (released.c_up) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/CUp", false));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/CUp", false));
   }
 
   if (released.c_down) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/CDown", false));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/CDown", false));
   }
 
   if (released.c_left) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/CLeft", false));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/CLeft", false));
   }
 
   if (released.c_right) {
-    handleButtonEvent(ButtonEvent("Gamepad/N64/CRight", false));
+    mHotkeysManager.handleButtonEvent(ButtonEvent("Gamepad/N64/CRight", false));
   }
 #endif
 }

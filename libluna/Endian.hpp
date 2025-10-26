@@ -2,6 +2,11 @@
 
 #include <cstdint>
 
+/**
+ * @brief Utilities for handling endianness.
+ *
+ * @ingroup system
+ */
 namespace Luna::Endian {
   enum Endian { Little, Big };
 
@@ -10,6 +15,9 @@ namespace Luna::Endian {
   //   return *reinterpret_cast<const uint8_t *>(&value) == 0x01 ? Endian::Big : Endian::Little;
   // }
 
+  /**
+   * @brief Get the system's endianness at compile time.
+   */
   constexpr Endian getEndian() {
 #ifdef N64
     return Endian::Big;
@@ -18,6 +26,11 @@ namespace Luna::Endian {
 #endif
   }
 
+  /**
+   * @brief Swap the endianness of a value.
+   *
+   * @param value The value to swap.
+   */
   template <typename T> T swapEndian(T value) {
     if constexpr (sizeof(T) == 1) {
       return value;
@@ -36,6 +49,11 @@ namespace Luna::Endian {
     }
   }
 
+  /**
+   * @brief Convert a value from little-endian to the system's endianness.
+   *
+   * If the system is little-endian, the value is returned as-is.
+   */
   template <typename T> T fromLittleEndian(T value) {
     if constexpr (getEndian() == Endian::Little) {
       return value;
@@ -44,6 +62,11 @@ namespace Luna::Endian {
     }
   }
 
+  /**
+   * @brief Convert a value from big-endian to the system's endianness.
+   *
+   * If the system is big-endian, the value is returned as-is.
+   */
   template <typename T> T fromBigEndian(T value) {
     if constexpr (getEndian() == Endian::Big) {
       return value;

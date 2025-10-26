@@ -5,6 +5,11 @@
 #include <libluna/Vector.hpp>
 
 namespace Luna::Input {
+  /**
+   * @brief Represents a Nintendo 3DS gamepad input device.
+   *
+   * @ingroup input input_devices
+   */
   class N3dsGamepadDevice {
     public:
     N3dsGamepadDevice(const N3dsGamepadState* state);

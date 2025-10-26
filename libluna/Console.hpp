@@ -6,12 +6,14 @@
 
 namespace Luna {
   /**
-   * \brief Add support for standard output and special functions such as
+   * @brief Add support for standard output and special functions such as
    * changing the color and initializing on video game consoles.
+   *
+   * @ingroup system
    */
   namespace Console {
     /**
-     * \brief Available terminal colors.
+     * @brief Available terminal colors.
      *
      * On Linux, there is only one brightness for the background, for example
      * red equals darkRed.
@@ -73,12 +75,12 @@ namespace Luna {
     }
 
     /**
-     * \brief Set foreground and background color.
+     * @brief Set foreground and background color.
      */
     void setColor(Color fgColor, Color bgColor = black);
 
     /**
-     * \brief Reset foreground and background color.
+     * @brief Reset foreground and background color.
      */
     void resetColor();
   } // namespace Console

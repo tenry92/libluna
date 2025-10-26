@@ -5,6 +5,11 @@
 #include <libluna/Input/N3dsGamepad.hpp>
 
 namespace Luna::Input {
+  /**
+   * @brief Represents the state of a Nintendo 3DS gamepad.
+   *
+   * @ingroup input
+   */
   struct N3dsGamepadState {
     std::array<bool, static_cast<std::size_t>(N3dsGamepad::Button::kPower) + 1> buttonStates{};
     std::array<float, static_cast<std::size_t>(N3dsGamepad::Axis::kStickY) + 1> axisStates{};

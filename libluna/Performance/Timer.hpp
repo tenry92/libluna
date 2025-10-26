@@ -4,7 +4,9 @@
 
 namespace Luna::Performance {
   /**
-   * \brief Measure time between two locations of code.
+   * @brief Measure time between two locations of code.
+   *
+   * @ingroup system
    */
   class Timer {
     public:
@@ -12,14 +14,14 @@ namespace Luna::Performance {
     ~Timer();
 
     /**
-     * \brief Start timer.
+     * @brief Start timer.
      */
     void start();
 
     /**
-     * \brief Get elapsed time since last \c start() or \c elapse() .
+     * @brief Get elapsed time since last @c start() or @c elapse() .
      *
-     * \return Elapsed time in seconds.
+     * @return Elapsed time in seconds.
      */
     double elapse();
 

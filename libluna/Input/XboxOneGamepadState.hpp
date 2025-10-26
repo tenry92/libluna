@@ -5,6 +5,11 @@
 #include <libluna/Input/XboxOneGamepad.hpp>
 
 namespace Luna::Input {
+  /**
+   * @brief Represents the state of an Xbox One gamepad.
+   *
+   * @ingroup input
+   */
   struct XboxOneGamepadState {
     std::array<bool, static_cast<std::size_t>(XboxOneGamepad::Button::kDpadRight) + 1> buttonStates{};
     std::array<float, static_cast<std::size_t>(XboxOneGamepad::Axis::kRightTriggerAxis) + 1> axisStates{};

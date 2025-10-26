@@ -5,6 +5,11 @@
 #include <libluna/Input/N64Gamepad.hpp>
 
 namespace Luna::Input {
+  /**
+   * @brief Represents the state of a Nintendo 64 gamepad.
+   *
+   * @ingroup input
+   */
   struct N64GamepadState {
     std::array<bool, static_cast<std::size_t>(N64Gamepad::Button::kCRight) + 1> buttonStates{};
     std::array<float, static_cast<std::size_t>(N64Gamepad::Axis::kStickY) + 1> axisStates{};

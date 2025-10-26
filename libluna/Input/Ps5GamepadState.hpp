@@ -5,6 +5,11 @@
 #include <libluna/Input/Ps5Gamepad.hpp>
 
 namespace Luna::Input {
+  /**
+   * @brief Represents the state of a PlayStation 5 gamepad.
+   *
+   * @ingroup input
+   */
   struct Ps5GamepadState {
     std::array<bool, static_cast<std::size_t>(Ps5Gamepad::Button::kMute) + 1> buttonStates{};
     std::array<float, static_cast<std::size_t>(Ps5Gamepad::Axis::kR2Axis) + 1> axisStates{};

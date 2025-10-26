@@ -10,7 +10,9 @@
 
 namespace Luna::Performance {
   /**
-   * \brief Measure average ticks per second and tick duration.
+   * @brief Measure average ticks per second and tick duration.
+   *
+   * @ingroup system
    */
   class Ticker {
     public:
@@ -18,15 +20,15 @@ namespace Luna::Performance {
     ~Ticker();
 
     /**
-     * \brief Do a tick.
+     * @brief Do a tick.
      *
      * This should happen exactly once per cycle.
      *
-     * Use a following \c measure() to measure the time elapsed between last
-     * \c tick() and \c measure() calls.
+     * Use a following @c measure() to measure the time elapsed between last
+     * @c tick() and @c measure() calls.
      *
-     * \par Example
-     * \code{.cpp}
+     * @par Example
+     * @code{.cpp}
      * while (true) {
      *   ticker.tick();
      *   updateObjects();
@@ -35,25 +37,25 @@ namespace Luna::Performance {
      *   auto averageTimePerTick = ticker.getTickDuration();
      *   auto ticksPerSecond = ticker.getTicksPerSecond();
      * }
-     * \endcode
+     * @endcode
      */
     void tick();
 
     /**
-     * \brief Measure time elapsed since last \c tick() call.
+     * @brief Measure time elapsed since last @c tick() call.
      *
-     * Use \c getTickDuration() to get average elapsed time per tick.
+     * Use @c getTickDuration() to get average elapsed time per tick.
      */
     void measure();
 
     /**
-     * \brief Get average duration between \c tick() and \c measure() calls in
+     * @brief Get average duration between @c tick() and @c measure() calls in
      * seconds.
      */
     float getTickDuration() const;
 
     /**
-     * \brief Get average duration between two \c tick() calls.
+     * @brief Get average duration between two @c tick() calls.
      */
     float getTicksPerSecond() const;
 

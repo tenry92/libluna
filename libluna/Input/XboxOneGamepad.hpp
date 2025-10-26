@@ -1,6 +1,11 @@
 #pragma once
 
 namespace Luna::Input {
+  /**
+   * @brief Provides enum definitions for Xbox One gamepad buttons and axes.
+   *
+   * @ingroup input
+   */
   class XboxOneGamepad {
     public:
     enum Button {

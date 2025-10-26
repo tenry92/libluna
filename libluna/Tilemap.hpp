@@ -11,7 +11,7 @@ namespace Luna {
   /**
    * @brief A 2D tilemap.
    *
-   * @ingroup drawables2d
+   * @ingroup drawables2d canvas
    */
   class Tilemap final : public Drawable2d {
     public:

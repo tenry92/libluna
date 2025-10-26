@@ -61,6 +61,12 @@ namespace Luna {
   };
 
   /**
+   * @defgroup canvas Canvas
+   *
+   * @brief Everything related to Canvas and Stage.
+   */
+
+  /**
    * @brief Abstraction for windows (computer) and fullscreen displays.
    *
    * A canvas simply provides the interface to render graphics and receive input.
@@ -70,6 +76,8 @@ namespace Luna {
    *
    * The same stage can be assigned to multiple canvases, for example to render
    * the same screen using different renderers or cameras.
+   *
+   * @ingroup canvas
    */
   class Canvas {
     public:

@@ -8,6 +8,11 @@
 namespace Luna {
   class Stage;
 
+  /**
+   * @brief A 3D camera for rendering a stage.
+   *
+   * @ingroup canvas
+   */
   class Camera3d {
     public:
     Camera3d();

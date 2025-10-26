@@ -6,7 +6,15 @@
 
 namespace Luna {
   /**
+   * @defgroup system System
+   *
+   * @brief General low-level system information and utilities.
+   */
+
+  /**
    * @brief Get information about system resources and capabilities.
+   *
+   * @ingroup system
    */
   namespace System {
     /**

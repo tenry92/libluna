@@ -5,6 +5,11 @@
 #include <libluna/Input/SwitchProGamepad.hpp>
 
 namespace Luna::Input {
+  /**
+   * @brief Represents the state of a Nintendo Switch Pro gamepad.
+   *
+   * @ingroup input
+   */
   struct SwitchProGamepadState {
     std::array<bool, static_cast<std::size_t>(SwitchProGamepad::Button::kCapture) + 1> buttonStates{};
     std::array<float, static_cast<std::size_t>(SwitchProGamepad::Axis::kRightStickY) + 1> axisStates{};

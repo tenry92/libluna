@@ -5,6 +5,11 @@
 #include <libluna/Vector.hpp>
 
 namespace Luna::Input {
+  /**
+   * @brief Represents an Xbox One gamepad input device.
+   *
+   * @ingroup input input_devices
+   */
   class XboxOneGamepadDevice {
     public:
     XboxOneGamepadDevice(const XboxOneGamepadState* state);

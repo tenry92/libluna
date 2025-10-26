@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 project(libluna
   VERSION 0.1.0.0
-  DESCRIPTION "Luna Game Engine"
+  DESCRIPTION "Luna Framework"
   LANGUAGES C CXX
 )
 
@@ -162,7 +162,6 @@ list(APPEND PUBLIC_HEADERS
   libluna/InputStream.hpp
   libluna/Palette.hpp
   libluna/Pool.hpp
-  libluna/Resource.hpp
   libluna/utf8.h
   ${CMAKE_CURRENT_BINARY_DIR}/libluna/config.h
   libs/imgui/imgui.h

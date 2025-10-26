@@ -4,7 +4,6 @@
 #include <libluna/Drawable2d.hpp>
 #include <libluna/Texture.hpp>
 #include <libluna/Palette.hpp>
-#include <libluna/Resource.hpp>
 #include <libluna/String.hpp>
 #include <libluna/Vector.hpp>
 
@@ -19,7 +18,7 @@ namespace Luna {
   /**
    * @brief A 2D sprite.
    *
-   * @ingroup drawables2d
+   * @ingroup drawables2d canvas
    */
   class Sprite final : public Drawable2d {
     public:
@@ -31,13 +30,7 @@ namespace Luna {
     int getTexture() const;
     ///@}
 
-    ///@{
-    void setPalette(ResourcePtr<Palette> palette);
-    ResourcePtr<Palette> getPalette() const;
-    ///@}
-
     private:
     int mTextureId{0};
-    std::shared_ptr<Resource<Palette>> mPalette;
   };
 } // namespace Luna

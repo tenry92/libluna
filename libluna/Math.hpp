@@ -8,6 +8,8 @@
 
 /**
  * @brief Additional math utilities.
+ *
+ * @ingroup system
  */
 namespace Luna::Math {
   constexpr double kPi = M_PI;

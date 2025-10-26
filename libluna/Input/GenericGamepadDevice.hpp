@@ -10,6 +10,11 @@
 #include <libluna/Vector.hpp>
 
 namespace Luna::Input {
+  /**
+   * @brief Represents a generic gamepad input device.
+   *
+   * @ingroup input input_devices
+   */
   class GenericGamepadDevice {
     public:
     using GamepadDeviceVariant = std::variant<

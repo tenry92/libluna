@@ -80,8 +80,6 @@ class ExampleApp : public Application {
     mSprite16bpp->setTexture(TEX_BASE_SLOT_16BPP + frameIndex);
   }
 
-  void handleButtonEvent(const ButtonEvent& event) override {}
-
   private:
   void loadTextures() {
     loadTexture(

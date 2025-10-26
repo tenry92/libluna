@@ -5,6 +5,11 @@
 #endif
 
 namespace Luna::Input {
+  /**
+   * @brief Provides enum definitions for keyboard keys.
+   *
+   * @ingroup input
+   */
   class Keyboard {
     public:
     enum Scancode {

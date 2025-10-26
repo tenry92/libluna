@@ -9,7 +9,6 @@ set(UNIT_TESTS
   InputManager
   # Matrix
   # ResourceReader
-  # Resource
   String
   System
   Vector

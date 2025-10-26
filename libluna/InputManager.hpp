@@ -68,6 +68,11 @@
  */
 
 namespace Luna {
+  /**
+   * @brief Manages input bindings and states.
+   *
+   * @deprecated Use methods from @ref Application to retrieve input devices.
+   */
   class InputManager {
     public:
     InputManager();

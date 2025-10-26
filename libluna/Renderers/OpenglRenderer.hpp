@@ -16,6 +16,11 @@
 #include <libluna/Renderers/CommonRenderer.hpp>
 
 namespace Luna {
+  /**
+   * @brief OpenGL renderer.
+   * 
+   * @ingroup renderers
+   */
   class OpenglRenderer : public CommonRenderer {
     public:
     OpenglRenderer();

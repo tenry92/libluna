@@ -22,6 +22,28 @@
 #endif
 
 namespace Luna {
+  /**
+   * @defgroup input Input
+   *
+   * @brief User input handling classes and functions.
+   *
+   * Use @ref Application to get access to input devices such as keyboards
+   * and gamepads. Every input device is represented by an @ref InputDevice
+   * instance. Use the `is*()` and `get*()` methods to retrieve the actual
+   * underlying device implementation.
+   */
+
+  /**
+   * @defgroup input_devices Input Devices
+   *
+   * @brief Specific input device implementations.
+   */
+
+  /**
+   * @brief Represents a generic input device (keyboard or gamepad).
+   *
+   * @ingroup input input_devices
+   */
   class InputDevice {
     public:
 #ifdef N64

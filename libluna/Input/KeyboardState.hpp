@@ -10,6 +10,11 @@ namespace {
 }
 
 namespace Luna::Input {
+  /**
+   * @brief Represents the state of a keyboard.
+   *
+   * @ingroup input
+   */
   struct KeyboardState {
     std::array<bool, static_cast<std::size_t>(Keyboard::Scancode::kUnknown) + 1> keyStates{};
     std::array<bool, kLastKeycode - kFirstKeycode + 1> keycodeStates{};

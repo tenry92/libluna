@@ -1,8 +1,5 @@
 #pragma once
 
-#include <libluna/Resource.hpp>
-#include <libluna/Sprite.hpp>
-
 namespace Luna {
   class Material {
     public:

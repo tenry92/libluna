@@ -17,10 +17,8 @@ namespace Luna {
    * - info: general information on what is happening
    * - warn: non-critical incidents and exceptions
    * - error: critical incidends and exceptions; application should stop
-   */
-
-  /**
-   * @brief Logging class.
+   * 
+   * @ingroup system
    */
   class Logger {
     public:

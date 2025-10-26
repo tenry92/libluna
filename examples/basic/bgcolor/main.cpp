@@ -63,8 +63,6 @@ class ExampleApp : public Application {
     mCanvas->setBackgroundColor(baseColor);
   }
 
-  void handleButtonEvent(const ButtonEvent& event) override {}
-
   private:
   Canvas* mCanvas{nullptr};
   double mTime{0.f};

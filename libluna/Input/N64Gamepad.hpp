@@ -1,6 +1,11 @@
 #pragma once
 
 namespace Luna::Input {
+  /**
+   * @brief Provides enum definitions for Nintendo 64 gamepad buttons and axes.
+   *
+   * @ingroup input
+   */
   class N64Gamepad {
     public:
     enum Button {

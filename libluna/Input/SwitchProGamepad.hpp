@@ -1,6 +1,11 @@
 #pragma once
 
 namespace Luna::Input {
+  /**
+   * @brief Provides enum definitions for Nintendo Switch Pro gamepad buttons and axes.
+   *
+   * @ingroup input
+   */
   class SwitchProGamepad {
     public:
     enum Button {

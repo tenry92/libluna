@@ -66,34 +66,6 @@ void N64Renderer::clearBackground([[maybe_unused]] ColorRgb color) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-bool N64Renderer::sliceTexture(
-  Texture* texture, std::vector<Texture>& slices, Vector2i& sliceCount
-) {
-  const int tmemSize = 4096;
-
-  if (texture->getByteCount() <= tmemSize) {
-    return false;
-  }
-
-  Vector2i sliceSize = texture->getSize();
-  sliceSize.width = Math::previousPowerOfTwo(sliceSize.width);
-  sliceSize.height = Math::previousPowerOfTwo(sliceSize.height);
-
-  while (sliceSize.width * sliceSize.height * (texture->getBitsPerPixel() / 4) /
-           2 >
-         tmemSize) {
-    if (sliceSize.width > sliceSize.height) {
-      sliceSize.width /= 2;
-    } else {
-      sliceSize.height /= 2;
-    }
-  }
-
-  slices = texture->slice(sliceSize, sliceCount);
-
-  return true;
-}
-
 void N64Renderer::createFramebufferTexture([[maybe_unused]] uint16_t id, [[maybe_unused]] Vector2i size) {}
 
 void N64Renderer::resizeFramebufferTexture([[maybe_unused]] uint16_t id, [[maybe_unused]] Vector2i size) {}

@@ -1,6 +1,11 @@
 #pragma once
 
 namespace Luna::Input {
+  /**
+   * @brief Provides enum definitions for Nintendo DS gamepad buttons.
+   *
+   * @ingroup input
+   */
   class NdsGamepad {
     public:
     enum Button {

@@ -75,8 +75,6 @@ class ExampleApp : public Application {
     }
   }
 
-  void handleButtonEvent(const ButtonEvent& event) override {}
-
   private:
   void loadTextures() {
     auto fileReader = FileReader::make(getAssetsPath().cd("font.fnt"));

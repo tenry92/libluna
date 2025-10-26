@@ -11,6 +11,11 @@
 #include <libluna/Renderers/CommonRenderer.hpp>
 
 namespace Luna {
+  /**
+   * @brief Renderer for Nintendo 64.
+   * 
+   * @ingroup renderers
+   */
   class N64Renderer : public CommonRenderer {
     public:
     N64Renderer();
@@ -27,9 +32,6 @@ namespace Luna {
     Internal::GraphicsMetrics getMetrics() override;
 
     void clearBackground(ColorRgb color) override;
-    bool sliceTexture(
-      Texture* texture, std::vector<Texture>& slices, Vector2i& sliceCount
-    ) override;
     void createFramebufferTexture(uint16_t id, Vector2i size) override;
     void resizeFramebufferTexture(uint16_t id, Vector2i size) override;
     void destroyFramebufferTexture(uint16_t id) override;

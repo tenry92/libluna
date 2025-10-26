@@ -2,6 +2,7 @@
 
 #include <forward_list>
 #include <set>
+#include <unordered_map>
 #include <variant>
 #include <vector>
 
@@ -26,6 +27,8 @@ namespace Luna {
    * This class might not be suitable for certain specialized backends, for
    * example if the system renders sprites automatically and doesn't allow for
    * explicit draw commands.
+   *
+   * @ingroup renderers
    */
   class CommonRenderer : public AbstractRenderer {
     public:
@@ -108,16 +111,29 @@ namespace Luna {
     /**
      * @brief Declare a texture in the GPU texture mapping.
      *
+     * This should be called by implementations of @ref uploadTexture().
+     *
      * @p gpuTexture must be prepared with the texture and sub texture sizes.
      * Their IDs will be set in this method.
      *
      * @param slot The texture slot.
      * @param gpuTexture The GPU texture information.
+     *
+     * @see freeGpuTexture()
      */
     void declareGpuTexture(int slot, GpuTexture& gpuTexture);
 
     GpuTexture* getGpuTexture(int slot);
 
+    /**
+     * @brief Free the GPU texture mapping for the given slot.
+     *
+     * This should be called by implementations of @ref freeTexture().
+     *
+     * @param slot The texture slot.
+     *
+     * @see declareGpuTexture()
+     */
     void freeGpuTexture(int slot);
 
     virtual void startRender();
@@ -131,15 +147,6 @@ namespace Luna {
     virtual void resizeFramebufferTexture(uint16_t id, Vector2i size) = 0;
 
     virtual void destroyFramebufferTexture(uint16_t id) = 0;
-
-    /**
-     * @brief Slice a texture before loading to GPU.
-     *
-     * Returns true if the texture was sliced, false otherwise.
-     */
-    virtual bool sliceTexture(
-      Texture* texture, std::vector<Texture>& slices, Vector2i& sliceCount
-    );
 
     /**
      * @brief Draw a texture on the canvas.
@@ -159,11 +166,16 @@ namespace Luna {
      *
      * This may do nothing and the actual creation can be done later in
      * @ref loadMesh().
+     *
+     * @see destroyMesh()
+     * @see loadMesh()
      */
     virtual void createMesh(int id);
 
     /**
      * @brief Destroy a mesh for the provided ID.
+     *
+     * @see createMesh()
      */
     virtual void destroyMesh(int id);
 
@@ -172,6 +184,8 @@ namespace Luna {
      *
      * It is guaranteed that the given mesh ID was previously passed to
      * @ref createMesh().
+     *
+     * @see createMesh()
      */
     virtual void loadMesh(int id, std::shared_ptr<Mesh> mesh);
 

@@ -7,6 +7,11 @@
 namespace Luna {
   class Model;
 
+  /**
+   * @brief A 3D model consisting of a mesh and a material.
+   *
+   * @ingroup canvas
+   */
   class Model final {
     public:
     Model();

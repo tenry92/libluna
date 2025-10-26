@@ -3,6 +3,11 @@
 #include <libluna/Vector.hpp>
 
 namespace Luna {
+  /**
+   * @brief A 2D drawable object.
+   *
+   * @ingroup canvas
+   */
   class Drawable2d {
     public:
     Drawable2d();

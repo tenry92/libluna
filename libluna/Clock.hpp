@@ -6,6 +6,11 @@
 #include <chrono>
 #endif
 
+/**
+ * @brief High-resolution clock utilities.
+ *
+ * @ingroup system
+ */
 namespace Luna::Clock {
 #ifdef N64
   using TimePoint = long long;
@@ -22,12 +27,22 @@ namespace Luna::Clock {
 #endif
   }
 
+  /**
+   * @brief Initializes the clock system.
+   *
+   * This function is used internally by Luna.
+   *
+   * @internal
+   */
   inline void init() {
 #ifdef N64
     timer_init();
 #endif
   }
 
+  /**
+   * @brief Calculates the time span in seconds between two time points.
+   */
   inline double timeSpan(TimePoint start, TimePoint end) {
 #ifdef N64
     return static_cast<double>(end - start) / TICKS_PER_SECOND;

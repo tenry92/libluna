@@ -10,6 +10,8 @@
 namespace Luna {
   /**
    * @brief Get information about the current platform.
+   *
+   * @ingroup system
    */
   class Platform {
     public:

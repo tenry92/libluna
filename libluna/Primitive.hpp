@@ -7,8 +7,8 @@
 namespace Luna {
   /**
    * @brief A primitive shape.
-   * 
-   * @ingroup drawables2d
+   *
+   * @ingroup drawables2d canvas
    */
   class Primitive final : public Drawable2d {
     public:

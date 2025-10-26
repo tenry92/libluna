@@ -58,6 +58,8 @@ namespace Luna {
    * A stage can be assigned to multiple canvases. For example, if each canvas
    * uses a different renderer, the same stage can be viewed and tested from
    * different canvases.
+   *
+   * @ingroup canvas
    */
   class Stage {
     public:

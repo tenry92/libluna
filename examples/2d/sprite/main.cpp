@@ -88,8 +88,6 @@ class ExampleApp : public Application {
     mCanvas->setBackgroundColor(baseColor);
   }
 
-  void handleButtonEvent(const ButtonEvent& event) override {}
-
   private:
   void loadTextures() {
     generateTexture32bpp();

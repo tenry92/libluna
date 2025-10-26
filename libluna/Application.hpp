@@ -23,12 +23,11 @@
 #include <libluna/IntervalManager.hpp>
 #include <libluna/PathManager.hpp>
 #include <libluna/Pool.hpp>
-#include <libluna/Resource.hpp>
 #include <libluna/Sprite.hpp>
 #include <libluna/String.hpp>
 
 /**
- * @mainpage Luna Game Engine
+ * @mainpage Luna Framework
  *
  * ## Major classes
  *
@@ -42,7 +41,6 @@
  *
  * ## Resources
  *
- * - @ref Luna::Resource "Resource" - Resource loading abstraction.
  * - @ref Luna::Texture "Texture" - Container for storing 2D image data in RAM.
  * - @ref Luna::Font "Font"
  * - @ref Luna::Mesh "Mesh" - 3D mesh containing vertices and faces and more.
@@ -139,6 +137,9 @@
  * ```
  */
 
+/**
+ * @brief This is the main namespace for the Luna framework.
+ */
 namespace Luna {
   class ApplicationImpl;
 
@@ -247,8 +248,6 @@ namespace Luna {
     virtual void init() = 0;
 
     virtual void update(float deltaTime) = 0;
-
-    virtual void handleButtonEvent(const ButtonEvent& event);
 
     private:
     void executeKeyboardShortcuts();
