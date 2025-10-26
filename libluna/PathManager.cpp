@@ -21,7 +21,7 @@ void PathManager::detectProgramPath() {
   wchar_t selfPath[MAX_PATH] = {0};
   GetModuleFileNameW(nullptr, selfPath, MAX_PATH);
   mProgramPath = Path(selfPath);
-#elif defined(__SWITCH__) || defined(__3DS__) || defined(NDS) || defined(N64)
+#elif defined(__SWITCH__) || defined(__3DS__) || defined(__NDS__) || defined(N64)
   return;
 #else
   char selfPath[PATH_MAX];

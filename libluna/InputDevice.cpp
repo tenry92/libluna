@@ -19,7 +19,7 @@ N64GamepadDevice InputDevice::getN64Gamepad() {
 N3dsGamepadDevice InputDevice::getN3dsGamepad() {
   return std::get<N3dsGamepadDevice>(mDevice);
 }
-#elif defined(NDS)
+#elif defined(__NDS__)
 NdsGamepadDevice InputDevice::getNdsGamepad() {
   return std::get<NdsGamepadDevice>(mDevice);
 }

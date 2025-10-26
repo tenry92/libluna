@@ -6,7 +6,7 @@
 #include <switch.h>
 #endif
 
-#ifdef NDS
+#ifdef __NDS__
 #include <nds.h>
 #endif
 
@@ -135,7 +135,7 @@ void Application::mainLoop() {
       break;
     }
 #endif
-#ifdef NDS
+#ifdef __NDS__
     swiWaitForVBlank();
 #endif
 
@@ -184,7 +184,7 @@ void Application::mainLoop() {
       Console::update();
     }
 #endif
-#ifdef NDS
+#ifdef __NDS__
     Console::init();
     logError("{}", mRaisedErrorMessage.c_str());
     while (true) {
@@ -502,7 +502,7 @@ int Application::run() {
   mGamepadDevices = {
     InputDevice(Input::N3dsGamepadDevice(&mGamepadStates[0])),
   };
-#elif defined(NDS)
+#elif defined(__NDS__)
   mGamepadDevices = {
     InputDevice(Input::NdsGamepadDevice(&mGamepadStates[0])),
   };

@@ -28,7 +28,7 @@ Use these preprocessor macros to write platform-specific code:
 - `__linux__` - Linux platform
 - `__SWITCH__` - Nintendo Switch
 - `__3DS__` - Nintendo 3DS
-- `NDS` - Nintendo DS
+- `__NDS__` - Nintendo DS
 - `N64` - Nintendo 64
 
 ### Build Configuration
@@ -76,7 +76,7 @@ Platform-specific headers should be wrapped in appropriate `#ifdef` guards.
 Examples for platform-specific includes are:
 
 - `<windows.h>` (`_WIN32`)
-- `<nds.h>` (`NDS`)
+- `<nds.h>` (`__NDS__`)
 - `<3ds.h>` (`__3DS__`)
 - `<libdragon.h>` (`N64`)
 - `<switch.h>` (`__SWITCH__`)

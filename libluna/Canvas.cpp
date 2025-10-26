@@ -32,7 +32,7 @@
 #include <libluna/Renderers/OpenglRenderer.hpp>
 #endif
 
-#ifdef NDS
+#ifdef __NDS__
 #include <libluna/Renderers/NdsRenderer.hpp>
 #endif
 
@@ -392,7 +392,7 @@ void Canvas::setDisplayMode(DisplayMode mode) {
     createWindow(mode);
 
     logInfo("setting canvas video driver to {}", mode.videoDriver.c_str());
-#ifdef NDS
+#ifdef __NDS__
     mRenderer = std::make_unique<NdsRenderer>();
 #endif
 #ifdef N64

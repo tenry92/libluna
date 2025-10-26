@@ -52,7 +52,7 @@ target_include_directories(luna PUBLIC
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "NintendoDS")
-  add_compile_definitions(NDS)
+  add_compile_definitions(NDS __NDS__)
 endif()
 
 ################################################################################

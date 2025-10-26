@@ -80,7 +80,7 @@
  */
 
 namespace Luna {
-#if N64 || NDS
+#if N64 || __NDS__
   template <typename T> class Promise;
 
   template <typename T> class Future {
@@ -136,7 +136,7 @@ namespace Luna {
      */
     using LoaderType = std::function<ResultType()>;
 
-#if N64 || NDS
+#if N64 || __NDS__
     using FutureType = Future<ResultType>;
 
     using PromiseType = Promise<ResultType>;

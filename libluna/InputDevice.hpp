@@ -6,7 +6,7 @@
 #include <libluna/Input/N64GamepadDevice.hpp>
 #elif defined(__3DS__)
 #include <libluna/Input/N3dsGamepadDevice.hpp>
-#elif defined(NDS)
+#elif defined(__NDS__)
 #include <libluna/Input/NdsGamepadDevice.hpp>
 #else
 #include <libluna/Input/KeyboardDevice.hpp>
@@ -17,7 +17,7 @@
 #include <libluna/Input/GenericGamepadDevice.hpp>
 #endif
 
-#if !defined(N64) && !defined(__3DS__) && !defined(NDS)
+#if !defined(N64) && !defined(__3DS__) && !defined(__NDS__)
 #define LUNA_FLEXIBLE_INPUT
 #endif
 
@@ -28,7 +28,7 @@ namespace Luna {
     using InputDeviceVariant = std::variant<Input::N64GamepadDevice>;
 #elif defined(__3DS__)
     using InputDeviceVariant = std::variant<Input::N3dsGamepadDevice>;
-#elif defined(NDS)
+#elif defined(__NDS__)
     using InputDeviceVariant = std::variant<Input::NdsGamepadDevice>;
 #else
     using InputDeviceVariant = std::variant<
@@ -57,7 +57,7 @@ namespace Luna {
     Input::N64GamepadDevice getN64Gamepad();
 #elif defined(__3DS__)
     Input::N3dsGamepadDevice getN3dsGamepad();
-#elif defined(NDS)
+#elif defined(__NDS__)
     Input::NdsGamepadDevice getNdsGamepad();
 #else
     bool isKeyboard() const;

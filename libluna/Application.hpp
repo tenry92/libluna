@@ -276,7 +276,7 @@ namespace Luna {
 #elif defined(__3DS__)
     std::array<std::optional<InputDevice>, 1> mGamepadDevices;
     std::array<Input::N3dsGamepadState, 1> mGamepadStates;
-#elif defined(NDS)
+#elif defined(__NDS__)
     std::array<std::optional<InputDevice>, 1> mGamepadDevices;
     std::array<Input::NdsGamepadState, 1> mGamepadStates;
 #else

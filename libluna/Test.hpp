@@ -12,7 +12,7 @@
 #include <switch.h>
 #endif
 
-#ifdef NDS
+#ifdef __NDS__
 #include <nds.h>
 #endif
 
@@ -103,7 +103,7 @@ static int runTests() {
     Luna::Console::update();
   }
 #endif
-#ifdef NDS
+#ifdef __NDS__
   while (true) {
     swiWaitForVBlank();
     Luna::Console::update();
