@@ -92,14 +92,27 @@ class ExampleApp : public Application {
     for (int i = 0; i < bmFont->common.pages; ++i) {
       String pageFile = String(bmFont->pages[i].file);
       loadTexture(getAssetsPath().cd(pageFile), mFontTextures[i]);
+
+      // due to N64 texture size limits, we'll upload each glyph as a separate
+      // texture further below
+#ifndef N64
       mCanvas->uploadTexture(i, &mFontTextures[i]);
+#endif
     }
+
+#ifdef N64
+    mGlyphTextures.resize(bmFont->charCount);
+#endif
 
     for (int i = 0; i < bmFont->charCount; ++i) {
       BMFontChar& bmChar = bmFont->chars[i];
 
       Font::Glyph* glyph = mFont.makeGlyphForCodePoint(static_cast<String::CodePoint>(bmChar.id));
+#ifdef N64
+      glyph->textureSlot = i;
+#else
       glyph->textureSlot = bmChar.page;
+#endif
       glyph->crop = Recti{
         bmChar.x,
         bmChar.y,
@@ -108,6 +121,14 @@ class ExampleApp : public Application {
       };
       glyph->offset = Vector2i{bmChar.xoffset, bmChar.yoffset};
       glyph->advance = bmChar.xadvance;
+
+#ifdef N64
+      mGlyphTextures[i] = mFontTextures[bmChar.page].crop(
+        Vector2i{bmChar.width, bmChar.height},
+        Vector2i{bmChar.x, bmChar.y}
+      );
+      mCanvas->uploadTexture(glyph->textureSlot, &mGlyphTextures[i]);
+#endif
     }
   }
 
@@ -117,6 +138,9 @@ class ExampleApp : public Application {
   Camera2d mCamera;
   Font mFont;
   std::vector<Texture> mFontTextures;
+#ifdef N64
+  std::vector<Texture> mGlyphTextures;
+#endif
   double mTime{0.f};
 };
 

@@ -17,6 +17,6 @@ add_dependencies(var_text luna)
 target_link_libraries(var_text PRIVATE luna)
 
 add_dependencies(var_text copy_assets_var_text)
-set_property(TARGET var_text PROPERTY ROMFS "${DATA_OUTPUT_PATH}")
+set_property(TARGET var_text PROPERTY ROMFS "${CMAKE_CURRENT_BINARY_DIR}/data")
 
 luna_make_rom(var_text)
