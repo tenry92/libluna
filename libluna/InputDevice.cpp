@@ -12,15 +12,15 @@ int InputDevice::getIndex() const {
 }
 
 #ifdef N64
-N64GamepadDevice InputDevice::getN64Gamepad() {
+N64GamepadDevice InputDevice::getN64Gamepad() const {
   return std::get<N64GamepadDevice>(mDevice);
 }
 #elif defined(__3DS__)
-N3dsGamepadDevice InputDevice::getN3dsGamepad() {
+N3dsGamepadDevice InputDevice::getN3dsGamepad() const {
   return std::get<N3dsGamepadDevice>(mDevice);
 }
 #elif defined(__NDS__)
-NdsGamepadDevice InputDevice::getNdsGamepad() {
+NdsGamepadDevice InputDevice::getNdsGamepad() const {
   return std::get<NdsGamepadDevice>(mDevice);
 }
 #else

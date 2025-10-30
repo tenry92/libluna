@@ -76,11 +76,11 @@ namespace Luna {
     int getIndex() const;
 
 #ifdef N64
-    Input::N64GamepadDevice getN64Gamepad();
+    Input::N64GamepadDevice getN64Gamepad() const;
 #elif defined(__3DS__)
-    Input::N3dsGamepadDevice getN3dsGamepad();
+    Input::N3dsGamepadDevice getN3dsGamepad() const;
 #elif defined(__NDS__)
-    Input::NdsGamepadDevice getNdsGamepad();
+    Input::NdsGamepadDevice getNdsGamepad() const;
 #else
     bool isKeyboard() const;
     Input::KeyboardDevice getKeyboard() const;
