@@ -108,7 +108,7 @@ Texture Texture::toRgb16() {
   }
 }
 
-Texture Texture::crop(Vector2i size, Vector2i offset) {
+Texture Texture::crop(Vector2i size, Vector2i offset) const {
   auto maxSize = this->getSize() - offset;
   size = Vector2i(
     std::min(size.width, maxSize.width), std::min(size.height, maxSize.height)
@@ -130,7 +130,7 @@ Texture Texture::crop(Vector2i size, Vector2i offset) {
   return croppedTexture;
 }
 
-std::vector<Texture> Texture::slice(Vector2i maxSliceSize, Vector2i& sliceCount) {
+std::vector<Texture> Texture::slice(Vector2i maxSliceSize, Vector2i& sliceCount) const {
   std::vector<Texture> slices;
 
   // add 1 to round integer calculation up

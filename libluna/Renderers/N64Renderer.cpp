@@ -15,6 +15,50 @@
 
 using namespace Luna;
 
+constexpr int kTmemSize = 4096;
+
+namespace {
+  void uploadTextureData(GLuint textureId, const Texture* texture) {
+    GLenum inputFormat = GL_RGBA;
+    GLenum inputType = GL_UNSIGNED_SHORT_5_5_5_1_EXT;
+    GLenum internalFormat = GL_RGB5_A1;
+
+    if (texture->getBitsPerPixel() == 24) {
+      inputFormat = GL_RGB;
+      inputType = GL_UNSIGNED_BYTE;
+    } else if (texture->getBitsPerPixel() == 32) {
+      inputType = GL_UNSIGNED_INT_8_8_8_8_EXT;
+      internalFormat = GL_RGBA;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    // note: on N64, a texture size that's not a power of 2, must be clamped
+    if (!Math::isPowerOfTwo(texture->getWidth())) {
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    }
+
+    if (!Math::isPowerOfTwo(texture->getHeight())) {
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    }
+
+    glTexImage2D(
+      GL_TEXTURE_2D, 0,                         /* mipmap level */
+      internalFormat,                           /* internal format */
+      texture->getWidth(), texture->getHeight(), 0, /* format (legacy) */
+      inputFormat,                              /* input format */
+      inputType, texture->getData()
+    );
+    glTexParameteri(
+      GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+      texture->isInterpolated() ? GL_LINEAR : GL_NEAREST
+    );
+    glTexParameteri(
+      GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+      texture->isInterpolated() ? GL_LINEAR : GL_NEAREST
+    );
+  }
+}
+
 N64Renderer::N64Renderer() {
   mMetrics = std::make_shared<Internal::GraphicsMetrics>();
 }
@@ -104,54 +148,91 @@ void N64Renderer::uploadTexture(int slot, const Texture* texture) {
   GpuTexture gpuTexture;
   gpuTexture.size = texture->getSize();
 
-  // todo: slice texture if it is too large for TMEM
+  if (texture->getByteCount() > kTmemSize) {
+    if (texture->getHeight() <= 64) {
+      // sub textures from left to right
+      int sliceMaxWidth = kTmemSize / (texture->getBitsPerPixel() / 8) / texture->getHeight();
+      int sliceCount = (texture->getWidth() + sliceMaxWidth - 1) / sliceMaxWidth;
+
+      gpuTexture.subTextures.reserve(sliceCount);
+
+      for (int i = 0; i < sliceCount; ++i) {
+        gpuTexture.subTextures.push_back({
+          0,
+          Recti(
+            i * sliceMaxWidth, 0,
+            std::min(sliceMaxWidth, texture->getWidth() - i * sliceMaxWidth),
+            texture->getHeight()
+          )
+        });
+      }
+    } else if (texture->getWidth() <= 64) {
+      // sub textures from top to bottom
+      int sliceMaxHeight = kTmemSize / (texture->getBitsPerPixel() / 8) / texture->getWidth();
+      int sliceCount = (texture->getHeight() + sliceMaxHeight - 1) / sliceMaxHeight;
+
+      gpuTexture.subTextures.reserve(sliceCount);
+
+      for (int i = 0; i < sliceCount; ++i) {
+        gpuTexture.subTextures.push_back({
+          0,
+          Recti(
+            0, i * sliceMaxHeight, texture->getWidth(),
+            std::min(sliceMaxHeight, texture->getHeight() - i * sliceMaxHeight)
+          )
+        });
+      }
+    } else {
+      // grid of sub textures
+      int sliceMaxWidth = 64;
+      int sliceMaxHeight = kTmemSize / (texture->getBitsPerPixel() / 8) / sliceMaxWidth;
+      int sliceCountX = (texture->getWidth() + sliceMaxWidth - 1) / sliceMaxWidth;
+      int sliceCountY = (texture->getHeight() + sliceMaxHeight - 1) / sliceMaxHeight;
+
+      gpuTexture.subTextures.reserve(sliceCountX * sliceCountY);
+
+      for (int y = 0; y < sliceCountY; ++y) {
+        for (int x = 0; x < sliceCountX; ++x) {
+          gpuTexture.subTextures.push_back({
+            0,
+            Recti(
+              x * sliceMaxWidth, y * sliceMaxHeight,
+              std::min(sliceMaxWidth, texture->getWidth() - x * sliceMaxWidth),
+              std::min(sliceMaxHeight, texture->getHeight() - y * sliceMaxHeight)
+            )
+          });
+        }
+      }
+    }
+  }
 
   declareGpuTexture(slot, gpuTexture);
 
-  GLuint glTexture;
+  std::vector<GLuint> glTextures;
 
-  glGenTextures(1, &glTexture);
-  mTextureIdMapping.emplace(gpuTexture.id, glTexture);
-
-  GLenum inputFormat = GL_RGBA;
-  GLenum inputType = GL_UNSIGNED_SHORT_5_5_5_1_EXT;
-  GLenum internalFormat = GL_RGB5_A1;
-
-  if (texture->getBitsPerPixel() == 24) {
-    inputFormat = GL_RGB;
-    inputType = GL_UNSIGNED_BYTE;
-  } else if (texture->getBitsPerPixel() == 32) {
-    inputType = GL_UNSIGNED_INT_8_8_8_8_EXT;
-    internalFormat = GL_RGBA;
+  if (gpuTexture.subTextures.empty()) {
+    glTextures.push_back(0);
+  } else {
+    glTextures.resize(gpuTexture.subTextures.size(), 0);
   }
 
-  auto textureSize = texture->getSize();
+  glGenTextures(glTextures.size(), glTextures.data());
 
-  glBindTexture(GL_TEXTURE_2D, glTexture);
-  // note: on N64, a texture size that's not a power of 2, must be clamped
-  if (!Math::isPowerOfTwo(textureSize.width)) {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  if (gpuTexture.subTextures.empty()) {
+    mTextureIdMapping.emplace(gpuTexture.id, glTextures[0]);
+    uploadTextureData(glTextures[0], texture);
+  } else {
+    for (std::size_t i = 0; i < gpuTexture.subTextures.size(); ++i) {
+      auto& subTexture = gpuTexture.subTextures[i];
+      mTextureIdMapping.emplace(subTexture.id, glTextures[i]);
+
+      Texture croppedTexture =
+        texture->crop(Vector2i(subTexture.crop.width, subTexture.crop.height),
+                      Vector2i(subTexture.crop.x, subTexture.crop.y));
+
+      uploadTextureData(glTextures[i], &croppedTexture);
+    }
   }
-
-  if (!Math::isPowerOfTwo(textureSize.height)) {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  }
-
-  glTexImage2D(
-    GL_TEXTURE_2D, 0,                         /* mipmap level */
-    internalFormat,                           /* internal format */
-    texture->getWidth(), texture->getHeight(), 0, /* format (legacy) */
-    inputFormat,                              /* input format */
-    inputType, texture->getData()
-  );
-  glTexParameteri(
-    GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-    texture->isInterpolated() ? GL_LINEAR : GL_NEAREST
-  );
-  glTexParameteri(
-    GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-    texture->isInterpolated() ? GL_LINEAR : GL_NEAREST
-  );
 }
 
 void N64Renderer::renderTexture(

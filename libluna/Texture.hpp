@@ -105,14 +105,14 @@ namespace Luna {
      * If the given size exceeds the texture dimensions from offset, the cropped
      * texture may be smaller than the given size.
      */
-    Texture crop(Vector2i size, Vector2i offset = Vector2i(0, 0));
+    Texture crop(Vector2i size, Vector2i offset = Vector2i(0, 0)) const;
 
     /**
      * @brief Slice a texture into smaller textures.
      *
      * The slices are from left to right, then top to bottom.
      */
-    std::vector<Texture> slice(Vector2i maxSliceSize, Vector2i& sliceCount);
+    std::vector<Texture> slice(Vector2i maxSliceSize, Vector2i& sliceCount) const;
 
     int getByteCount() const {
       return getSize().width * getSize().height * (getBitsPerPixel() / 4) / 2;

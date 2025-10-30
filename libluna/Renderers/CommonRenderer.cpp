@@ -292,15 +292,34 @@ void CommonRenderer::render2d(
             return;
           }
 
-          RenderTextureInfo info;
           auto& gpuTexture = mGpuTextureSlotMapping.at(textureSlot);
 
-          info.gpuTexture = &gpuTexture;
-          info.textureId = gpuTexture.id;
-          info.size = gpuTexture.size;
-          info.position =
-            sprite.getPosition() - canvas->getCamera2d().getPosition();
-          renderTexture(canvas, &info);
+          if (gpuTexture.id > 0) {
+            RenderTextureInfo info;
+            info.gpuTexture = &gpuTexture;
+            info.textureId = gpuTexture.id;
+            info.size = gpuTexture.size;
+            info.position =
+              sprite.getPosition() - canvas->getCamera2d().getPosition();
+            renderTexture(canvas, &info);
+          } else if (!gpuTexture.subTextures.empty()) {
+            for (auto& subTexture : gpuTexture.subTextures) {
+              Vector2f offset{
+                static_cast<float>(subTexture.crop.x),
+                static_cast<float>(subTexture.crop.y)
+              };
+
+              RenderTextureInfo info;
+              info.gpuTexture = &gpuTexture;
+              info.gpuSubTexture = &subTexture;
+              info.textureId = subTexture.id;
+              // info.crop = subTexture.crop;
+              info.size = {subTexture.crop.width, subTexture.crop.height};
+              info.position =
+                offset + sprite.getPosition() - canvas->getCamera2d().getPosition();
+              renderTexture(canvas, &info);
+            }
+          }
         },
         [&](const Primitive& primitive) {
           if (!primitive.getShape() || !mKnownShapes.count(primitive.getShape())) {
