@@ -3,6 +3,7 @@
 #include <libluna/config.h>
 
 #include <list>
+#include <queue>
 
 #ifdef LUNA_AUDIO_SDL2
 #include <SDL2/SDL.h>

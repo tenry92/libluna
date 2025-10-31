@@ -156,8 +156,8 @@ void Application::mainLoop() {
     }
     mDebugMetrics->renderTicker.measure();
 
-    for (auto&& canvas : mCanvases) {
-      canvas.sync();
+    for (auto canvas : getOpenCanvases()) {
+      canvas->sync();
     }
 
     // logDebug("==============");
@@ -584,10 +584,11 @@ void Application::setAssetsPath(Filesystem::Path assetsPath) {
   mPathManager.setAssetsPath(assetsPath);
 }
 
-Canvas* Application::allocCanvas() {
-  logInfo("allocating canvas");
+Canvas* Application::createCanvas(int id) {
+  Canvas* canvas = &mCanvases[static_cast<std::size_t>(id)];
 
-  auto canvas = mCanvases.acquire();
+  canvas->close();
+  canvas->init();
 
   return canvas;
 }
@@ -595,8 +596,10 @@ Canvas* Application::allocCanvas() {
 std::list<Canvas*> Application::getOpenCanvases() {
   std::list<Canvas*> canvases;
 
-  for (auto&& canvas : mCanvases) {
-    canvases.emplace_back(&canvas);
+  for (std::size_t i = 0; i < sizeof(mCanvases) / sizeof(Canvas); ++i) {
+    if (!mCanvases[i].isClosed()) {
+      canvases.emplace_back(&mCanvases[i]);
+    }
   }
 
   return canvases;

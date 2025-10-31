@@ -26,7 +26,7 @@ namespace Luna {
 
   /**
    * @brief SDL renderer.
-   * 
+   *
    * @ingroup renderers
    */
   class SdlRenderer : public CommonRenderer {

@@ -308,14 +308,17 @@ bool Canvas::sendSdlEventToImmediateGui(const SDL_Event* event) {
 }
 #endif
 
-Canvas::Canvas() {
+Canvas::Canvas() = default;
+
+Canvas::~Canvas() { this->close(); }
+
+void Canvas::init() {
+  mClosed = false;
 #ifdef LUNA_THREADED_CANVAS
   mThread = std::thread(&Canvas::renderThread, this);
   this->sync();
 #endif
 }
-
-Canvas::~Canvas() { this->close(); }
 
 void Canvas::close() {
   mImmediateGuis.clear();

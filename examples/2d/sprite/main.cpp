@@ -22,7 +22,7 @@ class ExampleApp : public Application {
 
   protected:
   void init() override {
-    mCanvas = allocCanvas();
+    mCanvas = createCanvas();
     mCanvas->setDisplayMode({
       Vector2i{CANVAS_WIDTH, CANVAS_HEIGHT}, // resolution
       false,                                 // fullscreen

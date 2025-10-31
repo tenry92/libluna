@@ -6,7 +6,6 @@
 #include <functional>
 #include <list>
 #include <optional>
-#include <queue>
 #include <vector>
 
 #ifdef LUNA_WINDOW_SDL2
@@ -14,7 +13,6 @@
 #endif
 
 #include <libluna/Audio/AudioManager.hpp>
-#include <libluna/Audio/AudioNode.hpp>
 #include <libluna/Canvas.hpp>
 #include <libluna/Filesystem/Path.hpp>
 #include <libluna/InputDevice.hpp>
@@ -22,8 +20,6 @@
 #include <libluna/Internal/DebugMetrics.hpp>
 #include <libluna/IntervalManager.hpp>
 #include <libluna/PathManager.hpp>
-#include <libluna/Pool.hpp>
-#include <libluna/Sprite.hpp>
 #include <libluna/String.hpp>
 
 /**
@@ -187,12 +183,7 @@ namespace Luna {
 
     void setAssetsPath(Filesystem::Path assetsPath);
 
-    /**
-     * @brief Allocate a canvas.
-     *
-     * Use setDisplayMode() on the returned canvas to configure the window.
-     */
-    Canvas* allocCanvas();
+    Canvas* createCanvas(int id = 0);
 
     std::list<Canvas*> getOpenCanvases();
 
@@ -258,7 +249,7 @@ namespace Luna {
     bool hasCanvas();
 
     std::vector<String> mArgs;
-    Pool<Canvas, 4> mCanvases;
+    Canvas mCanvases[4];
     String mRaisedErrorMessage;
     IntervalManager mIntervalManager;
     Audio::AudioManager mAudioManager;

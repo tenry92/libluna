@@ -80,16 +80,18 @@ namespace Luna {
    * @ingroup canvas
    */
   class Canvas {
-    public:
-    /**
-     * @brief Create a canvas.
-     *
-     * Use setDisplayMode() to configure the window size and video driver.
-     */
+    private:
+    friend class Application;
+
     Canvas();
 
+    public:
     ~Canvas();
 
+    private:
+    void init();
+
+    public:
     void close();
 
     void setDisplayMode(DisplayMode mode);
@@ -167,7 +169,7 @@ namespace Luna {
     Camera3d mCamera3d;
     ColorRgb mBackgroundColor;
     std::map<std::string, float> mAxisValues;
-    bool mClosed{false};
+    bool mClosed{true};
 
     std::queue<std::shared_ptr<Command>> mCommandQueue;
 
