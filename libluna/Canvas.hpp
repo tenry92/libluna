@@ -86,6 +86,9 @@ namespace Luna {
     Canvas();
 
     public:
+    Canvas(const Canvas&) = delete;
+    Canvas& operator=(const Canvas&) = delete;
+
     ~Canvas();
 
     private:
