@@ -8,6 +8,9 @@
 #ifdef __SWITCH__
 #define CANVAS_WIDTH 1920
 #define CANVAS_HEIGHT 1080
+#elif defined(N64)
+#define CANVAS_WIDTH 320
+#define CANVAS_HEIGHT 240
 #else
 #define CANVAS_WIDTH 800
 #define CANVAS_HEIGHT 600
@@ -15,6 +18,8 @@
 
 using namespace std;
 using namespace Luna;
+
+const int kSpriteSize = 32;
 
 class ExampleApp : public Application {
   public:
@@ -28,7 +33,7 @@ class ExampleApp : public Application {
       false,                                 // fullscreen
       getDefaultVideoDriver()
     });
-    mCanvas->setBackgroundColor(ColorRgb{0.f, 0.f, 0.f});
+    mCanvas->setBackgroundColor(ColorRgb{0.f, 0.5f, 1.f});
 
     mCamera.setStage(&mStage);
     mCanvas->setCamera2d(mCamera);
@@ -44,48 +49,23 @@ class ExampleApp : public Application {
       mCanvas->uploadTexture(1, &mTexture24bpp);
       mCanvas->uploadTexture(2, &mTexture16bpp);
 
-      Sprite* sprite1 = mStage.allocSprite();
-      sprite1->setTexture(0);
-      sprite1->setPosition({64.f, 64.f});
+      mSprites[0] = mStage.allocSprite();
+      mSprites[0]->setTexture(0);
 
-      Sprite* sprite2 = mStage.allocSprite();
-      sprite2->setTexture(1);
-      sprite2->setPosition({128.f, 64.f});
+      mSprites[1] = mStage.allocSprite();
+      mSprites[1]->setTexture(1);
 
-      Sprite* sprite3 = mStage.allocSprite();
-      sprite3->setTexture(2);
-      sprite3->setPosition({192.f, 64.f});
+      mSprites[2] = mStage.allocSprite();
+      mSprites[2]->setTexture(2);
     }
 
-    ColorRgb baseColor;
-
-    switch (static_cast<int>(mTime) % 6) {
-      case 0:
-        baseColor = ColorRgb{1.0f, 0.f, 0.f};
-        break;
-      case 1:
-        baseColor = ColorRgb{1.0f, 1.f, 0.f};
-        break;
-      case 2:
-        baseColor = ColorRgb{0.0f, 1.f, 0.f};
-        break;
-      case 3:
-        baseColor = ColorRgb{0.0f, 1.f, 1.f};
-        break;
-      case 4:
-        baseColor = ColorRgb{0.0f, 0.f, 1.f};
-        break;
-      case 5:
-        baseColor = ColorRgb{1.0f, 0.f, 1.f};
-        break;
+    for (int i = 0; i < 3; i++) {
+      float angle = mTime + i * Luna::Math::kPi / 1.5f;
+      float radius = 50.f;
+      float x = CANVAS_WIDTH / 2.f + std::cos(angle) * radius - kSpriteSize / 2.f;
+      float y = CANVAS_HEIGHT / 2.f + std::sin(angle) * radius - kSpriteSize / 2.f;
+      mSprites[i]->setPosition({x, y});
     }
-
-    float lightness = std::sin(Math::kPi * std::fmod(mTime, 1.0f));
-
-    baseColor.red *= lightness;
-    baseColor.green *= lightness;
-    baseColor.blue *= lightness;
-    mCanvas->setBackgroundColor(baseColor);
   }
 
   private:
@@ -96,7 +76,7 @@ class ExampleApp : public Application {
   }
 
   void generateTexture32bpp() {
-    mTexture32bpp = Texture(32, Vector2i(32, 32));
+    mTexture32bpp = Texture(32, Vector2i(kSpriteSize, kSpriteSize));
 
     // Fill corners (8x8 pixels each)
     // Top left corner - red
@@ -168,7 +148,7 @@ class ExampleApp : public Application {
   }
 
   void generateTexture24bpp() {
-    mTexture24bpp = Texture(24, Vector2i(32, 32));
+    mTexture24bpp = Texture(24, Vector2i(kSpriteSize, kSpriteSize));
 
     // Fill corners (8x8 pixels each)
     // Top left corner - red
@@ -239,7 +219,7 @@ class ExampleApp : public Application {
   }
 
   void generateTexture16bpp() {
-    mTexture16bpp = Texture(16, Vector2i(32, 32));
+    mTexture16bpp = Texture(16, Vector2i(kSpriteSize, kSpriteSize));
 
     // Fill corners (8x8 pixels each)
     // Top left corner - red
@@ -315,6 +295,7 @@ class ExampleApp : public Application {
   Texture mTexture32bpp;
   Texture mTexture24bpp;
   Texture mTexture16bpp;
+  Sprite* mSprites[3]{nullptr};
   double mTime{0.f};
 };
 

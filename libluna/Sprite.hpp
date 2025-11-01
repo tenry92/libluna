@@ -1,11 +1,6 @@
 #pragma once
 
-#include <libluna/Color.hpp>
 #include <libluna/Drawable2d.hpp>
-#include <libluna/Texture.hpp>
-#include <libluna/Palette.hpp>
-#include <libluna/String.hpp>
-#include <libluna/Vector.hpp>
 
 namespace Luna {
   class Sprite;

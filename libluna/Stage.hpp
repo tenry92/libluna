@@ -52,8 +52,8 @@ namespace Luna {
    *
    * | Coordinate System | Origin | X-Axis | Y-Axis | Z-Axis | Unit | Image |
    * |-------------------|--------|--------|--------|--------|------|-------|
-   * | 2D                | Top-left corner | Right | Down | Higher values are drawn above lower values | Pixels | @image html coordinate-system-2d.svg "2D Coordinate System in libluna" |
-   * | 3D                | Center of the world | Right | Up | Backwards | Meters | @image html coordinate-system-3d.svg "3D Coordinate System in libluna" |
+   * | 2D                | Top-left corner | Right | Down | Higher values are drawn above lower values | Pixels | @image html coordinate-system-2d.svg "2D Coordinate System in libluna" width=256px |
+   * | 3D                | Center of the world | Right | Up | Backwards | Meters | @image html coordinate-system-3d.svg "3D Coordinate System in libluna" width=256px |
    *
    * A stage can be assigned to multiple canvases. For example, if each canvas
    * uses a different renderer, the same stage can be viewed and tested from
