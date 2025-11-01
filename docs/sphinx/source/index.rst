@@ -5,6 +5,8 @@ Luna Framework
    :maxdepth: 1
 
    installation
+   link-to-your-project
+   basic-concepts
    project-structure
    build-layout
    coding-guidelines
@@ -37,4 +39,4 @@ In order to build **libluna**, you need the following on your system:
 When compiling for a video game console, you only need the respective toolchain
 (devkitPro or libdragon) and CMake.
 
-See the `installation guide <installation.html>`_ for more information.
+See the :doc:`installation` for more information.

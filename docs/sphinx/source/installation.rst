@@ -1,11 +1,10 @@
 Installation
 ============
 
-The installation process involves:
-
-1. Installing system prerequisites and dependencies
-2. Configuring the build system with CMake
-3. Building and installing the library
+This document provides step-by-step instructions for installing libluna on your
+platform. If you do not wish to install libluna on your system, see
+:doc:`link-to-your-project` for guidance on using libluna
+directly from the source.
 
 Prerequisites for Linux
 -----------------------
@@ -215,19 +214,6 @@ prefix, such as ``/opt/libdragon/mips64-elf``.
 
 For devkitPro targets, it defaults to the respective sub-directory in the
 devkitPro installation, such as ``/opt/devkitpro/portlibs/nds``.
-
-**Using libluna in Your Project**
-
-After installation, you can use libluna in your CMake projects:
-
-.. code-block:: cmake
-
-   find_package(luna REQUIRED)
-   target_link_libraries(your_target luna::luna)
-
-.. note::
-   Make sure ``CMAKE_PREFIX_PATH`` includes your installation directory if you
-   installed to a custom location.
 
 Generating Documentation
 ------------------------

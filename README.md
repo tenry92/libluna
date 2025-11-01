@@ -26,7 +26,7 @@ class ExampleApp : public Luna::Application {
   void init() override {
     // Allocate a canvas and set the display mode.
     // On desktop, this creates a window with the desired dimensions.
-    mCanvas = allocCanvas();
+    mCanvas = createCanvas();
     mCanvas->setDisplayMode({
       Luna::Vector2i{800, 600}, // resolution
       false,                    // fullscreen

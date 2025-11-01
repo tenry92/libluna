@@ -7,19 +7,21 @@ The Luna framework (libluna) project is composed of the following parts:
 
    libluna/
    ├── CMakeLists.txt - Instructions for building the library and dependencies using CMake
+   ├── cmake/ - Additional CMake scripts
    ├── Doxyfile - Instructions for generating Doxygen documentation
    ├── docs/
-   │   ├── doxygen/
-   │   │   └── html/ - Generated Doxygen documentation
-   │   │       ├── index.html
-   │   │       ├── classes.html
-   │   │       ├── files.html
-   │   │       └── [other Doxygen generated files]
+   │   ├── generated/
+   │   │   ├── api/ - Generated Doxygen documentation
+   │   │   │   └── html/
+   │   │   │       ├── index.html
+   │   │   │       ├── classes.html
+   │   │   │       ├── files.html
+   │   │   │       └── [other Doxygen generated files]
+   │   │   └── guide/ - Generated Sphinx documentation
+   │   │       └── html/
+   │   │           ├── index.html
+   │   │           └── [other Sphinx generated files]
    │   └── sphinx/
-   │       ├── build/
-   │       │   └── html/ - Generated Sphinx documentation
-   │       │       ├── index.html
-   │       │       └── [other Sphinx generated files]
    │       └── source/ - Sphinx documentation source
    │           ├── conf.py
    │           ├── index.rst
@@ -29,9 +31,9 @@ The Luna framework (libluna) project is composed of the following parts:
    │   ├── *.hpp
    │   ├── *.cpp
    │   └── *.test.cpp
+   ├── examples/ - Example programs
+   ├── assets/ - Assets for the example programs
    ├── libs/ - Third-party dependencies
-   ├── scripts/
-   ├── tests/ - Integration tests
    └── tools/ - Source for related tools
 
 The source code is structured following the
