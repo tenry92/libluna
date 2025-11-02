@@ -128,13 +128,16 @@ set(LUNA_PUBLIC_HEADERS
   libluna/Camera2d.hpp
   libluna/Camera3d.hpp
   libluna/Canvas.hpp
+  libluna/Clock.hpp
   libluna/Color.hpp
   libluna/Command.hpp
   libluna/Console.hpp
   libluna/Drawable2d.hpp
+  libluna/Endian.hpp
   libluna/Filesystem/FileReader.hpp
   libluna/Filesystem/Path.hpp
   libluna/Font.hpp
+  libluna/IdAllocator.hpp
   libluna/ImmediateGui.hpp
   libluna/Input/GenericGamepad.hpp
   libluna/Input/GenericGamepadDevice.hpp
@@ -171,13 +174,16 @@ set(LUNA_PUBLIC_HEADERS
   libluna/Internal/GraphicsMetrics.hpp
   libluna/Internal/Keyboard.hpp
   libluna/IntervalManager.hpp
+  libluna/Light.hpp
   libluna/Logger.hpp
   libluna/Material.hpp
+  libluna/Math.hpp
   libluna/Matrix.hpp
   libluna/MemoryReader.hpp
   libluna/Mesh.hpp
   libluna/MeshBuilder.hpp
   libluna/Model.hpp
+  libluna/overloaded.hpp
   libluna/Palette.hpp
   libluna/PathManager.hpp
   libluna/Performance/Ticker.hpp
@@ -189,6 +195,9 @@ set(LUNA_PUBLIC_HEADERS
   libluna/ResourceReader.hpp
   libluna/Shape.hpp
   libluna/Sound.hpp
+  libluna/SoundBuffer.hpp
+  libluna/SoundBufferSource.hpp
+  libluna/SoundSource.hpp
   libluna/Sprite.hpp
   libluna/Stage.hpp
   libluna/String.hpp
