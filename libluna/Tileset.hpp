@@ -2,7 +2,6 @@
 
 #include <vector>
 
-#include <libluna/Sprite.hpp>
 #include <libluna/Vector.hpp>
 
 namespace Luna {

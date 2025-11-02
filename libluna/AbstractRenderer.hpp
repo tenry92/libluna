@@ -2,7 +2,6 @@
 
 #include <libluna/Internal/GraphicsMetrics.hpp>
 #include <libluna/Texture.hpp>
-#include <libluna/Vector.hpp>
 
 namespace Luna {
   class Canvas;

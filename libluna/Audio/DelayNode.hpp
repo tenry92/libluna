@@ -1,6 +1,8 @@
 #pragma once
 
-#include <libluna/Audio/GainNode.hpp>
+#include <vector>
+
+#include <libluna/Audio/AudioNode.hpp>
 
 namespace Luna::Audio {
   class DelayNode : public AudioNode {

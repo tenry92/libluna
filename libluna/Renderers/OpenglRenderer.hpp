@@ -8,8 +8,6 @@
 
 #include <libluna/GL/MeshBuffer.hpp>
 #include <libluna/GL/Shader.hpp>
-#include <libluna/GL/ShaderLib.hpp>
-#include <libluna/GL/SpriteBuffer.hpp>
 #include <libluna/GL/Uniform.hpp>
 #include <libluna/GL/common.hpp>
 

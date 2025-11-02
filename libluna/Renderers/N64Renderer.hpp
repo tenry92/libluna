@@ -7,7 +7,6 @@
 #include <GL/gl_integration.h>
 #include <GL/glu.h>
 
-#include <libluna/Math.hpp>
 #include <libluna/Renderers/CommonRenderer.hpp>
 
 namespace Luna {

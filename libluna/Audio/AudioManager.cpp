@@ -17,7 +17,6 @@
 #include <libluna/Audio/AudioManager.hpp>
 #include <libluna/Command.hpp>
 #include <libluna/Logger.hpp>
-#include <libluna/ResourceReader.hpp>
 
 using namespace Luna;
 using namespace Luna::Audio;

@@ -1,8 +1,7 @@
 #pragma once
 
+#include <list>
 #include <memory>
-
-#include <libluna/String.hpp>
 
 namespace Luna::Audio {
   class AudioNode;

@@ -5,7 +5,6 @@
 #include <list>
 #include <map>
 #include <queue>
-#include <set>
 #include <string>
 
 #if defined(__linux__) || defined(_WIN32)

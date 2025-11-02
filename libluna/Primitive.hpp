@@ -2,7 +2,6 @@
 
 #include <libluna/Drawable2d.hpp>
 #include <libluna/Shape.hpp>
-#include <libluna/Vector.hpp>
 
 namespace Luna {
   /**

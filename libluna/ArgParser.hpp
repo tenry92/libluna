@@ -3,8 +3,6 @@
 #include <memory>
 #include <vector>
 
-#include <libluna/String.hpp>
-
 namespace Luna {
   /**
    * @brief Helper for parsing command-line arguments.

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <forward_list>
+#include <map>
 #include <set>
 #include <unordered_map>
 #include <variant>
@@ -13,8 +14,7 @@
 #include <libluna/Mesh.hpp>
 #include <libluna/Rect.hpp>
 #include <libluna/Shape.hpp>
-#include <libluna/Stage.hpp>
-#include <libluna/Texture.hpp>
+#include <libluna/Vector.hpp>
 
 namespace Luna {
   /**
