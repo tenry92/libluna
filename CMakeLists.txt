@@ -129,6 +129,7 @@ set(LUNA_PUBLIC_HEADERS
   libluna/Camera3d.hpp
   libluna/Canvas.hpp
   libluna/Color.hpp
+  libluna/Command.hpp
   libluna/Console.hpp
   libluna/Drawable2d.hpp
   libluna/Filesystem/FileReader.hpp
