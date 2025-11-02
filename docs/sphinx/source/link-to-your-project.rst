@@ -9,10 +9,10 @@ you can link to it in your CMake project as follows:
 
 .. code-block:: cmake
 
-   find_package(libluna REQUIRED)
+   find_package(luna REQUIRED)
 
    add_executable(your_app src/main.cpp)
-   target_link_libraries(your_app PRIVATE libluna::libluna)
+   target_link_libraries(your_app PRIVATE luna::luna)
 
 .. note::
    Make sure ``CMAKE_PREFIX_PATH`` includes your installation directory if you
@@ -29,7 +29,7 @@ can do so by adding the libluna source directory to your CMake project:
    add_subdirectory(path/to/libluna)
 
    add_executable(your_app src/main.cpp)
-   target_link_libraries(your_app PRIVATE libluna::libluna)
+   target_link_libraries(your_app PRIVATE luna::luna)
 
 Or using CMake's FetchContent module:
 
