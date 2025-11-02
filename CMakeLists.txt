@@ -147,6 +147,11 @@ set(LUNA_PUBLIC_HEADERS
   libluna/InputDevice.hpp
   libluna/InputManager.hpp
   libluna/InputStream.hpp
+  libluna/Internal/AudioMetrics.hpp
+  libluna/Internal/DebugGui.hpp
+  libluna/Internal/DebugMetrics.hpp
+  libluna/Internal/GraphicsMetrics.hpp
+  libluna/Internal/Keyboard.hpp
   libluna/IntervalManager.hpp
   libluna/Logger.hpp
   libluna/Material.hpp
