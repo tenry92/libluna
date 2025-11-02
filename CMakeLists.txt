@@ -135,15 +135,32 @@ set(LUNA_PUBLIC_HEADERS
   libluna/Filesystem/Path.hpp
   libluna/Font.hpp
   libluna/ImmediateGui.hpp
+  libluna/Input/GenericGamepad.hpp
   libluna/Input/GenericGamepadDevice.hpp
+  libluna/Input/Keyboard.hpp
   libluna/Input/KeyboardDevice.hpp
+  libluna/Input/KeyboardState.hpp
+  libluna/Input/N3dsGamepad.hpp
   libluna/Input/N3dsGamepadDevice.hpp
+  libluna/Input/N3dsGamepadState.hpp
+  libluna/Input/N64Gamepad.hpp
   libluna/Input/N64GamepadDevice.hpp
+  libluna/Input/N64GamepadState.hpp
+  libluna/Input/NdsGamepad.hpp
   libluna/Input/NdsGamepadDevice.hpp
+  libluna/Input/NdsGamepadState.hpp
+  libluna/Input/Ps5Gamepad.hpp
   libluna/Input/Ps5GamepadDevice.hpp
+  libluna/Input/Ps5GamepadState.hpp
+  libluna/Input/SwitchProGamepad.hpp
   libluna/Input/SwitchProGamepadDevice.hpp
+  libluna/Input/SwitchProGamepadState.hpp
+  libluna/Input/Xbox360Gamepad.hpp
   libluna/Input/Xbox360GamepadDevice.hpp
+  libluna/Input/Xbox360GamepadState.hpp
+  libluna/Input/XboxOneGamepad.hpp
   libluna/Input/XboxOneGamepadDevice.hpp
+  libluna/Input/XboxOneGamepadState.hpp
   libluna/InputDevice.hpp
   libluna/InputManager.hpp
   libluna/InputStream.hpp
