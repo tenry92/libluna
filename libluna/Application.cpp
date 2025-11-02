@@ -23,7 +23,7 @@
 #endif
 
 #ifdef LUNA_IMGUI
-#include <imgui/imgui.h>
+#include <libluna/imgui/imgui.h>
 #include <libluna/Internal/DebugGui.hpp>
 #endif
 

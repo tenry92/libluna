@@ -45,7 +45,7 @@ add_dependencies(luna shaders)
 target_compile_features(luna PUBLIC cxx_std_17)
 target_include_directories(luna PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libs> # for imgui
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libluna/imgui>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}> # for generated files like config.h
 
   $<INSTALL_INTERFACE:include>
@@ -138,6 +138,8 @@ set(LUNA_PUBLIC_HEADERS
   libluna/Filesystem/Path.hpp
   libluna/Font.hpp
   libluna/IdAllocator.hpp
+  libluna/imgui/imconfig.h
+  libluna/imgui/imgui.h
   libluna/ImmediateGui.hpp
   libluna/Input/GenericGamepad.hpp
   libluna/Input/GenericGamepadDevice.hpp
@@ -303,7 +305,6 @@ foreach(header ${LUNA_PUBLIC_HEADERS})
 endforeach()
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libluna/config.h DESTINATION "include/libluna")
-install(FILES libs/imgui/imconfig.h libs/imgui/imgui.h DESTINATION "include/libluna/imgui")
 
 include(CMakePackageConfigHelpers)
 

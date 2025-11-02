@@ -13,9 +13,9 @@
 #endif
 
 #ifdef LUNA_IMGUI
-#include <imgui/backends/imgui_impl_sdl2.h>
-#include <imgui/backends/imgui_impl_sdlrenderer2.h>
-#include <imgui/imgui.h>
+#include <libluna/imgui/backends/imgui_impl_sdl2.h>
+#include <libluna/imgui/backends/imgui_impl_sdlrenderer2.h>
+#include <libluna/imgui/imgui.h>
 #endif // IMGUI
 
 #include <libluna/Application.hpp>

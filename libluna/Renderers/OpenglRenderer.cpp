@@ -21,16 +21,16 @@
 #endif
 
 #ifdef LUNA_IMGUI
-#include <imgui/backends/imgui_impl_opengl3.h>
-#include <imgui/imgui.h>
+#include <libluna/imgui/backends/imgui_impl_opengl3.h>
+#include <libluna/imgui/imgui.h>
 
 #ifdef LUNA_WINDOW_SDL2
-#include <imgui/backends/imgui_impl_sdl2.h>
-#include <imgui/backends/imgui_impl_sdlrenderer2.h>
+#include <libluna/imgui/backends/imgui_impl_sdl2.h>
+#include <libluna/imgui/backends/imgui_impl_sdlrenderer2.h>
 #endif
 
 #ifdef LUNA_WINDOW_GLFW
-#include <imgui/backends/imgui_impl_glfw.h>
+#include <libluna/imgui/backends/imgui_impl_glfw.h>
 #endif
 #endif // IMGUI
 

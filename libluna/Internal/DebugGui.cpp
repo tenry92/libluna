@@ -1,7 +1,7 @@
 #include <libluna/config.h>
 
 #ifdef LUNA_IMGUI
-#include <imgui/imgui.h>
+#include <libluna/imgui/imgui.h>
 #endif
 
 #include <chrono>

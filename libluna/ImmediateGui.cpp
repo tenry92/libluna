@@ -4,11 +4,11 @@
 #include <libluna/Logger.hpp>
 
 #ifdef LUNA_IMGUI
-#include <imgui/imgui.h>
+#include <libluna/imgui/imgui.h>
 
 #ifdef LUNA_WINDOW_SDL2
-#include <imgui/backends/imgui_impl_sdl2.h>
-#include <imgui/backends/imgui_impl_sdlrenderer2.h>
+#include <libluna/imgui/backends/imgui_impl_sdl2.h>
+#include <libluna/imgui/backends/imgui_impl_sdlrenderer2.h>
 #endif
 #endif // IMGUI
 

@@ -33,39 +33,39 @@ endif()
 
 if(LUNA_IMGUI)
   add_library(imgui_base OBJECT
-    libs/imgui/imgui_demo.cpp
-    libs/imgui/imgui_draw.cpp
-    libs/imgui/imgui_tables.cpp
-    libs/imgui/imgui_widgets.cpp
-    libs/imgui/imgui.cpp
+    libluna/imgui/imgui_demo.cpp
+    libluna/imgui/imgui_draw.cpp
+    libluna/imgui/imgui_tables.cpp
+    libluna/imgui/imgui_widgets.cpp
+    libluna/imgui/imgui.cpp
   )
-  target_include_directories(imgui_base PRIVATE libs/imgui)
+  target_include_directories(imgui_base PRIVATE libluna/imgui)
   target_sources(luna PRIVATE $<TARGET_OBJECTS:imgui_base>)
-  target_include_directories(luna PRIVATE libs/imgui)
+  target_include_directories(luna PRIVATE libluna/imgui)
 
   if(LUNA_RENDERER_OPENGL)
     add_library(imgui_opengl OBJECT
-      libs/imgui/backends/imgui_impl_opengl3.cpp
+      libluna/imgui/backends/imgui_impl_opengl3.cpp
     )
-    target_include_directories(imgui_opengl PRIVATE libs/imgui)
+    target_include_directories(imgui_opengl PRIVATE libluna/imgui)
     target_sources(luna PRIVATE $<TARGET_OBJECTS:imgui_opengl>)
   endif()
 
   if(LUNA_WINDOW_SDL2)
     add_library(imgui_sdl2 OBJECT
-      libs/imgui/backends/imgui_impl_sdl2.cpp
-      libs/imgui/backends/imgui_impl_sdlrenderer2.cpp
+      libluna/imgui/backends/imgui_impl_sdl2.cpp
+      libluna/imgui/backends/imgui_impl_sdlrenderer2.cpp
     )
-    target_include_directories(imgui_sdl2 PRIVATE libs/imgui)
+    target_include_directories(imgui_sdl2 PRIVATE libluna/imgui)
     target_link_libraries(imgui_sdl2 PRIVATE SDL2::SDL2)
     target_sources(luna PRIVATE $<TARGET_OBJECTS:imgui_sdl2>)
   endif()
 
   if(LUNA_WINDOW_GLFW)
     add_library(imgui_glfw OBJECT
-      libs/imgui/backends/imgui_impl_glfw.cpp
+      libluna/imgui/backends/imgui_impl_glfw.cpp
     )
-    target_include_directories(imgui_glfw PRIVATE libs/imgui)
+    target_include_directories(imgui_glfw PRIVATE libluna/imgui)
     target_link_libraries(imgui_glfw PRIVATE glfw)
     target_sources(luna PRIVATE $<TARGET_OBJECTS:imgui_glfw>)
   endif()
