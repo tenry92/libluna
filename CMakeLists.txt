@@ -58,115 +58,147 @@ endif()
 ################################################################################
 # SOURCES
 
-# public modules (their .hpp files will be installed)
-set(PUBLIC_MODULES
-  AbstractRenderer
-  Application
-  Audio/AudioManager
-  Audio/AudioNode
-  Audio/DelayNode
-  Audio/GainNode
-  Audio/OscillatorNode
-  ButtonEvent
-  Camera2d
-  Camera3d
-  Canvas
-  Console
-  Drawable2d
-  Filesystem/FileReader
-  Filesystem/Path
-  Font
-  Texture
-  ImmediateGui
-  Input/GenericGamepadDevice
-  Input/KeyboardDevice
-  Input/N3dsGamepadDevice
-  Input/N64GamepadDevice
-  Input/NdsGamepadDevice
-  Input/Ps5GamepadDevice
-  Input/SwitchProGamepadDevice
-  Input/Xbox360GamepadDevice
-  Input/XboxOneGamepadDevice
-  InputDevice
-  InputManager
-  IntervalManager
-  Logger
-  Material
-  Matrix
-  MemoryReader
-  Mesh
-  MeshBuilder
-  Model
-  PathManager
-  Performance/Ticker
-  Performance/Timer
-  Platform
-  Primitive
-  Rect
-  ResourceReader
-  Shape
-  Sound
-  Sprite
-  Stage
-  String
-  System
-  Text
-  Tilemap
-  Tileset
-  Vector
+set(LUNA_SOURCES
+  libluna/AbstractRenderer.cpp
+  libluna/Application.cpp
+  libluna/Audio/AudioManager.cpp
+  libluna/Audio/AudioNode.cpp
+  libluna/Audio/DelayNode.cpp
+  libluna/Audio/GainNode.cpp
+  libluna/Audio/OscillatorNode.cpp
+  libluna/ButtonEvent.cpp
+  libluna/Camera2d.cpp
+  libluna/Camera3d.cpp
+  libluna/Canvas.cpp
+  libluna/Console.cpp
+  libluna/Drawable2d.cpp
+  libluna/Filesystem/FileReader.cpp
+  libluna/Filesystem/Path.cpp
+  libluna/Font.cpp
+  libluna/Texture.cpp
+  libluna/ImmediateGui.cpp
+  libluna/Input/GenericGamepadDevice.cpp
+  libluna/Input/KeyboardDevice.cpp
+  libluna/Input/N3dsGamepadDevice.cpp
+  libluna/Input/N64GamepadDevice.cpp
+  libluna/Input/NdsGamepadDevice.cpp
+  libluna/Input/Ps5GamepadDevice.cpp
+  libluna/Input/SwitchProGamepadDevice.cpp
+  libluna/Input/Xbox360GamepadDevice.cpp
+  libluna/Input/XboxOneGamepadDevice.cpp
+  libluna/InputDevice.cpp
+  libluna/InputManager.cpp
+  libluna/IntervalManager.cpp
+  libluna/Logger.cpp
+  libluna/Material.cpp
+  libluna/Matrix.cpp
+  libluna/MemoryReader.cpp
+  libluna/Mesh.cpp
+  libluna/MeshBuilder.cpp
+  libluna/Model.cpp
+  libluna/PathManager.cpp
+  libluna/Performance/Ticker.cpp
+  libluna/Performance/Timer.cpp
+  libluna/Platform.cpp
+  libluna/Primitive.cpp
+  libluna/Rect.cpp
+  libluna/Renderers/CommonRenderer.cpp
+  libluna/ResourceReader.cpp
+  libluna/Shape.cpp
+  libluna/Sound.cpp
+  libluna/Sprite.cpp
+  libluna/Stage.cpp
+  libluna/String.cpp
+  libluna/System.cpp
+  libluna/Text.cpp
+  libluna/Tilemap.cpp
+  libluna/Tileset.cpp
+  libluna/Vector.cpp
 )
 
-set(PRIVATE_MODULES
-  Renderers/CommonRenderer
+set(LUNA_PUBLIC_HEADERS
+  libluna/AbstractRenderer.hpp
+  libluna/Application.hpp
+  libluna/Audio/AudioManager.hpp
+  libluna/Audio/AudioNode.hpp
+  libluna/Audio/DelayNode.hpp
+  libluna/Audio/GainNode.hpp
+  libluna/Audio/OscillatorNode.hpp
+  libluna/ButtonEvent.hpp
+  libluna/Camera2d.hpp
+  libluna/Camera3d.hpp
+  libluna/Canvas.hpp
+  libluna/Color.hpp
+  libluna/Console.hpp
+  libluna/Drawable2d.hpp
+  libluna/Filesystem/FileReader.hpp
+  libluna/Filesystem/Path.hpp
+  libluna/Font.hpp
+  libluna/ImmediateGui.hpp
+  libluna/Input/GenericGamepadDevice.hpp
+  libluna/Input/KeyboardDevice.hpp
+  libluna/Input/N3dsGamepadDevice.hpp
+  libluna/Input/N64GamepadDevice.hpp
+  libluna/Input/NdsGamepadDevice.hpp
+  libluna/Input/Ps5GamepadDevice.hpp
+  libluna/Input/SwitchProGamepadDevice.hpp
+  libluna/Input/Xbox360GamepadDevice.hpp
+  libluna/Input/XboxOneGamepadDevice.hpp
+  libluna/InputDevice.hpp
+  libluna/InputManager.hpp
+  libluna/InputStream.hpp
+  libluna/IntervalManager.hpp
+  libluna/Logger.hpp
+  libluna/Material.hpp
+  libluna/Matrix.hpp
+  libluna/MemoryReader.hpp
+  libluna/Mesh.hpp
+  libluna/MeshBuilder.hpp
+  libluna/Model.hpp
+  libluna/Palette.hpp
+  libluna/PathManager.hpp
+  libluna/Performance/Ticker.hpp
+  libluna/Performance/Timer.hpp
+  libluna/Platform.hpp
+  libluna/Pool.hpp
+  libluna/Primitive.hpp
+  libluna/Rect.hpp
+  libluna/ResourceReader.hpp
+  libluna/Shape.hpp
+  libluna/Sound.hpp
+  libluna/Sprite.hpp
+  libluna/Stage.hpp
+  libluna/String.hpp
+  libluna/System.hpp
+  libluna/Text.hpp
+  libluna/Texture.hpp
+  libluna/Tilemap.hpp
+  libluna/Tileset.hpp
+  libluna/utf8.h
+  libluna/Vector.hpp
 )
 
-# private modules (their .hpp files will NOT be installed)
 if(LUNA_IMGUI)
-  list(APPEND PRIVATE_MODULES
-    Internal/DebugGui
-  )
+  list(APPEND LUNA_SOURCES libluna/Internal/DebugGui.cpp)
 endif()
 
 if(LUNA_RENDERER_SDL2)
-  list(APPEND PRIVATE_MODULES Renderers/SdlRenderer)
+  list(APPEND LUNA_SOURCES libluna/Renderers/SdlRenderer.cpp)
 endif()
 
 if(LUNA_RENDERER_OPENGL)
-  list(APPEND PRIVATE_MODULES Renderers/OpenglRenderer)
+  list(APPEND LUNA_SOURCES libluna/Renderers/OpenglRenderer.cpp)
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "NintendoDS")
-  list(APPEND PRIVATE_MODULES Renderers/NdsRenderer)
+  list(APPEND LUNA_SOURCES libluna/Renderers/NdsRenderer.cpp)
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
-  list(APPEND PRIVATE_MODULES Renderers/N64Renderer)
+  list(APPEND LUNA_SOURCES libluna/Renderers/N64Renderer.cpp)
 endif()
 
-# X => libluna/X.cpp
-set(SOURCE_FILES ${PUBLIC_MODULES} ${PRIVATE_MODULES})
-list(TRANSFORM SOURCE_FILES PREPEND "libluna/")
-list(TRANSFORM SOURCE_FILES APPEND ".cpp")
-
-# X => libluna/X.hpp
-set(PUBLIC_HEADERS ${PUBLIC_MODULES})
-list(TRANSFORM PUBLIC_HEADERS PREPEND "libluna/")
-list(TRANSFORM PUBLIC_HEADERS APPEND ".hpp")
-
-target_sources(luna PRIVATE
-  ${SOURCE_FILES}
-)
-
-list(APPEND PUBLIC_HEADERS
-  libluna/Color.hpp
-  libluna/InputStream.hpp
-  libluna/Palette.hpp
-  libluna/Pool.hpp
-  libluna/utf8.h
-  ${CMAKE_CURRENT_BINARY_DIR}/libluna/config.h
-  libs/imgui/imgui.h
-  libs/imgui/imconfig.h
-)
+target_sources(luna PRIVATE ${LUNA_SOURCES})
 
 # enable warnings and debug
 if(MSVC)
@@ -233,7 +265,13 @@ install(TARGETS luna
   PUBLIC_HEADER DESTINATION include/libluna
 )
 
-install(FILES ${PUBLIC_HEADERS} DESTINATION include/libluna)
+foreach(header ${LUNA_PUBLIC_HEADERS})
+  get_filename_component(header_dir ${header} DIRECTORY)
+  install(FILES ${header} DESTINATION "include/${header_dir}")
+endforeach()
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libluna/config.h DESTINATION "include/libluna")
+install(FILES libs/imgui/imconfig.h libs/imgui/imgui.h DESTINATION "include/libluna/imgui")
 
 include(CMakePackageConfigHelpers)
 
