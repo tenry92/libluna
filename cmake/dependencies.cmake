@@ -5,7 +5,7 @@ if(LUNA_USE_STD_THREAD)
   target_link_libraries(luna PUBLIC Threads::Threads)
 endif()
 
-if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
+if(LUNA_GLM)
   find_package(glm REQUIRED)
   target_link_libraries(luna PUBLIC glm::glm)
 endif()

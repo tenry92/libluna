@@ -21,5 +21,6 @@ option(LUNA_AUDIO_SDL2 "Enable audio via SDL2" ${LUNA_SUPPORTS_SDL2})
 
 option(LUNA_IMGUI "Enable ImGui" ${SUPPORTS_IMGUI})
 option(LUNA_STD_THREAD "Enable threading using std::thread" ${SUPPORTS_STD_THREAD})
+option(LUNA_GLM "Enable GLM support" ${SUPPORTS_GLM})
 
 configure_file(libluna/config.h.in libluna/config.h)

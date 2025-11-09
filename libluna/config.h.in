@@ -100,3 +100,4 @@
 
 #cmakedefine LUNA_IMGUI
 #cmakedefine LUNA_STD_THREAD
+#cmakedefine LUNA_GLM

@@ -1,12 +1,16 @@
 #pragma once
 
+#include <libluna/config.h>
+
 #include <array>
 #include <cmath>
 #include <iostream>
 
+#ifdef LUNA_GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#endif
 
 #include <libluna/Matrix.hpp>
 #include <libluna/Vector.hpp>
@@ -35,6 +39,10 @@ namespace Luna {
     perspective(float fov, float aspect, float near, float far);
 
     private:
+#ifdef LUNA_GLM
     glm::mat4 mMatrix;
+#else
+    std::array<std::array<float, 4>, 4> mMatrix{};
+#endif
   };
 } // namespace Luna

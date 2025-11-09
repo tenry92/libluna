@@ -132,6 +132,10 @@ void Application::mainLoop() {
     }
 #endif
 #ifdef __NDS__
+    if (!pmMainLoop()) {
+      break;
+    }
+
     swiWaitForVBlank();
 #endif
 

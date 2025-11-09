@@ -1,6 +1,10 @@
 #include <libluna/Console.hpp>
 #include <libluna/System.hpp>
 
+#ifdef __NDS__
+#include <nds.h>
+#endif
+
 using namespace Luna;
 
 int main(int argc, char** argv) {
@@ -33,6 +37,12 @@ int main(int argc, char** argv) {
 #ifdef N64
   while (true) {
     Console::update();
+  }
+#endif
+
+#ifdef __NDS__
+  while (pmMainLoop()) {
+    swiWaitForVBlank();
   }
 #endif
 
