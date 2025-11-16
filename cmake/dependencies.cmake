@@ -1,5 +1,3 @@
-# add_subdirectory(libs/assimp-5.4.2)
-
 if(LUNA_USE_STD_THREAD)
   find_package(Threads REQUIRED)
   target_link_libraries(luna PUBLIC Threads::Threads)
@@ -71,22 +69,9 @@ if(LUNA_IMGUI)
   endif()
 endif()
 
-# target_include_directories(luna PUBLIC
-#   /usr/include/opus
-# )
-
 if(CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
   target_link_libraries(luna PRIVATE EGL glapi drm_nouveau)
 endif()
-
-if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
-  target_include_directories(luna PRIVATE ${LIBDRAGON_INCLUDE_DIR})
-  # target_link_libraries(luna PRIVATE ${LIBDRAGON_LIB})
-endif()
-
-target_include_directories(luna PUBLIC
-  /usr/local/include
-)
 
 if(CMAKE_SYSTEM_NAME IN_LIST DESKTOP)
   add_subdirectory(libs/glad-4.3)
