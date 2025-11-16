@@ -107,7 +107,7 @@
  *     });
  *
  *     mCamera.setStage(&mStage);
- *     mCanvas->setCamera2d(mCamera);
+ *     mCanvas->setCamera2d(&mCamera);
  *
  *     // define a sprite
  *     Luna::Sprite* sprite = mStage.allocSprite();

@@ -239,7 +239,7 @@ Vector2i CommonRenderer::getTextureSize(int slot) const {
 }
 
 void CommonRenderer::renderWorld(Canvas* canvas) {
-  auto stage = canvas->getCamera3d().getStage();
+  auto stage = canvas->getCamera3d()->getStage();
 
   if (!stage) {
     return;
@@ -271,7 +271,7 @@ void CommonRenderer::renderWorld(Canvas* canvas) {
 void CommonRenderer::render2d(
   Canvas* canvas, [[maybe_unused]] Vector2i renderSize
 ) {
-  auto stage = canvas->getCamera2d().getStage();
+  auto stage = canvas->getCamera2d()->getStage();
 
   if (!stage) {
     return;
@@ -300,7 +300,7 @@ void CommonRenderer::render2d(
             info.textureId = gpuTexture.id;
             info.size = gpuTexture.size;
             info.position =
-              sprite.getPosition() - canvas->getCamera2d().getPosition();
+              sprite.getPosition() - canvas->getCamera2d()->getPosition();
             renderTexture(canvas, &info);
           } else if (!gpuTexture.subTextures.empty()) {
             for (auto& subTexture : gpuTexture.subTextures) {
@@ -316,7 +316,7 @@ void CommonRenderer::render2d(
               // info.crop = subTexture.crop;
               info.size = {subTexture.crop.width, subTexture.crop.height};
               info.position =
-                offset + sprite.getPosition() - canvas->getCamera2d().getPosition();
+                offset + sprite.getPosition() - canvas->getCamera2d()->getPosition();
               renderTexture(canvas, &info);
             }
           }

@@ -42,7 +42,7 @@ class ExampleApp : public Luna::Application {
     mCamera.setStage(&mStage);
 
     // Assign the 2D camera this canvas shall use for rendering.
-    mCanvas->setCamera2d(mCamera);
+    mCanvas->setCamera2d(&mCamera);
   }
 
   void update(float deltaTime) override {

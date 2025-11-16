@@ -400,7 +400,7 @@ void OpenglRenderer::renderMesh(
   glEnable(GL_CULL_FACE);
   glEnable(GL_MULTISAMPLE);
 
-  auto ambientLight = canvas->getCamera3d().getStage()->getAmbientLight();
+  auto ambientLight = canvas->getCamera3d()->getStage()->getAmbientLight();
   mUniforms.ambientLightColor = mModelShader.getUniform("uAmbientLight.color");
   mUniforms.ambientLightIntensity =
     mModelShader.getUniform("uAmbientLight.intensity");
@@ -412,7 +412,7 @@ void OpenglRenderer::renderMesh(
   mUniforms.pointLightsPosition =
     mModelShader.getUniform("uPointLights[{}].position", 1);
 
-  for (auto&& pointLight : canvas->getCamera3d().getStage()->getPointLights()) {
+  for (auto&& pointLight : canvas->getCamera3d()->getStage()->getPointLights()) {
     mUniforms.pointLightsColor[0] = pointLight->color;
     mUniforms.pointLightsPosition[0] = pointLight->position;
   }
@@ -444,11 +444,11 @@ void OpenglRenderer::renderMesh(
   auto camera = canvas->getCamera3d();
 
   mUniforms.transformView = mModelShader.getUniform("uTransform.view");
-  mUniforms.transformView = camera.getViewMatrix();
+  mUniforms.transformView = camera->getViewMatrix();
 
   mUniforms.transformProjection =
     mModelShader.getUniform("uTransform.projection");
-  mUniforms.transformProjection = camera.getProjectionMatrix(
+  mUniforms.transformProjection = camera->getProjectionMatrix(
     static_cast<float>(getCurrentRenderSize().width) /
     static_cast<float>(getCurrentRenderSize().height)
   );

@@ -40,7 +40,7 @@ A minimal program would look like this:
         mCanvas->setBackgroundColor(Luna::ColorRgb{0.f, 0.5f, 1.f});
 
         mCamera.setStage(&mStage);
-        mCanvas->setCamera2d(mCamera);
+        mCanvas->setCamera2d(&mCamera);
       }
 
       void update(float deltaTime) override {

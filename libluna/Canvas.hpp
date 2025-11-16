@@ -102,11 +102,11 @@ namespace Luna {
     void detachImmediateGui(ImmediateGui* gui);
     std::list<ImmediateGui*> getImmediateGuis() const;
 
-    void setCamera2d(const Camera2d& camera);
-    Camera2d getCamera2d() const;
+    void setCamera2d(Camera2d* camera);
+    Camera2d* getCamera2d() const;
 
-    void setCamera3d(const Camera3d& camera);
-    Camera3d getCamera3d() const;
+    void setCamera3d(Camera3d* camera);
+    Camera3d* getCamera3d() const;
 
     void setBackgroundColor(ColorRgb color);
     ColorRgb getBackgroundColor() const;
@@ -167,8 +167,8 @@ namespace Luna {
     Vector2i mInternalResolution;
     std::unique_ptr<AbstractRenderer> mRenderer;
     std::list<std::unique_ptr<ImmediateGui>> mImmediateGuis;
-    Camera2d mCamera2d;
-    Camera3d mCamera3d;
+    Camera2d* mCamera2d{nullptr};
+    Camera3d* mCamera3d{nullptr};
     ColorRgb mBackgroundColor;
     std::map<std::string, float> mAxisValues;
     bool mClosed{true};

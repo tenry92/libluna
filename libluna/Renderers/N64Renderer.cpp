@@ -368,7 +368,7 @@ void N64Renderer::renderMesh(
   auto listId = mMeshIdMapping.at(info->meshId);
   auto texture = mTextureIdMapping.at(info->diffuseTextureId);
 
-  auto ambientLight = canvas->getCamera3d().getStage()->getAmbientLight();
+  auto ambientLight = canvas->getCamera3d()->getStage()->getAmbientLight();
   float ambient[4] = {
     ambientLight.color.red, ambientLight.color.green, ambientLight.color.blue,
     ambientLight.color.alpha};
@@ -377,7 +377,7 @@ void N64Renderer::renderMesh(
 
   int lightId = 0;
 
-  for (auto&& pointLight : canvas->getCamera3d().getStage()->getPointLights()) {
+  for (auto&& pointLight : canvas->getCamera3d()->getStage()->getPointLights()) {
     glEnable(GL_LIGHT0 + lightId);
     float pos[4] = {
       pointLight->position.x, pointLight->position.y, pointLight->position.z,
@@ -405,8 +405,8 @@ void N64Renderer::renderMesh(
   auto camera = canvas->getCamera3d();
 
   glMatrixMode(GL_PROJECTION);
-  glLoadMatrixf((camera.getProjectionMatrix(4.0f / 3.0f) *
-                 camera.getViewMatrix())
+  glLoadMatrixf((camera->getProjectionMatrix(4.0f / 3.0f) *
+                 camera->getViewMatrix())
                   .getValuePointer());
 
   glMatrixMode(GL_MODELVIEW);

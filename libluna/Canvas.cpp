@@ -513,13 +513,13 @@ std::list<ImmediateGui*> Canvas::getImmediateGuis() const {
   return result;
 }
 
-void Canvas::setCamera2d(const Camera2d& camera) { mCamera2d = camera; }
+void Canvas::setCamera2d(Camera2d* camera) { mCamera2d = camera; }
 
-Camera2d Canvas::getCamera2d() const { return mCamera2d; }
+Camera2d* Canvas::getCamera2d() const { return mCamera2d; }
 
-void Canvas::setCamera3d(const Camera3d& camera) { mCamera3d = camera; }
+void Canvas::setCamera3d(Camera3d* camera) { mCamera3d = camera; }
 
-Camera3d Canvas::getCamera3d() const { return mCamera3d; }
+Camera3d* Canvas::getCamera3d() const { return mCamera3d; }
 
 void Canvas::setBackgroundColor(ColorRgb color) { mBackgroundColor = color; }
 
