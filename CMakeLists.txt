@@ -319,9 +319,23 @@ install(EXPORT lunaTargets
   DESTINATION lib/cmake/luna
 )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lunaConfig.cmake
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/lunaConfig.cmake
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/LunaUtils.cmake
   DESTINATION lib/cmake/luna
 )
+
+if(MINGW)
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/MinGW.cmake
+    DESTINATION lib/cmake/luna
+  )
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Nintendo64.cmake
+    DESTINATION lib/cmake/luna
+  )
+endif()
 
 # configure_file(luna.pc.in luna.pc @ONLY)
 

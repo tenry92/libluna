@@ -24,7 +24,7 @@
       "generator": "Unix Makefiles",
       "hidden": false,
       "binaryDir": "${sourceDir}/build/mingw",
-      "toolchainFile": "${sourceDir}/cmake/MinGW.cmake",
+      "toolchainFile": "${sourceDir}/cmake/MinGW-Toolchain.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
@@ -81,7 +81,7 @@
       "generator": "Unix Makefiles",
       "hidden": false,
       "binaryDir": "${sourceDir}/build/n64",
-      "toolchainFile": "${sourceDir}/cmake/Nintendo64.cmake",
+      "toolchainFile": "${sourceDir}/cmake/Nintendo64-Toolchain.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }

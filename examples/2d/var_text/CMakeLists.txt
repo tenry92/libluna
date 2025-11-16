@@ -1,4 +1,4 @@
-include(${PROJECT_SOURCE_DIR}/cmake/utils.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/LunaUtils.cmake)
 
 add_custom_target(copy_assets_var_text ALL
   COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/data/assets

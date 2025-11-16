@@ -1,4 +1,4 @@
-include(cmake/utils.cmake)
+include(cmake/LunaUtils.cmake)
 
 enable_testing()
 

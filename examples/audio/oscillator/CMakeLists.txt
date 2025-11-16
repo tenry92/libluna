@@ -1,4 +1,4 @@
-include(${PROJECT_SOURCE_DIR}/cmake/utils.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/LunaUtils.cmake)
 
 add_executable(oscillator main.cpp)
 add_dependencies(oscillator luna)
