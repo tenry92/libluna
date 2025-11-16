@@ -326,13 +326,13 @@ install(FILES
 )
 
 if(MINGW)
-  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/MinGW.cmake
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/MinGW-Toolchain.cmake
     DESTINATION lib/cmake/luna
   )
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Nintendo64")
-  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Nintendo64.cmake
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Nintendo64-Toolchain.cmake
     DESTINATION lib/cmake/luna
   )
 endif()
