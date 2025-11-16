@@ -236,19 +236,21 @@ target_sources(luna PRIVATE ${LUNA_SOURCES})
 
 # enable warnings and debug
 if(MSVC)
-  target_compile_options(luna PRIVATE /W4 /WX)
-
-  set(CMAKE_CXX_FLAGS_DEBUG "/Zi /Od")
-  set(CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG")
-  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/O2 /Zi /DNDEBUG")
-  set(CMAKE_CXX_FLAGS_MINSIZEREL "/O1 /DNDEBUG")
+  target_compile_options(luna PRIVATE
+    /W4 /WX
+    $<$<CONFIG:DEBUG>:/Zi /Od>
+    $<$<CONFIG:RELEASE>:/O2 /DNDEBUG>
+    $<$<CONFIG:RELWITHDEBINFO>:/O2 /Zi /DNDEBUG>
+    $<$<CONFIG:MINSIZEREL>:/O1 /DNDEBUG>
+  )
 else()
-  target_compile_options(luna PRIVATE -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wpedantic -Werror -Wnull-dereference -Wconversion)
-
-  set(CMAKE_CXX_FLAGS_DEBUG "-g")
-  set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
-  set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os")
+  target_compile_options(luna PRIVATE
+    -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wpedantic -Werror -Wnull-dereference -Wconversion
+    $<$<CONFIG:DEBUG>:-g -O0>
+    $<$<CONFIG:RELEASE>:-O3 -DNDEBUG>
+    $<$<CONFIG:RELWITHDEBINFO>:-O2 -g -DNDEBUG>
+    $<$<CONFIG:MINSIZEREL>:-Os -DNDEBUG>
+  )
 endif()
 
 ################################################################################
@@ -271,12 +273,12 @@ set(SHADER_SOURCE_FILES
 
 foreach(SHADER_SOURCE_FILE ${SHADER_SOURCE_FILES})
   get_filename_component(SHADER_NAME ${SHADER_SOURCE_FILE} NAME)
-  set(SHADER_HEADER_FILE "${PROJECT_BINARY_DIR}/libluna/GL/shaders/${SHADER_SOURCE_FILE}.h")
+  set(SHADER_HEADER_FILE "${CMAKE_CURRENT_BINARY_DIR}/libluna/GL/shaders/${SHADER_SOURCE_FILE}.h")
   add_custom_command(
     OUTPUT ${SHADER_HEADER_FILE}
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/libluna/GL/shaders
-    COMMAND ${XXD} -n ${SHADER_SOURCE_FILE} -i ${PROJECT_SOURCE_DIR}/libluna/GL/shaders/${SHADER_SOURCE_FILE} ${SHADER_HEADER_FILE}
-    DEPENDS xxd-native ${PROJECT_SOURCE_DIR}/libluna/GL/shaders/${SHADER_SOURCE_FILE}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/libluna/GL/shaders
+    COMMAND ${XXD} -n ${SHADER_SOURCE_FILE} -i ${CMAKE_CURRENT_SOURCE_DIR}/libluna/GL/shaders/${SHADER_SOURCE_FILE} ${SHADER_HEADER_FILE}
+    DEPENDS xxd-native ${CMAKE_CURRENT_SOURCE_DIR}/libluna/GL/shaders/${SHADER_SOURCE_FILE}
     COMMENT "Converting ${SHADER_SOURCE_FILE} to C header"
   )
   list(APPEND SHADER_HEADER_FILES "${SHADER_HEADER_FILE}")
