@@ -135,7 +135,7 @@ file and specify the target architecture:
 
    mkdir build
    cd build
-   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../cmake/Nintendo64.cmake ..
+   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../cmake/Nintendo64-Toolchain.cmake ..
 
 **Advanced Configuration Options**
 
@@ -210,7 +210,7 @@ To install libluna to your system:
 - **Windows:** ``C:\Program Files\libluna`` (or ``C:\Program Files (x86)\libluna`` for 32-bit)
 
 For Nintendo 64, defaults to ``/usr/local``. It's recommended to set a custom
-prefix, such as ``/opt/libdragon/mips64-elf``.
+prefix, such as ``/opt/libdragon``.
 
 For devkitPro targets, it defaults to the respective sub-directory in the
 devkitPro installation, such as ``/opt/devkitpro/portlibs/nds``.

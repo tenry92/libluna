@@ -47,3 +47,14 @@ Or using CMake's FetchContent module:
 
    add_executable(your_app src/main.cpp)
    target_link_libraries(your_app PRIVATE libluna::libluna)
+
+Troubleshooting
+---------------
+
+**"fatal error: stdlib.h: No such file or directory"**
+
+If the compiler cannot find some standard C or C++ headers, although the
+development environment is fully installed, it's likely that you installed
+libluna in the toolchain's sysroot (e.g. ``/opt/libdragon/mips64-elf``). Make
+sure to install libluna outside of the toolchain's sysroot, for example in
+``/opt/libdragon``.
